@@ -8,7 +8,7 @@ import com.bcd.base.support_parser.impl.gb32960.processor.VehicleCommonDataField
 
 import java.util.Date;
 
-public class VehicleRealData implements PacketData{
+public class VehicleRunData implements PacketData{
     //数据采集时间
     @F_date(mode = DateMode.Bytes_yyMMddHHmmss, baseYear = 2000)
     public Date collectTime;

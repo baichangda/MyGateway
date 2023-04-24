@@ -31,7 +31,7 @@ public class PacketDataFieldBuilder extends FieldBuilder {
         JavassistUtil.append(body, "}\n");
 
         JavassistUtil.append(body, "case 2:{\n");
-        JavassistUtil.append(body, "{}= {}.parse({}.class, {},{});\n", varNameField, parserClassName, VehicleRealData.class.getName(), FieldBuilder.varNameByteBuf, parseContextVarName);
+        JavassistUtil.append(body, "{}= {}.parse({}.class, {},{});\n", varNameField, parserClassName, VehicleRunData.class.getName(), FieldBuilder.varNameByteBuf, parseContextVarName);
         JavassistUtil.append(body, "break;\n");
         JavassistUtil.append(body, "}\n");
 

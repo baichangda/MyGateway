@@ -19,7 +19,7 @@ public class Packet {
     public byte[] header;
     //命令标识 2-3
     @F_integer(len = 1)
-    public short flag;
+    public PacketFlag flag;
     //应答标识 3-4
     @F_integer(len = 1)
     public short replyFlag;
@@ -49,7 +49,7 @@ public class Packet {
     public static void main(String[] args) {
         Packet packet= new Packet();
         packet.vin="abcd";
-        packet.flag=1;
+        packet.flag=PacketFlag.vehicle_login_data;
         packet.header=new byte[]{0x23,0x23};
         final VehicleLoginData vehicleLoginData = new VehicleLoginData();
         vehicleLoginData.collectTime=new Date();
