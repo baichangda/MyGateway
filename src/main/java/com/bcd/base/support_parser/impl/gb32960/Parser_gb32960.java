@@ -2,6 +2,7 @@ package com.bcd.base.support_parser.impl.gb32960;
 
 import com.bcd.base.support_parser.Parser;
 import com.bcd.base.support_parser.impl.gb32960.data.Packet;
+import com.bcd.base.support_parser.impl.gb32960.data.PacketFlag;
 import com.bcd.base.support_parser.util.PerformanceUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
@@ -48,7 +49,7 @@ public class Parser_gb32960{
             byteBuf.readBytes(header);
             packet.header = header;
 
-            packet.flag = byteBuf.readUnsignedByte();
+            packet.flag = PacketFlag.fromInteger(byteBuf.readUnsignedByte());
 
             packet.replyFlag = byteBuf.readUnsignedByte();
 
