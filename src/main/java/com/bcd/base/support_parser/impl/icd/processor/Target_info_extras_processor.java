@@ -1,0 +1,43 @@
+package com.bcd.base.support_parser.impl.icd.processor;
+
+import com.bcd.base.support_parser.Parser;
+import com.bcd.base.support_parser.exception.BaseRuntimeException;
+import com.bcd.base.support_parser.impl.icd.data.*;
+import com.bcd.base.support_parser.processor.ProcessContext;
+import com.bcd.base.support_parser.processor.Processor;
+import io.netty.buffer.ByteBuf;
+
+public class Target_info_extras_processor implements Processor<Target_info_extras> {
+    @Override
+    public Target_info_extras process(ByteBuf data, ProcessContext parentContext) {
+        TargetClass targetClass;
+        if (parentContext.instance instanceof Target_info target_info) {
+            targetClass = target_info.clazz;
+        } else if (parentContext.instance instanceof Event_target event_target) {
+            targetClass = event_target.targetClass;
+        } else {
+            throw BaseRuntimeException.getException("parentContext.instance[{}] not support", parentContext.instance.getClass());
+        }
+        if(targetClass==null){
+            return null;
+        }
+        final Target_info_extras extras;
+        switch (targetClass) {
+            case person -> {
+                extras = Parser.parse(Target_info_extras_person.class, data, parentContext);
+            }
+            case car -> {
+                extras = Parser.parse(Target_info_extras_car.class, data, parentContext);
+            }
+            default -> {
+                throw BaseRuntimeException.getException("sensor_type[{}] not support", targetClass);
+            }
+        }
+        return extras;
+    }
+
+    @Override
+    public void deProcess(ByteBuf data, ProcessContext parentContext, Target_info_extras instance) {
+        Parser.deParse(instance, data, parentContext);
+    }
+}

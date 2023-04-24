@@ -1,0 +1,37 @@
+package com.bcd.base.support_parser.builder;
+
+import com.bcd.base.support_parser.Parser;
+import com.bcd.base.support_parser.util.JavassistUtil;
+
+import java.lang.reflect.Field;
+
+public class FieldBuilder__F_bean extends FieldBuilder{
+    @Override
+    public void buildParse(BuilderContext context) {
+        final StringBuilder body = context.body;
+        final String varNameField = JavassistUtil.getFieldVarName(context);
+        final String fieldTypeClassName = context.field.getType().getName();
+        final String parserClassName = Parser.class.getName();
+        JavassistUtil.append(body,"{}.{}=({}){}.parse({}.class,{},{});\n",
+                FieldBuilder.varNameInstance,
+                context.field.getName(),
+                fieldTypeClassName,
+                parserClassName,
+                fieldTypeClassName,
+                FieldBuilder.varNameByteBuf,
+                context.getProcessContextVarName());
+    }
+
+    @Override
+    public void buildDeParse(BuilderContext context) {
+        final StringBuilder body = context.body;
+        final Field field = context.field;
+        final String fieldName = field.getName();
+        final String parserClassName = Parser.class.getName();
+        JavassistUtil.append(body,"{}.deParse({},{},{});\n",
+                parserClassName,
+                FieldBuilder.varNameInstance +"."+ fieldName,
+                FieldBuilder.varNameByteBuf,
+                context.getProcessContextVarName());
+    }
+}

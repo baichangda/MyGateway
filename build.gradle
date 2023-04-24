@@ -1,0 +1,95 @@
+buildscript {
+    ext {
+        aliyunPublic = 'https://maven.aliyun.com/repository/public/'
+    }
+
+    repositories {
+        mavenLocal()
+        maven { url "${aliyunPublic}" }
+        mavenCentral()
+    }
+}
+
+plugins {
+    id 'java-library'
+    id 'java'
+    id 'idea'
+    id "io.spring.dependency-management" version "1.1.0"
+    id 'org.springframework.boot' version "+"
+}
+
+group 'com.bcd'
+version '6.0-SNAPSHOT'
+
+sourceCompatibility = 17
+
+repositories {
+    mavenLocal()
+    maven { url "${aliyunPublic}" }
+    mavenCentral()
+}
+
+//下载源码和文档
+//gradle cleanIdea idea
+idea {
+    module {
+        downloadSources = true
+        downloadJavadoc = true
+    }
+}
+
+configurations.all {
+    //去除springboot默认的logback
+    exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+    exclude module: 'logback-classic'
+    exclude module: 'logback-core'
+
+    //指定快照jar的更新策略
+    resolutionStrategy {
+        //缓存依赖时间、0代表不缓存
+        cacheChangingModulesFor 0, 'seconds'
+    }
+}
+
+dependencies {
+    // https://mvnrepository.com/artifact/org.projectlombok/lombok
+    compileOnly group: 'org.projectlombok', name: 'lombok', version: "+"
+    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: "+"
+
+    // https://mvnrepository.com/artifact/com.google.guava/guava
+    implementation group: 'com.google.guava', name: 'guava', version: "+"
+
+    //springboot支持
+    implementation("org.springframework.boot:spring-boot-starter")
+    implementation("org.springframework.boot:spring-boot-configuration-processor")
+
+    //springboot log4j2支持
+    implementation('org.springframework.boot:spring-boot-starter-log4j2')
+
+    //springboot redis支持
+    //lettuce异步客户端(默认使用lettuce)
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
+
+    //springboot mongodb支持
+    implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
+    //spring kafka支持
+    implementation group: 'org.springframework.kafka', name: 'spring-kafka', version: "+"
+
+    // https://mvnrepository.com/artifact/io.netty/netty-all
+    implementation group: 'io.netty', name: 'netty-all', version: "4.+"
+
+    // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: "+"
+
+    // https://mvnrepository.com/artifact/org.javassist/javassist
+    implementation group: 'org.javassist', name: 'javassist', version: "+"
+
+    // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-test
+    testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
+}
+
+//生成jar时打包源码
+task sourceJar(type: Jar) {
+    from sourceSets.main.java.srcDirs
+    archiveClassifier= "sources"
+}
