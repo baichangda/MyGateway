@@ -42,7 +42,7 @@ public class Save_gb32960 implements ApplicationListener<ContextRefreshedEvent> 
                 if (curTs - prevTs > 1000) {
                     try {
                         if (!cache.isEmpty()) {
-                            mongoTemplate.insertAll(cache);
+                            Helper_gb32960.saveBatch(cache);
                         }
                     }catch (Exception ex){
                         logger.error("error",ex);
