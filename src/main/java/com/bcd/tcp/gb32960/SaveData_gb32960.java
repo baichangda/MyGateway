@@ -53,14 +53,14 @@ public class SaveData_gb32960 {
         return Hashing.md5().hashString(vin, StandardCharsets.UTF_8).toString().substring(0, 4)
                 + Strings.padEnd(vin, 20, '#')
                 + Strings.padStart(Integer.toHexString(flag.type), 2, '0')
-                + "99999999999999999";
+                + "99999999999999";
     }
 
     public static String toId_min(String vin, PacketFlag flag) {
         return Hashing.md5().hashString(vin, StandardCharsets.UTF_8).toString().substring(0, 4)
                 + Strings.padEnd(vin, 20, '#')
                 + Strings.padStart(Integer.toHexString(flag.type), 2, '0')
-                + "00000000000000000";
+                + "00000000000000";
     }
 
 
