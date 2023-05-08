@@ -27,19 +27,19 @@ import java.util.stream.Collectors;
  * 1、没有被{@link #annoSet}中注解标注的字段
  * 2、static或者final修饰的字段
  * 3、非public字段
- *
+ * <p>
  * 工作原理:
  * 使用javassist框架配合自定义注解、生成一套解析代码
- *
+ * <p>
  * 解析调用入口:
  * {@link #parse(Class, ByteBuf, ProcessContext)}
- *
+ * <p>
  * 反解析调用入口:
  * {@link #deParse(Object, ByteBuf, ProcessContext)}
- *
+ * <p>
  * 性能表现:
  * 由于是字节码增强技术、和手动编写代码解析效率一样
- *
+ * <p>
  * 可配置方法
  * {@link #enableGenerateClassFile()}
  * {@link #enablePrintBuildLog()}
@@ -106,7 +106,6 @@ public class Parser {
      * 是否打印javassist生成class的过程日志
      */
     private static boolean printBuildLog = false;
-
 
 
     public interface LogCollector_parse {
@@ -184,7 +183,7 @@ public class Parser {
 
     /**
      * 配置包级别的{@link ByteOrder}定义
-     *
+     * <p>
      * 用于该包下所有带如下注解的属性覆盖
      * {@link F_float_ieee754#order()}
      * {@link F_float_ieee754_array#order()}
@@ -193,7 +192,7 @@ public class Parser {
      * {@link F_integer#order()}
      * {@link F_integer_array#order()}
      * {@link F_date#order()}
-     *
+     * <p>
      * 可以配置重复的包、优先使用前缀匹配更多的规则
      * 例如有如下目录、目录下都有class
      * com.bcd、com.bcd.test1、com.bcd.test2、com.bcd.test3、
@@ -205,12 +204,16 @@ public class Parser {
      * com.bcd、com.bcd.test3 会使用规则1
      * com.bcd.test1 会使用规则2
      * com.bcd.test2 会使用规则3
-     *
+     * <p>
      * 注意:
      * 优先级说明
      * 1、字段注解{@link ByteOrder}!={@link ByteOrder#Default}、此时注解的非默认值
      * 2、{@link #append(ByteOrder, String)}!={@link ByteOrder#Default}、此时采用包级别的配置值
      * 3、此时为{@link ByteOrder#BigEndian}、此时默认采用大端模式
+     * <p>
+     * 注意:
+     * 如果一个bean在多套协议中被复用、且需要在不同的协议中表现不同的{@link ByteOrder}
+     * 则此bean不能复用、需要重新定义一个、因为针对一个bean只会生成一个processor、且存储在{@link #beanClass_to_processor}
      *
      * @param order
      * @param classPrefix
@@ -485,7 +488,6 @@ public class Parser {
             }
         }
     }
-
 
 
     private static Class buildClass(Class clazz) throws CannotCompileException, NotFoundException, IOException {
