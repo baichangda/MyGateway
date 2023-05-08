@@ -2,6 +2,7 @@ package com.bcd.base.support_parser.builder;
 
 import com.bcd.base.support_parser.anno.F_date;
 import com.bcd.base.support_parser.util.JavassistUtil;
+import io.netty.buffer.ByteBuf;
 
 import java.lang.reflect.Field;
 import java.time.Instant;
@@ -32,9 +33,10 @@ public class FieldBuilder__F_date extends FieldBuilder {
                         , FieldBuilder.varNameByteBuf, FieldBuilder.varNameByteBuf, varNameZoneId);
             }
             case Bytes_yyyyMMddHHmmss -> {
-                JavassistUtil.append(body, "final long {}={}.of({}.readUnsignedByte(),{}.readByte(),{}.readByte(),{}.readByte(),{}.readByte(),{}.readByte(),0,{}).toInstant().toEpochMilli();\n",
+                final String readFuncName = bigEndian ? "readUnsignedShort" : "readUnsignedShortLE";
+                JavassistUtil.append(body, "final long {}={}.of({}.{}(),{}.readByte(),{}.readByte(),{}.readByte(),{}.readByte(),{}.readByte(),0,{}).toInstant().toEpochMilli();\n",
                         varNameLongField, zoneDateTimeClassName
-                        , FieldBuilder.varNameByteBuf, FieldBuilder.varNameByteBuf, FieldBuilder.varNameByteBuf, FieldBuilder.varNameByteBuf
+                        , FieldBuilder.varNameByteBuf, readFuncName, FieldBuilder.varNameByteBuf, FieldBuilder.varNameByteBuf, FieldBuilder.varNameByteBuf
                         , FieldBuilder.varNameByteBuf, FieldBuilder.varNameByteBuf, varNameZoneId);
             }
             case Uint64_millisecond -> {
@@ -104,7 +106,7 @@ public class FieldBuilder__F_date extends FieldBuilder {
         } else if (String.class.isAssignableFrom(fieldTypeClass)) {
             final String varNameStringZoneId = JavassistUtil.defineClassVar(context, ZoneId.class, "{}.of(\"{}\")", ZoneId.class.getName(), anno.stringZoneId());
             final String dateTimeFormatterVarName = JavassistUtil.defineClassVar(context, DateTimeFormatter.class, "{}.ofPattern(\"{}\").withZone({})", DateTimeFormatter.class.getName(), anno.stringFormat(), varNameStringZoneId);
-            JavassistUtil.append(body, "final long {}={}.parse({},{}).toInstant().toEpochMilli();\n", varNameLongField,zoneDateTimeClassName, valCode, dateTimeFormatterVarName);
+            JavassistUtil.append(body, "final long {}={}.parse({},{}).toInstant().toEpochMilli();\n", varNameLongField, zoneDateTimeClassName, valCode, dateTimeFormatterVarName);
         } else {
             JavassistUtil.notSupport_fieldType(field, F_date.class);
         }
