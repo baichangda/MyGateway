@@ -1,4 +1,4 @@
-package com.bcd.tcp.icd;
+package com.bcd.tcp;
 
 import com.bcd.base.exception.BaseRuntimeException;
 import io.netty.buffer.ByteBuf;
