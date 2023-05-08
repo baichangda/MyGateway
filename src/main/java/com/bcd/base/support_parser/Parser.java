@@ -203,14 +203,14 @@ public class Parser {
      * 3、{@link ByteOrder#BigEndian} -> com.bcd.test2
      * 此时
      * com.bcd、com.bcd.test3 会使用规则1
-     * com.bcd.test1 会使用规则1
-     * com.bcd.test2 会使用规则1
+     * com.bcd.test1 会使用规则2
+     * com.bcd.test2 会使用规则3
      *
      * 注意:
      * 优先级说明
-     * 1、字段注解{@link ByteOrder}!={@link ByteOrder#Default}
-     * 2、{@link #append(ByteOrder, String)}!={@link ByteOrder#Default}
-     * 3、此时为{@link ByteOrder#BigEndian}
+     * 1、字段注解{@link ByteOrder}!={@link ByteOrder#Default}、此时注解的非默认值
+     * 2、{@link #append(ByteOrder, String)}!={@link ByteOrder#Default}、此时采用包级别的配置值
+     * 3、此时为{@link ByteOrder#BigEndian}、此时默认采用大端模式
      *
      * @param order
      * @param classPrefix
