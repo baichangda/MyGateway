@@ -25,8 +25,8 @@ public class FieldBuilder__F_integer extends FieldBuilder {
                 throw BaseRuntimeException.getException("class[{}] field[{}] anno[{}] must have len or bit", field.getDeclaringClass().getName(), field.getName(), annoClass.getName());
             } else {
                 final int bit = anno.bit();
-                if (bit < 1 || bit > 32) {
-                    throw BaseRuntimeException.getException("class[{}] field[{}] anno[{}] bit must in range [1,32]", field.getDeclaringClass().getName(), field.getName(), annoClass.getName());
+                if (bit < 1 || bit > 64) {
+                    throw BaseRuntimeException.getException("class[{}] field[{}] anno[{}] bit[{}] must in range [1,64]", field.getDeclaringClass().getName(), field.getName(), annoClass.getName(),bit);
                 }
                 final Map<String, int[]> fieldNameToBitInfo = context.fieldNameToBitInfo;
                 String varNameBitBytes = context.varNameBitBytes;
@@ -165,8 +165,8 @@ public class FieldBuilder__F_integer extends FieldBuilder {
                 throw BaseRuntimeException.getException("class[{}] field[{}] anno[{}] must have len or bit", field.getDeclaringClass().getName(), fieldName, annoClass.getName());
             } else {
                 final int bit = anno.bit();
-                if (bit < 1 || bit > 32) {
-                    throw BaseRuntimeException.getException("class[{}] field[{}] anno[{}] bit must in range [1,32]", field.getDeclaringClass().getName(), fieldName, annoClass.getName());
+                if (bit < 1 || bit > 64) {
+                    throw BaseRuntimeException.getException("class[{}] field[{}] anno[{}] bit[{}] must in range [1,64]", field.getDeclaringClass().getName(), field.getName(), annoClass.getName(),bit);
                 }
                 final Map<String, int[]> fieldNameToBitInfo = context.fieldNameToBitInfo;
                 String varNameBitBytes = context.varNameBitBytes;

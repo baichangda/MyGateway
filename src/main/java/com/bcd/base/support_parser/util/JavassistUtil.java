@@ -129,7 +129,7 @@ public class JavassistUtil {
         append(context.body, "{}.getBytes({},{});\n", FieldBuilder.varNameByteBuf, fieldByteBufReaderIndexVarName, fieldLogBytesVarName);
         append(context.body, "{}.logCollector_parse.collect_field({}.class,\"{}\",{},{},\"{}\");\n",
                 Parser.class.getName(),
-                context.field.getDeclaringClass().getName(),
+                context.clazz.getName(),
                 context.field.getName(),
                 fieldLogBytesVarName,
                 boxing(FieldBuilder.varNameInstance + "." + context.field.getName(), context.field.getType()),
@@ -148,7 +148,7 @@ public class JavassistUtil {
         append(context.body, "{}.getBytes({},{});\n", FieldBuilder.varNameByteBuf, fieldByteBufWriterIndexVarName, fieldLogBytesVarName);
         append(context.body, "{}.logCollector_deParse.collect_field({}.class,\"{}\",{},{},\"{}\");\n",
                 Parser.class.getName(),
-                context.field.getDeclaringClass().getName(),
+                context.clazz.getName(),
                 context.field.getName(),
                 boxing(FieldBuilder.varNameInstance + "." + context.field.getName(), context.field.getType()),
                 fieldLogBytesVarName,

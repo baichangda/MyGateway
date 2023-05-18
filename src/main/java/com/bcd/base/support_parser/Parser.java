@@ -23,10 +23,13 @@ import java.util.stream.Collectors;
 /**
  * 解析器
  * 配合注解完成解析工作
+ * 会扫描当前类和其父类的所有字段
  * 会忽视如下字段
  * 1、没有被{@link #annoSet}中注解标注的字段
  * 2、static或者final修饰的字段
  * 3、非public字段
+ * 解析字段的顺序为 父类字段在子类之前
+ *
  * <p>
  * 工作原理:
  * 使用javassist框架配合自定义注解、生成一套解析代码
@@ -256,15 +259,19 @@ public class Parser {
                 tempList.add(ints);
                 fieldNameToBitInfo.put(field.getName(), ints);
                 bitSum += f_integer.bit();
-                continue;
+                if (!f_integer.bitEnd() && bitSum % 8 != 0) {
+                    continue;
+                }
             }
             final F_float_integer f_floatInteger = field.getAnnotation(F_float_integer.class);
             if (f_floatInteger != null && f_floatInteger.bit() > 0) {
                 final int[] ints = new int[]{bitSum, 0, 0};
                 tempList.add(ints);
                 fieldNameToBitInfo.put(field.getName(), ints);
-                bitSum += f_floatInteger.len();
-                continue;
+                bitSum += f_floatInteger.bit();
+                if (!f_floatInteger.bitEnd() && bitSum % 8 != 0) {
+                    continue;
+                }
             }
             if (!tempList.isEmpty()) {
                 final int byteLen = bitSum / 8 + (bitSum % 8 == 0 ? 0 : 1);
@@ -275,6 +282,15 @@ public class Parser {
                 tempList.clear();
                 bitSum = 0;
             }
+        }
+        if (!tempList.isEmpty()) {
+            final int byteLen = bitSum / 8 + (bitSum % 8 == 0 ? 0 : 1);
+            tempList.get(tempList.size() - 1)[1] = 1;
+            for (int[] ints : tempList) {
+                ints[2] = byteLen;
+            }
+            tempList.clear();
+            bitSum = 0;
         }
         return fieldNameToBitInfo;
     }
@@ -289,15 +305,34 @@ public class Parser {
         return false;
     }
 
+    private static List<Field> getFields(Class clazz) {
+        final List<Class> classList = new ArrayList<>();
+        classList.add(clazz);
+        Class temp = clazz;
+        while (true) {
+            temp = temp.getSuperclass();
+            if (temp == null || Object.class == temp) {
+                break;
+            } else {
+                classList.add(0, temp);
+            }
+        }
+        final List<Field> resList = new ArrayList<>();
+        for (Class c : classList) {
+            //过滤掉 final、static关键字修饰、且不是public的字段
+            final List<Field> fieldList = Arrays.stream(c.getDeclaredFields())
+                    .filter(e ->
+                            needParse(e) &&
+                                    !Modifier.isFinal(e.getModifiers()) &&
+                                    !Modifier.isStatic(e.getModifiers()) &&
+                                    Modifier.isPublic(e.getModifiers())).toList();
+            resList.addAll(fieldList);
+        }
+        return resList;
+    }
+
     private static void buildMethodBody_parse(Class clazz, BuilderContext context) {
-        //过滤掉 final、static关键字修饰、且不是public的字段
-        final List<Field> fieldList = Arrays.stream(clazz.getDeclaredFields())
-                .filter(e ->
-                        needParse(e) &&
-                                !Modifier.isFinal(e.getModifiers()) &&
-                                !Modifier.isStatic(e.getModifiers()) &&
-                                Modifier.isPublic(e.getModifiers()))
-                .collect(Collectors.toList());
+        final List<Field> fieldList = getFields(clazz);
         if (fieldList.isEmpty()) {
             return;
         }
@@ -391,14 +426,7 @@ public class Parser {
     }
 
     private static void buildMethodBody_deParse(Class clazz, BuilderContext context) {
-        //过滤掉 final、static关键字修饰、且不是public的字段
-        final List<Field> fieldList = Arrays.stream(clazz.getDeclaredFields())
-                .filter(e ->
-                        needParse(e) &&
-                                !Modifier.isFinal(e.getModifiers()) &&
-                                !Modifier.isStatic(e.getModifiers()) &&
-                                Modifier.isPublic(e.getModifiers()))
-                .collect(Collectors.toList());
+        final List<Field> fieldList = getFields(clazz);
         //需要提前计算出F_integer_bit、F_float_bit的占用字节数、以及各个字段的在其中的偏移量
         context.fieldNameToBitInfo = calcBitField(fieldList, context);
         if (fieldList.isEmpty()) {

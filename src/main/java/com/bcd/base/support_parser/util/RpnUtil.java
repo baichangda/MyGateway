@@ -3,6 +3,7 @@ package com.bcd.base.support_parser.util;
 
 import com.bcd.base.support_parser.exception.BaseRuntimeException;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -82,11 +83,7 @@ public class RpnUtil {
         int stackIndex = -1;
         for (Ele ele : eles) {
             if (ele.s == null) {
-                if (ele.d == (int) ele.d) {
-                    stack[++stackIndex] = ((int) ele.d) + "";
-                } else {
-                    stack[++stackIndex] = ele.d + "";
-                }
+                stack[++stackIndex] = ele.ds;
             } else {
                 switch (ele.s) {
                     case "!": {
@@ -207,7 +204,7 @@ public class RpnUtil {
     }
 
     public static String toExpr(Ele[] eles) {
-        if (eles == null || eles.length==0) {
+        if (eles == null || eles.length == 0) {
             throw new IllegalArgumentException("param[eles] must not be null or empty");
         }
         final String[] stack = new String[eles.length];
@@ -261,15 +258,19 @@ public class RpnUtil {
         final String s;
         //存储数字值
         final double d;
+        //存储浮点数的字符串表达式、因为d会默认转换为科学计数法表示
+        final String ds;
 
         public Ele(String s) {
             this.s = s;
             this.d = 0d;
+            this.ds = null;
         }
 
-        public Ele(double d) {
+        public Ele(double d, String ds) {
             this.s = null;
             this.d = d;
+            this.ds = ds;
         }
 
         @Override
@@ -286,7 +287,7 @@ public class RpnUtil {
     }
 
     public static double calc(Ele[] eles, Map<String, Double> dataMap) {
-        if (eles == null || eles.length==0) {
+        if (eles == null || eles.length == 0) {
             throw new IllegalArgumentException("param[eles] must not be null or empty");
         }
         final double[] stack = new double[eles.length];
@@ -338,7 +339,7 @@ public class RpnUtil {
         for (int i = 0; i < rpn.length; i++) {
             try {
                 final double v = Double.parseDouble(rpn[i]);
-                eles[i] = new Ele(v);
+                eles[i] = new Ele(v, rpn[i]);
             } catch (NumberFormatException ex) {
                 eles[i] = new Ele(rpn[i]);
             }
