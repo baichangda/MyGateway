@@ -7,13 +7,19 @@ import com.bcd.base.support_parser.impl.immotors.Evt;
 import com.bcd.base.support_parser.impl.immotors.ep33.data.*;
 import com.bcd.base.support_parser.processor.ProcessContext;
 import com.bcd.base.support_parser.processor.Processor;
+import com.google.common.base.Strings;
 import io.netty.buffer.ByteBuf;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
 
 public class Packet_evts_processor implements Processor<List<Evt>> {
+
+    static Logger logger = LoggerFactory.getLogger(Packet_evts_processor.class);
+
     @Override
     public List<Evt> process(ByteBuf data, ProcessContext parentContext) {
         final List<Evt> evts = new ArrayList<>();
@@ -55,7 +61,28 @@ public class Packet_evts_processor implements Processor<List<Evt>> {
                     evt = Parser.parse(Evt_0803.class, data, parentContext);
                 }
                 default -> {
-                    throw BaseRuntimeException.getException("evtId[{}] not support", evtId);
+                    final String evtIdHex = Strings.padStart(Integer.toHexString(evtId).toUpperCase(), 4, '0');
+                    if ((evtId >= 0x0001 && evtId <= 0x07FF)
+                            || (evtId >= 0x0800 && evtId <= 0x0FFF)
+                            || (evtId >= 0x1000 && evtId <= 0x2FFF)
+                            || (evtId >= 0x3000 && evtId <= 0x4FFF)
+                            || (evtId >= 0x5000 && evtId <= 0x5FFF)
+                            || (evtId >= 0x6000 && evtId <= 0x6FFF)
+                            || (evtId >= 0x7000 && evtId <= 0x8FFF)
+                            || (evtId >= 0x9000 && evtId <= 0xAFFF)
+                            || evtId == 0XFFFF
+                    ) {
+                        logger.warn("evtId[{}] 2+6 not support,skip[8]", evtIdHex);
+                        data.skipBytes(8);
+                    } else if (evtId >= 0xD000 && evtId <= 0xDFFF) {
+                        data.skipBytes(2);
+                        final int len = data.readUnsignedShort();
+                        data.skipBytes(len);
+                        logger.warn("evtId[{}] 4+X not support,skip[{}]", evtIdHex, 4 + len);
+                    } else {
+                        throw BaseRuntimeException.getException("evtId[{}] not support", evtIdHex);
+                    }
+                    continue;
                 }
             }
             evts.add(evt);
