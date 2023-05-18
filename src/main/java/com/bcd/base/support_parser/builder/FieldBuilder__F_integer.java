@@ -37,7 +37,7 @@ public class FieldBuilder__F_integer extends FieldBuilder {
                     JavassistUtil.append(body, "{}.readBytes({});\n", FieldBuilder.varNameByteBuf, varNameBitBytes);
                     context.varNameBitBytes = varNameBitBytes;
                 }
-                JavassistUtil.append(body, "final int {}={}.getBitVal({},{},{});\n", varNameField, JavassistUtil.class.getName(), varNameBitBytes, ints[0], bit);
+                JavassistUtil.append(body, "final long {}={}.getBitVal({},{},{});\n", varNameField, JavassistUtil.class.getName(), varNameBitBytes, ints[0], bit);
                 if (fieldTypeClass.isEnum()) {
                     JavassistUtil.append(body, "{}.{}={}.fromInteger((int){});\n", varNameInstance, field.getName(), fieldTypeClass.getName(), JavassistUtil.replaceValExprToCode(anno.valExpr(), varNameField));
                 } else {
@@ -176,7 +176,7 @@ public class FieldBuilder__F_integer extends FieldBuilder {
                     JavassistUtil.append(body, "final byte[] {}=new byte[{}];\n", varNameBitBytes, ints[2]);
                     context.varNameBitBytes = varNameBitBytes;
                 }
-                JavassistUtil.append(body, "{}.putBitVal((int)({}),{},{},{});\n", JavassistUtil.class.getName(), valCode, varNameBitBytes, ints[0], bit);
+                JavassistUtil.append(body, "{}.putBitVal((long)({}),{},{},{});\n", JavassistUtil.class.getName(), valCode, varNameBitBytes, ints[0], bit);
                 if (ints[1] == 1) {
                     JavassistUtil.append(body, "{}.writeBytes({});\n", FieldBuilder.varNameByteBuf, varNameBitBytes);
                     context.varNameBitBytes = null;

@@ -6,6 +6,7 @@ import com.bcd.base.support_parser.anno.ByteOrder;
 import com.bcd.base.support_parser.builder.BuilderContext;
 import com.bcd.base.support_parser.builder.FieldBuilder;
 import com.bcd.base.support_parser.exception.BaseRuntimeException;
+import io.netty.buffer.ByteBufUtil;
 import javassist.CannotCompileException;
 import javassist.CtClass;
 import javassist.CtField;
@@ -247,32 +248,32 @@ public class JavassistUtil {
         sb.append(format(message, params));
     }
 
-    public static int getBitVal(byte[] bytes, int bitOffset, int bitLen) {
+    public static long getBitVal(byte[] bytes, int bitOffset, int bitLen) {
         final int startByteIndex = bitOffset / 8;
         final int endBitOffset = bitOffset + bitLen - 1;
         final int endByteIndex = endBitOffset / 8;
         final int byteLen = endByteIndex - startByteIndex + 1;
 //        System.out.println("startByteIndex["+startByteIndex+"] endByteIndex["+endByteIndex+"] byteLen["+byteLen+"] bitOffset["+bitOffset+"] endBitOffset["+endBitOffset+"]");
-        int c = bytes[endByteIndex] & 0xff;
+        long c = bytes[endByteIndex] & 0xffL;
         for (int i = endByteIndex - 1; i >= startByteIndex; i--) {
-            c |= ((bytes[i] & 0xff) << ((endByteIndex - i) * 8));
+            c |= ((bytes[i] & 0xffL) << ((endByteIndex - i) * 8));
         }
 //        printBinaryString(byteLen + "个字节转换为int的二进制表示", c, byteLen);
         final int right = byteLen * 8 - bitOffset - bitLen;
 //        printBinaryString("右移" + right + "后的结果", c >>> right, byteLen);
 //        printBinaryString("需要进行&运算", (0x01 << bitLen) - 1, byteLen);
-        final int res = (c >>> right) & ((0x01 << bitLen) - 1);
+        final long res = (c >>> right) & ((0x01L << bitLen) - 1);
 //        printBinaryString("最后结果二进制表示", res, byteLen);
         return res;
     }
 
-    public static void putBitVal(int val, byte[] bytes, int bitOffset, int bitLen) {
+    public static void putBitVal(long val, byte[] bytes, int bitOffset, int bitLen) {
         final int startByteIndex = bitOffset / 8;
         final int endBitOffset = bitOffset + bitLen - 1;
         final int endByteIndex = endBitOffset / 8;
         final int byteLen = endByteIndex - startByteIndex + 1;
         final int left = byteLen * 8 - bitOffset - bitLen;
-        final int newVal = val << left;
+        final long newVal = val << left;
         for (int i = endByteIndex; i >= startByteIndex; i--) {
             int right = (endByteIndex - i) * 8;
             bytes[i] = (byte) (bytes[i] | ((newVal >> right) & 0xff));
@@ -334,15 +335,15 @@ public class JavassistUtil {
 //        byte[] bytes = new byte[]{(byte) 0};
 //        System.out.println(getBitVal(bytes, 0, 1));
 //        System.out.println(getBitVal(bytes, 1, 7));
-        final byte[] source = {0x00, (byte) 0xe4};
-        final int bitVal1 = getBitVal(source, 0, 1);
-        final int bitVal2 = getBitVal(source, 1, 15);
+        final byte[] source = {(byte)0xF0, (byte) 0xe4};
+        final long bitVal1 = getBitVal(source, 0, 1);
+        final long bitVal2 = getBitVal(source, 1, 15);
         System.out.println(bitVal1);
         System.out.println(bitVal2);
         byte[] dest = new byte[2];
-        putBitVal(bitVal1, dest, 0, 1);
-        putBitVal(bitVal2, dest, 1, 15);
-        System.out.println(Arrays.toString(dest));
+        putBitVal((int) bitVal1, dest, 0, 1);
+        putBitVal((int) bitVal2, dest, 1, 15);
+        System.out.println(ByteBufUtil.hexDump(dest));
 
 //        final double format = JavassistUtil.format(1.23232d, 4);
 //        System.out.println(format);
