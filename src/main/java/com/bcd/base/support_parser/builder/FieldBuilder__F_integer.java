@@ -2,11 +2,12 @@ package com.bcd.base.support_parser.builder;
 
 import com.bcd.base.support_parser.anno.F_integer;
 import com.bcd.base.support_parser.exception.BaseRuntimeException;
+import com.bcd.base.support_parser.util.BitBuf_reader;
+import com.bcd.base.support_parser.util.BitBuf_writer;
 import com.bcd.base.support_parser.util.JavassistUtil;
 import com.bcd.base.support_parser.util.RpnUtil;
 
 import java.lang.reflect.Field;
-import java.util.Map;
 
 public class FieldBuilder__F_integer extends FieldBuilder {
     @Override
@@ -26,25 +27,24 @@ public class FieldBuilder__F_integer extends FieldBuilder {
             } else {
                 final int bit = anno.bit();
                 if (bit < 1 || bit > 64) {
-                    throw BaseRuntimeException.getException("class[{}] field[{}] anno[{}] bit[{}] must in range [1,64]", field.getDeclaringClass().getName(), field.getName(), annoClass.getName(),bit);
+                    throw BaseRuntimeException.getException("class[{}] field[{}] anno[{}] bit[{}] must in range [1,64]", field.getDeclaringClass().getName(), field.getName(), annoClass.getName(), bit);
                 }
-                final Map<String, int[]> fieldNameToBitInfo = context.fieldNameToBitInfo;
-                String varNameBitBytes = context.varNameBitBytes;
-                final int[] ints = fieldNameToBitInfo.get(field.getName());
-                if (varNameBitBytes == null) {
-                    varNameBitBytes = varNameField + "_bitBytes";
-                    JavassistUtil.append(body, "final byte[] {}=new byte[{}];\n", varNameBitBytes, ints[2]);
-                    JavassistUtil.append(body, "{}.readBytes({});\n", FieldBuilder.varNameByteBuf, varNameBitBytes);
-                    context.varNameBitBytes = varNameBitBytes;
+
+                String varNameBitBuf = context.varNameBitBuf;
+                if (varNameBitBuf == null) {
+                    varNameBitBuf = varNameField + "_bitBuf";
+                    final String bitBufClassName = BitBuf_reader.class.getName();
+                    JavassistUtil.append(body, "final {} {}={}.newBitBuf({});\n", bitBufClassName, varNameBitBuf, bitBufClassName, FieldBuilder.varNameByteBuf);
+                    context.varNameBitBuf=varNameBitBuf;
                 }
-                JavassistUtil.append(body, "final long {}={}.getBitVal({},{},{});\n", varNameField, JavassistUtil.class.getName(), varNameBitBytes, ints[0], bit);
+                JavassistUtil.append(body, "final long {}={}.read({});\n", varNameField, varNameBitBuf, bit);
+                if (context.bitEndWhenBitField_process) {
+                    JavassistUtil.append(body, "{}.finish();\n", varNameBitBuf);
+                }
                 if (fieldTypeClass.isEnum()) {
                     JavassistUtil.append(body, "{}.{}={}.fromInteger((int){});\n", varNameInstance, field.getName(), fieldTypeClass.getName(), JavassistUtil.replaceValExprToCode(anno.valExpr(), varNameField));
                 } else {
                     JavassistUtil.append(body, "{}.{}=({}){};\n", varNameInstance, field.getName(), fieldTypeName, JavassistUtil.replaceValExprToCode(anno.valExpr(), varNameField));
-                }
-                if (ints[1] == 1) {
-                    context.varNameBitBytes = null;
                 }
             }
         } else {
@@ -166,21 +166,21 @@ public class FieldBuilder__F_integer extends FieldBuilder {
             } else {
                 final int bit = anno.bit();
                 if (bit < 1 || bit > 64) {
-                    throw BaseRuntimeException.getException("class[{}] field[{}] anno[{}] bit[{}] must in range [1,64]", field.getDeclaringClass().getName(), field.getName(), annoClass.getName(),bit);
+                    throw BaseRuntimeException.getException("class[{}] field[{}] anno[{}] bit[{}] must in range [1,64]", field.getDeclaringClass().getName(), field.getName(), annoClass.getName(), bit);
                 }
-                final Map<String, int[]> fieldNameToBitInfo = context.fieldNameToBitInfo;
-                String varNameBitBytes = context.varNameBitBytes;
-                final int[] ints = fieldNameToBitInfo.get(fieldName);
-                if (varNameBitBytes == null) {
-                    varNameBitBytes = varNameField + "_bitBytes";
-                    JavassistUtil.append(body, "final byte[] {}=new byte[{}];\n", varNameBitBytes, ints[2]);
-                    context.varNameBitBytes = varNameBitBytes;
+
+                String varNameBitBuf = context.varNameBitBuf;
+                if (varNameBitBuf == null) {
+                    varNameBitBuf = varNameField + "_bitBuf";
+                    final String bitBufClassName = BitBuf_writer.class.getName();
+                    JavassistUtil.append(body, "final {} {}={}.newBitBuf({});\n", bitBufClassName, varNameBitBuf, bitBufClassName, FieldBuilder.varNameByteBuf);
+                    context.varNameBitBuf=varNameBitBuf;
                 }
-                JavassistUtil.append(body, "{}.putBitVal((long)({}),{},{},{});\n", JavassistUtil.class.getName(), valCode, varNameBitBytes, ints[0], bit);
-                if (ints[1] == 1) {
-                    JavassistUtil.append(body, "{}.writeBytes({});\n", FieldBuilder.varNameByteBuf, varNameBitBytes);
-                    context.varNameBitBytes = null;
+                JavassistUtil.append(body, "{}.write((long)({}),{});\n", varNameBitBuf, valCode, bit);
+                if (context.bitEndWhenBitField_deProcess) {
+                    JavassistUtil.append(body, "{}.finish();\n", varNameBitBuf);
                 }
+
             }
         } else {
             switch (anno.len()) {

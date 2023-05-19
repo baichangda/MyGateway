@@ -95,7 +95,7 @@ public class Evt_D006 extends Evt_4_x {
     @F_integer(bit = 1)
     public byte TMActuToqV;
     @F_float_integer(bit = 11, valExpr = "x*0.5-512")
-    public int ISGActuToq;
+    public float ISGActuToq;
     @F_integer(bit = 1)
     public byte ISGActuToqV;
     @F_integer(bit = 1)

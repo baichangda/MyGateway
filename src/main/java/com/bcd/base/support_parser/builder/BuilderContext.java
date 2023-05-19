@@ -35,14 +35,10 @@ public class BuilderContext {
      */
     public Field field;
 
-    /**
-     * 主要用于处理
-     * {@link F_integer}
-     * {@link F_float_integer}
-     * 使用bit时候
-     */
-    public Map<String, int[]> fieldNameToBitInfo = new HashMap<>();
-    public String varNameBitBytes;
+    public String varNameBitBuf;
+
+    public boolean bitEndWhenBitField_process;
+    public boolean bitEndWhenBitField_deProcess;
 
     /**
      * 用于给

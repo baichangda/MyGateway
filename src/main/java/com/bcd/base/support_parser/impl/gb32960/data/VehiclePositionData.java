@@ -1,7 +1,9 @@
 package com.bcd.base.support_parser.impl.gb32960.data;
 
+import com.bcd.base.support_parser.anno.F_float_ieee754;
 import com.bcd.base.support_parser.anno.F_float_integer;
 import com.bcd.base.support_parser.anno.F_integer;
+import com.bcd.base.support_parser.anno.FloatType_ieee754;
 
 /**
  * 车辆位置数据

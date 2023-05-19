@@ -60,6 +60,9 @@ public class Packet_evts_processor implements Processor<List<Evt>> {
                 case 0x0803 -> {
                     evt = Parser.parse(Evt_0803.class, data, parentContext);
                 }
+                case 0xD006 -> {
+                    evt = Parser.parse(Evt_D006.class, data, parentContext);
+                }
                 default -> {
                     final String evtIdHex = Strings.padStart(Integer.toHexString(evtId).toUpperCase(), 4, '0');
                     if ((evtId >= 0x0001 && evtId <= 0x07FF)

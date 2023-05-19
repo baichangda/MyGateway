@@ -6,7 +6,9 @@ import com.bcd.base.support_parser.anno.ByteOrder;
 import com.bcd.base.support_parser.builder.BuilderContext;
 import com.bcd.base.support_parser.builder.FieldBuilder;
 import com.bcd.base.support_parser.exception.BaseRuntimeException;
+import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
+import io.netty.buffer.Unpooled;
 import javassist.CannotCompileException;
 import javassist.CtClass;
 import javassist.CtField;
@@ -335,15 +337,24 @@ public class JavassistUtil {
 //        byte[] bytes = new byte[]{(byte) 0};
 //        System.out.println(getBitVal(bytes, 0, 1));
 //        System.out.println(getBitVal(bytes, 1, 7));
-        final byte[] source = {(byte)0xF0, (byte) 0xe4};
+
+        final byte[] source = {(byte) 0xF0, (byte) 0xe4};
         final long bitVal1 = getBitVal(source, 0, 1);
         final long bitVal2 = getBitVal(source, 1, 15);
         System.out.println(bitVal1);
         System.out.println(bitVal2);
+
+
+        final long t1 = System.currentTimeMillis();
         byte[] dest = new byte[2];
-        putBitVal((int) bitVal1, dest, 0, 1);
-        putBitVal((int) bitVal2, dest, 1, 15);
-        System.out.println(ByteBufUtil.hexDump(dest));
+        for(int i=0;i<100000000;i++){
+            final ByteBuf bb = Unpooled.buffer();
+            final BitBuf_writer bitBufWriter = BitBuf_writer.newBitBuf(bb);
+            putBitVal((int) bitVal1, dest, 0, 1);
+            putBitVal((int) bitVal2, dest, 1, 15);
+//        System.out.println(ByteBufUtil.hexDump(dest));
+        }
+        System.out.println(System.currentTimeMillis() - t1);
 
 //        final double format = JavassistUtil.format(1.23232d, 4);
 //        System.out.println(format);

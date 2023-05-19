@@ -2,6 +2,7 @@ package com.bcd.base.support_parser.builder;
 
 import com.bcd.base.support_parser.anno.F_float_ieee754;
 import com.bcd.base.support_parser.util.JavassistUtil;
+import com.bcd.base.support_parser.util.RpnUtil;
 
 import java.lang.reflect.Field;
 
@@ -26,7 +27,6 @@ public class FieldBuilder__F_float_ieee754 extends FieldBuilder {
         final String varNameInstance = FieldBuilder.varNameInstance;
 
 
-
         final String funcName;
         switch (anno.type()) {
             case Float32 -> {
@@ -40,10 +40,13 @@ public class FieldBuilder__F_float_ieee754 extends FieldBuilder {
                 funcName = null;
             }
         }
+
+        final String valCode = JavassistUtil.format("{}.{}()", varNameByteBuf, funcName);
+
         if (anno.valPrecision() == -1) {
-            JavassistUtil.append(body, "{}.{}={}.{}();\n", varNameInstance, field.getName(), varNameByteBuf, funcName);
+            JavassistUtil.append(body, "{}.{}={};\n", varNameInstance, field.getName(), JavassistUtil.replaceValExprToCode(anno.valExpr(), JavassistUtil.format("(({}){})", fieldType, valCode)));
         } else {
-            JavassistUtil.append(body, "{}.{}=({}){}.format((double)({}.{}()),{});\n", varNameInstance, field.getName(), fieldType, JavassistUtil.class.getName(), varNameByteBuf, funcName, anno.valPrecision());
+            JavassistUtil.append(body, "{}.{}=({}){}.format((double)({}),{});\n", varNameInstance, field.getName(), fieldType, JavassistUtil.class.getName(), JavassistUtil.replaceValExprToCode(anno.valExpr(), valCode), anno.valPrecision());
         }
     }
 
@@ -58,6 +61,15 @@ public class FieldBuilder__F_float_ieee754 extends FieldBuilder {
         final String varNameInstance = FieldBuilder.varNameInstance;
         final String funcName;
         final String funcParamTypeName;
+
+        final String valCode;
+        if (anno.valExpr().isEmpty()) {
+            valCode = varNameInstance + "." + fieldName;
+        } else {
+            final String reverseExpr = RpnUtil.reverseExpr(anno.valExpr());
+            valCode = JavassistUtil.replaceValExprToCode(reverseExpr, varNameInstance + "." + fieldName);
+        }
+
         switch (anno.type()) {
             case Float32 -> {
                 funcName = bigEndian ? "writeFloat" : "writeFloatLE";
@@ -73,6 +85,6 @@ public class FieldBuilder__F_float_ieee754 extends FieldBuilder {
                 funcParamTypeName = null;
             }
         }
-        JavassistUtil.append(body, "{}.{}(({})({}.{}));\n", varNameByteBuf, funcName, funcParamTypeName, varNameInstance, fieldName);
+        JavassistUtil.append(body, "{}.{}(({})({}));\n", varNameByteBuf, funcName, funcParamTypeName, valCode);
     }
 }

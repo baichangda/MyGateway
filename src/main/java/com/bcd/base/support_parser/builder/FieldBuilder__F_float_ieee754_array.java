@@ -4,6 +4,7 @@ import com.bcd.base.support_parser.anno.F_float_ieee754_array;
 import com.bcd.base.support_parser.anno.F_skip;
 import com.bcd.base.support_parser.exception.BaseRuntimeException;
 import com.bcd.base.support_parser.util.JavassistUtil;
+import com.bcd.base.support_parser.util.RpnUtil;
 
 import java.lang.reflect.Field;
 
@@ -26,7 +27,7 @@ public class FieldBuilder__F_float_ieee754_array extends FieldBuilder {
 
         final F_float_ieee754_array anno = context.field.getAnnotation(annoClass);
         final boolean bigEndian = JavassistUtil.bigEndian(anno.order(), context.clazz);
-        
+
         final String lenRes;
         if (anno.len() == 0) {
             if (anno.lenExpr().isEmpty()) {
@@ -58,10 +59,11 @@ public class FieldBuilder__F_float_ieee754_array extends FieldBuilder {
         String arrVarName = varNameField + "_arr";
         JavassistUtil.append(body, "final {}[] {}=new {}[{}];\n", arrayElementType, arrVarName, arrayElementType, lenRes);
         JavassistUtil.append(body, "for(int i=0;i<{}.length;i++){\n", arrVarName);
+        final String valCode = JavassistUtil.format("{}.{}()", varNameByteBuf, funcName);
         if (anno.valPrecision() == -1) {
-            JavassistUtil.append(body, "{}[i]=({})({}.{}());\n", arrVarName, arrayElementType, varNameByteBuf, funcName);
+            JavassistUtil.append(body, "{}[i]=({})({});\n", arrVarName, arrayElementType, JavassistUtil.replaceValExprToCode(anno.valExpr(), valCode));
         } else {
-            JavassistUtil.append(body, "{}[i]=({}){}.format((double)({}.{}()),{});\n", arrVarName, fieldType, JavassistUtil.class.getName(), varNameByteBuf, funcName, anno.valPrecision());
+            JavassistUtil.append(body, "{}[i]=({}){}.format((double)({}),{});\n", arrVarName, fieldType, JavassistUtil.class.getName(), JavassistUtil.replaceValExprToCode(anno.valExpr(), valCode), anno.valPrecision());
         }
         JavassistUtil.append(body, "};\n");
         JavassistUtil.append(body, "{}.{}={};\n", varNameInstance, fieldName, arrVarName);
@@ -112,7 +114,13 @@ public class FieldBuilder__F_float_ieee754_array extends FieldBuilder {
         String arrVarName = varNameField + "_arr";
         JavassistUtil.append(body, "final {}[] {}={};\n", arrayElementType, arrVarName, valCode);
         JavassistUtil.append(body, "for(int i=0;i<{}.length;i++){\n", arrVarName);
-        JavassistUtil.append(body, "{}.{}(({})({}[i]));\n", varNameByteBuf, funcName, funcParamTypeName, arrVarName);
+
+        if (anno.valExpr().isEmpty()) {
+            JavassistUtil.append(body, "{}.{}(({})({}[i]));\n", varNameByteBuf, funcName, funcParamTypeName, arrVarName);
+        } else {
+            JavassistUtil.append(body, "{}.{}(({})({}));\n", varNameByteBuf, funcName, funcParamTypeName, JavassistUtil.replaceValExprToCode(RpnUtil.reverseExpr(anno.valExpr()), arrVarName + "[i]"));
+        }
+
         JavassistUtil.append(body, "}\n");
 
         JavassistUtil.append(body, "}\n");

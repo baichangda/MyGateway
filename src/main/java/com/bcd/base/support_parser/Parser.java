@@ -237,62 +237,42 @@ public class Parser {
         Collections.sort(byteOrderConfigs);
     }
 
-    /**
-     * 计算bit字段属性、解析时候使用
-     * map
-     * key为字段名称
-     * val [bit偏移、当前字段是否是bit组的最后一个字段、当前组bit计算的byte数组长度]
-     *
-     * @param fieldList
-     * @param builderContext
-     * @return
-     */
-    private static Map<String, int[]> calcBitField(List<Field> fieldList, BuilderContext builderContext) {
-        Map<String, int[]> fieldNameToBitInfo = new HashMap<>();
-        List<int[]> tempList = new ArrayList<>();
-        int bitSum = 0;
-        for (int i = 0; i < fieldList.size(); i++) {
-            final Field field = fieldList.get(i);
-            final F_integer f_integer = field.getAnnotation(F_integer.class);
-            if (f_integer != null && f_integer.bit() > 0) {
-                final int[] ints = new int[]{bitSum, 0, 0};
-                tempList.add(ints);
-                fieldNameToBitInfo.put(field.getName(), ints);
-                bitSum += f_integer.bit();
-                if (!f_integer.bitEnd() && bitSum % 8 != 0) {
-                    continue;
+    private static void bitEndWhenBitField(List<Field> fieldList, int i, BuilderContext context) {
+        if (fieldList.size() - 1 == i) {
+            context.bitEndWhenBitField_process = false;
+            context.bitEndWhenBitField_deProcess = true;
+        } else {
+            final Field cur = fieldList.get(i);
+            final F_integer f_integer1 = cur.getAnnotation(F_integer.class);
+            final F_float_integer f_float_integer1 = cur.getAnnotation(F_float_integer.class);
+            if (f_integer1 != null && f_integer1.bit() > 0) {
+                if (f_integer1.bitEnd()) {
+                    context.bitEndWhenBitField_process = true;
+                    context.bitEndWhenBitField_deProcess = true;
+                    return;
                 }
             }
-            final F_float_integer f_floatInteger = field.getAnnotation(F_float_integer.class);
-            if (f_floatInteger != null && f_floatInteger.bit() > 0) {
-                final int[] ints = new int[]{bitSum, 0, 0};
-                tempList.add(ints);
-                fieldNameToBitInfo.put(field.getName(), ints);
-                bitSum += f_floatInteger.bit();
-                if (!f_floatInteger.bitEnd() && bitSum % 8 != 0) {
-                    continue;
+            if (f_float_integer1 != null && f_float_integer1.bit() > 0) {
+                if (f_float_integer1.bitEnd()) {
+                    context.bitEndWhenBitField_process = true;
+                    context.bitEndWhenBitField_deProcess = true;
+                    return;
                 }
             }
-            if (!tempList.isEmpty()) {
-                final int byteLen = bitSum / 8 + (bitSum % 8 == 0 ? 0 : 1);
-                tempList.get(tempList.size() - 1)[1] = 1;
-                for (int[] ints : tempList) {
-                    ints[2] = byteLen;
-                }
-                tempList.clear();
-                bitSum = 0;
+
+            final Field next = fieldList.get(i + 1);
+            final F_integer f_integer2 = next.getAnnotation(F_integer.class);
+            final F_float_integer f_float_integer2 = next.getAnnotation(F_float_integer.class);
+            if ((f_integer2 == null && f_float_integer2 == null)
+                    || (f_integer2 != null && f_integer2.bit() == 0)
+                    || (f_float_integer2 != null && f_float_integer2.bit() == 0)) {
+                context.bitEndWhenBitField_process = true;
+                context.bitEndWhenBitField_deProcess = true;
+                return;
             }
+            context.bitEndWhenBitField_process = false;
+            context.bitEndWhenBitField_deProcess = false;
         }
-        if (!tempList.isEmpty()) {
-            final int byteLen = bitSum / 8 + (bitSum % 8 == 0 ? 0 : 1);
-            tempList.get(tempList.size() - 1)[1] = 1;
-            for (int[] ints : tempList) {
-                ints[2] = byteLen;
-            }
-            tempList.clear();
-            bitSum = 0;
-        }
-        return fieldNameToBitInfo;
     }
 
     private static boolean needParse(Field field) {
@@ -336,12 +316,11 @@ public class Parser {
         if (fieldList.isEmpty()) {
             return;
         }
-        //需要提前计算出F_integer_bit、F_float_bit的占用字节数、以及各个字段的在其中的偏移量
-        context.fieldNameToBitInfo = calcBitField(fieldList, context);
 
         for (int i = 0; i < fieldList.size(); i++) {
             Field field = fieldList.get(i);
             context.field = field;
+            bitEndWhenBitField(fieldList, i,context);
             if (logCollector_parse != null) {
                 JavassistUtil.prependLogCode_parse(context);
             }
@@ -427,14 +406,13 @@ public class Parser {
 
     private static void buildMethodBody_deParse(Class clazz, BuilderContext context) {
         final List<Field> fieldList = getFields(clazz);
-        //需要提前计算出F_integer_bit、F_float_bit的占用字节数、以及各个字段的在其中的偏移量
-        context.fieldNameToBitInfo = calcBitField(fieldList, context);
         if (fieldList.isEmpty()) {
             return;
         }
         for (int i = 0; i < fieldList.size(); i++) {
             Field field = fieldList.get(i);
             context.field = field;
+            bitEndWhenBitField(fieldList, i, context);
             try {
                 if (logCollector_deParse != null) {
                     JavassistUtil.prependLogCode_deParse(context);

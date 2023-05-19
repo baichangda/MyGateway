@@ -100,9 +100,9 @@ public class FieldBuilder__F_float_integer_array extends FieldBuilder {
             }
         }
         if (anno.valPrecision() == -1) {
-            JavassistUtil.append(body, "{}[i]={};\n", arrVarName, JavassistUtil.replaceValExprToCode(anno.valExpr(), varNameArrayElement));
+            JavassistUtil.append(body, "{}[i]={};\n", arrVarName, JavassistUtil.replaceValExprToCode(anno.valExpr(), JavassistUtil.format("(({}){})",arrayElementType,varNameArrayElement)));
         } else {
-            JavassistUtil.append(body, "{}[i]=({}){}.format((double){},{});\n", arrVarName, arrayElementType, JavassistUtil.class.getName(), JavassistUtil.replaceValExprToCode(anno.valExpr(), varNameArrayElement), anno.valPrecision());
+            JavassistUtil.append(body, "{}[i]=({}){}.format((double){},{});\n", arrVarName, arrayElementType, JavassistUtil.class.getName(), JavassistUtil.replaceValExprToCode(anno.valExpr(), JavassistUtil.format("(({}){})",arrayElementType,varNameArrayElement)), anno.valPrecision());
         }
         body.append("}\n");
 
