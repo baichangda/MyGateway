@@ -17,6 +17,15 @@ public class FieldBuilder__F_integer extends FieldBuilder {
         final Field field = context.field;
         final Class<?> fieldTypeClass = field.getType();
         final String fieldTypeName = fieldTypeClass.getName();
+
+        switch (fieldTypeName) {
+            case "byte", "short", "int", "long" -> {
+            }
+            default -> {
+                JavassistUtil.notSupport_fieldType(field, annoClass);
+            }
+        }
+
         final F_integer anno = context.field.getAnnotation(annoClass);
         final boolean bigEndian = JavassistUtil.bigEndian(anno.order(), context.clazz);
         final StringBuilder body = context.body;
@@ -31,19 +40,13 @@ public class FieldBuilder__F_integer extends FieldBuilder {
                     throw BaseRuntimeException.getException("class[{}] field[{}] anno[{}] bit[{}] must in range [1,64]", field.getDeclaringClass().getName(), field.getName(), annoClass.getName(), bit);
                 }
 
-                String varNameBitBuf = context.varNameBitBuf;
-                if (varNameBitBuf == null) {
-                    varNameBitBuf = varNameField + "_bitBuf";
-                    final String bitBufClassName = BitBuf_reader.class.getName();
-                    JavassistUtil.append(body, "final {} {}={}.newBitBuf({});\n", bitBufClassName, varNameBitBuf, bitBufClassName, FieldBuilder.varNameByteBuf);
-                    context.varNameBitBuf=varNameBitBuf;
-                }
+                final String varNameBitBuf = context.getVarNameBitBuf(BitBuf_reader.class);
 
                 if (Parser.logCollector_parse == null) {
-                    JavassistUtil.append(body, "final long {}={}.read({});\n", varNameField, varNameBitBuf, bit);
+                    JavassistUtil.append(body, "final long {}={}.read({},{});\n", varNameField, varNameBitBuf, bit, anno.bitUnsigned());
                 } else {
                     context.varNameBitLog = varNameField + "_bitLog";
-                    JavassistUtil.append(body, "final {} {}={}.read_log({});\n", BitBuf_reader.ReadLog.class.getName(), context.varNameBitLog, varNameBitBuf, bit);
+                    JavassistUtil.append(body, "final {} {}={}.read_log({},{});\n", BitBuf_reader.ReadLog.class.getName(), context.varNameBitLog, varNameBitBuf, bit, anno.bitUnsigned());
                     JavassistUtil.append(body, "final long {}={}.val;\n", varNameField, context.varNameBitLog);
                 }
 
@@ -178,19 +181,13 @@ public class FieldBuilder__F_integer extends FieldBuilder {
                     throw BaseRuntimeException.getException("class[{}] field[{}] anno[{}] bit[{}] must in range [1,64]", field.getDeclaringClass().getName(), field.getName(), annoClass.getName(), bit);
                 }
 
-                String varNameBitBuf = context.varNameBitBuf;
-                if (varNameBitBuf == null) {
-                    varNameBitBuf = varNameField + "_bitBuf";
-                    final String bitBufClassName = BitBuf_writer.class.getName();
-                    JavassistUtil.append(body, "final {} {}={}.newBitBuf({});\n", bitBufClassName, varNameBitBuf, bitBufClassName, FieldBuilder.varNameByteBuf);
-                    context.varNameBitBuf=varNameBitBuf;
-                }
+                final String varNameBitBuf = context.getVarNameBitBuf(BitBuf_writer.class);
 
                 if (Parser.logCollector_deParse == null) {
-                    JavassistUtil.append(body, "{}.write((long)({}),{});\n", varNameBitBuf, valCode, bit);
+                    JavassistUtil.append(body, "{}.write((long)({}),{},{});\n", varNameBitBuf, valCode, bit, anno.bitUnsigned());
                 } else {
                     context.varNameBitLog = varNameField + "_bitLog";
-                    JavassistUtil.append(body, "final {} {}={}.write_log((long)({}),{});\n", BitBuf_writer.WriteLog.class.getName(), context.varNameBitLog, varNameBitBuf, valCode, bit);
+                    JavassistUtil.append(body, "final {} {}={}.write_log((long)({}),{},{});\n", BitBuf_writer.WriteLog.class.getName(), context.varNameBitLog, varNameBitBuf, valCode, bit, anno.bitUnsigned());
                 }
 
                 if (context.bitEndWhenBitField_deProcess) {

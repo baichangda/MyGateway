@@ -21,7 +21,7 @@ public class Evt_D009 extends Evt_4_x {
     public byte BMSWrnngInfoRC;
     @F_integer(bit = 1)
     public byte BMSPreThrmFltInd;
-    @F_integer(bit = 5)
+    @F_skip(bit = 5)
     public byte skip1;
     @F_integer(bit = 4)
     public byte BMSKeepSysAwkScene;

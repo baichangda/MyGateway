@@ -15,12 +15,13 @@ public abstract class FieldBuilder {
      * 解析bean开始时候、记录{@link ByteBuf#readerIndex()}
      * 反解析bean开始时候、记录{@link ByteBuf#writerIndex()}
      */
-    public final static String startIndexVarName = "_start_index";
+    public final static String varNameStartIndex = "_start_index";
+    public final static String varNameBitBuf = "_bitBuf";
 
     public abstract void buildParse(final BuilderContext context);
-    
 
-    public void buildDeParse(final BuilderContext context){
+
+    public void buildDeParse(final BuilderContext context) {
 
     }
 

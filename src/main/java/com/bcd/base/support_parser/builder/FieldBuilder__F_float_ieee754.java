@@ -12,15 +12,17 @@ public class FieldBuilder__F_float_ieee754 extends FieldBuilder {
         final Class<F_float_ieee754> annoClass = F_float_ieee754.class;
         final Field field = context.field;
         final Class<?> fieldTypeClass = field.getType();
-        final String fieldType;
-        if (float.class.isAssignableFrom(fieldTypeClass)) {
-            fieldType = "float";
-        } else if (double.class.isAssignableFrom(fieldTypeClass)) {
-            fieldType = "double";
-        } else {
-            JavassistUtil.notSupport_fieldType(field, annoClass);
-            fieldType = "";
+        final String fieldType = fieldTypeClass.getName();
+
+        switch (fieldType) {
+            case "float", "double" -> {
+            }
+            default -> {
+                JavassistUtil.notSupport_fieldType(field, annoClass);
+            }
         }
+
+
         final F_float_ieee754 anno = context.field.getAnnotation(annoClass);
         final boolean bigEndian = JavassistUtil.bigEndian(anno.order(), context.clazz);
         final StringBuilder body = context.body;

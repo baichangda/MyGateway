@@ -116,14 +116,14 @@ public class JavassistUtil {
     }
 
     public static void prependLogCode_parse(final BuilderContext context) {
-        if (!context.bitField) {
+        if (!context.logBit) {
             final String varName = getFieldByteBufReaderIndexVarName(context);
             append(context.body, "final int {}={}.readerIndex();\n", varName, FieldBuilder.varNameByteBuf);
         }
     }
 
     public static void appendLogCode_parse(final BuilderContext context) {
-        if (context.bitField) {
+        if (context.logBit) {
             append(context.body, "{}.logCollector_parse.collect_field_bit({}.class,\"{}\",{},{},\"{}\");\n",
                     Parser.class.getName(),
                     context.clazz.getName(),
@@ -147,7 +147,7 @@ public class JavassistUtil {
     }
 
     public static void prependLogCode_deParse(final BuilderContext context) {
-        if (!context.bitField) {
+        if (!context.logBit) {
             final String varName = getFieldByteBufWriterIndexVarName(context);
             append(context.body, "final int {}={}.writerIndex();\n", varName, FieldBuilder.varNameByteBuf);
         }
@@ -155,7 +155,7 @@ public class JavassistUtil {
     }
 
     public static void appendLogCode_deParse(final BuilderContext context) {
-        if (!context.bitField) {
+        if (context.logBit) {
             append(context.body, "{}.logCollector_deParse.collect_field_bit({}.class,\"{}\",{},{},\"{}\");\n",
                     Parser.class.getName(),
                     context.clazz.getName(),
@@ -236,14 +236,14 @@ public class JavassistUtil {
     }
 
 
-    public static String replaceLenExprToCode(final String expr, final Map<Character, String> map, final Field field) {
+    public static String replaceLenExprToCode(final String lenExpr, final Map<Character, String> map, final Field field) {
         final StringBuilder sb = new StringBuilder();
-        final char[] chars = expr.toCharArray();
+        final char[] chars = lenExpr.toCharArray();
         for (char c : chars) {
             if (c != '+' && c != '-' && c != '*' && c != '/' && !Character.isDigit(c)) {
                 final String s = map.get(c);
                 if (s == null) {
-                    throw BaseRuntimeException.getException("class[{}] field[{}] expr[{}] can't find char[{}] value", field.getDeclaringClass().getName(), field.getName(), expr, c);
+                    throw BaseRuntimeException.getException("class[{}] field[{}] expr[{}] can't find char[{}] value", field.getDeclaringClass().getName(), field.getName(), lenExpr, c);
                 }
                 //所有的len字段必须转化为int运算
                 sb.append("(int)(").append(s).append(")");

@@ -15,15 +15,7 @@ public class FieldBuilder__F_float_ieee754_array extends FieldBuilder {
         final Field field = context.field;
         final Class<?> fieldType = field.getType();
         final String fieldName = field.getName();
-        final String arrayElementType;
-        if (float[].class.isAssignableFrom(fieldType)) {
-            arrayElementType = "float";
-        } else if (double[].class.isAssignableFrom(fieldType)) {
-            arrayElementType = "double";
-        } else {
-            JavassistUtil.notSupport_fieldType(field, annoClass);
-            arrayElementType = "";
-        }
+        final String arrayElementType=fieldType.componentType().getName();
 
         final F_float_ieee754_array anno = context.field.getAnnotation(annoClass);
         final boolean bigEndian = JavassistUtil.bigEndian(anno.order(), context.clazz);
@@ -82,14 +74,14 @@ public class FieldBuilder__F_float_ieee754_array extends FieldBuilder {
 
         JavassistUtil.append(body, "if({}!=null){\n", FieldBuilder.varNameInstance, valCode);
 
-        final String arrayElementType;
-        if (float[].class.isAssignableFrom(fieldType)) {
-            arrayElementType = "float";
-        } else if (double[].class.isAssignableFrom(fieldType)) {
-            arrayElementType = "double";
-        } else {
-            JavassistUtil.notSupport_fieldType(field, annoClass);
-            arrayElementType = "";
+        final String arrayElementType=fieldType.componentType().getName();
+
+        switch (arrayElementType) {
+            case "float", "double" -> {
+            }
+            default -> {
+                JavassistUtil.notSupport_fieldType(field, annoClass);
+            }
         }
 
         final String funcName;

@@ -3,6 +3,7 @@ package com.bcd.base.support_parser.builder;
 import com.bcd.base.support_parser.anno.*;
 import com.bcd.base.support_parser.processor.ProcessContext;
 import com.bcd.base.support_parser.processor.Processor;
+import com.bcd.base.support_parser.util.BitBuf_reader;
 import com.bcd.base.support_parser.util.JavassistUtil;
 import io.netty.buffer.ByteBuf;
 import javassist.CtClass;
@@ -37,7 +38,7 @@ public class BuilderContext {
 
     public String varNameBitBuf;
 
-    public boolean bitField;
+    public boolean logBit;
     public String varNameBitLog;
     public boolean bitEndWhenBitField_process;
     public boolean bitEndWhenBitField_deProcess;
@@ -69,9 +70,9 @@ public class BuilderContext {
      * {@link SkipMode#ReservedFromStart} 或
      * {@link SkipMode#ReservedFromPrevReserved}
      * 时候索引的位置变量名称
-     * 如果没有上一个这样的字段、则取值是{@link FieldBuilder#startIndexVarName}
+     * 如果没有上一个这样的字段、则取值是{@link FieldBuilder#varNameStartIndex}
      */
-    public String prevSkipReservedIndexVarName = FieldBuilder.startIndexVarName;
+    public String prevSkipReservedIndexVarName = FieldBuilder.varNameStartIndex;
     public final Set<String> indexFieldNameSet = new HashSet<>();
 
     private void initIndexFieldNameSet() {
@@ -114,5 +115,14 @@ public class BuilderContext {
                     FieldBuilder.varNameParentProcessContext);
         }
         return processContextVarName;
+    }
+
+    public final String getVarNameBitBuf(Class bitBufClass) {
+        if (varNameBitBuf == null) {
+            final String bitBufClassName = bitBufClass.getName();
+            JavassistUtil.append(body, "final {} {}={}.newBitBuf({});\n", bitBufClassName, FieldBuilder.varNameBitBuf, bitBufClassName, FieldBuilder.varNameByteBuf);
+            varNameBitBuf = FieldBuilder.varNameBitBuf;
+        }
+        return varNameBitBuf;
     }
 }

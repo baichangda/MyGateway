@@ -18,14 +18,13 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface F_integer_array {
     /**
-     * 占用字节数
+     * 数组元素个数
      * 与{@link #lenExpr()}互斥
      */
     int len() default 0;
 
     /**
-     * 字段所占字节长度表达式
-     * 用于固定长度字段解析,配合var参数使用,代表的是Byte的长度
+     * 数组元素个数表达式,配合var参数使用
      * 与{@link #len()}互斥
      * 例如:
      * m
@@ -47,7 +46,7 @@ public @interface F_integer_array {
      * singleLen=2、调用readUnsignedShort、将得到int[4]
      * singleLen=4、调用readInt、将得到int[2]
      */
-    int singleLen();
+    int singleLen() default 1;
 
     /**
      * 值处理表达式、针对于数组中每个值
@@ -67,5 +66,19 @@ public @interface F_integer_array {
      * 字节序模式
      */
     ByteOrder order() default ByteOrder.Default;
+
+    int bit() default 0;
+
+    /**
+     * bit位表示的值是否为无符号类型
+     * 当是有符号类型时候
+     * bit最高位为符号位、0代表正数、1代表负数
+     * 对值的求解方式为
+     * 正数、正常进行求值
+     * 负数、所有bit位取反+1、求值后、代表负数
+     */
+    boolean bitUnsigned() default true;
+
+    boolean bitEnd() default false;
 
 }

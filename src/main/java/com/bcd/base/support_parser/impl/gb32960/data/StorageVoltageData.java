@@ -33,6 +33,6 @@ public class StorageVoltageData {
     public short frameTotal;
 
     //单体电池电压
-    @F_float_integer_array(singleLen = 2, lenExpr = "2*m", valExpr = "x/1000")
+    @F_float_integer_array(singleLen = 2, lenExpr = "m", valExpr = "x/1000")
     public float[] singleVoltage;
 }

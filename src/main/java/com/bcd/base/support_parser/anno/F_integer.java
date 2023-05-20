@@ -71,6 +71,16 @@ public @interface F_integer {
     int bit() default 0;
 
     /**
+     * bit位表示的值是否为无符号类型
+     * 当是有符号类型时候
+     * bit最高位为符号位、0代表正数、1代表负数
+     * 对值的求解方式为
+     * 正数、正常进行求值
+     * 负数、所有bit位取反+1、求值后、代表负数
+     */
+    boolean bitUnsigned() default true;
+
+    /**
      * {@link #bit()}时候生效
      * 表示当前字段bit解析结束时候、剩余多余的bit(不满1字节的)将被忽略
      * 用于连续字段的bit解析、但是下一个字段的bit不接着之前的字段bit解析

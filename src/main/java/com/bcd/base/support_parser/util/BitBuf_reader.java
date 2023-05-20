@@ -70,10 +70,10 @@ public class BitBuf_reader {
 //            final long l1 = bitBuf2.read_log(3);
 //            final long l2 = bitBuf2.read_log(3);
 //            final long l3 = bitBuf2.read_log(9);
-            final ReadLog res1 = bitBuf2.read_log(3);
-            final ReadLog res2 = bitBuf2.read_log(3);
+            final ReadLog res1 = bitBuf2.read_log(3, false);
+            final ReadLog res2 = bitBuf2.read_log(3, true);
             final SkipLog skip1 = bitBuf2.skip_log(3);
-            final ReadLog res3 = bitBuf2.read_log(9);
+            final ReadLog res3 = bitBuf2.read_log(9, false);
             res1.print();
             res2.print();
             skip1.print();
@@ -83,6 +83,7 @@ public class BitBuf_reader {
 //            System.out.println(l3);
         }
         System.out.println(System.currentTimeMillis() - t1);
+
     }
 
     public void finish() {
@@ -128,10 +129,13 @@ public class BitBuf_reader {
 
     public static class ReadLog extends Log {
 
+        public final boolean unsigned;
+
         public long val;
 
-        public ReadLog(int byteLen, int bitStart, int bitEnd) {
+        public ReadLog(int byteLen, int bitStart, int bitEnd, boolean unsigned) {
             super(byteLen, bitStart, bitEnd);
+            this.unsigned = unsigned;
         }
 
         public void print() {
@@ -140,8 +144,7 @@ public class BitBuf_reader {
     }
 
 
-
-    public long read(int bit) {
+    public long read(int bit, boolean unsigned) {
         if (bitOffset == 0) {
             b = byteBuf.readByte();
         }
@@ -157,17 +160,23 @@ public class BitBuf_reader {
 
         bitOffset = temp & 7;
 
-        return (c >>> right) & ((0x01L << bit) - 1);
+
+        final long cRight = c >>> right;
+        if (!unsigned && ((cRight >> (bit - 1)) & 0x01) == 1) {
+            return -(((~cRight) & ((0x01L << bit) - 1)) + 1);
+        } else {
+            return cRight & ((0x01L << bit) - 1);
+        }
     }
 
-    public ReadLog read_log(int bit) {
+    public ReadLog read_log(int bit, boolean unsigned) {
         if (bitOffset == 0) {
             b = byteBuf.readByte();
         }
         final int temp = bit + bitOffset;
         final int byteLen = (temp >> 3) + ((temp & 7) == 0 ? 0 : 1);
 
-        final ReadLog log = new ReadLog(byteLen, bitOffset, bitOffset + bit - 1);
+        final ReadLog log = new ReadLog(byteLen, bitOffset, bitOffset + bit - 1, unsigned);
 
         log.bytes[0] = b;
 
@@ -181,8 +190,12 @@ public class BitBuf_reader {
 
         bitOffset = temp & 7;
 
-        log.val = (c >>> right) & ((0x01L << bit) - 1);
-
+        final long cRight = c >>> right;
+        if (!unsigned && ((cRight >> (bit - 1)) & 0x01) == 1) {
+            log.val = -(((~cRight) & ((0x01L << bit) - 1)) + 1);
+        } else {
+            log.val = cRight & ((0x01L << bit) - 1);
+        }
         return log;
     }
 

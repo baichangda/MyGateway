@@ -130,11 +130,11 @@ public class Parser {
          *
          * @param fieldClass         字段类型
          * @param fieldName          字段名称
-         * @param readLog            bit字段解析详情
+         * @param logRes             bit字段解析详情
          * @param val                解析后的值
          * @param processorClassName 解析器类名
          */
-        void collect_field_bit(Class fieldClass, String fieldName, BitBuf_reader.ReadLog readLog, Object val, String processorClassName);
+        void collect_field_bit(Class fieldClass, String fieldName, BitBuf_reader.Log logRes, Object val, String processorClassName);
     }
 
 
@@ -156,10 +156,10 @@ public class Parser {
          * @param fieldClass         字段类型
          * @param fieldName          字段名称
          * @param val                解析后的字节数组
-         * @param writeLog           反解析的bit字段详情
+         * @param logRes             反解析的bit字段详情
          * @param processorClassName 解析器类名
          */
-        void collect_field_bit(Class fieldClass, String fieldName, Object val, BitBuf_writer.WriteLog writeLog, String processorClassName);
+        void collect_field_bit(Class fieldClass, String fieldName, Object val, BitBuf_writer.Log logRes, String processorClassName);
 
     }
 
@@ -185,17 +185,29 @@ public class Parser {
             }
 
             @Override
-            public void collect_field_bit(Class fieldClass, String fieldName, BitBuf_reader.ReadLog readLog, Object val, String processorClassName) {
-                logger.info("--parse field--[{}].[{}] bit_hex[{}] bit_pos[{}-{}] bit_binary[{}] bit_val[{}]->[{}]"
-                        , fieldClass.getSimpleName()
-                        , fieldName
-                        , readLog.getLogHex()
-                        , readLog.bitStart
-                        , readLog.bitEnd
-                        , readLog.getLogBit()
-                        , readLog.val
-                        , val
-                );
+            public void collect_field_bit(Class fieldClass, String fieldName, BitBuf_reader.Log logRes, Object val, String processorClassName) {
+                if (logRes instanceof BitBuf_reader.ReadLog readLog) {
+                    logger.info("--parse field--[{}].[{}] bit_hex[{}] bit_pos[{}-{}] bit_binary[{}] bit_val[{}]->[{}]"
+                            , fieldClass.getSimpleName()
+                            , fieldName
+                            , readLog.getLogHex()
+                            , readLog.bitStart
+                            , readLog.bitEnd
+                            , readLog.getLogBit()
+                            , readLog.val
+                            , val
+                    );
+                } else if (logRes instanceof BitBuf_reader.SkipLog skipLog) {
+                    logger.info("--parse field--[{}].[{}] skip bit_hex[{}] bit_pos[{}-{}] bit_binary[{}]"
+                            , fieldClass.getSimpleName()
+                            , fieldName
+                            , skipLog.getLogHex()
+                            , skipLog.bitStart
+                            , skipLog.bitEnd
+                            , skipLog.getLogBit()
+                    );
+                }
+
             }
         };
 
@@ -213,17 +225,28 @@ public class Parser {
             }
 
             @Override
-            public void collect_field_bit(Class fieldClass, String fieldName, Object val, BitBuf_writer.WriteLog writeLog, String processorClassName) {
-                logger.info("--deParse field--[{}].[{}] [{}]->bit_val[{}] bit_binary[{}] bit_hex[{}] bit_pos[{}-{}]"
-                        , fieldClass.getSimpleName()
-                        , fieldName
-                        , val
-                        , writeLog.val
-                        , writeLog.getLogBit()
-                        , writeLog.getLogHex()
-                        , writeLog.bitStart
-                        , writeLog.bitEnd
-                );
+            public void collect_field_bit(Class fieldClass, String fieldName, Object val, BitBuf_writer.Log logRes, String processorClassName) {
+                if (logRes instanceof BitBuf_writer.WriteLog writeLog) {
+                    logger.info("--deParse field--[{}].[{}] [{}]->bit_val[{}] bit_binary[{}] bit_hex[{}] bit_pos[{}-{}]"
+                            , fieldClass.getSimpleName()
+                            , fieldName
+                            , val
+                            , writeLog.val
+                            , writeLog.getLogBit()
+                            , writeLog.getLogHex()
+                            , writeLog.bitStart
+                            , writeLog.bitEnd
+                    );
+                } else if (logRes instanceof BitBuf_writer.SkipLog skipLog) {
+                    logger.info("--deParse field--[{}].[{}] skip bit_binary[{}] bit_hex[{}] bit_pos[{}-{}]"
+                            , fieldClass.getSimpleName()
+                            , fieldName
+                            , skipLog.getLogBit()
+                            , skipLog.getLogHex()
+                            , skipLog.bitStart
+                            , skipLog.bitEnd);
+                }
+
             }
         };
     }
@@ -307,8 +330,11 @@ public class Parser {
             final Field cur = fieldList.get(i);
             final F_integer f_integer1 = cur.getAnnotation(F_integer.class);
             final F_float_integer f_float_integer1 = cur.getAnnotation(F_float_integer.class);
+            final F_skip f_skip1 = cur.getAnnotation(F_skip.class);
+            final F_integer_array f_integer_array1 = cur.getAnnotation(F_integer_array.class);
+            final F_float_integer_array f_float_integer_array1 = cur.getAnnotation(F_float_integer_array.class);
             if (f_integer1 != null && f_integer1.bit() > 0) {
-                context.bitField = true;
+                context.logBit = true;
                 if (f_integer1.bitEnd()) {
                     context.bitEndWhenBitField_process = true;
                     context.bitEndWhenBitField_deProcess = true;
@@ -316,8 +342,32 @@ public class Parser {
                 }
             }
             if (f_float_integer1 != null && f_float_integer1.bit() > 0) {
-                context.bitField = true;
+                context.logBit = true;
                 if (f_float_integer1.bitEnd()) {
+                    context.bitEndWhenBitField_process = true;
+                    context.bitEndWhenBitField_deProcess = true;
+                    return;
+                }
+            }
+
+            if (f_skip1 != null && f_skip1.bit() > 0) {
+                context.logBit = true;
+                if (f_skip1.bitEnd()) {
+                    context.bitEndWhenBitField_process = true;
+                    context.bitEndWhenBitField_deProcess = true;
+                    return;
+                }
+            }
+
+            if (f_integer_array1 != null && f_integer_array1.bit() > 0) {
+                if (f_integer_array1.bitEnd()) {
+                    context.bitEndWhenBitField_process = true;
+                    context.bitEndWhenBitField_deProcess = true;
+                    return;
+                }
+            }
+            if (f_float_integer_array1 != null && f_float_integer_array1.bit() > 0) {
+                if (f_float_integer_array1.bitEnd()) {
                     context.bitEndWhenBitField_process = true;
                     context.bitEndWhenBitField_deProcess = true;
                     return;
@@ -327,9 +377,16 @@ public class Parser {
             final Field next = fieldList.get(i + 1);
             final F_integer f_integer2 = next.getAnnotation(F_integer.class);
             final F_float_integer f_float_integer2 = next.getAnnotation(F_float_integer.class);
-            if ((f_integer2 == null && f_float_integer2 == null)
+            final F_skip f_skip2 = next.getAnnotation(F_skip.class);
+            final F_integer_array f_integer_array2 = next.getAnnotation(F_integer_array.class);
+            final F_float_integer_array f_float_integer_array2 = next.getAnnotation(F_float_integer_array.class);
+            if ((f_integer2 == null && f_float_integer2 == null &&f_skip2==null &&f_integer_array2==null &&f_float_integer_array2==null)
                     || (f_integer2 != null && f_integer2.bit() == 0)
-                    || (f_float_integer2 != null && f_float_integer2.bit() == 0)) {
+                    || (f_float_integer2 != null && f_float_integer2.bit() == 0)
+                    || (f_skip2 != null && f_skip2.bit() == 0)
+                    || (f_integer_array2 != null && f_integer_array2.bit() == 0)
+                    || (f_float_integer_array2 != null && f_float_integer_array2.bit() == 0)
+            ) {
                 context.bitEndWhenBitField_process = true;
                 context.bitEndWhenBitField_deProcess = true;
                 return;
@@ -628,7 +685,7 @@ public class Parser {
             }
         });
         if (hasFieldSkipModeReserved) {
-            JavassistUtil.append(processBody, "final int {}={}.readerIndex();\n", FieldBuilder.startIndexVarName, FieldBuilder.varNameByteBuf);
+            JavassistUtil.append(processBody, "final int {}={}.readerIndex();\n", FieldBuilder.varNameStartIndex, FieldBuilder.varNameByteBuf);
         }
         BuilderContext parseContext = new BuilderContext(processBody, clazz, cc, classVarDefineToVarName);
         buildMethodBody_parse(clazz, parseContext);
@@ -655,7 +712,7 @@ public class Parser {
         deProcessBody.append("\n{\n");
         JavassistUtil.append(deProcessBody, "final {} {}=({})$3;\n", clazzName, FieldBuilder.varNameInstance, clazzName);
         if (hasFieldSkipModeReserved) {
-            JavassistUtil.append(deProcessBody, "final int {}={}.writerIndex();\n", FieldBuilder.startIndexVarName, FieldBuilder.varNameByteBuf);
+            JavassistUtil.append(deProcessBody, "final int {}={}.writerIndex();\n", FieldBuilder.varNameStartIndex, FieldBuilder.varNameByteBuf);
         }
         BuilderContext deParseContext = new BuilderContext(deProcessBody, clazz, cc, classVarDefineToVarName);
         buildMethodBody_deParse(clazz, deParseContext);

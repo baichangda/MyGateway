@@ -18,7 +18,7 @@ public class Msg_body_area_statistics_info implements Msg_body{
 
     @F_skip(len = 32,mode = SkipMode.ReservedFromStart)
     public byte[] reserved;
-    @F_integer_array(lenExpr = "a*4", singleLen = 4)
+    @F_integer_array(lenExpr = "a", singleLen = 4)
     public long[] src_array;
     @F_bean_list(listLenExpr = "b")
     public List<Lane_info_area> lane_info_array;

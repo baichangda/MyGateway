@@ -57,10 +57,10 @@ public class BitBuf_writer {
 
             final ByteBuf bb = Unpooled.buffer();
             final BitBuf_writer bitBufWriter = BitBuf_writer.newBitBuf(bb);
-            final WriteLog res1 = bitBufWriter.write_log(4, 3);
-            final WriteLog res2 = bitBufWriter.write_log(0, 3);
+            final WriteLog res1 = bitBufWriter.write_log(-4, 3, false);
+            final WriteLog res2 = bitBufWriter.write_log(0, 3, true);
             final SkipLog skip1 = bitBufWriter.skip_log(3);
-            final WriteLog res3 = bitBufWriter.write_log(457, 9);
+            final WriteLog res3 = bitBufWriter.write_log(-55, 9, false);
             res1.print();
             res2.print();
             skip1.print();
@@ -118,9 +118,12 @@ public class BitBuf_writer {
     public static class WriteLog extends Log {
         public long val;
 
-        public WriteLog(int byteLen, int bitStart, int bitEnd, long val) {
+        public final boolean unsigned;
+
+        public WriteLog(int byteLen, int bitStart, int bitEnd, long val, boolean unsigned) {
             super(byteLen, bitStart, bitEnd);
             this.val = val;
+            this.unsigned = unsigned;
         }
 
         public void print() {
@@ -129,7 +132,10 @@ public class BitBuf_writer {
     }
 
 
-    public final void write(long l, int bit) {
+    public final void write(long l, int bit, boolean unsigned) {
+        if (!unsigned && l < 0) {
+            l = (-l) & ((0x01L << bit) - 1);
+        }
         final int temp = bit + bitOffset;
         final int byteLen = (temp >> 3) + ((temp & 7) == 0 ? 0 : 1);
         final int left = (byteLen << 3) - temp;
@@ -150,13 +156,14 @@ public class BitBuf_writer {
     }
 
 
-
-
-    public final WriteLog write_log(long l, int bit) {
+    public final WriteLog write_log(long l, int bit, boolean unsigned) {
+        if (!unsigned && l < 0) {
+            l = (-l) & ((0x01L << bit) - 1);
+        }
         final int temp = bit + bitOffset;
         final int byteLen = (temp >> 3) + ((temp & 7) == 0 ? 0 : 1);
 
-        final WriteLog logRes = new WriteLog(byteLen, bitOffset, bitOffset + bit - 1, l);
+        final WriteLog logRes = new WriteLog(byteLen, bitOffset, bitOffset + bit - 1, l, unsigned);
         final int left = (byteLen << 3) - temp;
         final long newL = l << left;
         if (bitOffset == 0) {

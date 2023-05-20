@@ -12,10 +12,10 @@ import java.lang.annotation.Target;
  * 数组长度=总字节数/singleLen
  * <p>
  * {@link #len()}和{@link #lenExpr()} 二选一、代表字段所占用总字节数
- *
+ * <p>
  * 通过如下方式解析float
  * 首先得到整型数字、然后通过{@link #valExpr()}得到浮点数
- *
+ * <p>
  * 反解析中
  * 值可以为null、代表空数组
  */
@@ -23,14 +23,13 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface F_float_integer_array {
     /**
-     * 占用字节数
+     * 数组元素个数
      * 与{@link #lenExpr()}互斥
      */
     int len() default 0;
 
     /**
-     * 字段所占字节长度表达式
-     * 用于固定长度字段解析,配合var参数使用,代表的是Byte的长度
+     * 数组元素个数表达式,配合var参数使用
      * 与{@link #len()}互斥
      * 例如:
      * m
@@ -50,7 +49,7 @@ public @interface F_float_integer_array {
      * singleLen=4、调用readUnsignedLong、然后将long转换为double 将得到double[2]
      * singleLen=8、调用readLong、然后将long转换为double 将得到double[1]
      */
-    int singleLen();
+    int singleLen() default 1;
 
     /**
      * 值处理表达式、针对于数组中每个值
@@ -93,4 +92,18 @@ public @interface F_float_integer_array {
      * 8字节 byteBuf.readLong()
      */
     boolean unsigned() default true;
+
+    int bit() default 0;
+
+    /**
+     * bit位表示的值是否为无符号类型
+     * 当是有符号类型时候
+     * bit最高位为符号位、0代表正数、1代表负数
+     * 对值的求解方式为
+     * 正数、正常进行求值
+     * 负数、所有bit位取反+1、求值后、代表负数
+     */
+    boolean bitUnsigned() default true;
+
+    boolean bitEnd() default false;
 }

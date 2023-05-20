@@ -26,7 +26,7 @@ public class Event_info {
 
     @F_skip(len = 64, mode = SkipMode.ReservedFromStart)
     public byte[] reserved;
-    @F_integer_array(lenExpr = "a*4", singleLen = 4)
+    @F_integer_array(lenExpr = "a", singleLen = 4)
     public long[] src_array;
     @F_bean_list(listLenExpr = "b")
     public List<Event_target> event_target_array;

@@ -20,7 +20,7 @@ public class VehicleAlarmData {
     public short chargeBadNum;
 
     //可充电储能装置故障代码列表
-    @F_integer_array(lenExpr = "a*4", singleLen = 4)
+    @F_integer_array(lenExpr = "a", singleLen = 4)
     public long[] chargeBadCodes;
 
     //驱动电机故障总数
@@ -28,7 +28,7 @@ public class VehicleAlarmData {
     public short driverBadNum;
 
     //驱动电机故障代码列表
-    @F_integer_array(lenExpr = "b*4", singleLen = 4)
+    @F_integer_array(lenExpr = "b", singleLen = 4)
     public int[] driverBadCodes;
 
     //发动机故障总数
@@ -36,7 +36,7 @@ public class VehicleAlarmData {
     public short engineBadNum;
 
     //发动机故障代码列表
-    @F_integer_array(lenExpr = "c*4", singleLen = 1)
+    @F_integer_array(lenExpr = "c", singleLen = 1)
     public short[] engineBadCodes;
 
     //其他故障总数
@@ -44,7 +44,7 @@ public class VehicleAlarmData {
     public short otherBadNum;
 
     //其他故障代码列表
-    @F_integer_array(lenExpr = "d*4", singleLen = 4)
+    @F_integer_array(lenExpr = "d", singleLen = 4)
     public long[] otherBadCodes;
 
 
