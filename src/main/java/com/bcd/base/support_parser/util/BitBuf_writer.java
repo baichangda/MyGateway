@@ -7,7 +7,7 @@ import io.netty.buffer.Unpooled;
 public class BitBuf_writer {
     private final ByteBuf byteBuf;
 
-    private final ByteBuf cache = Unpooled.buffer();
+    private byte b;
 
     //当前写入字节bit偏移量
     private int bitOffset = 0;
@@ -23,10 +23,10 @@ public class BitBuf_writer {
     public static void main(String[] args) {
         final long t1 = System.currentTimeMillis();
         for (int i = 0; i < 100000000; i++) {
-            final ByteBuf bb = Unpooled.buffer();
-            final BitBuf_writer bitBufWriter = BitBuf_writer.newBitBuf(bb);
-            bitBufWriter.write(1L, 1);
-            bitBufWriter.write(28900L, 15);
+//            final ByteBuf bb = Unpooled.buffer();
+//            final BitBuf_writer bitBufWriter = BitBuf_writer.newBitBuf(bb);
+//            bitBufWriter.write(1L, 1);
+//            bitBufWriter.write(28900L, 15);
 //            bitBufWriter.write(1L, 1);
 //            bitBufWriter.write(28900L, 15);
 //            bitBufWriter.write(1L, 1);
@@ -48,49 +48,46 @@ public class BitBuf_writer {
 //            bitBufWriter.write(28900L, 15);
 
 //            System.out.println(ByteBufUtil.hexDump(bb));
+
+
+            final ByteBuf bb = Unpooled.buffer();
+            final BitBuf_writer bitBufWriter = BitBuf_writer.newBitBuf(bb);
+            bitBufWriter.write(4, 3);
+            bitBufWriter.write(0, 3);
+            bitBufWriter.write(114, 9);
+            bitBufWriter.write(114, 9);
+            bitBufWriter.write(114, 9);
+            bitBufWriter.finish();
+//            System.out.println(ByteBufUtil.hexDump(bb));
         }
         System.out.println(System.currentTimeMillis() - t1);
-
-//        final ByteBuf bb = Unpooled.buffer();
-//        final BitBuf_writer bitBufWriter = BitBuf_writer.newBitBuf(bb);
-//        bitBufWriter.write(4, 3);
-//        bitBufWriter.write(0, 3);
-//        bitBufWriter.write(114, 9);
-//        bitBufWriter.finish();
-//        System.out.println(ByteBufUtil.hexDump(bb));
     }
 
     public void finish() {
-        byteBuf.writeBytes(cache);
-        cache.clear();
+        if (bitOffset > 0) {
+            byteBuf.writeByte(b);
+        }
+        b = 0;
         bitOffset = 0;
     }
 
-    public void write(long l, int bit) {
+    public final void write(long l, int bit) {
         final int temp = bit + bitOffset;
         final int byteLen = (temp >> 3) + ((temp & 7) == 0 ? 0 : 1);
-        final int left = (byteLen << 3) - bitOffset - bit;
+        final int left = 8 - (temp & 7);
         final long newL = l << left;
-
         if (bitOffset == 0) {
-            cache.writeByte((byte) (newL >> ((byteLen - 1) << 3)));
+            b = (byte) (newL >> ((byteLen - 1) << 3));
         } else {
-            cache.setByte(cache.writerIndex(), (byte) (newL >> ((byteLen - 1) << 3)));
+            b |= (byte) (newL >> ((byteLen - 1) << 3));
         }
         for (int i = 1; i < byteLen; i++) {
-            cache.writeByte((byte) (newL >> ((byteLen - i - 1) << 3)));
+            byteBuf.writeByte(b);
+            b = (byte) (newL >> ((byteLen - i - 1) << 3));
         }
-
         bitOffset = temp & 7;
-
-        checkBuf();
-    }
-
-    private void checkBuf() {
         if (bitOffset == 0) {
-            byteBuf.writeBytes(cache);
-        } else {
-            byteBuf.writeBytes(cache, cache.readableBytes() - 1);
+            byteBuf.writeByte(b);
         }
     }
 }

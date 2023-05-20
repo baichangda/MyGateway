@@ -250,42 +250,6 @@ public class JavassistUtil {
         sb.append(format(message, params));
     }
 
-    public static long getBitVal(byte[] bytes, int bitOffset, int bitLen) {
-        final int startByteIndex = bitOffset / 8;
-        final int endBitOffset = bitOffset + bitLen - 1;
-        final int endByteIndex = endBitOffset / 8;
-        final int byteLen = endByteIndex - startByteIndex + 1;
-//        System.out.println("startByteIndex["+startByteIndex+"] endByteIndex["+endByteIndex+"] byteLen["+byteLen+"] bitOffset["+bitOffset+"] endBitOffset["+endBitOffset+"]");
-        long c = bytes[endByteIndex] & 0xffL;
-        for (int i = endByteIndex - 1; i >= startByteIndex; i--) {
-            c |= ((bytes[i] & 0xffL) << ((endByteIndex - i) * 8));
-        }
-//        printBinaryString(byteLen + "个字节转换为int的二进制表示", c, byteLen);
-        final int right = byteLen * 8 - bitOffset - bitLen;
-//        printBinaryString("右移" + right + "后的结果", c >>> right, byteLen);
-//        printBinaryString("需要进行&运算", (0x01 << bitLen) - 1, byteLen);
-        final long res = (c >>> right) & ((0x01L << bitLen) - 1);
-//        printBinaryString("最后结果二进制表示", res, byteLen);
-        return res;
-    }
-
-    public static void putBitVal(long val, byte[] bytes, int bitOffset, int bitLen) {
-        final int startByteIndex = bitOffset / 8;
-        final int endBitOffset = bitOffset + bitLen - 1;
-        final int endByteIndex = endBitOffset / 8;
-        final int byteLen = endByteIndex - startByteIndex + 1;
-        final int left = byteLen * 8 - bitOffset - bitLen;
-        final long newVal = val << left;
-        for (int i = endByteIndex; i >= startByteIndex; i--) {
-            int right = (endByteIndex - i) * 8;
-            bytes[i] = (byte) (bytes[i] | ((newVal >> right) & 0xff));
-        }
-    }
-
-    private static void printBinaryString(String prepend, int i, int byteLen) {
-        System.out.println(String.format(prepend + "---%" + byteLen * 8 + "s", Integer.toBinaryString(i)).replaceAll(" ", "0"));
-    }
-
     static final double[] pows;
 
     static {
@@ -331,32 +295,5 @@ public class JavassistUtil {
         } else {
             return s.substring(0, len);
         }
-    }
-
-    public static void main(String[] args) {
-//        byte[] bytes = new byte[]{(byte) 0};
-//        System.out.println(getBitVal(bytes, 0, 1));
-//        System.out.println(getBitVal(bytes, 1, 7));
-
-        final byte[] source = {(byte) 0xF0, (byte) 0xe4};
-        final long bitVal1 = getBitVal(source, 0, 1);
-        final long bitVal2 = getBitVal(source, 1, 15);
-        System.out.println(bitVal1);
-        System.out.println(bitVal2);
-
-
-        final long t1 = System.currentTimeMillis();
-        byte[] dest = new byte[2];
-        for(int i=0;i<100000000;i++){
-            final ByteBuf bb = Unpooled.buffer();
-            final BitBuf_writer bitBufWriter = BitBuf_writer.newBitBuf(bb);
-            putBitVal((int) bitVal1, dest, 0, 1);
-            putBitVal((int) bitVal2, dest, 1, 15);
-//        System.out.println(ByteBufUtil.hexDump(dest));
-        }
-        System.out.println(System.currentTimeMillis() - t1);
-
-//        final double format = JavassistUtil.format(1.23232d, 4);
-//        System.out.println(format);
     }
 }
