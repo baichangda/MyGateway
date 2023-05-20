@@ -16,21 +16,28 @@ public class FieldBuilder__F_integer extends FieldBuilder {
         final Class<F_integer> annoClass = F_integer.class;
         final Field field = context.field;
         final Class<?> fieldTypeClass = field.getType();
+        final String sourceValTypeName;
         final String fieldTypeName = fieldTypeClass.getName();
 
         switch (fieldTypeName) {
-            case "byte", "short", "int", "long" -> {
+            case "byte", "short", "int", "long", "float", "double" -> {
+                sourceValTypeName = fieldTypeName;
             }
             default -> {
-                JavassistUtil.notSupport_fieldType(field, annoClass);
+                if (fieldTypeClass.isEnum()) {
+                    sourceValTypeName = "int";
+                } else {
+                    JavassistUtil.notSupport_fieldType(field, annoClass);
+                    sourceValTypeName = null;
+                }
             }
         }
 
         final F_integer anno = context.field.getAnnotation(annoClass);
-        final boolean bigEndian = JavassistUtil.bigEndian(anno.order(), context.clazz);
         final StringBuilder body = context.body;
         final String varNameInstance = FieldBuilder.varNameInstance;
         final String varNameField = JavassistUtil.getFieldVarName(context);
+
         if (anno.len() == 0) {
             if (anno.bit() == 0) {
                 throw BaseRuntimeException.getException("class[{}] field[{}] anno[{}] must have len or bit", field.getDeclaringClass().getName(), field.getName(), annoClass.getName());
@@ -54,86 +61,45 @@ public class FieldBuilder__F_integer extends FieldBuilder {
                     JavassistUtil.append(body, "{}.finish();\n", varNameBitBuf);
                 }
                 if (fieldTypeClass.isEnum()) {
-                    JavassistUtil.append(body, "{}.{}={}.fromInteger((int){});\n", varNameInstance, field.getName(), fieldTypeClass.getName(), JavassistUtil.replaceValExprToCode(anno.valExpr(), varNameField));
+                    JavassistUtil.append(body, "{}.{}={}.fromInteger((int){});\n", varNameInstance, field.getName(), fieldTypeName, JavassistUtil.replaceValExprToCode(anno.valExpr(), varNameField));
                 } else {
                     JavassistUtil.append(body, "{}.{}=({}){};\n", varNameInstance, field.getName(), fieldTypeName, JavassistUtil.replaceValExprToCode(anno.valExpr(), varNameField));
                 }
             }
         } else {
-            if (byte.class.isAssignableFrom(fieldTypeClass)) {
-                if (anno.len() == 1) {
-                    JavassistUtil.append(body, "final byte {}={}.readByte();\n", varNameField, FieldBuilder.varNameByteBuf);
-                } else {
+            final boolean unsigned = anno.unsigned();
+            final boolean bigEndian = JavassistUtil.bigEndian(anno.order(), context.clazz);
+            String funcName;
+            switch (anno.len()) {
+                case 1 -> {
+                    funcName = unsigned ? "readUnsignedByte" : "readByte";
+                }
+                case 2 -> {
+                    funcName = unsigned ? "readUnsignedShort" : "readShort";
+                    funcName += (bigEndian ? "" : "LE");
+                }
+                case 4 -> {
+                    funcName = unsigned ? "readUnsignedInt" : "readInt";
+                    funcName += (bigEndian ? "" : "LE");
+                }
+                case 8 -> {
+                    funcName = bigEndian ? "readLong" : "readLongLE";
+                }
+                default -> {
                     JavassistUtil.notSupport_len(field, annoClass);
+                    funcName = null;
                 }
-                JavassistUtil.append(body, "{}.{}=({}){};\n", varNameInstance, field.getName(), fieldTypeName, JavassistUtil.replaceValExprToCode(anno.valExpr(), varNameField));
-            } else if (short.class.isAssignableFrom(fieldTypeClass)) {
-                switch (anno.len()) {
-                    case 1 -> {
-                        JavassistUtil.append(body, "final short {}={}.readUnsignedByte();\n", varNameField, FieldBuilder.varNameByteBuf);
-                    }
-                    case 2 -> {
-                        final String funcName = bigEndian ? "readShort" : "readShortLE";
-                        JavassistUtil.append(body, "final short {}={}.{}();\n", varNameField, FieldBuilder.varNameByteBuf, funcName);
-                    }
-                    default -> {
-                        JavassistUtil.notSupport_len(field, annoClass);
-                    }
-                }
-                JavassistUtil.append(body, "{}.{}=({}){};\n", varNameInstance, field.getName(), fieldTypeName, JavassistUtil.replaceValExprToCode(anno.valExpr(), varNameField));
-            } else if (int.class.isAssignableFrom(fieldTypeClass)) {
-                switch (anno.len()) {
-                    case 2 -> {
-                        final String funcName = bigEndian ? "readUnsignedShort" : "readUnsignedShortLE";
-                        JavassistUtil.append(body, "final int {}={}.{}();\n", varNameField, FieldBuilder.varNameByteBuf, funcName);
-                    }
-                    case 4 -> {
-                        final String funcName = bigEndian ? "readInt" : "readIntLE";
-                        JavassistUtil.append(body, "final int {}={}.{}();\n", varNameField, FieldBuilder.varNameByteBuf, funcName);
-                    }
-                    default -> {
-                        JavassistUtil.notSupport_len(field, annoClass);
-                    }
-                }
-                JavassistUtil.append(body, "{}.{}=({}){};\n", varNameInstance, field.getName(), fieldTypeName, JavassistUtil.replaceValExprToCode(anno.valExpr(), varNameField));
-            } else if (long.class.isAssignableFrom(fieldTypeClass)) {
-                switch (anno.len()) {
-                    case 4 -> {
-                        final String funcName = bigEndian ? "readUnsignedInt" : "readUnsignedIntLE";
-                        JavassistUtil.append(body, "final long {}={}.{}();\n", varNameField, FieldBuilder.varNameByteBuf, funcName);
-                    }
-                    case 8 -> {
-                        final String funcName = bigEndian ? "readLong" : "readLongLE";
-                        JavassistUtil.append(body, "final long {}={}.{}();\n", varNameField, FieldBuilder.varNameByteBuf, funcName);
-                    }
-                    default -> {
-                        JavassistUtil.notSupport_len(field, annoClass);
-                    }
-                }
-                JavassistUtil.append(body, "{}.{}=({}){};\n", varNameInstance, field.getName(), fieldTypeName, JavassistUtil.replaceValExprToCode(anno.valExpr(), varNameField));
-            } else if (fieldTypeClass.isEnum()) {
-                switch (anno.len()) {
-                    case 1 -> {
-                        JavassistUtil.append(body, "final short {}={}.readUnsignedByte();\n", varNameField, FieldBuilder.varNameByteBuf);
-                    }
-                    case 2 -> {
-                        final String funcName = bigEndian ? "readUnsignedShort" : "readUnsignedShortLE";
-                        JavassistUtil.append(body, "final int {}={}.{}();\n", varNameField, FieldBuilder.varNameByteBuf, funcName);
-                    }
-                    case 4 -> {
-                        final String funcName = bigEndian ? "readInt" : "readIntLE";
-                        JavassistUtil.append(body, "final int {}={}.{}();\n", varNameField, FieldBuilder.varNameByteBuf, funcName);
-                    }
-                    default -> {
-                        JavassistUtil.notSupport_len(field, annoClass);
-                    }
-                }
-                JavassistUtil.append(body, "{}.{}={}.fromInteger((int){});\n", varNameInstance, field.getName(), fieldTypeName, JavassistUtil.replaceValExprToCode(anno.valExpr(), varNameField));
+            }
+            //读取原始数据
+            JavassistUtil.append(body, "final {} {}=({}){}.{}();\n", sourceValTypeName, varNameField, sourceValTypeName, FieldBuilder.varNameByteBuf, funcName);
+            //表达式运算
+            final String valCode = JavassistUtil.replaceValExprToCode(anno.valExpr(), varNameField);
+            if (fieldTypeClass.isEnum()) {
+                JavassistUtil.append(body, "{}.{}={}.fromInteger((int)({}));\n", varNameInstance, field.getName(), fieldTypeName, valCode);
             } else {
-                JavassistUtil.notSupport_fieldType(field, annoClass);
+                JavassistUtil.append(body, "{}.{}={};\n", varNameInstance, field.getName(), valCode);
             }
         }
-
 
         final char var = anno.var();
         if (var != '0') {
@@ -198,11 +164,11 @@ public class FieldBuilder__F_integer extends FieldBuilder {
         } else {
             switch (anno.len()) {
                 case 1 -> {
-                    JavassistUtil.append(body, "{}.writeByte((byte)({}));\n", FieldBuilder.varNameByteBuf, valCode);
+                    JavassistUtil.append(body, "{}.writeByte((int)({}));\n", FieldBuilder.varNameByteBuf, valCode);
                 }
                 case 2 -> {
                     final String funcName = bigEndian ? "writeShort" : "writeShortLE";
-                    JavassistUtil.append(body, "{}.{}((short)({}));\n", FieldBuilder.varNameByteBuf, funcName, valCode);
+                    JavassistUtil.append(body, "{}.{}((int)({}));\n", FieldBuilder.varNameByteBuf, funcName, valCode);
                 }
                 case 4 -> {
                     final String funcName = bigEndian ? "writeInt" : "writeIntLE";

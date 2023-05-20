@@ -59,8 +59,6 @@ public class Parser {
     private final static FieldBuilder__F_bean fieldBuilder__f_bean = new FieldBuilder__F_bean();
     private final static FieldBuilder__F_bean_list fieldBuilder__f_bean_list = new FieldBuilder__F_bean_list();
     private final static FieldBuilder__F_date field_builder__f_date = new FieldBuilder__F_date();
-    private final static FieldBuilder__F_float_integer_array fieldBuilder__f_float_integer_array = new FieldBuilder__F_float_integer_array();
-    private final static FieldBuilder__F_float_integer fieldBuilder__f_float_integer = new FieldBuilder__F_float_integer();
     private final static FieldBuilder__F_float_ieee754_array fieldBuilder__F_float_ieee754_array = new FieldBuilder__F_float_ieee754_array();
     private final static FieldBuilder__F_float_ieee754 fieldbuilder__f_float_ieee754 = new FieldBuilder__F_float_ieee754();
     private final static FieldBuilder__F_integer_array fieldBuilder__f_integer_array = new FieldBuilder__F_integer_array();
@@ -79,9 +77,6 @@ public class Parser {
     static {
         annoSet.add(F_integer.class);
         annoSet.add(F_integer_array.class);
-
-        annoSet.add(F_float_integer.class);
-        annoSet.add(F_float_integer_array.class);
 
         annoSet.add(F_float_ieee754.class);
         annoSet.add(F_float_ieee754_array.class);
@@ -277,8 +272,6 @@ public class Parser {
      * 用于该包下所有带如下注解的属性覆盖
      * {@link F_float_ieee754#order()}
      * {@link F_float_ieee754_array#order()}
-     * {@link F_float_integer#order()}
-     * {@link F_float_integer_array#order()}
      * {@link F_integer#order()}
      * {@link F_integer_array#order()}
      * {@link F_date#order()}
@@ -331,21 +324,11 @@ public class Parser {
         } else {
             final Field cur = fieldList.get(i);
             final F_integer f_integer1 = cur.getAnnotation(F_integer.class);
-            final F_float_integer f_float_integer1 = cur.getAnnotation(F_float_integer.class);
             final F_skip f_skip1 = cur.getAnnotation(F_skip.class);
             final F_integer_array f_integer_array1 = cur.getAnnotation(F_integer_array.class);
-            final F_float_integer_array f_float_integer_array1 = cur.getAnnotation(F_float_integer_array.class);
             if (f_integer1 != null && f_integer1.bit() > 0) {
                 context.logBit = true;
                 if (f_integer1.bitEnd()) {
-                    context.bitEndWhenBitField_process = true;
-                    context.bitEndWhenBitField_deProcess = true;
-                    return;
-                }
-            }
-            if (f_float_integer1 != null && f_float_integer1.bit() > 0) {
-                context.logBit = true;
-                if (f_float_integer1.bitEnd()) {
                     context.bitEndWhenBitField_process = true;
                     context.bitEndWhenBitField_deProcess = true;
                     return;
@@ -368,26 +351,15 @@ public class Parser {
                     return;
                 }
             }
-            if (f_float_integer_array1 != null && f_float_integer_array1.bit() > 0) {
-                if (f_float_integer_array1.bitEnd()) {
-                    context.bitEndWhenBitField_process = true;
-                    context.bitEndWhenBitField_deProcess = true;
-                    return;
-                }
-            }
 
             final Field next = fieldList.get(i + 1);
             final F_integer f_integer2 = next.getAnnotation(F_integer.class);
-            final F_float_integer f_float_integer2 = next.getAnnotation(F_float_integer.class);
             final F_skip f_skip2 = next.getAnnotation(F_skip.class);
             final F_integer_array f_integer_array2 = next.getAnnotation(F_integer_array.class);
-            final F_float_integer_array f_float_integer_array2 = next.getAnnotation(F_float_integer_array.class);
-            if ((f_integer2 == null && f_float_integer2 == null && f_skip2 == null && f_integer_array2 == null && f_float_integer_array2 == null)
+            if ((f_integer2 == null  && f_skip2 == null && f_integer_array2 == null )
                     || (f_integer2 != null && f_integer2.bit() == 0)
-                    || (f_float_integer2 != null && f_float_integer2.bit() == 0)
                     || (f_skip2 != null && f_skip2.bit() == 0)
                     || (f_integer_array2 != null && f_integer_array2.bit() == 0)
-                    || (f_float_integer_array2 != null && f_float_integer_array2.bit() == 0)
             ) {
                 context.bitEndWhenBitField_process = true;
                 context.bitEndWhenBitField_deProcess = true;
@@ -454,12 +426,6 @@ public class Parser {
                     continue;
                 }
 
-                final F_float_integer f_floatInteger = field.getAnnotation(F_float_integer.class);
-                if (f_floatInteger != null) {
-                    fieldBuilder__f_float_integer.buildParse(context);
-                    continue;
-                }
-
                 final F_float_ieee754 f_float_ieee754 = field.getAnnotation(F_float_ieee754.class);
                 if (f_float_ieee754 != null) {
                     fieldbuilder__f_float_ieee754.buildParse(context);
@@ -469,12 +435,6 @@ public class Parser {
                 final F_integer_array f_integer_array = field.getAnnotation(F_integer_array.class);
                 if (f_integer_array != null) {
                     fieldBuilder__f_integer_array.buildParse(context);
-                    continue;
-                }
-
-                final F_float_integer_array f_float_integer_array = field.getAnnotation(F_float_integer_array.class);
-                if (f_float_integer_array != null) {
-                    fieldBuilder__f_float_integer_array.buildParse(context);
                     continue;
                 }
 
@@ -546,12 +506,6 @@ public class Parser {
                     continue;
                 }
 
-                final F_float_integer f_floatInteger = field.getAnnotation(F_float_integer.class);
-                if (f_floatInteger != null) {
-                    fieldBuilder__f_float_integer.buildDeParse(context);
-                    continue;
-                }
-
                 final F_float_ieee754 f_float_ieee754 = field.getAnnotation(F_float_ieee754.class);
                 if (f_float_ieee754 != null) {
                     fieldbuilder__f_float_ieee754.buildDeParse(context);
@@ -561,12 +515,6 @@ public class Parser {
                 final F_integer_array f_integer_array = field.getAnnotation(F_integer_array.class);
                 if (f_integer_array != null) {
                     fieldBuilder__f_integer_array.buildDeParse(context);
-                    continue;
-                }
-
-                final F_float_integer_array f_float_integer_array = field.getAnnotation(F_float_integer_array.class);
-                if (f_float_integer_array != null) {
-                    fieldBuilder__f_float_integer_array.buildDeParse(context);
                     continue;
                 }
 

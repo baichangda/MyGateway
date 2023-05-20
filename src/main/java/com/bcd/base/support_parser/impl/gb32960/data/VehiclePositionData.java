@@ -1,9 +1,6 @@
 package com.bcd.base.support_parser.impl.gb32960.data;
 
-import com.bcd.base.support_parser.anno.F_float_ieee754;
-import com.bcd.base.support_parser.anno.F_float_integer;
 import com.bcd.base.support_parser.anno.F_integer;
-import com.bcd.base.support_parser.anno.FloatType_ieee754;
 
 /**
  * 车辆位置数据
@@ -14,10 +11,10 @@ public class VehiclePositionData {
     public byte status;
 
     //经度
-    @F_float_integer(len = 4, valExpr = "x/1000000")
+    @F_integer(len = 4, valExpr = "x/1000000")
     public double lng;
 
     //纬度
-    @F_float_integer(len = 4, valExpr = "x/1000000")
+    @F_integer(len = 4, valExpr = "x/1000000")
     public double lat;
 }

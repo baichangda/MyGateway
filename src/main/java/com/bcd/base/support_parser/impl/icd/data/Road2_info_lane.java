@@ -7,7 +7,7 @@ import java.util.List;
 public class Road2_info_lane {
     @F_integer(len = 4)
     public long lane_id;
-    @F_float_integer(len = 2, valExpr = "x/100")
+    @F_integer(len = 2, valExpr = "x/100")
     public float lane_azimuth;
     @F_integer(len = 1)
     public LaneCanalization lane_canalization;

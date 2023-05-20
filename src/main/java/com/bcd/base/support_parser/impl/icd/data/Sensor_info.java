@@ -12,17 +12,17 @@ public class Sensor_info {
     public SensorType sensor_type;
     @F_integer(len = 1)
     public DataType data_type;
-    @F_float_integer(len = 4, valExpr = "x/10000000")
+    @F_integer(len = 4, valExpr = "x/10000000")
     public double sensor_lon;
-    @F_float_integer(len = 4, valExpr = "x/10000000")
+    @F_integer(len = 4, valExpr = "x/10000000")
     public double sensor_lat;
     @F_integer(len = 4)
     public long sensor_alt;
-    @F_float_integer(len = 2, valExpr = "x/100")
+    @F_integer(len = 2, valExpr = "x/100")
     public float sensor_azimuth;
-    @F_float_integer(len = 2, valExpr = "x/100")
+    @F_integer(len = 2, valExpr = "x/100")
     public float sensor_pitch;
-    @F_float_integer(len = 2, valExpr = "x/100")
+    @F_integer(len = 2, valExpr = "x/100")
     public float sensor_roll;
     @F_integer(len = 1)
     public SensorStatus sensor_status;

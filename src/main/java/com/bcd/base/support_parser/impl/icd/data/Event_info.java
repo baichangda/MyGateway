@@ -11,9 +11,9 @@ public class Event_info {
     public EventType event_type;
     @F_float_ieee754(type = FloatType_ieee754.Float64)
     public double event_timestamp;
-    @F_float_integer(len = 8, valExpr = "x/10000000")
+    @F_integer(len = 8, valExpr = "x/10000000")
     public double event_lon;
-    @F_float_integer(len = 8, valExpr = "x/10000000")
+    @F_integer(len = 8, valExpr = "x/10000000")
     public double event_lat;
     @F_integer(len = 4)
     public long event_alt;

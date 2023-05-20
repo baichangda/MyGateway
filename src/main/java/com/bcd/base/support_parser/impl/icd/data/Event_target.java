@@ -6,9 +6,9 @@ import com.bcd.base.support_parser.impl.icd.processor.Target_info_extras_process
 public class Event_target {
     @F_integer(len = 4)
     public long track_id;
-    @F_float_integer(len = 4, valExpr = "x/10000000")
+    @F_integer(len = 4, valExpr = "x/10000000")
     public double lon;
-    @F_float_integer(len = 4, valExpr = "x/10000000")
+    @F_integer(len = 4, valExpr = "x/10000000")
     public double lat;
     @F_integer(len = 4)
     public long alt;

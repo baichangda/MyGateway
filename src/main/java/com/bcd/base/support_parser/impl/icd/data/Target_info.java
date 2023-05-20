@@ -10,9 +10,9 @@ public class Target_info {
     public long track_id;
     @F_integer(len = 4)
     public long lane_id;
-    @F_float_integer(len = 4, valExpr = "x/10000000")
+    @F_integer(len = 4, valExpr = "x/10000000")
     public double lon;
-    @F_float_integer(len = 4, valExpr = "x/10000000")
+    @F_integer(len = 4, valExpr = "x/10000000")
     public double lat;
     @F_integer(len = 4)
     public long alt;
@@ -22,7 +22,7 @@ public class Target_info {
     public int dev_y;
     @F_integer(len = 4)
     public int dev_z;
-    @F_float_integer(len = 2, valExpr = "x/100")
+    @F_integer(len = 2, valExpr = "x/100")
     public float azimuth_angle;
     @F_integer(len = 4)
     public int dev_vx;
@@ -52,11 +52,11 @@ public class Target_info {
     @F_integer(len = 2)
     public int img_height;
 
-    @F_float_integer(len = 2, unsigned = false, valExpr = "x/100")
+    @F_integer(len = 2, unsigned = false, valExpr = "x/100")
     public float img_direc_len;
-    @F_float_integer(len = 2, unsigned = false, valExpr = "x/100")
+    @F_integer(len = 2, unsigned = false, valExpr = "x/100")
     public float img_direc_width;
-    @F_float_integer(len = 2, unsigned = false, valExpr = "x/100")
+    @F_integer(len = 2, unsigned = false, valExpr = "x/100")
     public float img_direc_height;
 
     @F_integer(len = 1)

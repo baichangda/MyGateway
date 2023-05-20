@@ -9,9 +9,9 @@ public class Road2_info {
     public long road_id;
     @F_integer(len = 1)
     public RoadType road_type;
-    @F_float_integer(len = 4,valExpr = "x/10000000")
+    @F_integer(len = 4,valExpr = "x/10000000")
     public double road_lon;
-    @F_float_integer(len = 4,valExpr = "x/10000000")
+    @F_integer(len = 4,valExpr = "x/10000000")
     public double road_lat;
     @F_integer(len = 4)
     public long road_alt;

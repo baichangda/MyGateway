@@ -5,7 +5,7 @@ import com.bcd.base.support_parser.anno.*;
 import java.util.List;
 
 public class Msg_body_area_statistics_info implements Msg_body{
-    @F_float_integer(len = 2,valExpr = "x/10")
+    @F_integer(len = 2,valExpr = "x/10")
     public float period;
     @F_integer(len = 2)
     public int area_dis_near;

@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 /**
  * 适用如下字段类型
- * byte、short、int、long、枚举类
+ * byte、short、int、long、float、double、枚举类
  * <p>
  * 枚举类
  * 仅支持当{@link #len()}为1、2、4时候、因为默认类型为int、8会产生精度丢失
@@ -107,6 +107,12 @@ public @interface F_integer {
      * 例如: m,n,a
      */
     char var() default '0';
+
+
+    /**
+     * 有符号或者无符号
+     */
+    boolean unsigned() default true;
 
     /**
      * 字节序模式

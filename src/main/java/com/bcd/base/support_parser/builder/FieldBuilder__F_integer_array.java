@@ -9,24 +9,31 @@ import com.bcd.base.support_parser.util.JavassistUtil;
 import com.bcd.base.support_parser.util.RpnUtil;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
 
 public class FieldBuilder__F_integer_array extends FieldBuilder {
     @Override
     public void buildParse(BuilderContext context) {
         final Field field = context.field;
         final Class<?> fieldTypeClass = field.getType();
-        final String arrayElementType = fieldTypeClass.componentType().getName();
+        final Class<?> arrayElementType = fieldTypeClass.componentType();
+        final String arrayElementTypeName = arrayElementType.getName();
+        final String sourceValTypeName;
         final Class<F_integer_array> annoClass = F_integer_array.class;
         final F_integer_array anno = context.field.getAnnotation(annoClass);
-        switch (arrayElementType) {
-            case "byte", "short", "int", "long" -> {
+        switch (arrayElementTypeName) {
+            case "byte", "short", "int", "long", "float", "double" -> {
+                sourceValTypeName = arrayElementTypeName;
             }
             default -> {
-                JavassistUtil.notSupport_fieldType(field, annoClass);
+                if (arrayElementType.isEnum()) {
+                    sourceValTypeName = "int";
+                } else {
+                    JavassistUtil.notSupport_fieldType(field, annoClass);
+                    sourceValTypeName = null;
+                }
             }
         }
-        final boolean bigEndian = JavassistUtil.bigEndian(anno.order(), context.clazz);
+
         final String arrLenRes;
         if (anno.len() == 0) {
             if (anno.lenExpr().isEmpty()) {
@@ -45,93 +52,50 @@ public class FieldBuilder__F_integer_array extends FieldBuilder {
         final String varNameField = JavassistUtil.getFieldVarName(context);
         String arrVarName = varNameField + "_arr";
         if (anno.bit() == 0) {
-            if (byte[].class.isAssignableFrom(fieldTypeClass)) {
-                JavassistUtil.append(body, "final byte[] {}=new byte[{}];\n", arrVarName, arrLenRes);
-                switch (singleLen) {
-                    case 1: {
-                        if (valExpr.isEmpty()) {
-                            JavassistUtil.append(body, "{}.readBytes({});\n", FieldBuilder.varNameByteBuf, arrVarName);
-                        } else {
-                            final String varNameArrayElement = varNameField + "_arrEle";
-                            JavassistUtil.append(body, "for(int i=0;i<{}.length;i++){\n", arrVarName);
-                            JavassistUtil.append(body, "byte {}={}.readByte();\n", varNameArrayElement, FieldBuilder.varNameByteBuf);
-                            JavassistUtil.append(body, "{}[i]=(byte)({});\n", arrVarName, JavassistUtil.replaceValExprToCode(valExpr, varNameArrayElement));
-                            JavassistUtil.append(body, "}\n");
-                        }
-                        break;
-                    }
-                    default: {
-                        JavassistUtil.notSupport_singleLen(field, annoClass);
-                    }
+            final boolean bigEndian = JavassistUtil.bigEndian(anno.order(), context.clazz);
+            final boolean unsigned = anno.unsigned();
+            JavassistUtil.append(body, "final {}[] {}=new {}[{}];\n", arrayElementTypeName, arrVarName, arrayElementTypeName, arrLenRes);
+            String funcName;
+            switch (singleLen) {
+                case 1 -> {
+                    funcName = unsigned ? "readUnsignedByte" : "readByte";
                 }
-            } else if (short[].class.isAssignableFrom(fieldTypeClass)) {
-                JavassistUtil.append(body, "final short[] {}=new short[{}];\n", arrVarName, arrLenRes);
-                final String varNameArrayElement = varNameField + "_arrEle";
-                JavassistUtil.append(body, "for(int i=0;i<{}.length;i++){\n", arrVarName);
-                switch (singleLen) {
-                    case 1 -> {
-                        JavassistUtil.append(body, "final short {}={}.readUnsignedByte();\n", varNameArrayElement, FieldBuilder.varNameByteBuf);
-                    }
-                    case 2 -> {
-                        final String funcName = bigEndian ? "readShort" : "readShortLE";
-                        JavassistUtil.append(body, "final short {}={}.{}();\n", varNameArrayElement, FieldBuilder.varNameByteBuf, funcName);
-                    }
-                    default -> {
-                        JavassistUtil.notSupport_singleLen(field, annoClass);
-                    }
+                case 2 -> {
+                    funcName = unsigned ? "readUnsignedShort" : "readShort";
+                    funcName += (bigEndian ? "" : "LE");
                 }
-                JavassistUtil.append(body, "{}[i]=(short)({});\n", arrVarName, JavassistUtil.replaceValExprToCode(valExpr, varNameArrayElement));
-                JavassistUtil.append(body, "}\n");
-            } else if (int[].class.isAssignableFrom(fieldTypeClass)) {
-                JavassistUtil.append(body, "final int[] {}=new int[{}];\n", arrVarName, arrLenRes);
-                final String varNameArrayElement = varNameField + "_arrEle";
-                JavassistUtil.append(body, "for(int i=0;i<{}.length;i++){\n", arrVarName);
-                switch (singleLen) {
-                    case 2 -> {
-                        final String funcName = bigEndian ? "readUnsignedShort" : "readUnsignedShortLE";
-                        JavassistUtil.append(body, "final int {}={}.{}();\n", varNameArrayElement, FieldBuilder.varNameByteBuf, funcName);
-                    }
-                    case 4 -> {
-                        final String funcName = bigEndian ? "readInt" : "readIntLE";
-                        JavassistUtil.append(body, "final int {}={}.{}();\n", varNameArrayElement, FieldBuilder.varNameByteBuf, funcName);
-                    }
-                    default -> {
-                        JavassistUtil.notSupport_singleLen(field, annoClass);
-                    }
+                case 4 -> {
+                    funcName = unsigned ? "readUnsignedInt" : "readInt";
+                    funcName += (bigEndian ? "" : "LE");
                 }
-                JavassistUtil.append(body, "{}[i]=(int)({});\n", arrVarName, JavassistUtil.replaceValExprToCode(valExpr, varNameArrayElement));
-                JavassistUtil.append(body, "}\n");
-            } else if (long[].class.isAssignableFrom(fieldTypeClass)) {
-                JavassistUtil.append(body, "final long[] {}=new long[{}];\n", arrVarName, arrLenRes);
-                final String varNameArrayElement = varNameField + "_arrEle";
-                JavassistUtil.append(body, "for(int i=0;i<{}.length;i++){\n", arrVarName);
-                switch (singleLen) {
-                    case 4 -> {
-                        final String funcName = bigEndian ? "readUnsignedInt" : "readUnsignedIntLE";
-                        JavassistUtil.append(body, "final long {}={}.{}();\n", varNameArrayElement, FieldBuilder.varNameByteBuf, funcName);
-                    }
-                    case 8 -> {
-                        final String funcName = bigEndian ? "readLong" : "readLongLE";
-                        JavassistUtil.append(body, "final long {}={}.{}();\n", varNameArrayElement, FieldBuilder.varNameByteBuf, funcName);
-                    }
-                    default -> {
-                        JavassistUtil.notSupport_singleLen(field, annoClass);
-                    }
+                case 8 -> {
+                    funcName = bigEndian ? "readLong" : "readLongLE";
                 }
-                JavassistUtil.append(body, "{}[i]=(long)({});\n", arrVarName, JavassistUtil.replaceValExprToCode(valExpr, varNameArrayElement));
-                JavassistUtil.append(body, "}\n");
-
-            } else {
-                JavassistUtil.notSupport_fieldType(field, annoClass);
+                default -> {
+                    JavassistUtil.notSupport_singleLen(field, annoClass);
+                    funcName = null;
+                }
             }
+
+            JavassistUtil.append(body, "for(int i=0;i<{}.length;i++){\n", arrVarName);
+            final String varNameArrayElement = varNameField + "_arrEle";
+            JavassistUtil.append(body, "final {} {}=({}){}.{}();\n", sourceValTypeName, varNameArrayElement, sourceValTypeName, FieldBuilder.varNameByteBuf, funcName);
+            //表达式运算
+            final String valCode = JavassistUtil.replaceValExprToCode(anno.valExpr(), varNameArrayElement);
+            if (arrayElementType.isEnum()) {
+                JavassistUtil.append(body, "{}[i]={}.fromInteger((int)({}));\n", arrVarName, arrayElementTypeName, valCode);
+            } else {
+                JavassistUtil.append(body, "{}[i]=({})({});\n", arrVarName, arrayElementTypeName, valCode);
+            }
+            JavassistUtil.append(body, "}\n");
         } else {
             final String varNameArrayElement = varNameField + "_arrEle";
             final String varNameBitBuf = context.getVarNameBitBuf(BitBuf_reader.class);
 
-            JavassistUtil.append(body, "final {}[] {}=new {}[{}];\n", arrayElementType, arrVarName, arrayElementType, arrLenRes);
+            JavassistUtil.append(body, "final {}[] {}=new {}[{}];\n", arrayElementTypeName, arrVarName, arrayElementTypeName, arrLenRes);
             JavassistUtil.append(body, "for(int i=0;i<{}.length;i++){\n", arrVarName);
-            JavassistUtil.append(body, "final {} {}=({}){}.read({},{});\n", arrayElementType, varNameArrayElement, arrayElementType, varNameBitBuf, anno.bit(), anno.bitUnsigned());
-            JavassistUtil.append(body, "{}[i]=({})({});\n", arrVarName, arrayElementType, JavassistUtil.replaceValExprToCode(valExpr, varNameArrayElement));
+            JavassistUtil.append(body, "final {} {}=({}){}.read({},{});\n", arrayElementTypeName, varNameArrayElement, arrayElementTypeName, varNameBitBuf, anno.bit(), anno.bitUnsigned());
+            JavassistUtil.append(body, "{}[i]=({})({});\n", arrVarName, arrayElementTypeName, JavassistUtil.replaceValExprToCode(valExpr, varNameArrayElement));
             JavassistUtil.append(body, "}\n");
 
             if (context.bitEndWhenBitField_process) {
@@ -146,115 +110,67 @@ public class FieldBuilder__F_integer_array extends FieldBuilder {
         final Field field = context.field;
         final Class<F_integer_array> annoClass = F_integer_array.class;
         final F_integer_array anno = context.field.getAnnotation(annoClass);
-        final boolean bigEndian = JavassistUtil.bigEndian(anno.order(), context.clazz);
         final Class<?> fieldTypeClass = field.getType();
         final int singleLen = anno.singleLen();
         final StringBuilder body = context.body;
         final String varNameInstance = FieldBuilder.varNameInstance;
         final String fieldName = field.getName();
-        final String valCode = varNameInstance + "." + fieldName;
+        String valCode = varNameInstance + "." + fieldName;
         final String varNameField = JavassistUtil.getFieldVarName(context);
 
         if (anno.bit() == 0) {
-            JavassistUtil.append(body, "if({}!=null){\n", FieldBuilder.varNameInstance, valCode);
-            if (byte[].class.isAssignableFrom(fieldTypeClass)) {
-                if (singleLen == 1) {
-                    if (anno.valExpr().isEmpty()) {
-                        JavassistUtil.append(body, "{}.writeBytes({});\n", FieldBuilder.varNameByteBuf, valCode);
-                    } else {
-                        String varNameFieldArr = varNameField + "_arr";
-                        String varNameFieldRes = varNameField + "_res";
-                        JavassistUtil.append(body, "final byte[] {}={};\n", varNameFieldArr, valCode);
-                        JavassistUtil.append(body, "final byte[] {}=new byte[{}.length];\n", varNameFieldRes, varNameFieldArr);
-                        JavassistUtil.append(body, "for(int i=0;i<{}.length;i++){\n", varNameFieldRes);
-                        JavassistUtil.append(body, "{}[i]={};\n", varNameFieldRes, JavassistUtil.replaceValExprToCode(RpnUtil.reverseExpr(anno.valExpr()), varNameFieldArr + "[i]"));
-                        JavassistUtil.append(body, "}\n");
-                        JavassistUtil.append(body, "{}.writeBytes({});\n", FieldBuilder.varNameByteBuf, varNameFieldRes);
-                    }
-                } else {
-                    JavassistUtil.notSupport_singleLen(field, annoClass);
-                }
-            } else if (short[].class.isAssignableFrom(fieldTypeClass)) {
+            JavassistUtil.append(body, "if({}!=null){\n", valCode);
+
+            if (byte[].class.isAssignableFrom(fieldTypeClass) && singleLen == 1 && anno.valExpr().isEmpty()) {
+                JavassistUtil.append(body, "{}.writeBytes({});\n", FieldBuilder.varNameByteBuf, valCode);
+            } else {
+                final Class<?> arrayElementType = fieldTypeClass.componentType();
+                final String arrayElementTypeName = arrayElementType.getName();
+
                 String varNameFieldArr = varNameField + "_arr";
-                JavassistUtil.append(body, "final short[] {}={};\n", varNameFieldArr, valCode);
+                JavassistUtil.append(body, "final {}[] {}={};\n", arrayElementTypeName, varNameFieldArr, valCode);
                 JavassistUtil.append(body, "for(int i=0;i<{}.length;i++){\n", varNameFieldArr);
+                String varNameFieldArrEle = varNameField + "_arrEle";
+                JavassistUtil.append(body, "final {} {}={}[i];\n", arrayElementTypeName, varNameFieldArrEle, varNameFieldArr);
+                String arrEleValCode = varNameFieldArrEle;
+                if (arrayElementType.isEnum()) {
+                    arrEleValCode = JavassistUtil.format("({}).toInteger()", arrEleValCode);
+                }
+                if (!anno.valExpr().isEmpty()) {
+                    arrEleValCode = JavassistUtil.replaceValExprToCode(RpnUtil.reverseExpr(anno.valExpr()), arrEleValCode);
+                }
+
+                final boolean bigEndian = JavassistUtil.bigEndian(anno.order(), context.clazz);
+                final String funcName;
+                final String writeCastTypeName;
                 switch (singleLen) {
                     case 1 -> {
-                        if (anno.valExpr().isEmpty()) {
-                            JavassistUtil.append(body, "{}.writeByte((byte){});\n", FieldBuilder.varNameByteBuf, varNameFieldArr + "[i]");
-                        } else {
-                            JavassistUtil.append(body, "{}.writeByte((byte)({}));\n", FieldBuilder.varNameByteBuf, JavassistUtil.replaceValExprToCode(RpnUtil.reverseExpr(anno.valExpr()), varNameFieldArr + "[i]"));
-                        }
+                        funcName = "writeByte";
+                        writeCastTypeName = "int";
                     }
                     case 2 -> {
-                        final String funcName = bigEndian ? "writeShort" : "writeShortLE";
-                        if (anno.valExpr().isEmpty()) {
-                            JavassistUtil.append(body, "{}.{}({});\n", FieldBuilder.varNameByteBuf, funcName, varNameFieldArr + "[i]");
-                        } else {
-                            JavassistUtil.append(body, "{}.{}((short)({}));\n", FieldBuilder.varNameByteBuf, funcName, JavassistUtil.replaceValExprToCode(RpnUtil.reverseExpr(anno.valExpr()), varNameFieldArr + "[i]"));
-                        }
-                    }
-                    default -> {
-                        JavassistUtil.notSupport_singleLen(field, annoClass);
-                    }
-                }
-                JavassistUtil.append(body, "}\n");
-            } else if (int[].class.isAssignableFrom(fieldTypeClass)) {
-                String varNameFieldArr = varNameField + "_arr";
-                JavassistUtil.append(body, "final int[] {}={};\n", varNameFieldArr, valCode);
-                JavassistUtil.append(body, "for(int i=0;i<{}.length;i++){\n", varNameFieldArr);
-                switch (singleLen) {
-                    case 2 -> {
-                        final String funcName = bigEndian ? "writeShort" : "writeShortLE";
-                        if (anno.valExpr().isEmpty()) {
-                            JavassistUtil.append(body, "{}.{}((short){});\n", FieldBuilder.varNameByteBuf, funcName, varNameFieldArr + "[i]");
-                        } else {
-                            JavassistUtil.append(body, "{}.{}((short)({}));\n", FieldBuilder.varNameByteBuf, funcName, JavassistUtil.replaceValExprToCode(RpnUtil.reverseExpr(anno.valExpr()), varNameFieldArr + "[i]"));
-                        }
+                        funcName = bigEndian ? "writeShort" : "writeShortLE";
+                        writeCastTypeName = "int";
                     }
                     case 4 -> {
-                        final String funcName = bigEndian ? "writeInt" : "writeIntLE";
-                        if (anno.valExpr().isEmpty()) {
-                            JavassistUtil.append(body, "{}.{}({});\n", FieldBuilder.varNameByteBuf, funcName, varNameFieldArr + "[i]");
-                        } else {
-                            JavassistUtil.append(body, "{}.{}((int)({}));\n", FieldBuilder.varNameByteBuf, funcName, JavassistUtil.replaceValExprToCode(RpnUtil.reverseExpr(anno.valExpr()), varNameFieldArr + "[i]"));
-                        }
-                    }
-                    default -> {
-                        JavassistUtil.notSupport_singleLen(field, annoClass);
-                    }
-                }
-                JavassistUtil.append(body, "}\n");
-            } else if (long[].class.isAssignableFrom(fieldTypeClass)) {
-                String varNameFieldArr = varNameField + "_arr";
-                JavassistUtil.append(body, "final long[] {}={};\n", varNameFieldArr, valCode);
-                JavassistUtil.append(body, "for(int i=0;i<{}.length;i++){\n", varNameFieldArr);
-                switch (singleLen) {
-                    case 4 -> {
-                        final String funcName = bigEndian ? "writeInt" : "writeIntLE";
-                        if (anno.valExpr().isEmpty()) {
-                            JavassistUtil.append(body, "{}.{}((int){});\n", FieldBuilder.varNameByteBuf, funcName, varNameFieldArr + "[i]");
-                        } else {
-                            JavassistUtil.append(body, "{}.{}((int)({}));\n", FieldBuilder.varNameByteBuf, funcName, JavassistUtil.replaceValExprToCode(RpnUtil.reverseExpr(anno.valExpr()), varNameFieldArr + "[i]"));
-                        }
+                        funcName = bigEndian ? "writeInt" : "writeIntLE";
+                        writeCastTypeName = "int";
                     }
                     case 8 -> {
-                        final String funcName = bigEndian ? "writeLong" : "writeLongLE";
-                        if (anno.valExpr().isEmpty()) {
-                            JavassistUtil.append(body, "{}.{}({});\n", FieldBuilder.varNameByteBuf, funcName, varNameFieldArr + "[i]");
-                        } else {
-                            JavassistUtil.append(body, "{}.{}((long)({}));\n", FieldBuilder.varNameByteBuf, funcName, JavassistUtil.replaceValExprToCode(RpnUtil.reverseExpr(anno.valExpr()), varNameFieldArr + "[i]"));
-                        }
+                        funcName = bigEndian ? "writeLong" : "writeLongLE";
+                        writeCastTypeName = "long";
                     }
                     default -> {
                         JavassistUtil.notSupport_singleLen(field, annoClass);
+                        funcName = null;
+                        writeCastTypeName = null;
                     }
                 }
+                JavassistUtil.append(body, "{}.{}(({})({}));\n", FieldBuilder.varNameByteBuf, funcName, writeCastTypeName, arrEleValCode);
                 JavassistUtil.append(body, "}\n");
-            } else {
-                JavassistUtil.notSupport_fieldType(field, annoClass);
             }
             JavassistUtil.append(body, "}\n");
+
         } else {
             final String varNameBitBuf = context.getVarNameBitBuf(BitBuf_writer.class);
             JavassistUtil.append(body, "if({}!=null){\n", FieldBuilder.varNameInstance, valCode);
