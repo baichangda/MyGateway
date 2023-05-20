@@ -125,6 +125,14 @@ public class Parser {
          */
         void collect_field(Class fieldClass, String fieldName, byte[] content, Object val, String processorClassName);
 
+        /**
+         * 收集bit字段解析详情
+         * @param fieldClass 字段类型
+         * @param fieldName 字段名称
+         * @param logRes bit字段解析详情
+         * @param val 解析后的值
+         * @param processorClassName 解析器类名
+         */
         void collect_field_bit(Class fieldClass, String fieldName, BitBuf_reader.LogRes logRes, Object val, String processorClassName);
     }
 
@@ -135,12 +143,20 @@ public class Parser {
          *
          * @param fieldClass         字段类型
          * @param fieldName          字段名称
-         * @param content            对象属性值
-         * @param val                解析后的字节数组
+         * @param val                值
+         * @param content            值转换成的字节数组
          * @param processorClassName 解析器类名
          */
         void collect_field(Class fieldClass, String fieldName, Object val, byte[] content, String processorClassName);
 
+        /**
+         * 收集bit字段解析详情
+         * @param fieldClass 字段类型
+         * @param fieldName 字段名称
+         * @param val 解析后的字节数组
+         * @param logRes 反解析的bit字段详情
+         * @param processorClassName 解析器类名
+         */
         void collect_field_bit(Class fieldClass, String fieldName, Object val, BitBuf_writer.LogRes logRes, String processorClassName);
 
     }
