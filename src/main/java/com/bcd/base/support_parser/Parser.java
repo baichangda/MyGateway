@@ -184,7 +184,7 @@ public class Parser {
 
             @Override
             public void collect_field_bit(Class fieldClass, String fieldName, BitBuf_reader.LogRes logRes, Object val, String processorClassName) {
-                logger.info("--parse bit field--[{}].[{}] bit_hex[{}] bit_pos[{}-{}] bit_binary[{}] bit_val[{}]->[{}]"
+                logger.info("--parse field--[{}].[{}] bit_hex[{}] bit_pos[{}-{}] bit_binary[{}] bit_val[{}]->[{}]"
                         , fieldClass.getSimpleName()
                         , fieldName
                         , logRes.getLogHex()
@@ -212,7 +212,7 @@ public class Parser {
 
             @Override
             public void collect_field_bit(Class fieldClass, String fieldName, Object val, BitBuf_writer.LogRes logRes, String processorClassName) {
-                logger.info("--deParse bit field--[{}].[{}] [{}]->bit_val[{}] bit_binary[{}] bit_hex[{}] bit_pos[{}-{}]"
+                logger.info("--deParse field--[{}].[{}] [{}]->bit_val[{}] bit_binary[{}] bit_hex[{}] bit_pos[{}-{}]"
                         , fieldClass.getSimpleName()
                         , fieldName
                         , val
