@@ -102,7 +102,7 @@ public class BitBuf_writer {
             for (byte b : bytes) {
                 sb.append(Strings.padStart(Integer.toBinaryString(b & 0xff), 8, '0'));
             }
-            return sb.substring(bitStart, bitEnd);
+            return sb.substring(bitStart, bitEnd+1);
         }
 
         public void print() {

@@ -5,6 +5,8 @@ import com.bcd.base.support_parser.builder.*;
 import com.bcd.base.support_parser.exception.BaseRuntimeException;
 import com.bcd.base.support_parser.processor.ProcessContext;
 import com.bcd.base.support_parser.processor.Processor;
+import com.bcd.base.support_parser.util.BitBuf_reader;
+import com.bcd.base.support_parser.util.BitBuf_writer;
 import com.bcd.base.support_parser.util.JavassistUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
@@ -123,7 +125,9 @@ public class Parser {
          */
         void collect_field(Class fieldClass, String fieldName, byte[] content, Object val, String processorClassName);
 
+        void collect_field_bit(Class fieldClass, String fieldName, BitBuf_reader.LogRes logRes, Object val, String processorClassName);
     }
+
 
     public interface LogCollector_deParse {
         /**
@@ -137,6 +141,8 @@ public class Parser {
          */
         void collect_field(Class fieldClass, String fieldName, Object val, byte[] content, String processorClassName);
 
+        void collect_field_bit(Class fieldClass, String fieldName, Object val, BitBuf_writer.LogRes logRes, String processorClassName);
+
     }
 
     /**
@@ -149,21 +155,59 @@ public class Parser {
 
 
     public static void withDefaultLogCollector_parse() {
-        logCollector_parse = (fieldClass, fieldName, content, val, processorClassName) -> logger.info("--parse field--[{}].[{}] [{}]->[{}]"
-                , fieldClass.getSimpleName()
-                , fieldName
-                , ByteBufUtil.hexDump(content)
-                , val
-        );
+        logCollector_parse = new LogCollector_parse() {
+            @Override
+            public void collect_field(Class fieldClass, String fieldName, byte[] content, Object val, String processorClassName) {
+                logger.info("--parse field--[{}].[{}] [{}]->[{}]"
+                        , fieldClass.getSimpleName()
+                        , fieldName
+                        , ByteBufUtil.hexDump(content)
+                        , val
+                );
+            }
+
+            @Override
+            public void collect_field_bit(Class fieldClass, String fieldName, BitBuf_reader.LogRes logRes, Object val, String processorClassName) {
+                logger.info("--parse bit field--[{}].[{}] bit_hex[{}] bit_pos[{}-{}] bit_binary[{}] bit_val[{}]->[{}]"
+                        , fieldClass.getSimpleName()
+                        , fieldName
+                        , logRes.getLogHex()
+                        , logRes.bitStart
+                        , logRes.bitEnd
+                        , logRes.getLogBit()
+                        , logRes.val
+                        , val
+                );
+            }
+        };
+
     }
 
     public static void withDefaultLogCollector_deParse() {
-        logCollector_deParse = (fieldClass, fieldName, val, content, processorClassName) -> logger.info("--deParse field--[{}].[{}] [{}]->[{}]"
-                , fieldClass.getSimpleName()
-                , fieldName
-                , val
-                , ByteBufUtil.hexDump(content)
-        );
+        logCollector_deParse = new LogCollector_deParse() {
+            @Override
+            public void collect_field(Class fieldClass, String fieldName, Object val, byte[] content, String processorClassName) {
+                logger.info("--deParse field--[{}].[{}] [{}]->[{}]"
+                        , fieldClass.getSimpleName()
+                        , fieldName
+                        , val
+                        , ByteBufUtil.hexDump(content));
+            }
+
+            @Override
+            public void collect_field_bit(Class fieldClass, String fieldName, Object val, BitBuf_writer.LogRes logRes, String processorClassName) {
+                logger.info("--deParse bit field--[{}].[{}] [{}]->bit_val[{}] bit_binary[{}] bit_hex[{}] bit_pos[{}-{}]"
+                        , fieldClass.getSimpleName()
+                        , fieldName
+                        , val
+                        , logRes.val
+                        , logRes.getLogBit()
+                        , logRes.getLogHex()
+                        , logRes.bitStart
+                        , logRes.bitEnd
+                );
+            }
+        };
     }
 
     public static void enablePrintBuildLog() {
@@ -246,6 +290,7 @@ public class Parser {
             final F_integer f_integer1 = cur.getAnnotation(F_integer.class);
             final F_float_integer f_float_integer1 = cur.getAnnotation(F_float_integer.class);
             if (f_integer1 != null && f_integer1.bit() > 0) {
+                context.bitField = true;
                 if (f_integer1.bitEnd()) {
                     context.bitEndWhenBitField_process = true;
                     context.bitEndWhenBitField_deProcess = true;
@@ -253,6 +298,7 @@ public class Parser {
                 }
             }
             if (f_float_integer1 != null && f_float_integer1.bit() > 0) {
+                context.bitField = true;
                 if (f_float_integer1.bitEnd()) {
                     context.bitEndWhenBitField_process = true;
                     context.bitEndWhenBitField_deProcess = true;
@@ -320,7 +366,7 @@ public class Parser {
         for (int i = 0; i < fieldList.size(); i++) {
             Field field = fieldList.get(i);
             context.field = field;
-            bitEndWhenBitField(fieldList, i,context);
+            bitEndWhenBitField(fieldList, i, context);
             if (logCollector_parse != null) {
                 JavassistUtil.prependLogCode_parse(context);
             }

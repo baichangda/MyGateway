@@ -113,7 +113,7 @@ public class BitBuf_reader {
             for (byte b : bytes) {
                 sb.append(Strings.padStart(Integer.toBinaryString(b & 0xff), 8, '0'));
             }
-            return sb.substring(bitStart, bitEnd);
+            return sb.substring(bitStart, bitEnd+1);
         }
 
         public void print() {
@@ -128,7 +128,7 @@ public class BitBuf_reader {
         final int temp = bit + bitOffset;
         final int byteLen = (temp >> 3) + ((temp & 7) == 0 ? 0 : 1);
 
-        final LogRes logRes = new LogRes(byteLen, bitOffset, bitOffset + bit-1);
+        final LogRes logRes = new LogRes(byteLen, bitOffset, bitOffset + bit - 1);
 
         logRes.bytes[0] = b;
 

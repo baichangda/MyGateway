@@ -1,5 +1,6 @@
 package com.bcd.base.support_parser.builder;
 
+import com.bcd.base.support_parser.Parser;
 import com.bcd.base.support_parser.anno.F_integer;
 import com.bcd.base.support_parser.exception.BaseRuntimeException;
 import com.bcd.base.support_parser.util.BitBuf_reader;
@@ -37,7 +38,15 @@ public class FieldBuilder__F_integer extends FieldBuilder {
                     JavassistUtil.append(body, "final {} {}={}.newBitBuf({});\n", bitBufClassName, varNameBitBuf, bitBufClassName, FieldBuilder.varNameByteBuf);
                     context.varNameBitBuf=varNameBitBuf;
                 }
-                JavassistUtil.append(body, "final long {}={}.read({});\n", varNameField, varNameBitBuf, bit);
+
+                if (Parser.logCollector_parse == null) {
+                    JavassistUtil.append(body, "final long {}={}.read({});\n", varNameField, varNameBitBuf, bit);
+                } else {
+                    context.varNameBitLogRes = varNameField + "_bitLogRes";
+                    JavassistUtil.append(body, "final {} {}={}.read_log({});\n", BitBuf_reader.LogRes.class.getName(), context.varNameBitLogRes, varNameBitBuf, bit);
+                    JavassistUtil.append(body, "final long {}={}.val;\n", varNameField, context.varNameBitLogRes);
+                }
+
                 if (context.bitEndWhenBitField_process) {
                     JavassistUtil.append(body, "{}.finish();\n", varNameBitBuf);
                 }
@@ -176,7 +185,14 @@ public class FieldBuilder__F_integer extends FieldBuilder {
                     JavassistUtil.append(body, "final {} {}={}.newBitBuf({});\n", bitBufClassName, varNameBitBuf, bitBufClassName, FieldBuilder.varNameByteBuf);
                     context.varNameBitBuf=varNameBitBuf;
                 }
-                JavassistUtil.append(body, "{}.write((long)({}),{});\n", varNameBitBuf, valCode, bit);
+
+                if (Parser.logCollector_parse == null) {
+                    JavassistUtil.append(body, "{}.write((long)({}),{});\n", varNameBitBuf, valCode, bit);
+                } else {
+                    context.varNameBitLogRes = varNameField + "_bitLogRes";
+                    JavassistUtil.append(body, "final {} {}={}.write_log((long)({}),{});\n", BitBuf_writer.LogRes.class.getName(), context.varNameBitLogRes, varNameBitBuf, valCode, bit);
+                }
+
                 if (context.bitEndWhenBitField_deProcess) {
                     JavassistUtil.append(body, "{}.finish();\n", varNameBitBuf);
                 }
