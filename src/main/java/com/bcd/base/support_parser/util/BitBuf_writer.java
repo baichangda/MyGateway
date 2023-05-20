@@ -127,7 +127,7 @@ public class BitBuf_writer {
         }
 
         public void print() {
-            logger.info("write bit_val[{}] bit_binary[{}] bit_hex[{}] bit_pos[{}-{}]", val, getLogBit(), getLogHex(), bitStart, bitEnd);
+            logger.info("write bit_val[{}] bit_binary[{},{}] bit_hex[{}] bit_pos[{}-{}]", val, unsigned ? "u" : "s", getLogBit(), getLogHex(), bitStart, bitEnd);
         }
     }
 

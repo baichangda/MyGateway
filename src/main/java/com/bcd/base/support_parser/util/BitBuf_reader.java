@@ -139,7 +139,7 @@ public class BitBuf_reader {
         }
 
         public void print() {
-            logger.info("read bit_hex[{}] bit_pos[{}-{}] bit_binary[{}] bit_val[{}]", getLogHex(), bitStart, bitEnd, getLogBit(), val);
+            logger.info("read bit_hex[{}] bit_pos[{}-{}] bit_binary[{},{}] bit_val[{}]", getLogHex(), bitStart, bitEnd, unsigned ? "u" : "s", getLogBit(), val);
         }
     }
 

@@ -187,12 +187,13 @@ public class Parser {
             @Override
             public void collect_field_bit(Class fieldClass, String fieldName, BitBuf_reader.Log logRes, Object val, String processorClassName) {
                 if (logRes instanceof BitBuf_reader.ReadLog readLog) {
-                    logger.info("--parse field--[{}].[{}] bit_hex[{}] bit_pos[{}-{}] bit_binary[{}] bit_val[{}]->[{}]"
+                    logger.info("--parse field--[{}].[{}] bit_hex[{}] bit_pos[{}-{}] bit_binary[{},{}] bit_val[{}]->[{}]"
                             , fieldClass.getSimpleName()
                             , fieldName
                             , readLog.getLogHex()
                             , readLog.bitStart
                             , readLog.bitEnd
+                            , readLog.unsigned ? "u" : "s"
                             , readLog.getLogBit()
                             , readLog.val
                             , val
@@ -227,11 +228,12 @@ public class Parser {
             @Override
             public void collect_field_bit(Class fieldClass, String fieldName, Object val, BitBuf_writer.Log logRes, String processorClassName) {
                 if (logRes instanceof BitBuf_writer.WriteLog writeLog) {
-                    logger.info("--deParse field--[{}].[{}] [{}]->bit_val[{}] bit_binary[{}] bit_hex[{}] bit_pos[{}-{}]"
+                    logger.info("--deParse field--[{}].[{}] [{}]->bit_val[{}] bit_binary[{},{}] bit_hex[{}] bit_pos[{}-{}]"
                             , fieldClass.getSimpleName()
                             , fieldName
                             , val
                             , writeLog.val
+                            , writeLog.unsigned ? "u" : "s"
                             , writeLog.getLogBit()
                             , writeLog.getLogHex()
                             , writeLog.bitStart
@@ -380,7 +382,7 @@ public class Parser {
             final F_skip f_skip2 = next.getAnnotation(F_skip.class);
             final F_integer_array f_integer_array2 = next.getAnnotation(F_integer_array.class);
             final F_float_integer_array f_float_integer_array2 = next.getAnnotation(F_float_integer_array.class);
-            if ((f_integer2 == null && f_float_integer2 == null &&f_skip2==null &&f_integer_array2==null &&f_float_integer_array2==null)
+            if ((f_integer2 == null && f_float_integer2 == null && f_skip2 == null && f_integer_array2 == null && f_float_integer_array2 == null)
                     || (f_integer2 != null && f_integer2.bit() == 0)
                     || (f_float_integer2 != null && f_float_integer2.bit() == 0)
                     || (f_skip2 != null && f_skip2.bit() == 0)
