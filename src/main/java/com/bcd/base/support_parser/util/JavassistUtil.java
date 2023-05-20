@@ -6,16 +6,12 @@ import com.bcd.base.support_parser.anno.ByteOrder;
 import com.bcd.base.support_parser.builder.BuilderContext;
 import com.bcd.base.support_parser.builder.FieldBuilder;
 import com.bcd.base.support_parser.exception.BaseRuntimeException;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufUtil;
-import io.netty.buffer.Unpooled;
 import javassist.CannotCompileException;
 import javassist.CtClass;
 import javassist.CtField;
 import org.slf4j.helpers.MessageFormatter;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.Map;
 
 public class JavassistUtil {
@@ -132,7 +128,7 @@ public class JavassistUtil {
                     Parser.class.getName(),
                     context.clazz.getName(),
                     context.field.getName(),
-                    context.varNameBitLogRes,
+                    context.varNameBitLog,
                     boxing(FieldBuilder.varNameInstance + "." + context.field.getName(), context.field.getType()),
                     context.implCc.getSimpleName());
         } else {
@@ -165,7 +161,7 @@ public class JavassistUtil {
                     context.clazz.getName(),
                     context.field.getName(),
                     boxing(FieldBuilder.varNameInstance + "." + context.field.getName(), context.field.getType()),
-                    context.varNameBitLogRes,
+                    context.varNameBitLog,
                     context.implCc.getSimpleName());
         }else {
             final String fieldByteBufWriterIndexVarName = getFieldByteBufWriterIndexVarName(context);

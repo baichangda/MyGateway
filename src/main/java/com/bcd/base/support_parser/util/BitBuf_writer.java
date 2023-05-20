@@ -57,11 +57,13 @@ public class BitBuf_writer {
 
             final ByteBuf bb = Unpooled.buffer();
             final BitBuf_writer bitBufWriter = BitBuf_writer.newBitBuf(bb);
-            final LogRes res1 = bitBufWriter.write_log(4, 3);
-            final LogRes res2 = bitBufWriter.write_log(0, 3);
-            final LogRes res3 = bitBufWriter.write_log(185, 9);
+            final WriteLog res1 = bitBufWriter.write_log(4, 3);
+            final WriteLog res2 = bitBufWriter.write_log(0, 3);
+            final SkipLog skip1 = bitBufWriter.skip_log(3);
+            final WriteLog res3 = bitBufWriter.write_log(457, 9);
             res1.print();
             res2.print();
+            skip1.print();
             res3.print();
             bitBufWriter.finish();
 //            System.out.println(ByteBufUtil.hexDump(bb));
@@ -77,20 +79,17 @@ public class BitBuf_writer {
         bitOffset = 0;
     }
 
-    public static class LogRes {
+    public static class Log {
         public final byte[] bytes;
 
         public final int bitStart;
 
         public final int bitEnd;
 
-        public long val;
-
-        public LogRes(int byteLen, int bitStart, int bitEnd, long val) {
+        public Log(int byteLen, int bitStart, int bitEnd) {
             this.bytes = new byte[byteLen];
             this.bitStart = bitStart;
             this.bitEnd = bitEnd;
-            this.val = val;
         }
 
         public String getLogHex() {
@@ -102,7 +101,26 @@ public class BitBuf_writer {
             for (byte b : bytes) {
                 sb.append(Strings.padStart(Integer.toBinaryString(b & 0xff), 8, '0'));
             }
-            return sb.substring(bitStart, bitEnd+1);
+            return sb.substring(bitStart, bitEnd + 1);
+        }
+    }
+
+    public static class SkipLog extends Log {
+        public SkipLog(int byteLen, int bitStart, int bitEnd) {
+            super(byteLen, bitStart, bitEnd);
+        }
+
+        public void print() {
+            logger.info("skip bit_binary[{}] bit_hex[{}] bit_pos[{}-{}]", getLogBit(), getLogHex(), bitStart, bitEnd);
+        }
+    }
+
+    public static class WriteLog extends Log {
+        public long val;
+
+        public WriteLog(int byteLen, int bitStart, int bitEnd, long val) {
+            super(byteLen, bitStart, bitEnd);
+            this.val = val;
         }
 
         public void print() {
@@ -110,13 +128,36 @@ public class BitBuf_writer {
         }
     }
 
-    public final LogRes write_log(long l, int bit) {
+
+    public final void write(long l, int bit) {
+        final int temp = bit + bitOffset;
+        final int byteLen = (temp >> 3) + ((temp & 7) == 0 ? 0 : 1);
+        final int left = (byteLen << 3) - temp;
+        final long newL = l << left;
+        if (bitOffset == 0) {
+            b = (byte) (newL >> ((byteLen - 1) << 3));
+        } else {
+            b |= (byte) (newL >> ((byteLen - 1) << 3));
+        }
+        for (int i = 1; i < byteLen; i++) {
+            byteBuf.writeByte(b);
+            b = (byte) (newL >> ((byteLen - i - 1) << 3));
+        }
+        bitOffset = temp & 7;
+        if (bitOffset == 0) {
+            byteBuf.writeByte(b);
+        }
+    }
+
+
+
+
+    public final WriteLog write_log(long l, int bit) {
         final int temp = bit + bitOffset;
         final int byteLen = (temp >> 3) + ((temp & 7) == 0 ? 0 : 1);
 
-        final LogRes logRes = new LogRes(byteLen, bitOffset, bitOffset + bit - 1, l);
-
-        final int left = 8 - (temp & 7);
+        final WriteLog logRes = new WriteLog(byteLen, bitOffset, bitOffset + bit - 1, l);
+        final int left = (byteLen << 3) - temp;
         final long newL = l << left;
         if (bitOffset == 0) {
             b = (byte) (newL >> ((byteLen - 1) << 3));
@@ -137,23 +178,68 @@ public class BitBuf_writer {
         return logRes;
     }
 
-    public final void write(long l, int bit) {
+
+    public final void skip(int bit) {
         final int temp = bit + bitOffset;
-        final int byteLen = (temp >> 3) + ((temp & 7) == 0 ? 0 : 1);
-        final int left = 8 - (temp & 7);
-        final long newL = l << left;
-        if (bitOffset == 0) {
-            b = (byte) (newL >> ((byteLen - 1) << 3));
+        final boolean newBitOffsetZero = (temp & 7) == 0;
+        final int byteLen = (temp >> 3) + (newBitOffsetZero ? 0 : 1);
+        if (byteLen == 1) {
+            if (newBitOffsetZero) {
+                b = 0;
+            }
         } else {
-            b |= (byte) (newL >> ((byteLen - 1) << 3));
-        }
-        for (int i = 1; i < byteLen; i++) {
-            byteBuf.writeByte(b);
-            b = (byte) (newL >> ((byteLen - i - 1) << 3));
+            if (bitOffset == 0) {
+                if (newBitOffsetZero) {
+                    byteBuf.writeZero(byteLen);
+                } else {
+                    byteBuf.writeZero(byteLen - 1);
+                }
+
+            } else {
+                byteBuf.writeByte(b);
+                if (newBitOffsetZero) {
+                    byteBuf.writeZero(byteLen - 1);
+                } else {
+                    byteBuf.writeZero(byteLen - 2);
+                }
+            }
+            b = 0;
         }
         bitOffset = temp & 7;
-        if (bitOffset == 0) {
-            byteBuf.writeByte(b);
+    }
+
+    public final SkipLog skip_log(int bit) {
+        final int temp = bit + bitOffset;
+        final boolean newBitOffsetZero = (temp & 7) == 0;
+        final int byteLen = (temp >> 3) + (newBitOffsetZero ? 0 : 1);
+        final SkipLog log = new SkipLog(byteLen, bitOffset, bitOffset + bit - 1);
+
+        if (byteLen == 1) {
+            if (newBitOffsetZero) {
+                b = 0;
+            }
+        } else {
+            if (bitOffset == 0) {
+                if (newBitOffsetZero) {
+                    byteBuf.writeZero(byteLen);
+                } else {
+                    byteBuf.writeZero(byteLen - 1);
+                }
+
+            } else {
+                log.bytes[0] = b;
+                byteBuf.writeByte(b);
+                if (newBitOffsetZero) {
+                    byteBuf.writeZero(byteLen - 1);
+                } else {
+                    byteBuf.writeZero(byteLen - 2);
+                }
+            }
+            b = 0;
         }
+
+        bitOffset = temp & 7;
+
+        return log;
     }
 }

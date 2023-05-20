@@ -58,6 +58,8 @@ public @interface F_float_integer {
      * field1、field2会共用3个字节
      *
      * 注意:当此属性生效时候、{@link #order()}无效
+     *
+     * 注意:如果可以使用{@link #len()}表示、尽量不要使用bit、因为会导致解析变复杂、同时日志难以阅读
      */
     int bit() default 0;
 

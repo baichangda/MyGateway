@@ -15,5 +15,5 @@ public enum SkipMode {
     /**
      * 跳过 从当前对象上一个Reserved字段开始预留字节-已使用字节
      */
-    ReservedFromPrevReserved
+    ReservedFromPrevReserved,
 }

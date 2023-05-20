@@ -127,13 +127,14 @@ public class Parser {
 
         /**
          * 收集bit字段解析详情
-         * @param fieldClass 字段类型
-         * @param fieldName 字段名称
-         * @param logRes bit字段解析详情
-         * @param val 解析后的值
+         *
+         * @param fieldClass         字段类型
+         * @param fieldName          字段名称
+         * @param readLog            bit字段解析详情
+         * @param val                解析后的值
          * @param processorClassName 解析器类名
          */
-        void collect_field_bit(Class fieldClass, String fieldName, BitBuf_reader.LogRes logRes, Object val, String processorClassName);
+        void collect_field_bit(Class fieldClass, String fieldName, BitBuf_reader.ReadLog readLog, Object val, String processorClassName);
     }
 
 
@@ -151,13 +152,14 @@ public class Parser {
 
         /**
          * 收集bit字段解析详情
-         * @param fieldClass 字段类型
-         * @param fieldName 字段名称
-         * @param val 解析后的字节数组
-         * @param logRes 反解析的bit字段详情
+         *
+         * @param fieldClass         字段类型
+         * @param fieldName          字段名称
+         * @param val                解析后的字节数组
+         * @param writeLog           反解析的bit字段详情
          * @param processorClassName 解析器类名
          */
-        void collect_field_bit(Class fieldClass, String fieldName, Object val, BitBuf_writer.LogRes logRes, String processorClassName);
+        void collect_field_bit(Class fieldClass, String fieldName, Object val, BitBuf_writer.WriteLog writeLog, String processorClassName);
 
     }
 
@@ -183,15 +185,15 @@ public class Parser {
             }
 
             @Override
-            public void collect_field_bit(Class fieldClass, String fieldName, BitBuf_reader.LogRes logRes, Object val, String processorClassName) {
+            public void collect_field_bit(Class fieldClass, String fieldName, BitBuf_reader.ReadLog readLog, Object val, String processorClassName) {
                 logger.info("--parse field--[{}].[{}] bit_hex[{}] bit_pos[{}-{}] bit_binary[{}] bit_val[{}]->[{}]"
                         , fieldClass.getSimpleName()
                         , fieldName
-                        , logRes.getLogHex()
-                        , logRes.bitStart
-                        , logRes.bitEnd
-                        , logRes.getLogBit()
-                        , logRes.val
+                        , readLog.getLogHex()
+                        , readLog.bitStart
+                        , readLog.bitEnd
+                        , readLog.getLogBit()
+                        , readLog.val
                         , val
                 );
             }
@@ -211,16 +213,16 @@ public class Parser {
             }
 
             @Override
-            public void collect_field_bit(Class fieldClass, String fieldName, Object val, BitBuf_writer.LogRes logRes, String processorClassName) {
+            public void collect_field_bit(Class fieldClass, String fieldName, Object val, BitBuf_writer.WriteLog writeLog, String processorClassName) {
                 logger.info("--deParse field--[{}].[{}] [{}]->bit_val[{}] bit_binary[{}] bit_hex[{}] bit_pos[{}-{}]"
                         , fieldClass.getSimpleName()
                         , fieldName
                         , val
-                        , logRes.val
-                        , logRes.getLogBit()
-                        , logRes.getLogHex()
-                        , logRes.bitStart
-                        , logRes.bitEnd
+                        , writeLog.val
+                        , writeLog.getLogBit()
+                        , writeLog.getLogHex()
+                        , writeLog.bitStart
+                        , writeLog.bitEnd
                 );
             }
         };

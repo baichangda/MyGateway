@@ -45,6 +45,4 @@ public @interface F_skip {
      * a*(b-2)
      */
     String lenExpr() default "";
-
-
 }

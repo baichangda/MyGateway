@@ -55,8 +55,8 @@ public class FieldBuilder__F_skip extends FieldBuilder {
                     context.prevSkipReservedIndexVarName = indexVarName;
                 }
             }
-        }
 
+        }
     }
 
     @Override
