@@ -14,7 +14,12 @@ public class FieldBuilder__F_string extends FieldBuilder {
     public void buildParse(BuilderContext context) {
         final StringBuilder body = context.body;
         final Field field = context.field;
+        final Class<?> fieldType = field.getType();
         final F_string anno = field.getAnnotation(F_string.class);
+        final Class<? extends F_string> annoClass = anno.getClass();
+        if (fieldType != String.class) {
+            JavassistUtil.notSupport_type(field, annoClass);
+        }
         final String lenRes;
         if (anno.len() == 0) {
             if (anno.lenExpr().isEmpty()) {

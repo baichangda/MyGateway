@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
  * T[] 数组
  * List<T> 集合、默认实例是ArrayList类型
  * {@link #listLen()}和{@link #listLenExpr()} 二选一、代表字段所占用总字节数
- *
+ * <p>
  * 反解析中
  * 值可以为null、此时代表空集合
  */
@@ -34,4 +34,12 @@ public @interface F_bean_list {
      * m*n
      */
     String listLenExpr() default "";
+
+    /**
+     * 是否传递bitBuf对象到bean的解析中
+     * 即设置
+     * {@link com.bcd.base.support_parser.processor.ProcessContext#bitBuf_reader}
+     * {@link com.bcd.base.support_parser.processor.ProcessContext#bitBuf_writer}
+     */
+    boolean passBitBuf() default false;
 }

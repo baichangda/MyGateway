@@ -5,6 +5,23 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * 适用如下字段类型
+ * byte[]、short[]、int[]、long[]、float[]、double[]、enum[]
+ * 数组长度=总字节数/singleLen
+ * {@link #len()}和{@link #lenExpr()} 二选一、代表字段数组长度
+ *
+ * 枚举类
+ * 仅支持当{@link #singleLen()}为1、2、4时候、因为默认类型为int、8会产生精度丢失
+ * 要求枚举类必有如下静态方法、例如
+ * public enum Example{
+ * public static Example fromInteger(int i){}
+ * public int toInteger(){}
+ * }
+ *
+ * 反解析中
+ * 值可以为null、代表空数组
+ */
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface F_bit_num_array {
@@ -60,10 +77,9 @@ public @interface F_bit_num_array {
     String valExpr() default "";
 
     /**
-     * 表示当前字段bit解析结束时候、剩余多余的bit(不满1字节的)将被忽略
-     * 用于连续字段的bit解析、但是下一个字段的bit不接着之前的字段bit解析
+     * 表示当前字段bit解析结束时候、剩余多余的bit(不满1字节的)的处理模式
      */
-    boolean end() default false;
+    BitRemainingMode bitRemainingMode() default BitRemainingMode.Default;
 
 
 }

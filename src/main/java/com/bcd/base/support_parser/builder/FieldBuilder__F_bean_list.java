@@ -2,6 +2,8 @@ package com.bcd.base.support_parser.builder;
 
 import com.bcd.base.support_parser.Parser;
 import com.bcd.base.support_parser.anno.F_bean_list;
+import com.bcd.base.support_parser.util.BitBuf_reader;
+import com.bcd.base.support_parser.util.BitBuf_writer;
 import com.bcd.base.support_parser.util.JavassistUtil;
 
 import java.lang.reflect.Field;
@@ -38,13 +40,16 @@ public class FieldBuilder__F_bean_list extends FieldBuilder {
         } else {
             JavassistUtil.append(body, "final int {}=(int)({});\n", fieldVarNameListLen, anno.listLen());
         }
-
         final String typeClassName = typeClass.getName();
+        final String processContextVarName = context.getProcessContextVarName();
+        if (anno.passBitBuf()) {
+            final String varNameBitBuf = context.getVarNameBitBuf(BitBuf_reader.class);
+            JavassistUtil.append(body, "{}.bitBuf_reader={};\n", processContextVarName, varNameBitBuf);
+        }
         switch (fieldTypeFlag) {
             case 1 -> {
                 JavassistUtil.append(body, "final {}[] {}=new {}[{}];\n", typeClassName, varNameField, typeClassName, fieldVarNameListLen);
                 //在for循环外构造复用对象
-                String processContextVarName = context.getProcessContextVarName();
                 JavassistUtil.append(body, "for(int i=0;i<{};i++){\n", fieldVarNameListLen);
                 JavassistUtil.append(body, "{}[i]={}.parse({}.class,{},{});\n", varNameField, parserClassName, typeClassName, FieldBuilder.varNameByteBuf, processContextVarName);
                 JavassistUtil.append(body, "}\n");
@@ -54,7 +59,6 @@ public class FieldBuilder__F_bean_list extends FieldBuilder {
                 final String listClassName = List.class.getName();
                 JavassistUtil.append(body, "final {} {}=new {}({});\n", listClassName, varNameField, arrayListClassName, fieldVarNameListLen);
                 //在for循环外构造复用对象
-                String processContextVarName = context.getProcessContextVarName();
                 JavassistUtil.append(body, "for(int i=0;i<{};i++){\n", fieldVarNameListLen);
                 JavassistUtil.append(body, "{}.add({}.parse({}.class,{},{}));\n", varNameField, parserClassName, typeClassName, FieldBuilder.varNameByteBuf, processContextVarName);
                 JavassistUtil.append(body, "}\n");
@@ -92,6 +96,10 @@ public class FieldBuilder__F_bean_list extends FieldBuilder {
         final String typeClassName = typeClass.getName();
         final String parserClassName = Parser.class.getName();
         final String processContextVarName = context.getProcessContextVarName();
+        if (anno.passBitBuf()) {
+            final String varNameBitBuf = context.getVarNameBitBuf(BitBuf_writer.class);
+            JavassistUtil.append(body, "{}.bitBuf_writer={};\n", processContextVarName, varNameBitBuf);
+        }
         final String fieldVarNameTemp = varNameField + "_temp";
         switch (fieldTypeFlag) {
             case 1 -> {

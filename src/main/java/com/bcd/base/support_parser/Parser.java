@@ -331,41 +331,48 @@ public class Parser {
         if (f_bit_num1 != null || f_bit_skip1 != null) {
             context.logBit = true;
         }
+        BitRemainingMode bitRemainingMode1 = null;
+        if (f_bit_num1 != null) {
+            bitRemainingMode1 = f_bit_num1.bitRemainingMode();
+        }
+        if (f_bit_num_array1 != null) {
+            bitRemainingMode1 = f_bit_num_array1.bitRemainingMode();
+        }
+        if (f_bit_skip1 != null) {
+            bitRemainingMode1 = f_bit_skip1.bitRemainingMode();
+        }
 
-        if (i == fieldList.size() - 1) {
-            context.bitEndWhenBitField_process = false;
-            context.bitEndWhenBitField_deProcess = true;
-        } else {
-            if (f_bit_num1 != null && f_bit_num1.end()) {
+        if (bitRemainingMode1 == null) {
+            return;
+        }
+
+        switch (bitRemainingMode1) {
+            case Ignore -> {
                 context.bitEndWhenBitField_process = true;
                 context.bitEndWhenBitField_deProcess = true;
-                return;
             }
-
-            if (f_bit_num_array1 != null && f_bit_num_array1.end()) {
-                context.bitEndWhenBitField_process = true;
-                context.bitEndWhenBitField_deProcess = true;
-                return;
+            case Not_ignore -> {
+                context.bitEndWhenBitField_process = false;
+                context.bitEndWhenBitField_deProcess = false;
             }
-
-            if (f_bit_skip1 != null && f_bit_skip1.end()) {
-                context.bitEndWhenBitField_process = true;
-                context.bitEndWhenBitField_deProcess = true;
-                return;
+            default -> {
+                if (i == fieldList.size() - 1) {
+                    context.bitEndWhenBitField_process = true;
+                    context.bitEndWhenBitField_deProcess = true;
+                } else {
+                    final Field next = fieldList.get(i + 1);
+                    final F_bit_num f_bit_num2 = next.getAnnotation(F_bit_num.class);
+                    final F_bit_num_array f_bit_num_array2 = next.getAnnotation(F_bit_num_array.class);
+                    final F_bit_skip f_bit_skip2 = next.getAnnotation(F_bit_skip.class);
+                    if (f_bit_num2 == null && f_bit_skip2 == null && f_bit_num_array2 == null) {
+                        context.bitEndWhenBitField_process = true;
+                        context.bitEndWhenBitField_deProcess = true;
+                    } else {
+                        context.bitEndWhenBitField_process = false;
+                        context.bitEndWhenBitField_deProcess = false;
+                    }
+                }
             }
-
-            final Field next = fieldList.get(i + 1);
-            final F_bit_num f_bit_num2 = next.getAnnotation(F_bit_num.class);
-            final F_bit_num_array f_bit_num_array2 = next.getAnnotation(F_bit_num_array.class);
-            final F_bit_skip f_bit_skip2 = next.getAnnotation(F_bit_skip.class);
-            if (f_bit_num2 == null && f_bit_skip2 == null && f_bit_num_array2 == null) {
-                context.bitEndWhenBitField_process = true;
-                context.bitEndWhenBitField_deProcess = true;
-                return;
-            }
-
-            context.bitEndWhenBitField_process = false;
-            context.bitEndWhenBitField_deProcess = false;
         }
     }
 

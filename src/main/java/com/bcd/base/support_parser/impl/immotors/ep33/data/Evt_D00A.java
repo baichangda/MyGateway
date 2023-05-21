@@ -8,9 +8,11 @@ public class Evt_D00A extends Evt_4_x {
     @F_string(len = 17, appendMode = StringAppendMode.NoAppend)
     public String VIN;
     @F_string(len = 16, appendMode = StringAppendMode.NoAppend)
-    public long IAMSN;
+    public String IAMSN;
     @F_string(len = 20, appendMode = StringAppendMode.NoAppend)
-    public long EsimIccid;
+    public String EsimIccid;
     @F_string(len = 32, appendMode = StringAppendMode.NoAppend)
-    public long EsimID;
+    public String EsimID;
+
+
 }
