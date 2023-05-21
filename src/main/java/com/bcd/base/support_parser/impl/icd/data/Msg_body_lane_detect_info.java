@@ -9,17 +9,17 @@ import io.netty.buffer.Unpooled;
 import java.util.List;
 
 public class Msg_body_lane_detect_info implements Msg_body {
-    @F_integer(len = 4)
+    @F_num(len = 4)
     public long frame_id;
     @F_float_ieee754(type = FloatType_ieee754.Float64)
     public double frame_timestamp;
-    @F_integer(len = 2, var = 'a')
+    @F_num(len = 2, var = 'a')
     public int src_count;
-    @F_integer(len = 4, var = 'b')
+    @F_num(len = 4, var = 'b')
     public long road_count;
     @F_skip(len = 32, mode = SkipMode.ReservedFromStart)
     public byte[] reserved;
-    @F_integer_array(lenExpr = "a", singleLen = 4)
+    @F_num_array(lenExpr = "a", singleLen = 4)
     public long[] src_array;
     @F_bean_list(listLenExpr = "b")
     public List<Road_info> road_info_array;

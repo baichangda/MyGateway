@@ -45,8 +45,4 @@ public @interface F_skip {
      * a*(b-2)
      */
     String lenExpr() default "";
-
-    int bit() default 0;
-
-    boolean bitEnd() default false;
 }

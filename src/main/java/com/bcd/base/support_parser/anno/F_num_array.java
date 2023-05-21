@@ -24,7 +24,7 @@ import java.lang.annotation.Target;
  */
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface F_integer_array {
+public @interface F_num_array {
     /**
      * 数组元素个数
      * 与{@link #lenExpr()}互斥
@@ -43,18 +43,14 @@ public @interface F_integer_array {
     String lenExpr() default "";
 
     /**
-     * 单个元素字节长度(用于字节数组转换成byte[]、short[]、int[]、long[]数组中单个元素对应字节数)
-     * 不同的数据类型对应不同的长度
-     * byte[]: 1
-     * short[]: 1、2
-     * int[]: 2、4
-     * long[]: 4、8
-     * 例如:
-     * 原始为 byte[8] 字段数据 转换成 int[],
-     * singleLen=2、调用readUnsignedShort、将得到int[4]
-     * singleLen=4、调用readInt、将得到int[2]
+     * 单个元素字节长度
      */
-    int singleLen() default 1;
+    int singleLen();
+
+    /**
+     * 每个数组元素在读取后、应该skip的byte长度
+     */
+    int singleSkip() default 0;
 
     /**
      * 值处理表达式、针对于数组中每个值
@@ -79,19 +75,5 @@ public @interface F_integer_array {
      * 字节序模式
      */
     ByteOrder order() default ByteOrder.Default;
-
-    int bit() default 0;
-
-    /**
-     * bit位表示的值是否为无符号类型
-     * 当是有符号类型时候
-     * bit最高位为符号位、0代表正数、1代表负数
-     * 对值的求解方式为
-     * 正数、正常进行求值
-     * 负数、所有bit位取反+1、求值后、代表负数
-     */
-    boolean bitUnsigned() default true;
-
-    boolean bitEnd() default false;
 
 }

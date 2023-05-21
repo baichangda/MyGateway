@@ -1,7 +1,7 @@
 package com.bcd.base.support_parser.impl.gb32960.data;
 
 import com.bcd.base.support_parser.anno.F_bean_list;
-import com.bcd.base.support_parser.anno.F_integer;
+import com.bcd.base.support_parser.anno.F_num;
 
 
 /**
@@ -9,7 +9,7 @@ import com.bcd.base.support_parser.anno.F_integer;
  */
 public class VehicleMotorData {
     //驱动电机个数
-    @F_integer(len = 1,var = 'a')
+    @F_num(len = 1,var = 'a')
     public short num;
 
     //驱动电机总成信息列表

@@ -9,13 +9,13 @@ import io.netty.buffer.Unpooled;
 import java.util.List;
 
 public class Msg_body_queue_statistics_info implements Msg_body{
-    @F_integer(len = 2,var = 'a')
+    @F_num(len = 2,var = 'a')
     public int src_count;
-    @F_integer(len = 1,var = 'b')
+    @F_num(len = 1,var = 'b')
     public short lane_count;
     @F_skip(len = 32,mode = SkipMode.ReservedFromStart)
     public byte[] reserved;
-    @F_integer_array(lenExpr = "a", singleLen = 4)
+    @F_num_array(lenExpr = "a", singleLen = 4)
     public long[] src_array;
     @F_bean_list(listLenExpr = "b")
     public List<Lane_info_queue> lane_info_array;

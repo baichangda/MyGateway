@@ -2,8 +2,8 @@ package com.bcd.base.support_parser.impl.gb32960.data;
 
 import com.bcd.base.support_parser.Parser;
 import com.bcd.base.support_parser.anno.F_customize;
-import com.bcd.base.support_parser.anno.F_integer;
-import com.bcd.base.support_parser.anno.F_integer_array;
+import com.bcd.base.support_parser.anno.F_num;
+import com.bcd.base.support_parser.anno.F_num_array;
 import com.bcd.base.support_parser.anno.F_string;
 import com.bcd.base.support_parser.impl.gb32960.processor.PacketDataFieldProcessor;
 import io.netty.buffer.ByteBuf;
@@ -15,22 +15,22 @@ import java.util.Date;
 
 public class Packet {
     //头 0-2
-    @F_integer_array(len = 2, singleLen = 1)
+    @F_num_array(len = 2, singleLen = 1)
     public byte[] header;
     //命令标识 2-3
-    @F_integer(len = 1)
+    @F_num(len = 1)
     public PacketFlag flag;
     //应答标识 3-4
-    @F_integer(len = 1)
+    @F_num(len = 1)
     public short replyFlag;
     //唯一识别码 4-21
     @F_string(len = 17)
     public String vin;
     //数据单元加密方式 21-22
-    @F_integer(len = 1)
+    @F_num(len = 1)
     public short encodeWay;
     //数据单元长度 22-24
-    @F_integer(len = 2, var = 'a')
+    @F_num(len = 2, var = 'a')
     public int contentLength;
     //数据单元
 //    @F_integer_array(lenExpr = "a", singleLen = 1)
@@ -42,7 +42,7 @@ public class Packet {
 //    @F_skip(lenExpr = "a")
     public PacketData data;
     //异或校验位
-    @F_integer(len = 1)
+    @F_num(len = 1)
     public byte code;
 
 

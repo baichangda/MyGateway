@@ -1,6 +1,5 @@
 package com.bcd.base.support_parser.impl.immotors.ep33.data;
 
-import com.bcd.base.support_parser.anno.F_integer;
 import com.bcd.base.support_parser.anno.F_string;
 import com.bcd.base.support_parser.anno.StringAppendMode;
 import com.bcd.base.support_parser.impl.immotors.Evt_4_x;

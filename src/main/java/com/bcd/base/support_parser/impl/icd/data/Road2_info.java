@@ -5,17 +5,17 @@ import com.bcd.base.support_parser.anno.*;
 import java.util.List;
 
 public class Road2_info {
-    @F_integer(len = 4)
+    @F_num(len = 4)
     public long road_id;
-    @F_integer(len = 1)
+    @F_num(len = 1)
     public RoadType road_type;
-    @F_integer(len = 4,valExpr = "x/10000000")
+    @F_num(len = 4,valExpr = "x/10000000")
     public double road_lon;
-    @F_integer(len = 4,valExpr = "x/10000000")
+    @F_num(len = 4,valExpr = "x/10000000")
     public double road_lat;
-    @F_integer(len = 4)
+    @F_num(len = 4)
     public long road_alt;
-    @F_integer(len = 4,var = 'a')
+    @F_num(len = 4,var = 'a')
     public long lane_count;
 
     @F_skip(len = 64,mode = SkipMode.ReservedFromStart)

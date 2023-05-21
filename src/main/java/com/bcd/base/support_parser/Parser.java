@@ -61,12 +61,14 @@ public class Parser {
     private final static FieldBuilder__F_date field_builder__f_date = new FieldBuilder__F_date();
     private final static FieldBuilder__F_float_ieee754_array fieldBuilder__F_float_ieee754_array = new FieldBuilder__F_float_ieee754_array();
     private final static FieldBuilder__F_float_ieee754 fieldbuilder__f_float_ieee754 = new FieldBuilder__F_float_ieee754();
-    private final static FieldBuilder__F_integer_array fieldBuilder__f_integer_array = new FieldBuilder__F_integer_array();
-    private final static FieldBuilder__F_integer fieldBuilder__f_integer_ = new FieldBuilder__F_integer();
+    private final static FieldBuilder__F_num_array fieldBuilder__f_num_array = new FieldBuilder__F_num_array();
+    private final static FieldBuilder__F_num fieldBuilder__f_num = new FieldBuilder__F_num();
     private final static FieldBuilder__F_skip fieldBuilder__f_skip = new FieldBuilder__F_skip();
     private final static FieldBuilder__F_string fieldBuilder__f_string = new FieldBuilder__F_string();
     private final static FieldBuilder__F_customize fieldBuilder__f_customize = new FieldBuilder__F_customize();
-
+    private final static FieldBuilder__F_bit_num fieldbuilder__f_bit_num = new FieldBuilder__F_bit_num();
+    private final static FieldBuilder__F_bit_num_array fieldbuilder__f_bit_num_array = new FieldBuilder__F_bit_num_array();
+    private final static FieldBuilder__F_bit_skip fieldbuilder__f_bit_skip = new FieldBuilder__F_bit_skip();
     /**
      * javassist生成类序号
      */
@@ -75,8 +77,8 @@ public class Parser {
     private final static Set<Class> annoSet = new HashSet<>();
 
     static {
-        annoSet.add(F_integer.class);
-        annoSet.add(F_integer_array.class);
+        annoSet.add(F_num.class);
+        annoSet.add(F_num_array.class);
 
         annoSet.add(F_float_ieee754.class);
         annoSet.add(F_float_ieee754_array.class);
@@ -91,6 +93,10 @@ public class Parser {
         annoSet.add(F_customize.class);
 
         annoSet.add(F_skip.class);
+
+        annoSet.add(F_bit_num.class);
+        annoSet.add(F_bit_num_array.class);
+        annoSet.add(F_bit_skip.class);
     }
 
 
@@ -272,8 +278,8 @@ public class Parser {
      * 用于该包下所有带如下注解的属性覆盖
      * {@link F_float_ieee754#order()}
      * {@link F_float_ieee754_array#order()}
-     * {@link F_integer#order()}
-     * {@link F_integer_array#order()}
+     * {@link F_num#order()}
+     * {@link F_num_array#order()}
      * {@link F_date#order()}
      * <p>
      * 可以配置重复的包、优先使用前缀匹配更多的规则
@@ -318,53 +324,46 @@ public class Parser {
     }
 
     private static void bitEndWhenBitField(List<Field> fieldList, int i, BuilderContext context) {
-        if (fieldList.size() - 1 == i) {
+        final Field cur = fieldList.get(i);
+        final F_bit_num f_bit_num1 = cur.getAnnotation(F_bit_num.class);
+        final F_bit_num_array f_bit_num_array1 = cur.getAnnotation(F_bit_num_array.class);
+        final F_bit_skip f_bit_skip1 = cur.getAnnotation(F_bit_skip.class);
+        if (f_bit_num1 != null || f_bit_skip1 != null) {
+            context.logBit = true;
+        }
+
+        if (i == fieldList.size() - 1) {
             context.bitEndWhenBitField_process = false;
             context.bitEndWhenBitField_deProcess = true;
         } else {
-            final Field cur = fieldList.get(i);
-            final F_integer f_integer1 = cur.getAnnotation(F_integer.class);
-            final F_skip f_skip1 = cur.getAnnotation(F_skip.class);
-            final F_integer_array f_integer_array1 = cur.getAnnotation(F_integer_array.class);
-            if (f_integer1 != null && f_integer1.bit() > 0) {
-                context.logBit = true;
-                if (f_integer1.bitEnd()) {
-                    context.bitEndWhenBitField_process = true;
-                    context.bitEndWhenBitField_deProcess = true;
-                    return;
-                }
-            }
-
-            if (f_skip1 != null && f_skip1.bit() > 0) {
-                context.logBit = true;
-                if (f_skip1.bitEnd()) {
-                    context.bitEndWhenBitField_process = true;
-                    context.bitEndWhenBitField_deProcess = true;
-                    return;
-                }
-            }
-
-            if (f_integer_array1 != null && f_integer_array1.bit() > 0) {
-                if (f_integer_array1.bitEnd()) {
-                    context.bitEndWhenBitField_process = true;
-                    context.bitEndWhenBitField_deProcess = true;
-                    return;
-                }
-            }
-
-            final Field next = fieldList.get(i + 1);
-            final F_integer f_integer2 = next.getAnnotation(F_integer.class);
-            final F_skip f_skip2 = next.getAnnotation(F_skip.class);
-            final F_integer_array f_integer_array2 = next.getAnnotation(F_integer_array.class);
-            if ((f_integer2 == null  && f_skip2 == null && f_integer_array2 == null )
-                    || (f_integer2 != null && f_integer2.bit() == 0)
-                    || (f_skip2 != null && f_skip2.bit() == 0)
-                    || (f_integer_array2 != null && f_integer_array2.bit() == 0)
-            ) {
+            if (f_bit_num1 != null && f_bit_num1.end()) {
                 context.bitEndWhenBitField_process = true;
                 context.bitEndWhenBitField_deProcess = true;
                 return;
             }
+
+            if (f_bit_num_array1 != null && f_bit_num_array1.end()) {
+                context.bitEndWhenBitField_process = true;
+                context.bitEndWhenBitField_deProcess = true;
+                return;
+            }
+
+            if (f_bit_skip1 != null && f_bit_skip1.end()) {
+                context.bitEndWhenBitField_process = true;
+                context.bitEndWhenBitField_deProcess = true;
+                return;
+            }
+
+            final Field next = fieldList.get(i + 1);
+            final F_bit_num f_bit_num2 = next.getAnnotation(F_bit_num.class);
+            final F_bit_num_array f_bit_num_array2 = next.getAnnotation(F_bit_num_array.class);
+            final F_bit_skip f_bit_skip2 = next.getAnnotation(F_bit_skip.class);
+            if (f_bit_num2 == null && f_bit_skip2 == null && f_bit_num_array2 == null) {
+                context.bitEndWhenBitField_process = true;
+                context.bitEndWhenBitField_deProcess = true;
+                return;
+            }
+
             context.bitEndWhenBitField_process = false;
             context.bitEndWhenBitField_deProcess = false;
         }
@@ -420,9 +419,9 @@ public class Parser {
                 JavassistUtil.prependLogCode_parse(context);
             }
             try {
-                final F_integer f_integer = field.getAnnotation(F_integer.class);
-                if (f_integer != null) {
-                    fieldBuilder__f_integer_.buildParse(context);
+                final F_num f_num = field.getAnnotation(F_num.class);
+                if (f_num != null) {
+                    fieldBuilder__f_num.buildParse(context);
                     continue;
                 }
 
@@ -432,9 +431,9 @@ public class Parser {
                     continue;
                 }
 
-                final F_integer_array f_integer_array = field.getAnnotation(F_integer_array.class);
-                if (f_integer_array != null) {
-                    fieldBuilder__f_integer_array.buildParse(context);
+                final F_num_array f_num_array = field.getAnnotation(F_num_array.class);
+                if (f_num_array != null) {
+                    fieldBuilder__f_num_array.buildParse(context);
                     continue;
                 }
 
@@ -476,7 +475,21 @@ public class Parser {
                 final F_skip f_skip = field.getAnnotation(F_skip.class);
                 if (f_skip != null) {
                     fieldBuilder__f_skip.buildParse(context);
-                    continue;
+                }
+
+                final F_bit_num f_bit_num = field.getAnnotation(F_bit_num.class);
+                if (f_bit_num != null) {
+                    fieldbuilder__f_bit_num.buildParse(context);
+                }
+
+                final F_bit_num_array f_bit_num_array = field.getAnnotation(F_bit_num_array.class);
+                if (f_bit_num_array != null) {
+                    fieldbuilder__f_bit_num_array.buildParse(context);
+                }
+
+                final F_bit_skip f_bit_skip = field.getAnnotation(F_bit_skip.class);
+                if (f_bit_skip != null) {
+                    fieldbuilder__f_bit_skip.buildParse(context);
                 }
             } finally {
                 if (logCollector_parse != null) {
@@ -500,9 +513,9 @@ public class Parser {
                 if (logCollector_deParse != null) {
                     JavassistUtil.prependLogCode_deParse(context);
                 }
-                final F_integer f_integer = field.getAnnotation(F_integer.class);
-                if (f_integer != null) {
-                    fieldBuilder__f_integer_.buildDeParse(context);
+                final F_num f_num = field.getAnnotation(F_num.class);
+                if (f_num != null) {
+                    fieldBuilder__f_num.buildDeParse(context);
                     continue;
                 }
 
@@ -512,9 +525,9 @@ public class Parser {
                     continue;
                 }
 
-                final F_integer_array f_integer_array = field.getAnnotation(F_integer_array.class);
-                if (f_integer_array != null) {
-                    fieldBuilder__f_integer_array.buildDeParse(context);
+                final F_num_array f_num_array = field.getAnnotation(F_num_array.class);
+                if (f_num_array != null) {
+                    fieldBuilder__f_num_array.buildDeParse(context);
                     continue;
                 }
 
@@ -556,7 +569,21 @@ public class Parser {
                 final F_skip f_skip = field.getAnnotation(F_skip.class);
                 if (f_skip != null) {
                     fieldBuilder__f_skip.buildDeParse(context);
-                    continue;
+                }
+
+                final F_bit_num f_bit_num = field.getAnnotation(F_bit_num.class);
+                if (f_bit_num != null) {
+                    fieldbuilder__f_bit_num.buildDeParse(context);
+                }
+
+                final F_bit_num_array f_bit_num_array = field.getAnnotation(F_bit_num_array.class);
+                if (f_bit_num_array != null) {
+                    fieldbuilder__f_bit_num_array.buildDeParse(context);
+                }
+
+                final F_bit_skip f_bit_skip = field.getAnnotation(F_bit_skip.class);
+                if (f_bit_skip != null) {
+                    fieldbuilder__f_bit_skip.buildDeParse(context);
                 }
             } finally {
                 if (logCollector_deParse != null) {

@@ -2,7 +2,7 @@ package com.bcd.base.support_parser.impl.gb32960.data;
 
 import com.bcd.base.support_parser.anno.DateMode;
 import com.bcd.base.support_parser.anno.F_date;
-import com.bcd.base.support_parser.anno.F_integer;
+import com.bcd.base.support_parser.anno.F_num;
 import com.bcd.base.support_parser.anno.F_string;
 
 import java.util.Date;
@@ -13,7 +13,7 @@ public class VehicleLoginData implements PacketData {
     public Date collectTime;
 
     //登入流水号
-    @F_integer(len = 2)
+    @F_num(len = 2)
     public int sn;
 
     //iccid
@@ -21,11 +21,11 @@ public class VehicleLoginData implements PacketData {
     public String iccid;
 
     //可充电储能子系统数
-    @F_integer(len = 1, var = 'n')
+    @F_num(len = 1, var = 'n')
     public short subSystemNum;
 
     //可充电储能系统编码长度
-    @F_integer(len = 1, var = 'm')
+    @F_num(len = 1, var = 'm')
     public byte systemCodeLen;
 
     //可充电储能系统编码
