@@ -37,7 +37,7 @@ public @interface F_bean_list {
 
     /**
      * 是否传递bitBuf对象到bean的解析中
-     * 即设置
+     * 会在父类中构造bitBuf对象并设置
      * {@link com.bcd.base.support_parser.processor.ProcessContext#bitBuf_reader}
      * {@link com.bcd.base.support_parser.processor.ProcessContext#bitBuf_writer}
      */
