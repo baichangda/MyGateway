@@ -3,6 +3,8 @@ package com.bcd.base.support_parser.builder;
 
 import com.bcd.base.support_parser.anno.F_customize;
 import com.bcd.base.support_parser.exception.BaseRuntimeException;
+import com.bcd.base.support_parser.util.BitBuf_reader;
+import com.bcd.base.support_parser.util.BitBuf_writer;
 import com.bcd.base.support_parser.util.JavassistUtil;
 
 import java.lang.reflect.Field;
@@ -23,7 +25,12 @@ public class FieldBuilder__F_customize extends FieldBuilder {
                 final String processorClassVarName = JavassistUtil.getProcessorVarName(processorClass);
                 final String varNameInstance = FieldBuilder.varNameInstance;
                 final String fieldTypeClassName = field.getType().getName();
-                final String unBoxing = JavassistUtil.unBoxing(JavassistUtil.format("{}.process({},{})", processorClassVarName, FieldBuilder.varNameByteBuf, context.getProcessContextVarName()), field.getType());
+                final String processContextVarName = context.getProcessContextVarName();
+                if (anno.passBitBuf()) {
+                    final String varNameBitBuf = context.getVarNameBitBuf(BitBuf_reader.class);
+                    JavassistUtil.append(body, "{}.bitBuf_reader={};\n", processContextVarName, varNameBitBuf);
+                }
+                final String unBoxing = JavassistUtil.unBoxing(JavassistUtil.format("{}.process({},{})", processorClassVarName, FieldBuilder.varNameByteBuf, processContextVarName), field.getType());
                 if (anno.var() == '0') {
                     JavassistUtil.append(body, "{}.{}={};\n", varNameInstance, field.getName(), unBoxing);
                 } else {
@@ -63,8 +70,13 @@ public class FieldBuilder__F_customize extends FieldBuilder {
             if (processorClass == void.class) {
                 throw BaseRuntimeException.getException("class[{}] field[{}] anno[] must have builderClass or processorClass", field.getDeclaringClass().getName(), field.getName(), F_customize.class.getName());
             } else {
+                final String processContextVarName = context.getProcessContextVarName();
+                if (anno.passBitBuf()) {
+                    final String varNameBitBuf = context.getVarNameBitBuf(BitBuf_writer.class);
+                    JavassistUtil.append(body, "{}.bitBuf_writer={};\n", processContextVarName, varNameBitBuf);
+                }
                 final String processorClassVarName = JavassistUtil.getProcessorVarName(processorClass);
-                JavassistUtil.append(body, "{}.deProcess({},{},{});\n", processorClassVarName, FieldBuilder.varNameByteBuf, context.getProcessContextVarName(), valCode);
+                JavassistUtil.append(body, "{}.deProcess({},{},{});\n", processorClassVarName, FieldBuilder.varNameByteBuf, processContextVarName, valCode);
             }
         } else {
             BuilderContext.fieldBuilderCache.computeIfAbsent(builderClass, k -> {

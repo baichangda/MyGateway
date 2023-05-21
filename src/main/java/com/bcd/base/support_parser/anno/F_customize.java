@@ -40,4 +40,14 @@ public @interface F_customize {
      * 例如: m,n,a
      */
     char var() default '0';
+
+    /**
+     * 是否传递bitBuf对象到bean的解析中
+     * 会在父类中构造bitBuf对象并设置
+     * {@link com.bcd.base.support_parser.processor.ProcessContext#bitBuf_reader}
+     * {@link com.bcd.base.support_parser.processor.ProcessContext#bitBuf_writer}
+     * 集合中的子类获取bitBuf逻辑参考
+     * {@link com.bcd.base.support_parser.builder.BuilderContext#getVarNameBitBuf(Class)}
+     */
+    boolean passBitBuf() default false;
 }
