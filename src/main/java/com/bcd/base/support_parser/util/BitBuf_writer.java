@@ -9,6 +9,9 @@ import org.slf4j.LoggerFactory;
 
 public class BitBuf_writer {
 
+    public final static boolean default_bigEndian=true;
+    public final static boolean default_unsigned=true;
+
     static Logger logger = LoggerFactory.getLogger(BitBuf_writer.class);
     private final ByteBuf byteBuf;
 
@@ -145,6 +148,14 @@ public class BitBuf_writer {
                     bitStart, bitEnd
             );
         }
+    }
+
+    public final void write(long l, int bit) {
+        write(l, bit, default_bigEndian, default_unsigned);
+    }
+
+    public final WriteLog write_log(long l, int bit) {
+        return write_log(l, bit, default_bigEndian, default_unsigned);
     }
 
 
