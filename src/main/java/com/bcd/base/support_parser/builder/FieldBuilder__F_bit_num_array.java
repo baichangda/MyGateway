@@ -1,5 +1,6 @@
 package com.bcd.base.support_parser.builder;
 
+import com.bcd.base.support_parser.anno.F_bit_num;
 import com.bcd.base.support_parser.anno.F_bit_num_array;
 import com.bcd.base.support_parser.anno.F_num_array;
 import com.bcd.base.support_parser.anno.F_skip;
@@ -20,6 +21,8 @@ public class FieldBuilder__F_bit_num_array extends FieldBuilder {
         final String arrayElementTypeName = arrayElementType.getName();
         final Class<F_bit_num_array> annoClass = F_bit_num_array.class;
         final F_bit_num_array anno = context.field.getAnnotation(annoClass);
+        final boolean bigEndian = JavassistUtil.bigEndian(anno.order(), context.clazz);
+        final boolean unsigned = anno.unsigned();
         switch (arrayElementTypeName) {
             case "byte", "short", "int", "long", "float", "double" -> {
             }
@@ -54,7 +57,7 @@ public class FieldBuilder__F_bit_num_array extends FieldBuilder {
 
         JavassistUtil.append(body, "final {}[] {}=new {}[{}];\n", arrayElementTypeName, arrVarName, arrayElementTypeName, arrLenRes);
         JavassistUtil.append(body, "for(int i=0;i<{}.length;i++){\n", arrVarName);
-        JavassistUtil.append(body, "final {} {}=({}){}.read({},{});\n", arrayElementTypeName, varNameArrayElement, arrayElementTypeName, varNameBitBuf, singleLen, anno.unsigned());
+        JavassistUtil.append(body, "final {} {}=({}){}.read({},{},{});\n", arrayElementTypeName, varNameArrayElement, arrayElementTypeName, varNameBitBuf, singleLen, bigEndian, unsigned);
         if (singleSkip > 0) {
             JavassistUtil.append(body, "{}.skip({});\n", varNameBitBuf, singleSkip);
         }
@@ -72,6 +75,8 @@ public class FieldBuilder__F_bit_num_array extends FieldBuilder {
         final Field field = context.field;
         final Class<F_bit_num_array> annoClass = F_bit_num_array.class;
         final F_bit_num_array anno = context.field.getAnnotation(annoClass);
+        final boolean bigEndian = JavassistUtil.bigEndian(anno.order(), context.clazz);
+        final boolean unsigned = anno.unsigned();
         final Class<?> fieldTypeClass = field.getType();
         final int singleLen = anno.singleLen();
         final int singleSkip = anno.singleSkip();
@@ -86,9 +91,9 @@ public class FieldBuilder__F_bit_num_array extends FieldBuilder {
         JavassistUtil.append(body, "final {}[] {}={};\n", fieldTypeClass.componentType(), varNameFieldArr, valCode);
         JavassistUtil.append(body, "for(int i=0;i<{}.length;i++){\n", varNameFieldArr);
         if (anno.valExpr().isEmpty()) {
-            JavassistUtil.append(body, "{}.write((long)({}),{},{});\n", varNameBitBuf, varNameFieldArr + "[i]", singleLen, anno.unsigned());
+            JavassistUtil.append(body, "{}.write((long)({}),{},{},{});\n", varNameBitBuf, varNameFieldArr + "[i]", singleLen, bigEndian, unsigned);
         } else {
-            JavassistUtil.append(body, "{}.write((long)({}),{},{});\n", varNameBitBuf, JavassistUtil.replaceValExprToCode(RpnUtil.reverseExpr(anno.valExpr()), varNameFieldArr + "[i]"), singleLen, anno.unsigned());
+            JavassistUtil.append(body, "{}.write((long)({}),{},{},{});\n", varNameBitBuf, JavassistUtil.replaceValExprToCode(RpnUtil.reverseExpr(anno.valExpr()), varNameFieldArr + "[i]"), singleLen, bigEndian, unsigned);
         }
         if (singleSkip > 0) {
             JavassistUtil.append(body, "{}.skip({});\n", varNameBitBuf, singleSkip);

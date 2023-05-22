@@ -56,6 +56,11 @@ public @interface F_bit_num {
     boolean unsigned() default true;
 
     /**
+     * bit位序模式
+     */
+    BitOrder order() default BitOrder.Default;
+
+    /**
      * 变量名称
      * 标注此标记的会在解析时候将值缓存,供表达式使用
      * 例如: m,n,a

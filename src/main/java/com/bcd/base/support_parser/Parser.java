@@ -188,16 +188,15 @@ public class Parser {
             @Override
             public void collect_field_bit(Class fieldClass, String fieldName, BitBuf_reader.Log logRes, Object val, String processorClassName) {
                 if (logRes instanceof BitBuf_reader.ReadLog readLog) {
-                    logger.info("--parse field--[{}].[{}] bit_hex[{}] bit_pos[{}-{}] bit_binary[{},{}] bit_val[{}]->[{}]"
+                    logger.info("--parse field--[{}].[{}] bit_hex[{}] bit_pos[{}-{}] bit_bigEndian[{}] bit_unsigned[{}] bit_binary[{}->{}->{}] bit_val[{}->{}->{}]"
                             , fieldClass.getSimpleName()
-                            , fieldName
-                            , readLog.getLogHex()
-                            , readLog.bitStart
-                            , readLog.bitEnd
-                            , readLog.unsigned ? "u" : "s"
-                            , readLog.getLogBit()
-                            , readLog.val
-                            , val
+                            , fieldName,
+                            readLog.getLogHex(),
+                            readLog.bitStart, readLog.bitEnd,
+                            readLog.bigEndian ? "yes" : "no",
+                            readLog.unsigned ? "yes" : "no",
+                            readLog.getLogBit(readLog.val1,false), readLog.getLogBit(readLog.val2,false), readLog.getLogBit(readLog.val3,readLog.signed3),
+                            readLog.val1, readLog.val2, readLog.val3
                     );
                 } else if (logRes instanceof BitBuf_reader.SkipLog skipLog) {
                     logger.info("--parse field--[{}].[{}] skip bit_hex[{}] bit_pos[{}-{}] bit_binary[{}]"
@@ -229,22 +228,21 @@ public class Parser {
             @Override
             public void collect_field_bit(Class fieldClass, String fieldName, Object val, BitBuf_writer.Log logRes, String processorClassName) {
                 if (logRes instanceof BitBuf_writer.WriteLog writeLog) {
-                    logger.info("--deParse field--[{}].[{}] [{}]->bit_val[{}] bit_binary[{},{}] bit_hex[{}] bit_pos[{}-{}]"
+                    logger.info("--deParse field--[{}].[{}] [{}]->bit_unsigned[{}] bit_bigEndian[{}] bit_val[{}->{}->{}] bit_binary[{}->{}->{}] bit_hex[{}] bit_pos[{}-{}]"
                             , fieldClass.getSimpleName()
                             , fieldName
-                            , val
-                            , writeLog.val
-                            , writeLog.unsigned ? "u" : "s"
-                            , writeLog.getLogBit()
-                            , writeLog.getLogHex()
-                            , writeLog.bitStart
-                            , writeLog.bitEnd
+                            , val,
+                            writeLog.unsigned ? "yes" : "no",
+                            writeLog.bigEndian ? "yes" : "no",
+                            writeLog.val1, writeLog.val2, writeLog.val3,
+                            writeLog.getLogBit(writeLog.val1,writeLog.signed1), writeLog.getLogBit(writeLog.val2,false), writeLog.getLogBit(writeLog.val3,false),
+                            writeLog.getLogHex(),
+                            writeLog.bitStart, writeLog.bitEnd
                     );
                 } else if (logRes instanceof BitBuf_writer.SkipLog skipLog) {
-                    logger.info("--deParse field--[{}].[{}] skip bit_binary[{}] bit_hex[{}] bit_pos[{}-{}]"
+                    logger.info("--deParse field--[{}].[{}] skip bit_hex[{}] bit_pos[{}-{}]"
                             , fieldClass.getSimpleName()
                             , fieldName
-                            , skipLog.getLogBit()
                             , skipLog.getLogHex()
                             , skipLog.bitStart
                             , skipLog.bitEnd);
@@ -264,6 +262,7 @@ public class Parser {
 
 
     public static final ArrayList<ByteOrderConfig> byteOrderConfigs = new ArrayList<>();
+
 
     public record ByteOrderConfig(ByteOrder order, String classPrefix) implements Comparable<ByteOrderConfig> {
         @Override
@@ -313,7 +312,7 @@ public class Parser {
             if (config.classPrefix.equals(classPrefix)) {
                 if (config.order != order) {
                     byteOrderConfigs.set(i, new ByteOrderConfig(order, classPrefix));
-                    logger.warn("append[{},{}] rewrite[{},{}]", order, classPrefix, config.order, config.classPrefix);
+                    logger.warn("ByteOrder,append[{},{}] rewrite[{},{}]", order, classPrefix, config.order, config.classPrefix);
                     break;
                 }
                 return;
@@ -321,6 +320,44 @@ public class Parser {
         }
         byteOrderConfigs.add(new ByteOrderConfig(order, classPrefix));
         Collections.sort(byteOrderConfigs);
+    }
+
+
+    public static final ArrayList<BitOrderConfig> bitOrderConfigs = new ArrayList<>();
+
+    public record BitOrderConfig(BitOrder order, String classPrefix) implements Comparable<BitOrderConfig> {
+        @Override
+        public int compareTo(BitOrderConfig o) {
+            return Integer.compare(classPrefix.length(), o.classPrefix.length());
+        }
+    }
+
+    /**
+     * 配置包级别的{@link ByteOrder}定义
+     * <p>
+     * 用于该包下所有带如下注解的属性覆盖
+     * {@link F_bit_num#order()}
+     * {@link F_bit_num_array#order()}
+     * <p>
+     * 生效规则与{@link ByteOrder}一样
+     *
+     * @param order
+     * @param classPrefix
+     */
+    public synchronized static void append(BitOrder order, String classPrefix) {
+        for (int i = 0; i < byteOrderConfigs.size(); i++) {
+            final BitOrderConfig config = bitOrderConfigs.get(i);
+            if (config.classPrefix.equals(classPrefix)) {
+                if (config.order != order) {
+                    bitOrderConfigs.set(i, new BitOrderConfig(order, classPrefix));
+                    logger.warn("BitOrder,append[{},{}] rewrite[{},{}]", order, classPrefix, config.order, config.classPrefix);
+                    break;
+                }
+                return;
+            }
+        }
+        bitOrderConfigs.add(new BitOrderConfig(order, classPrefix));
+        Collections.sort(bitOrderConfigs);
     }
 
     private static void bitEndWhenBitField(List<Field> fieldList, int i, BuilderContext context) {

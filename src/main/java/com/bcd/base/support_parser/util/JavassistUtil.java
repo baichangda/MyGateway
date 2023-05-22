@@ -2,6 +2,7 @@ package com.bcd.base.support_parser.util;
 
 
 import com.bcd.base.support_parser.Parser;
+import com.bcd.base.support_parser.anno.BitOrder;
 import com.bcd.base.support_parser.anno.ByteOrder;
 import com.bcd.base.support_parser.builder.BuilderContext;
 import com.bcd.base.support_parser.builder.FieldBuilder;
@@ -42,6 +43,39 @@ public class JavassistUtil {
 
     public static String getProcessorVarName(final Class processorClass) {
         return "_" + toFirstLowerCase(processorClass.getSimpleName());
+    }
+
+    /**
+     * @param order
+     * @param clazz
+     * @return
+     */
+    public static boolean bigEndian(BitOrder order, Class clazz) {
+        BitOrder configOrder = null;
+        final String className = clazz.getName();
+        for (Parser.BitOrderConfig config : Parser.bitOrderConfigs) {
+            if (className.startsWith(config.classPrefix())) {
+                configOrder = config.order();
+            }
+        }
+
+        if (configOrder == null) {
+            if (order == BitOrder.Default) {
+                return true;
+            } else {
+                return order == BitOrder.BigEndian;
+            }
+        } else {
+            if (order == BitOrder.Default) {
+                if (configOrder == BitOrder.Default) {
+                    return true;
+                } else {
+                    return configOrder == BitOrder.BigEndian;
+                }
+            } else {
+                return order == BitOrder.BigEndian;
+            }
+        }
     }
 
     /**

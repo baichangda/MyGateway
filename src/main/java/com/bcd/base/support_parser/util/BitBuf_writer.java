@@ -57,10 +57,10 @@ public class BitBuf_writer {
 
             final ByteBuf bb = Unpooled.buffer();
             final BitBuf_writer bitBufWriter = BitBuf_writer.newBitBuf(bb);
-            final WriteLog res1 = bitBufWriter.write_log(-4, 3, false);
-            final WriteLog res2 = bitBufWriter.write_log(0, 3, true);
+            final WriteLog res1 = bitBufWriter.write_log(4, 3, true, true);
+            final WriteLog res2 = bitBufWriter.write_log(0, 3, true, true);
             final SkipLog skip1 = bitBufWriter.skip_log(3);
-            final WriteLog res3 = bitBufWriter.write_log(-55, 9, false);
+            final WriteLog res3 = bitBufWriter.write_log(-217, 9, false, false);
             res1.print();
             res2.print();
             skip1.print();
@@ -83,58 +83,77 @@ public class BitBuf_writer {
         public final byte[] bytes;
 
         public final int bitStart;
+        public final int bit;
 
         public final int bitEnd;
 
-        public Log(int byteLen, int bitStart, int bitEnd) {
+        public Log(int byteLen, int bitStart, int bit) {
             this.bytes = new byte[byteLen];
             this.bitStart = bitStart;
-            this.bitEnd = bitEnd;
+            this.bit = bit;
+            this.bitEnd = bitStart + bit - 1;
         }
+
 
         public String getLogHex() {
             return ByteBufUtil.hexDump(bytes) + ((bitEnd & 7) == 7 ? "" : "?");
         }
 
-        public String getLogBit() {
-            final StringBuilder sb = new StringBuilder();
-            for (byte b : bytes) {
-                sb.append(Strings.padStart(Integer.toBinaryString(b & 0xff), 8, '0'));
-            }
-            return sb.substring(bitStart, bitEnd + 1);
-        }
+
     }
 
     public static class SkipLog extends Log {
-        public SkipLog(int byteLen, int bitStart, int bitEnd) {
-            super(byteLen, bitStart, bitEnd);
+        public SkipLog(int byteLen, int bitStart, int bit) {
+            super(byteLen, bitStart, bit);
         }
 
         public void print() {
-            logger.info("skip bit_binary[{}] bit_hex[{}] bit_pos[{}-{}]", getLogBit(), getLogHex(), bitStart, bitEnd);
+            logger.info("skip bit_hex[{}] bit_pos[{}-{}]", getLogHex(), bitStart, bitEnd);
         }
     }
 
     public static class WriteLog extends Log {
-        public long val;
+        public long val1;
+        public boolean signed1;
+        public long val2;
+        public long val3;
 
+        public final boolean bigEndian;
         public final boolean unsigned;
 
-        public WriteLog(int byteLen, int bitStart, int bitEnd, long val, boolean unsigned) {
-            super(byteLen, bitStart, bitEnd);
-            this.val = val;
+        public WriteLog(int byteLen, int bitStart, int bit, boolean bigEndian, boolean unsigned) {
+            super(byteLen, bitStart, bit);
+            this.bigEndian = bigEndian;
             this.unsigned = unsigned;
         }
 
+        public String getLogBit(long l, boolean signed) {
+            if (signed) {
+                return "-" + Strings.padStart(Long.toBinaryString(-l), bit, '0');
+            } else {
+                return Strings.padStart(Long.toBinaryString(l), bit, '0');
+            }
+        }
+
         public void print() {
-            logger.info("write bit_val[{}] bit_binary[{},{}] bit_hex[{}] bit_pos[{}-{}]", val, unsigned ? "u" : "s", getLogBit(), getLogHex(), bitStart, bitEnd);
+            logger.info("write bit_unsigned[{}] bit_bigEndian[{}] bit_val[{}->{}->{}] bit_binary[{}->{}->{}] bit_hex[{}] bit_pos[{}-{}]",
+                    unsigned ? "yes" : "no",
+                    bigEndian ? "yes" : "no",
+                    val1, val2, val3,
+                    getLogBit(val1, signed1), getLogBit(val2, false), getLogBit(val3, false),
+                    getLogHex(),
+                    bitStart, bitEnd
+            );
         }
     }
 
 
-    public final void write(long l, int bit, boolean unsigned) {
+    public final void write(long l, int bit, boolean bigEndian, boolean unsigned) {
         if (!unsigned && l < 0) {
             l = (-l) & ((0x01L << bit) - 1);
+        }
+        if (!bigEndian) {
+            l = Long.reverse(l) >>> (64 - bit);
         }
         final int temp = bit + bitOffset;
         final int byteLen = (temp >> 3) + ((temp & 7) == 0 ? 0 : 1);
@@ -156,14 +175,26 @@ public class BitBuf_writer {
     }
 
 
-    public final WriteLog write_log(long l, int bit, boolean unsigned) {
-        if (!unsigned && l < 0) {
-            l = (-l) & ((0x01L << bit) - 1);
-        }
+    public final WriteLog write_log(long l, int bit, boolean bigEndian, boolean unsigned) {
         final int temp = bit + bitOffset;
         final int byteLen = (temp >> 3) + ((temp & 7) == 0 ? 0 : 1);
+        final WriteLog logRes = new WriteLog(byteLen, bitOffset, bit, bigEndian, unsigned);
 
-        final WriteLog logRes = new WriteLog(byteLen, bitOffset, bitOffset + bit - 1, l, unsigned);
+        logRes.val1 = l;
+
+        if (!unsigned && l < 0) {
+            logRes.signed1 = true;
+            l = l & ((0x01L << bit) - 1);
+        }
+
+        logRes.val2 = l;
+
+        if (!bigEndian) {
+            l = Long.reverse(l) >>> (64 - bit);
+        }
+
+        logRes.val3 = l;
+
         final int left = (byteLen << 3) - temp;
         final long newL = l << left;
         if (bitOffset == 0) {
@@ -219,7 +250,7 @@ public class BitBuf_writer {
         final int temp = bit + bitOffset;
         final boolean newBitOffsetZero = (temp & 7) == 0;
         final int byteLen = (temp >> 3) + (newBitOffsetZero ? 0 : 1);
-        final SkipLog log = new SkipLog(byteLen, bitOffset, bitOffset + bit - 1);
+        final SkipLog log = new SkipLog(byteLen, bitOffset, bit);
 
         if (byteLen == 1) {
             if (newBitOffsetZero) {

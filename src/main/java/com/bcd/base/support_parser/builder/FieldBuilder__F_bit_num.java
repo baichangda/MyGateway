@@ -18,6 +18,9 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
         final Field field = context.field;
         final Class<?> fieldTypeClass = field.getType();
         final String fieldTypeName = fieldTypeClass.getName();
+        final F_bit_num anno = field.getAnnotation(annoClass);
+        final boolean bigEndian = JavassistUtil.bigEndian(anno.order(), context.clazz);
+        final boolean unsigned = anno.unsigned();
 
         switch (fieldTypeName) {
             case "byte", "short", "int", "long", "float", "double" -> {
@@ -30,7 +33,6 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
             }
         }
 
-        final F_bit_num anno = context.field.getAnnotation(annoClass);
         final StringBuilder body = context.body;
         final String varNameInstance = FieldBuilder.varNameInstance;
         final String varNameField = JavassistUtil.getFieldVarName(context);
@@ -43,11 +45,11 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
         final String varNameBitBuf = context.getVarNameBitBuf(BitBuf_reader.class);
 
         if (Parser.logCollector_parse == null) {
-            JavassistUtil.append(body, "final long {}={}.read({},{});\n", varNameField, varNameBitBuf, len, anno.unsigned());
+            JavassistUtil.append(body, "final long {}={}.read({},{},{});\n", varNameField, varNameBitBuf, len, bigEndian, unsigned);
         } else {
             context.varNameBitLog = varNameField + "_bitLog";
-            JavassistUtil.append(body, "final {} {}={}.read_log({},{});\n", BitBuf_reader.ReadLog.class.getName(), context.varNameBitLog, varNameBitBuf, len, anno.unsigned());
-            JavassistUtil.append(body, "final long {}={}.val;\n", varNameField, context.varNameBitLog);
+            JavassistUtil.append(body, "final {} {}={}.read_log({},{},{});\n", BitBuf_reader.ReadLog.class.getName(), context.varNameBitLog, varNameBitBuf, len, bigEndian, unsigned);
+            JavassistUtil.append(body, "final long {}={}.val3;\n", varNameField, context.varNameBitLog);
         }
 
         if (context.bitEndWhenBitField_process) {
@@ -69,7 +71,9 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
     public void buildDeParse(BuilderContext context) {
         final Class<F_bit_num> annoClass = F_bit_num.class;
         final Field field = context.field;
-        final F_bit_num anno = context.field.getAnnotation(annoClass);
+        final F_bit_num anno = field.getAnnotation(annoClass);
+        final boolean bigEndian = JavassistUtil.bigEndian(anno.order(), context.clazz);
+        final boolean unsigned = anno.unsigned();
         final String varNameInstance = FieldBuilder.varNameInstance;
         final StringBuilder body = context.body;
         final String fieldName = field.getName();
@@ -103,10 +107,10 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
         final String varNameBitBuf = context.getVarNameBitBuf(BitBuf_writer.class);
 
         if (Parser.logCollector_deParse == null) {
-            JavassistUtil.append(body, "{}.write((long)({}),{},{});\n", varNameBitBuf, valCode, len, anno.unsigned());
+            JavassistUtil.append(body, "{}.write((long)({}),{},{},{});\n", varNameBitBuf, valCode, len, bigEndian, unsigned);
         } else {
             context.varNameBitLog = varNameField + "_bitLog";
-            JavassistUtil.append(body, "final {} {}={}.write_log((long)({}),{},{});\n", BitBuf_writer.WriteLog.class.getName(), context.varNameBitLog, varNameBitBuf, valCode, len, anno.unsigned());
+            JavassistUtil.append(body, "final {} {}={}.write_log((long)({}),{},{},{});\n", BitBuf_writer.WriteLog.class.getName(), context.varNameBitLog, varNameBitBuf, valCode, len, bigEndian, unsigned);
         }
 
         if (context.bitEndWhenBitField_deProcess) {

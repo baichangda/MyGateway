@@ -63,6 +63,11 @@ public @interface F_bit_num_array {
     boolean unsigned() default true;
 
     /**
+     * bit位序模式
+     */
+    BitOrder order() default BitOrder.Default;
+
+    /**
      * 值处理表达式
      * 在解析出的原始值得基础上,进行运算
      * 公式中的x变量代表字段原始的值
