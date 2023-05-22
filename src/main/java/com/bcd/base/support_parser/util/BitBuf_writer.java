@@ -71,7 +71,7 @@ public class BitBuf_writer {
         System.out.println(System.currentTimeMillis() - t1);
     }
 
-    public void finish() {
+    public final void finish() {
         if (bitOffset > 0) {
             byteBuf.writeByte(b);
         }

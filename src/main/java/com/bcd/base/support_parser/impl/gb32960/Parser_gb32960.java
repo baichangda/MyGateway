@@ -32,7 +32,7 @@ public class Parser_gb32960{
         }
         logger.info("param threadNum[{}]", threadNum);
         int num = 1000000000;
-        PerformanceUtil.testMultiThreadPerformance(data, Packet.class, threadNum, num, true);
+        PerformanceUtil.testMultiThreadPerformance(ByteBufUtil.decodeHexDump(data), Packet.class, threadNum, num, true);
     }
 
     private static void parseToPacket(String data, int num, AtomicInteger count) {

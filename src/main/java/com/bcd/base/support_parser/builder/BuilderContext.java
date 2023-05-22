@@ -120,14 +120,8 @@ public class BuilderContext {
     public final String getVarNameBitBuf(Class bitBufClass) {
         if (varNameBitBuf == null) {
             final String bitBufClassName = bitBufClass.getName();
-            final String simpleName = bitBufClass.getSimpleName();
-            final String processContextBitBufVarName = simpleName.substring(0, 1).toLowerCase() + simpleName.substring(1);
-            JavassistUtil.append(body, "final {} {};\n", bitBufClassName, FieldBuilder.varNameBitBuf);
-            JavassistUtil.append(body, "if({}.{}==null){\n", FieldBuilder.varNameParentProcessContext, processContextBitBufVarName);
-            JavassistUtil.append(body, "{}={}.newBitBuf({});\n", FieldBuilder.varNameBitBuf, bitBufClassName, FieldBuilder.varNameByteBuf);
-            JavassistUtil.append(body, "}else{\n");
-            JavassistUtil.append(body, "{}={}.{};\n", FieldBuilder.varNameBitBuf, FieldBuilder.varNameParentProcessContext, processContextBitBufVarName);
-            JavassistUtil.append(body, "}\n");
+            final String bitBufClassSimpleName = bitBufClass.getSimpleName();
+            JavassistUtil.append(body, "final {} {}={}.get{}({});\n", bitBufClassName, FieldBuilder.varNameBitBuf, FieldBuilder.varNameParentProcessContext, bitBufClassSimpleName, FieldBuilder.varNameByteBuf);
             varNameBitBuf = FieldBuilder.varNameBitBuf;
         }
         return varNameBitBuf;

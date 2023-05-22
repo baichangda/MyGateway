@@ -56,7 +56,7 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
         if (fieldTypeClass.isEnum()) {
             JavassistUtil.append(body, "{}.{}={}.fromInteger((int){});\n", varNameInstance, field.getName(), fieldTypeName, JavassistUtil.replaceValExprToCode(anno.valExpr(), varNameField));
         } else {
-            JavassistUtil.append(body, "{}.{}=({}){};\n", varNameInstance, field.getName(), fieldTypeName, JavassistUtil.replaceValExprToCode(anno.valExpr(), varNameField));
+            JavassistUtil.append(body, "{}.{}=({})({});\n", varNameInstance, field.getName(), fieldTypeName, JavassistUtil.replaceValExprToCode(anno.valExpr(), varNameField));
         }
 
         final char var = anno.var();

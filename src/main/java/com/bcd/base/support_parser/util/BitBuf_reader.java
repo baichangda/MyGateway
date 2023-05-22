@@ -35,7 +35,7 @@ public class BitBuf_reader {
                 (byte) 0xF0, (byte) 0xe4,
                 (byte) 0xF0, (byte) 0xe4
         };
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < 100000000; i++) {
 //            ByteBuf bb = Unpooled.wrappedBuffer(source);
 //            BitBuf_reader bitBuf = BitBuf_reader.newBitBuf(bb);
 //            final long bitVal1 = bitBuf.read(1);
@@ -74,10 +74,10 @@ public class BitBuf_reader {
             final ReadLog res2 = bitBuf2.read_log(3, true);
             final SkipLog skip1 = bitBuf2.skip_log(3);
             final ReadLog res3 = bitBuf2.read_log(9, false);
-            res1.print();
-            res2.print();
-            skip1.print();
-            res3.print();
+//            res1.print();
+//            res2.print();
+//            skip1.print();
+//            res3.print();
 //            System.out.println(l1);
 //            System.out.println(l2);
 //            System.out.println(l3);
@@ -86,7 +86,7 @@ public class BitBuf_reader {
 
     }
 
-    public void finish() {
+    public final void finish() {
         b = 0;
         bitOffset = 0;
     }
@@ -144,7 +144,7 @@ public class BitBuf_reader {
     }
 
 
-    public long read(int bit, boolean unsigned) {
+    public final long read(int bit, boolean unsigned) {
         if (bitOffset == 0) {
             b = byteBuf.readByte();
         }
@@ -169,7 +169,7 @@ public class BitBuf_reader {
         }
     }
 
-    public ReadLog read_log(int bit, boolean unsigned) {
+    public final ReadLog read_log(int bit, boolean unsigned) {
         if (bitOffset == 0) {
             b = byteBuf.readByte();
         }
@@ -200,7 +200,7 @@ public class BitBuf_reader {
     }
 
 
-    public void skip(int bit) {
+    public final void skip(int bit) {
         final int temp = bit + bitOffset;
         final boolean newBitOffsetZero = (temp & 7) == 0;
         final int byteLen = (temp >> 3) + (newBitOffsetZero ? 0 : 1);
@@ -229,7 +229,7 @@ public class BitBuf_reader {
     }
 
 
-    public SkipLog skip_log(int bit) {
+    public final SkipLog skip_log(int bit) {
         final int temp = bit + bitOffset;
         final boolean newBitOffsetZero = (temp & 7) == 0;
         final int byteLen = (temp >> 3) + (newBitOffsetZero ? 0 : 1);

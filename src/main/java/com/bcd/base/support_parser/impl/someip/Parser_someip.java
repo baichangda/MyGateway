@@ -4,6 +4,7 @@ package com.bcd.base.support_parser.impl.someip;
 import com.bcd.base.support_parser.Parser;
 import com.bcd.base.support_parser.impl.someip.data.Packet;
 import com.bcd.base.support_parser.util.PerformanceUtil;
+import io.netty.buffer.ByteBufUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +27,7 @@ public class Parser_someip{
         logger.info("param threadNum[{}]",threadNum);
         int num=1000000000;
 
-        PerformanceUtil.testMultiThreadPerformance(hex,Packet.class,threadNum,num,true);
+        PerformanceUtil.testMultiThreadPerformance(ByteBufUtil.decodeHexDump(hex),Packet.class,threadNum,num,true);
 
 
     }

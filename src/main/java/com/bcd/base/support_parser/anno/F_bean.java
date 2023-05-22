@@ -1,5 +1,7 @@
 package com.bcd.base.support_parser.anno;
 
+import io.netty.buffer.ByteBuf;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -20,7 +22,8 @@ public @interface F_bean {
      * {@link com.bcd.base.support_parser.processor.ProcessContext#bitBuf_reader}
      * {@link com.bcd.base.support_parser.processor.ProcessContext#bitBuf_writer}
      * 集合中的子类获取bitBuf逻辑参考
-     * {@link com.bcd.base.support_parser.builder.BuilderContext#getVarNameBitBuf(Class)}
+     * {@link com.bcd.base.support_parser.processor.ProcessContext#getBitBuf_reader(ByteBuf)}
+     * {@link com.bcd.base.support_parser.processor.ProcessContext#getBitBuf_writer(ByteBuf)}
      */
     boolean passBitBuf() default false;
 }
