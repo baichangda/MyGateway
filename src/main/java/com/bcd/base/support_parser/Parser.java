@@ -180,7 +180,7 @@ public class Parser {
                 logger.info("--parse field--[{}].[{}] [{}]->[{}]"
                         , fieldClass.getSimpleName()
                         , fieldName
-                        , ByteBufUtil.hexDump(content)
+                        , ByteBufUtil.hexDump(content).toUpperCase()
                         , val
                 );
             }
@@ -191,7 +191,7 @@ public class Parser {
                     logger.info("--parse field--[{}].[{}] bit_hex[{}] bit_pos[{}-{}] bit_bigEndian[{}] bit_unsigned[{}] bit_binary[{}->{}->{}] bit_val[{}->{}->{}]"
                             , fieldClass.getSimpleName()
                             , fieldName,
-                            readLog.getLogHex(),
+                            readLog.getLogHex().toUpperCase(),
                             readLog.bitStart, readLog.bitEnd,
                             readLog.bigEndian ? "yes" : "no",
                             readLog.unsigned ? "yes" : "no",
@@ -202,7 +202,7 @@ public class Parser {
                     logger.info("--parse field--[{}].[{}] skip bit_hex[{}] bit_pos[{}-{}] bit_binary[{}]"
                             , fieldClass.getSimpleName()
                             , fieldName
-                            , skipLog.getLogHex()
+                            , skipLog.getLogHex().toUpperCase()
                             , skipLog.bitStart
                             , skipLog.bitEnd
                             , skipLog.getLogBit()
@@ -222,7 +222,7 @@ public class Parser {
                         , fieldClass.getSimpleName()
                         , fieldName
                         , val
-                        , ByteBufUtil.hexDump(content));
+                        , ByteBufUtil.hexDump(content).toUpperCase());
             }
 
             @Override
@@ -236,14 +236,14 @@ public class Parser {
                             writeLog.bigEndian ? "yes" : "no",
                             writeLog.val1, writeLog.val2, writeLog.val3,
                             writeLog.getLogBit(writeLog.val1,writeLog.signed1), writeLog.getLogBit(writeLog.val2,false), writeLog.getLogBit(writeLog.val3,false),
-                            writeLog.getLogHex(),
+                            writeLog.getLogHex().toUpperCase(),
                             writeLog.bitStart, writeLog.bitEnd
                     );
                 } else if (logRes instanceof BitBuf_writer.SkipLog skipLog) {
                     logger.info("--deParse field--[{}].[{}] skip bit_hex[{}] bit_pos[{}-{}]"
                             , fieldClass.getSimpleName()
                             , fieldName
-                            , skipLog.getLogHex()
+                            , skipLog.getLogHex().toUpperCase()
                             , skipLog.bitStart
                             , skipLog.bitEnd);
                 }

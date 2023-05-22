@@ -114,6 +114,7 @@ public class FieldBuilder__F_num_array extends FieldBuilder {
             JavassistUtil.append(body, "{}.writeBytes({});\n", FieldBuilder.varNameByteBuf, valCode);
         } else {
             final Class<?> arrayElementType = fieldTypeClass.componentType();
+            final boolean isFloat = arrayElementType == float.class || arrayElementType == double.class;
             final String arrayElementTypeName = arrayElementType.getName();
 
             String varNameFieldArr = varNameField + "_arr";
@@ -126,7 +127,11 @@ public class FieldBuilder__F_num_array extends FieldBuilder {
                 arrEleValCode = JavassistUtil.format("({}).toInteger()", arrEleValCode);
             }
             if (!anno.valExpr().isEmpty()) {
-                arrEleValCode = JavassistUtil.replaceValExprToCode(RpnUtil.reverseExpr(anno.valExpr()), arrEleValCode);
+                if(isFloat){
+                    arrEleValCode = JavassistUtil.replaceValExprToCode_round(RpnUtil.reverseExpr(anno.valExpr()), arrEleValCode);
+                }else{
+                    arrEleValCode = JavassistUtil.replaceValExprToCode(RpnUtil.reverseExpr(anno.valExpr()), arrEleValCode);
+                }
             }
 
             final boolean bigEndian = JavassistUtil.bigEndian(anno.order(), context.clazz);

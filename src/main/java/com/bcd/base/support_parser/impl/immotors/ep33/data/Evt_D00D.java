@@ -11,7 +11,7 @@ public class Evt_D00D extends Evt_4_x {
 
     public static class Evt_D00D_BMSBusbarTem {
         @F_bit_num(len = 8, valExpr = "x-40")
-        public float BMSBusbarTem;
+        public double BMSBusbarTem;
         @F_bit_num(len = 1, bitRemainingMode = BitRemainingMode.Ignore)
         public byte BMSBusbarTemV;
     }

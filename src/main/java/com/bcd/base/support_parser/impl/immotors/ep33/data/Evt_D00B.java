@@ -11,9 +11,13 @@ public class Evt_D00B extends Evt_4_x {
 
     public static class Evt_D00B_BMSCellVol {
         @F_bit_num(len = 13, valExpr = "x*0.001")
-        public float BMSCellVol;
+        public double BMSCellVol;
         @F_bit_num(len = 1, bitRemainingMode = BitRemainingMode.Ignore)
         public byte BMSCellVolV;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(4.031/0.001);
     }
 }
 

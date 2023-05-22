@@ -79,6 +79,7 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
         final String fieldName = field.getName();
         final String varNameField = JavassistUtil.getFieldVarName(context);
         final Class<?> fieldType = field.getType();
+        final boolean isFloat = fieldType == float.class || fieldType == double.class;
         final char var = anno.var();
         String valCode;
         //先判断是否是枚举类型、如果是枚举转换为int
@@ -96,7 +97,11 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
 
         //最后判断是否用了值表达式、如果用了、进行表达式处理
         if (!anno.valExpr().isEmpty()) {
-            valCode = JavassistUtil.replaceValExprToCode(RpnUtil.reverseExpr(anno.valExpr()), valCode);
+            if(isFloat){
+                valCode = JavassistUtil.replaceValExprToCode_round(RpnUtil.reverseExpr(anno.valExpr()), valCode);
+            }else {
+                valCode = JavassistUtil.replaceValExprToCode(RpnUtil.reverseExpr(anno.valExpr()), valCode);
+            }
         }
 
         final int len = anno.len();

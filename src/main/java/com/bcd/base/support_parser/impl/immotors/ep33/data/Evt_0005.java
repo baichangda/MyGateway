@@ -11,5 +11,5 @@ public class Evt_0005 extends Evt_2_6 {
     @F_bit_num(len = 4)
     public byte VehTyp;
     @F_bit_num(len = 16, valExpr = "x*0.01")
-    public float GNSSDirection;
+    public double GNSSDirection;
 }

@@ -9,7 +9,7 @@ public class Evt_D00F extends Evt_4_x {
     @F_bit_num(len = 8)
     public short BMSWrnngInfoCRC;
     @F_bit_num(len = 8, valExpr = "x*0.5-40")
-    public float BMSBusbarTempMax;
+    public double BMSBusbarTempMax;
     @F_bit_num(len = 1)
     public byte BMSPreThrmFltIndBkup;
     @F_bit_num(len = 4)
@@ -25,13 +25,13 @@ public class Evt_D00F extends Evt_4_x {
     @F_bit_num(len = 1)
     public byte BMSBatPrsSnsrV;
     @F_bit_num(len = 15, valExpr = "x*0.05")
-    public float BMSBatPrsSnsrValBkup;
+    public double BMSBatPrsSnsrValBkup;
     @F_bit_num(len = 1)
     public byte BMSBatPrsSnsrVBkup;
     @F_bit_num(len = 15, valExpr = "x*0.05")
-    public float BMSBatPrsSnsrVal;
+    public double BMSBatPrsSnsrVal;
     @F_bit_num(len = 8, valExpr = "x*0.4")
-    public float BMSClntPumpPWMReq;
+    public double BMSClntPumpPWMReq;
     @F_bit_num(len = 1)
     public byte BMSPumpPwrOnReq;
     @F_bit_num(len = 1)
@@ -43,7 +43,7 @@ public class Evt_D00F extends Evt_4_x {
     @F_bit_num(len = 1)
     public byte VCUBatPrsAlrm;
     @F_bit_num(len = 8, valExpr = "x*0.5-40")
-    public float OtsdAirTemCrVal;
+    public double OtsdAirTemCrVal;
     @F_bit_num(len = 1)
     public byte VCUBatPrsAlrmV;
     @F_bit_num(len = 1)

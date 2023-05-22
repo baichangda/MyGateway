@@ -197,7 +197,7 @@ public class JavassistUtil {
                     boxing(FieldBuilder.varNameInstance + "." + context.field.getName(), context.field.getType()),
                     context.varNameBitLog,
                     context.implCc.getSimpleName());
-        }else {
+        } else {
             final String fieldByteBufWriterIndexVarName = getFieldByteBufWriterIndexVarName(context);
             final String fieldLogBytesVarName = getFieldLogBytesVarName(context);
             append(context.body, "final byte[] {}=new byte[{}.writerIndex()-{}];\n", fieldLogBytesVarName, FieldBuilder.varNameByteBuf, fieldByteBufWriterIndexVarName);
@@ -229,6 +229,14 @@ public class JavassistUtil {
                 sb.append(c);
             }
         }
+        return sb.toString();
+    }
+
+    public static String replaceValExprToCode_round(final String expr, final String valExpr) {
+        final StringBuilder sb = new StringBuilder();
+        sb.append(format("{}.round(", JavassistUtil.class.getName()));
+        sb.append(replaceValExprToCode(expr,valExpr));
+        sb.append(")");
         return sb.toString();
     }
 
@@ -314,6 +322,16 @@ public class JavassistUtil {
         }
     }
 
+    public static double round(double d) {
+        if (d > 0d) {
+            return Math.round(d);
+        } else if (d == 0d) {
+            return 0;
+        } else {
+            return -Math.round(-d);
+        }
+    }
+
     public static double format(double d, int i) {
         if (d > 0) {
             if (i == 0) {
@@ -333,22 +351,4 @@ public class JavassistUtil {
         }
     }
 
-    public static String prepend_2_0(int num) {
-        return prepend(num + "", 2, "0");
-    }
-
-    public static String prepend_2_0(String str) {
-        return prepend(str, 2, "0");
-    }
-
-    public static String prepend(String str, int len, String s) {
-        final int length = str.length();
-        if (length == len) {
-            return str;
-        } else if (length < len) {
-            return s.repeat(len - length) + str;
-        } else {
-            return s.substring(0, len);
-        }
-    }
 }

@@ -80,20 +80,27 @@ public class FieldBuilder__F_bit_num_array extends FieldBuilder {
         final Class<?> fieldTypeClass = field.getType();
         final int singleLen = anno.singleLen();
         final int singleSkip = anno.singleSkip();
+        final Class<?> arrElementType = fieldTypeClass.componentType();
+        final boolean isFloat = arrElementType == float.class || arrElementType == double.class;
         final StringBuilder body = context.body;
         final String varNameInstance = FieldBuilder.varNameInstance;
         final String fieldName = field.getName();
+
         String valCode = varNameInstance + "." + fieldName;
         final String varNameField = JavassistUtil.getFieldVarName(context);
         final String varNameBitBuf = context.getVarNameBitBuf(BitBuf_writer.class);
         JavassistUtil.append(body, "if({}!=null){\n", FieldBuilder.varNameInstance, valCode);
         final String varNameFieldArr = varNameField + "_arr";
-        JavassistUtil.append(body, "final {}[] {}={};\n", fieldTypeClass.componentType(), varNameFieldArr, valCode);
+        JavassistUtil.append(body, "final {}[] {}={};\n", arrElementType, varNameFieldArr, valCode);
         JavassistUtil.append(body, "for(int i=0;i<{}.length;i++){\n", varNameFieldArr);
         if (anno.valExpr().isEmpty()) {
             JavassistUtil.append(body, "{}.write((long)({}),{},{},{});\n", varNameBitBuf, varNameFieldArr + "[i]", singleLen, bigEndian, unsigned);
         } else {
-            JavassistUtil.append(body, "{}.write((long)({}),{},{},{});\n", varNameBitBuf, JavassistUtil.replaceValExprToCode(RpnUtil.reverseExpr(anno.valExpr()), varNameFieldArr + "[i]"), singleLen, bigEndian, unsigned);
+            if (isFloat) {
+                JavassistUtil.append(body, "{}.write((long)({}),{},{},{});\n", varNameBitBuf, JavassistUtil.replaceValExprToCode_round(RpnUtil.reverseExpr(anno.valExpr()), varNameFieldArr + "[i]"), singleLen, bigEndian, unsigned);
+            } else {
+                JavassistUtil.append(body, "{}.write((long)({}),{},{},{});\n", varNameBitBuf, JavassistUtil.replaceValExprToCode(RpnUtil.reverseExpr(anno.valExpr()), varNameFieldArr + "[i]"), singleLen, bigEndian, unsigned);
+            }
         }
         if (singleSkip > 0) {
             JavassistUtil.append(body, "{}.skip({});\n", varNameBitBuf, singleSkip);

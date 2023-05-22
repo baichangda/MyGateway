@@ -11,27 +11,27 @@ public class Evt_D006 extends Evt_4_x {
     @F_bit_num(len = 5)
     public byte BMSBscSta;
     @F_bit_num(len = 16, valExpr = "x*0.05-1000")
-    public float BMSPackCrnt;
+    public double BMSPackCrnt;
     @F_bit_num(len = 1)
     public byte BMSPackCrntV;
     @F_bit_num(len = 10, valExpr = "x*0.1")
-    public float BMSPackSOC;
+    public double BMSPackSOC;
     @F_bit_num(len = 1)
     public byte BMSPackSOCV;
     @F_bit_num(len = 10, valExpr = "x*0.1")
-    public float BMSPackSOCDsp;
+    public double BMSPackSOCDsp;
     @F_bit_num(len = 1)
     public byte BMSPackSOCDspV;
     @F_bit_num(len = 4)
     public byte ElecVehSysMd;
     @F_bit_num(len = 12, valExpr = "x*0.25")
-    public float BMSPackVol;
+    public double BMSPackVol;
     @F_bit_num(len = 1)
     public byte BMSPackVolV;
     @F_bit_num(len = 3)
     public byte HVDCDCSta;
     @F_bit_num(len = 12, valExpr = "x*0.5-848")
-    public float EPTTrInptShaftToq;
+    public double EPTTrInptShaftToq;
     @F_bit_num(len = 1)
     public byte EPTTrInptShaftToqV;
     @F_bit_num(len = 12, valExpr = "x*2-3392")
@@ -49,9 +49,9 @@ public class Evt_D006 extends Evt_4_x {
     @F_bit_num(len = 1)
     public byte EPBSysBrkLghtsReqdA;
     @F_bit_num(len = 14, valExpr = "x*0.5")
-    public float BMSPtIsltnRstc;
+    public double BMSPtIsltnRstc;
     @F_bit_num(len = 8, valExpr = "x*0.392157")
-    public float EPTAccelActuPos;
+    public double EPTAccelActuPos;
     @F_bit_num(len = 1)
     public byte EPTAccelActuPosV;
     @F_bit_num(len = 1)
@@ -91,17 +91,17 @@ public class Evt_D006 extends Evt_4_x {
     @F_bit_num(len = 16, valExpr = "x-32768")
     public int SAMSpd;
     @F_bit_num(len = 11, valExpr = "x*0.5-512")
-    public float TMActuToq;
+    public double TMActuToq;
     @F_bit_num(len = 1)
     public byte TMActuToqV;
     @F_bit_num(len = 11, valExpr = "x*0.5-512")
-    public float ISGActuToq;
+    public double ISGActuToq;
     @F_bit_num(len = 1)
     public byte ISGActuToqV;
     @F_bit_num(len = 1)
     public byte SAMActuToqV;
     @F_bit_num(len = 11, valExpr = "x*0.5-512")
-    public float SAMActuToq;
+    public double SAMActuToq;
     @F_bit_num(len = 8, valExpr = "x-40")
     public short TMSttrTem;
     @F_bit_num(len = 8, valExpr = "x-40")
@@ -113,7 +113,7 @@ public class Evt_D006 extends Evt_4_x {
     @F_bit_num(len = 1)
     public byte HVDCDCHVSideVolV;
     @F_bit_num(len = 8, valExpr = "x*0.1")
-    public float AvgFuelCsump;
+    public double AvgFuelCsump;
     @F_bit_num(len = 1)
     public byte TMInvtrVolV;
 
@@ -130,26 +130,26 @@ public class Evt_D006 extends Evt_4_x {
     @F_bit_num(len = 8)
     public short BMSCellMaxTemIndx;
     @F_bit_num(len = 8, valExpr = "x*0.5-40")
-    public float BMSCellMaxTem;
+    public double BMSCellMaxTem;
     @F_bit_num(len = 1)
     public byte BMSCellMaxTemV;
     @F_bit_num(len = 8)
     public short BMSCellMinTemIndx;
 
     @F_bit_num(len = 8, valExpr = "x*0.5-40")
-    public float BMSCellMinTem;
+    public double BMSCellMinTem;
     @F_bit_num(len = 1)
     public byte BMSCellMinTemV;
     @F_bit_num(len = 8)
     public short BMSCellMaxVolIndx;
     @F_bit_num(len = 13, valExpr = "x*0.001")
-    public float BMSCellMaxVol;
+    public double BMSCellMaxVol;
     @F_bit_num(len = 1)
     public byte BMSCellMaxVolV;
     @F_bit_num(len = 8)
     public short BMSCellMinVolIndx;
     @F_bit_num(len = 13, valExpr = "x*0.001")
-    public float BMSCellMinVol;
+    public double BMSCellMinVol;
     @F_bit_num(len = 1)
     public byte BMSCellMinVolV;
     @F_bit_num(len = 1)
@@ -169,13 +169,13 @@ public class Evt_D006 extends Evt_4_x {
     @F_bit_num(len = 1)
     public byte BMSHVILClsd;
     @F_bit_num(len = 12, valExpr = "x*0.5-848")
-    public float EPTTrOtptShaftTotToq;
+    public double EPTTrOtptShaftTotToq;
     @F_bit_num(len = 1)
     public byte EPTTrOtptShaftTotToqV;
     @F_bit_num(len = 1)
     public byte BrkFludLvlLowV;
     @F_bit_num(len = 16, valExpr = "x*0.25")
-    public float EnSpd;
+    public double EnSpd;
     @F_bit_num(len = 2)
     public byte EnSpdSts;
     @F_bit_num(len = 12, valExpr = "x*16")

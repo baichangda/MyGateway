@@ -12,7 +12,7 @@ public class Evt_D00C extends Evt_4_x {
 
     public static class Evt_D00C_BMSCellTem {
         @F_bit_num(len = 8, valExpr = "x-40")
-        public float BMSCellTem;
+        public double BMSCellTem;
         @F_bit_num(len = 1, bitRemainingMode = BitRemainingMode.Ignore)
         public byte BMSCellTemV;
     }

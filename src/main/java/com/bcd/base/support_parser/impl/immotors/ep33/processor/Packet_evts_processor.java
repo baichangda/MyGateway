@@ -4,6 +4,7 @@ import com.bcd.base.support_parser.Parser;
 import com.bcd.base.support_parser.exception.BaseRuntimeException;
 import com.bcd.base.support_parser.impl.icd.data.*;
 import com.bcd.base.support_parser.impl.immotors.Evt;
+import com.bcd.base.support_parser.impl.immotors.Evt_4_x;
 import com.bcd.base.support_parser.impl.immotors.ep33.data.*;
 import com.bcd.base.support_parser.processor.ProcessContext;
 import com.bcd.base.support_parser.processor.Processor;
@@ -98,20 +99,17 @@ public class Packet_evts_processor implements Processor<List<Evt>> {
                             || (evtId >= 0x9000 && evtId <= 0xAFFF)
                             || evtId == 0XFFFF
                     ) {
-                        data.skipBytes(8);
+                        evt = Parser.parse(Evt_2_6_unknown.class, data, parentContext);
 //                        final String evtIdHex = Strings.padStart(Integer.toHexString(evtId).toUpperCase(), 4, '0');
 //                        logger.warn("evtId[{}] 2+6 not support,skip[8]", evtIdHex);
                     } else if (evtId >= 0xD000 && evtId <= 0xDFFF) {
-                        data.skipBytes(2);
-                        final int len = data.readUnsignedShort();
-                        data.skipBytes(len);
+                        evt = Parser.parse(Evt_4_x_unknown.class, data, parentContext);
 //                        final String evtIdHex = Strings.padStart(Integer.toHexString(evtId).toUpperCase(), 4, '0');
 //                        logger.warn("evtId[{}] 4+X not support,skip[{}]", evtIdHex, 4 + len);
                     } else {
                         final String evtIdHex = Strings.padStart(Integer.toHexString(evtId).toUpperCase(), 4, '0');
                         throw BaseRuntimeException.getException("evtId[{}] not support", evtIdHex);
                     }
-                    continue;
                 }
             }
             evts.add(evt);
@@ -121,10 +119,9 @@ public class Packet_evts_processor implements Processor<List<Evt>> {
 
     @Override
     public void deProcess(ByteBuf data, ProcessContext parentContext, List<Evt> instance) {
-        Parser.deParse(instance, data, parentContext);
+        for (Evt evt : instance) {
+            Parser.deParse(evt, data, parentContext);
+        }
     }
 
-    public static void main(String[] args) {
-        System.out.println("[" + new String(new byte[1]) + "]");
-    }
 }
