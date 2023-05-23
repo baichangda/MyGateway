@@ -160,7 +160,7 @@ public class JavassistUtil {
             Date.class
     );
 
-    private static boolean needLog(final BuilderContext context) {
+    public static boolean needLog(final BuilderContext context) {
         final Class<?> fieldType = context.field.getType();
         if (logFieldTypeSet.contains(fieldType)) {
             return true;
