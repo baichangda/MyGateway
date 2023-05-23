@@ -186,7 +186,7 @@ public class JavassistUtil {
         }
 
         if (context.logBit) {
-            append(context.body, "{}.logCollector_parse.collect_field_bit({}.class,\"{}\",{},{},\"{}\");\n",
+            append(context.body, "{}.logCollector_parse.collect_field_bit({}.class,{}.class,\"{}\",{},{},\"{}\");\n",
                     Parser.class.getName(),
                     context.clazz.getName(),
                     context.field.getDeclaringClass().getName(),
