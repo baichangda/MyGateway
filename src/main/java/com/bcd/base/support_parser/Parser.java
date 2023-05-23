@@ -52,6 +52,7 @@ import java.util.stream.Collectors;
  * {@link #withDefaultLogCollector_deParse()}
  * {@link #append(ByteOrder, String)}
  */
+
 public class Parser {
 
     private final static Logger logger = LoggerFactory.getLogger(Parser.class);
@@ -74,7 +75,7 @@ public class Parser {
      */
     private static int processorIndex = 0;
 
-    private final static Set<Class> annoSet = new HashSet<>();
+    private final static Set<Class<?>> annoSet = new HashSet<>();
 
     static {
         annoSet.add(F_num.class);
@@ -100,7 +101,7 @@ public class Parser {
     }
 
 
-    private final static Map<Class, Processor> beanClass_to_processor = new HashMap<>();
+    private final static Map<Class<?>, Processor<?>> beanClass_to_processor = new HashMap<>();
 
     /**
      * 是否在src/main/java下面生成class文件
@@ -124,7 +125,7 @@ public class Parser {
          * @param val                解析后的值
          * @param processorClassName 解析器类名
          */
-        void collect_field(Class fieldClass, String fieldName, byte[] content, Object val, String processorClassName);
+        void collect_field(Class<?> fieldClass, String fieldName, byte[] content, Object val, String processorClassName);
 
         /**
          * 收集bit字段解析详情
@@ -135,7 +136,7 @@ public class Parser {
          * @param val                解析后的值
          * @param processorClassName 解析器类名
          */
-        void collect_field_bit(Class fieldClass, String fieldName, BitBuf_reader.Log logRes, Object val, String processorClassName);
+        void collect_field_bit(Class<?> fieldClass, String fieldName, BitBuf_reader.Log logRes, Object val, String processorClassName);
     }
 
 
@@ -149,7 +150,7 @@ public class Parser {
          * @param content            值转换成的字节数组
          * @param processorClassName 解析器类名
          */
-        void collect_field(Class fieldClass, String fieldName, Object val, byte[] content, String processorClassName);
+        void collect_field(Class<?> fieldClass, String fieldName, Object val, byte[] content, String processorClassName);
 
         /**
          * 收集bit字段解析详情
@@ -160,7 +161,7 @@ public class Parser {
          * @param logRes             反解析的bit字段详情
          * @param processorClassName 解析器类名
          */
-        void collect_field_bit(Class fieldClass, String fieldName, Object val, BitBuf_writer.Log logRes, String processorClassName);
+        void collect_field_bit(Class<?> fieldClass, String fieldName, Object val, BitBuf_writer.Log logRes, String processorClassName);
 
     }
 
@@ -176,7 +177,7 @@ public class Parser {
     public static void withDefaultLogCollector_parse() {
         logCollector_parse = new LogCollector_parse() {
             @Override
-            public void collect_field(Class fieldClass, String fieldName, byte[] content, Object val, String processorClassName) {
+            public void collect_field(Class<?> fieldClass, String fieldName, byte[] content, Object val, String processorClassName) {
                 logger.info("--parse field--[{}].[{}] [{}]->[{}]"
                         , fieldClass.getSimpleName()
                         , fieldName
@@ -186,7 +187,7 @@ public class Parser {
             }
 
             @Override
-            public void collect_field_bit(Class fieldClass, String fieldName, BitBuf_reader.Log logRes, Object val, String processorClassName) {
+            public void collect_field_bit(Class<?> fieldClass, String fieldName, BitBuf_reader.Log logRes, Object val, String processorClassName) {
                 if (logRes instanceof BitBuf_reader.ReadLog readLog) {
                     logger.info("--parse field--[{}].[{}] bit_hex[{}] bit_pos[{}-{}] bit_bigEndian[{}] bit_unsigned[{}] bit_binary[{}->{}->{}] bit_val[{}->{}->{}]"
                             , fieldClass.getSimpleName()
@@ -217,7 +218,7 @@ public class Parser {
     public static void withDefaultLogCollector_deParse() {
         logCollector_deParse = new LogCollector_deParse() {
             @Override
-            public void collect_field(Class fieldClass, String fieldName, Object val, byte[] content, String processorClassName) {
+            public void collect_field(Class<?> fieldClass, String fieldName, Object val, byte[] content, String processorClassName) {
                 logger.info("--deParse field--[{}].[{}] [{}]->[{}]"
                         , fieldClass.getSimpleName()
                         , fieldName
@@ -226,7 +227,7 @@ public class Parser {
             }
 
             @Override
-            public void collect_field_bit(Class fieldClass, String fieldName, Object val, BitBuf_writer.Log logRes, String processorClassName) {
+            public void collect_field_bit(Class<?> fieldClass, String fieldName, Object val, BitBuf_writer.Log logRes, String processorClassName) {
                 if (logRes instanceof BitBuf_writer.WriteLog writeLog) {
                     logger.info("--deParse field--[{}].[{}] [{}]->bit_unsigned[{}] bit_bigEndian[{}] bit_val[{}->{}->{}] bit_binary[{}->{}->{}] bit_hex[{}] bit_pos[{}-{}]"
                             , fieldClass.getSimpleName()
@@ -423,10 +424,10 @@ public class Parser {
         return false;
     }
 
-    private static List<Field> getFields(Class clazz) {
-        final List<Class> classList = new ArrayList<>();
+    private static List<Field> getFields(Class<?> clazz) {
+        final List<Class<?>> classList = new ArrayList<>();
         classList.add(clazz);
-        Class temp = clazz;
+        Class<?> temp = clazz;
         while (true) {
             temp = temp.getSuperclass();
             if (temp == null || Object.class == temp) {
@@ -436,7 +437,7 @@ public class Parser {
             }
         }
         final List<Field> resList = new ArrayList<>();
-        for (Class c : classList) {
+        for (Class<?> c : classList) {
             //过滤掉 final、static关键字修饰、且不是public的字段
             final List<Field> fieldList = Arrays.stream(c.getDeclaredFields())
                     .filter(e ->
@@ -449,7 +450,7 @@ public class Parser {
         return resList;
     }
 
-    private static void buildMethodBody_parse(Class clazz, BuilderContext context) {
+    private static void buildMethodBody_parse(Class<?> clazz, BuilderContext context) {
         final List<Field> fieldList = getFields(clazz);
         if (fieldList.isEmpty()) {
             return;
@@ -544,7 +545,7 @@ public class Parser {
 
     }
 
-    private static void buildMethodBody_deParse(Class clazz, BuilderContext context) {
+    private static void buildMethodBody_deParse(Class<?> clazz, BuilderContext context) {
         final List<Field> fieldList = getFields(clazz);
         if (fieldList.isEmpty()) {
             return;
@@ -638,7 +639,7 @@ public class Parser {
     }
 
 
-    private static Class buildClass(Class clazz) throws CannotCompileException, NotFoundException, IOException {
+    private static Class<?> buildClass(Class<?> clazz) throws CannotCompileException, NotFoundException, IOException {
         final String processor_class_name = Processor.class.getName();
         final String byteBufClassName = ByteBuf.class.getName();
         final String clazzName = clazz.getName();
@@ -661,8 +662,8 @@ public class Parser {
         final CtConstructor constructor = CtNewConstructor.make(new CtClass[]{}, null, cc);
         initBody.append("{\n");
         //加processorClass字段并初始化
-        final List<Class> processorClassList = Arrays.stream(clazz.getDeclaredFields()).map(f -> f.getAnnotation(F_customize.class)).filter(Objects::nonNull).map(F_customize::processorClass).filter(e -> e != void.class).collect(Collectors.toList());
-        for (Class processorClass : processorClassList) {
+        final List<Class<?>> processorClassList = Arrays.stream(clazz.getDeclaredFields()).map(f -> f.getAnnotation(F_customize.class)).filter(Objects::nonNull).map(F_customize::processorClass).filter(e -> e != void.class).collect(Collectors.toList());
+        for (Class<?> processorClass : processorClassList) {
             final String processorClassName = processorClass.getName();
             final String processorVarName = JavassistUtil.getProcessorVarName(processorClass);
             cc.addField(CtField.make("private final " + processorClassName + " " + processorVarName + ";", cc));
@@ -750,16 +751,16 @@ public class Parser {
 //        return cc.toClass();
     }
 
-
-    public static <T> T parse(Class<T> clazz, ByteBuf data, ProcessContext parentContext) {
-        Processor<T> processor = beanClass_to_processor.get(clazz);
+    @SuppressWarnings("unchecked")
+    public static <T> T parse(Class<T> clazz, ByteBuf data, ProcessContext<?> parentContext) {
+        Processor<T> processor = (Processor<T>)beanClass_to_processor.get(clazz);
         if (processor == null) {
             synchronized (beanClass_to_processor) {
-                processor = beanClass_to_processor.get(clazz);
+                processor = (Processor<T>)beanClass_to_processor.get(clazz);
                 if (processor == null) {
                     try {
-                        final Class impl = buildClass(clazz);
-                        processor = (Processor<T>) (impl.getConstructor().newInstance());
+                        final Class<?> impl = buildClass(clazz);
+                        processor = (Processor<T>) impl.getConstructor().newInstance();
                         beanClass_to_processor.put(clazz, processor);
                     } catch (Exception e) {
                         throw BaseRuntimeException.getException(e);
@@ -770,16 +771,17 @@ public class Parser {
         return processor.process(data, parentContext);
     }
 
-    public static void deParse(Object instance, ByteBuf data, ProcessContext parentContext) {
+    @SuppressWarnings("unchecked")
+    public static <T> void deParse(T instance, ByteBuf data, ProcessContext<?> parentContext) {
         final Class<?> clazz = instance.getClass();
-        Processor processor = beanClass_to_processor.get(clazz);
+        Processor<T> processor = (Processor<T>) beanClass_to_processor.get(clazz);
         if (processor == null) {
             synchronized (beanClass_to_processor) {
-                processor = beanClass_to_processor.get(clazz);
+                processor = (Processor<T>)beanClass_to_processor.get(clazz);
                 if (processor == null) {
                     try {
-                        final Class impl = buildClass(clazz);
-                        processor = (Processor) (impl.getConstructor().newInstance());
+                        final Class<?> impl = buildClass(clazz);
+                        processor = (Processor<T>) (impl.getConstructor().newInstance());
                         beanClass_to_processor.put(clazz, processor);
                     } catch (Exception e) {
                         throw BaseRuntimeException.getException(e);
