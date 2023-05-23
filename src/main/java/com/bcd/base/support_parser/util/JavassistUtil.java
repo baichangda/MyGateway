@@ -7,13 +7,16 @@ import com.bcd.base.support_parser.anno.ByteOrder;
 import com.bcd.base.support_parser.builder.BuilderContext;
 import com.bcd.base.support_parser.builder.FieldBuilder;
 import com.bcd.base.support_parser.exception.BaseRuntimeException;
+import com.google.common.collect.Sets;
 import javassist.CannotCompileException;
 import javassist.CtClass;
 import javassist.CtField;
 import org.slf4j.helpers.MessageFormatter;
 
 import java.lang.reflect.Field;
+import java.util.Date;
 import java.util.Map;
+import java.util.Set;
 
 public class JavassistUtil {
 
@@ -134,22 +137,43 @@ public class JavassistUtil {
         });
     }
 
-    public static String getFieldByteBufReaderIndexVarName(final BuilderContext context) {
+    private static String getFieldByteBufReaderIndexVarName(final BuilderContext context) {
         final String fieldVarName = getFieldVarName(context);
         return fieldVarName + "_log_byteBuf_readerIndex";
     }
 
-    public static String getFieldByteBufWriterIndexVarName(final BuilderContext context) {
+    private static String getFieldByteBufWriterIndexVarName(final BuilderContext context) {
         final String fieldVarName = getFieldVarName(context);
         return fieldVarName + "_log_byteBuf_writerIndex";
     }
 
-    public static String getFieldLogBytesVarName(final BuilderContext context) {
+    private static String getFieldLogBytesVarName(final BuilderContext context) {
         final String fieldVarName = getFieldVarName(context);
         return fieldVarName + "_log_bytes";
     }
 
+
+    private final static Set<Class<?>> logFieldTypeSet = Sets.newHashSet(
+            byte.class, short.class, int.class, long.class, float.class, double.class,
+            byte[].class, short[].class, int[].class, long[].class, float[].class, double[].class,
+            String.class,
+            Date.class
+    );
+
+    private static boolean needLog(final BuilderContext context) {
+        final Class<?> fieldType = context.field.getType();
+        if (logFieldTypeSet.contains(fieldType)) {
+            return true;
+        } else {
+            return fieldType.isEnum();
+        }
+    }
+
     public static void prependLogCode_parse(final BuilderContext context) {
+        if (!needLog(context)) {
+            return;
+        }
+
         if (!context.logBit) {
             final String varName = getFieldByteBufReaderIndexVarName(context);
             append(context.body, "final int {}={}.readerIndex();\n", varName, FieldBuilder.varNameByteBuf);
@@ -157,6 +181,10 @@ public class JavassistUtil {
     }
 
     public static void appendLogCode_parse(final BuilderContext context) {
+        if (!needLog(context)) {
+            return;
+        }
+
         if (context.logBit) {
             append(context.body, "{}.logCollector_parse.collect_field_bit({}.class,\"{}\",{},{},\"{}\");\n",
                     Parser.class.getName(),
@@ -181,6 +209,9 @@ public class JavassistUtil {
     }
 
     public static void prependLogCode_deParse(final BuilderContext context) {
+        if (!needLog(context)) {
+            return;
+        }
         if (!context.logBit) {
             final String varName = getFieldByteBufWriterIndexVarName(context);
             append(context.body, "final int {}={}.writerIndex();\n", varName, FieldBuilder.varNameByteBuf);
@@ -189,6 +220,9 @@ public class JavassistUtil {
     }
 
     public static void appendLogCode_deParse(final BuilderContext context) {
+        if (!needLog(context)) {
+            return;
+        }
         if (context.logBit) {
             append(context.body, "{}.logCollector_deParse.collect_field_bit({}.class,\"{}\",{},{},\"{}\");\n",
                     Parser.class.getName(),
@@ -235,7 +269,7 @@ public class JavassistUtil {
     public static String replaceValExprToCode_round(final String expr, final String valExpr) {
         final StringBuilder sb = new StringBuilder();
         sb.append(format("{}.round(", JavassistUtil.class.getName()));
-        sb.append(replaceValExprToCode(expr,valExpr));
+        sb.append(replaceValExprToCode(expr, valExpr));
         sb.append(")");
         return sb.toString();
     }

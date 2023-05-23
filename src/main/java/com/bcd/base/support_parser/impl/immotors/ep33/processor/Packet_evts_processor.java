@@ -76,18 +76,18 @@ public class Packet_evts_processor implements Processor<List<Evt>> {
                 case 0xD00B -> {
                     evt = Parser.parse(Evt_D00B.class, data, parentContext);
                 }
-                case 0xD00C -> {
-                    evt = Parser.parse(Evt_D00C.class, data, parentContext);
-                }
-                case 0xD00D -> {
-                    evt = Parser.parse(Evt_D00D.class, data, parentContext);
-                }
-                case 0xD00E -> {
-                    evt = Parser.parse(Evt_D00E.class, data, parentContext);
-                }
-                case 0xD00F -> {
-                    evt = Parser.parse(Evt_D00F.class, data, parentContext);
-                }
+//                case 0xD00C -> {
+//                    evt = Parser.parse(Evt_D00C.class, data, parentContext);
+//                }
+//                case 0xD00D -> {
+//                    evt = Parser.parse(Evt_D00D.class, data, parentContext);
+//                }
+//                case 0xD00E -> {
+//                    evt = Parser.parse(Evt_D00E.class, data, parentContext);
+//                }
+//                case 0xD00F -> {
+//                    evt = Parser.parse(Evt_D00F.class, data, parentContext);
+//                }
                 default -> {
                     if ((evtId >= 0x0001 && evtId <= 0x07FF)
                             || (evtId >= 0x0800 && evtId <= 0x0FFF)

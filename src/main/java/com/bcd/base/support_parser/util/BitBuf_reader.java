@@ -12,7 +12,7 @@ public class BitBuf_reader {
     public final static boolean default_bigEndian = true;
     public final static boolean default_unsigned = true;
 
-    static Logger logger = LoggerFactory.getLogger(BitBuf_reader.class);
+    static final Logger logger = LoggerFactory.getLogger(BitBuf_reader.class);
 
     private final ByteBuf byteBuf;
     private byte b;
@@ -114,7 +114,7 @@ public class BitBuf_reader {
             this.bitEnd = bitStart + bit - 1;
         }
 
-        public String getLogHex() {
+        public final String getLogHex() {
             return ByteBufUtil.hexDump(bytes) + ((bitEnd & 7) == 7 ? "" : "?");
         }
     }
@@ -125,7 +125,7 @@ public class BitBuf_reader {
             super(byteLen, bitStart, bit);
         }
 
-        public String getLogBit() {
+        public final String getLogBit() {
             final StringBuilder sb = new StringBuilder();
             for (byte b : bytes) {
                 sb.append(Strings.padStart(Integer.toBinaryString(b & 0xff), 8, '0'));
@@ -133,7 +133,7 @@ public class BitBuf_reader {
             return sb.substring(bitStart, bitEnd + 1);
         }
 
-        public void print() {
+        public final void print() {
             logger.info("skip bit_hex[{}] bit_pos[{}-{}] bit_binary[{}]", getLogHex(), bitStart, bitEnd, getLogBit());
         }
     }
@@ -155,7 +155,7 @@ public class BitBuf_reader {
             this.unsigned = unsigned;
         }
 
-        public String getLogBit(long l, boolean signed) {
+        public final String getLogBit(long l, boolean signed) {
             if (signed) {
                 return "-" + Strings.padStart(Long.toBinaryString(-l), bit, '0');
             } else {
@@ -163,7 +163,7 @@ public class BitBuf_reader {
             }
         }
 
-        public void print() {
+        public final void print() {
             logger.info("read bit_hex[{}] bit_pos[{}-{}] bit_bigEndian[{}] bit_unsigned[{}] bit_binary[{}->{}->{}] bit_val[{}->{}->{}]",
                     getLogHex(),
                     bitStart, bitEnd,

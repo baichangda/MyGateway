@@ -40,7 +40,7 @@ public class Parser_immotors_ep33_test {
 
     @Test
     public void test_performance(){
-        Parser.enablePrintBuildLog();
+//        Parser.enablePrintBuildLog();
         Parser.enableGenerateClassFile();
 //        Parser.withDefaultLogCollector_parse();
 //        Parser.withDefaultLogCollector_deParse();

@@ -98,7 +98,7 @@ public class BitBuf_writer {
         }
 
 
-        public String getLogHex() {
+        public final String getLogHex() {
             return ByteBufUtil.hexDump(bytes) + ((bitEnd & 7) == 7 ? "" : "?");
         }
 
@@ -110,7 +110,7 @@ public class BitBuf_writer {
             super(byteLen, bitStart, bit);
         }
 
-        public void print() {
+        public final void print() {
             logger.info("skip bit_hex[{}] bit_pos[{}-{}]", getLogHex(), bitStart, bitEnd);
         }
     }
@@ -130,7 +130,7 @@ public class BitBuf_writer {
             this.unsigned = unsigned;
         }
 
-        public String getLogBit(long l, boolean signed) {
+        public final String getLogBit(long l, boolean signed) {
             if (signed) {
                 return "-" + Strings.padStart(Long.toBinaryString(-l), bit, '0');
             } else {
@@ -138,7 +138,7 @@ public class BitBuf_writer {
             }
         }
 
-        public void print() {
+        public final void print() {
             logger.info("write bit_unsigned[{}] bit_bigEndian[{}] bit_val[{}->{}->{}] bit_binary[{}->{}->{}] bit_hex[{}] bit_pos[{}-{}]",
                     unsigned ? "yes" : "no",
                     bigEndian ? "yes" : "no",

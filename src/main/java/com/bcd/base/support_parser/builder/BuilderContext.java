@@ -26,7 +26,7 @@ public class BuilderContext {
     /**
      * 类
      */
-    public final Class clazz;
+    public final Class<?> clazz;
     /**
      * 生产的{@link Processor}子类
      */
