@@ -51,6 +51,11 @@ import java.util.stream.Collectors;
  * {@link #withDefaultLogCollector_parse()}
  * {@link #withDefaultLogCollector_deParse()}
  * {@link #append(ByteOrder, String)}
+ * {@link #append(BitOrder, String)}
+ *
+ * 注意:
+ * 如果启动了解析和反解析日志、并不是所有字段都会打印、逻辑参考
+ * {@link JavassistUtil#needLog(BuilderContext)}
  */
 
 public class Parser {
