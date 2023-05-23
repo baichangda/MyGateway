@@ -58,7 +58,7 @@ public class LogUtil {
     }
 
     public static void main(String[] args) throws NoSuchFieldException {
-        final Field f = Evt_0006.class.getDeclaredField("VDop");
+        System.out.println("."+getDeclaredFieldStackTrace(Evt_0006.class,"HDop"));
         System.out.println("."+getDeclaredFieldStackTrace(Evt_0006.class,"VDop"));
     }
 }
