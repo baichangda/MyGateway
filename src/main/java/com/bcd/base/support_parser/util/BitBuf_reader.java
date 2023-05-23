@@ -38,7 +38,7 @@ public class BitBuf_reader {
                 (byte) 0xF0, (byte) 0xe4,
                 (byte) 0xF0, (byte) 0xe4
         };
-        for (int i = 0; i < 1; i++) {
+        for (int i = 0; i < 100000000; i++) {
 //            ByteBuf bb = Unpooled.wrappedBuffer(source);
 //            BitBuf_reader bitBuf = BitBuf_reader.newBitBuf(bb);
 //            final long bitVal1 = bitBuf.read(1);
@@ -73,14 +73,18 @@ public class BitBuf_reader {
 //            final long l1 = bitBuf2.read_log(3);
 //            final long l2 = bitBuf2.read_log(3);
 //            final long l3 = bitBuf2.read_log(9);
-            final ReadLog res1 = bitBuf2.read_log(3, true, true);
-            final ReadLog res2 = bitBuf2.read_log(3, true, true);
-            final SkipLog skip1 = bitBuf2.skip_log(3);
-            final ReadLog res3 = bitBuf2.read_log(9, false, false);
-            res1.print();
-            res2.print();
-            skip1.print();
-            res3.print();
+//            final ReadLog res1 = bitBuf2.read_log(3, true, true);
+//            final ReadLog res2 = bitBuf2.read_log(3, true, true);
+//            final SkipLog skip1 = bitBuf2.skip_log(3);
+//            final ReadLog res3 = bitBuf2.read_log(9, false, false);
+            final long res1 = bitBuf2.read(3, true, true);
+            final long res2 = bitBuf2.read(3, true, true);
+            final long skip1 = bitBuf2.read(3);
+            final long res3 = bitBuf2.read(9, false, false);
+//            res1.print();
+//            res2.print();
+//            skip1.print();
+//            res3.print();
 //            System.out.println(l1);
 //            System.out.println(l2);
 //            System.out.println(l3);
@@ -187,18 +191,18 @@ public class BitBuf_reader {
         final int temp = bit + bitOffset;
         final int byteLen = (temp >> 3) + ((temp & 7) == 0 ? 0 : 1);
 
-        long c = (b & 0xffL) << ((byteLen - 1) * 8);
+        long l = (b & 0xffL) << ((byteLen - 1) << 3);
         for (int i = 1; i < byteLen; i++) {
             b = byteBuf.readByte();
-            c |= (b & 0xffL) << ((byteLen - 1 - i) << 3);
+            l |= ((b & 0xffL) << ((byteLen - 1 - i) << 3));
         }
 
         //如果是小端模式、则翻转bit
         final long cRight;
         if (bigEndian) {
-            cRight = c >>> (byteLen * 8 - bitOffset - bit);
+            cRight = l >>> (byteLen * 8 - bitOffset - bit);
         } else {
-            cRight = Long.reverse(c) >>> (64 - (byteLen << 3) + bitOffset);
+            cRight = Long.reverse(l) >>> (64 - (byteLen << 3) + bitOffset);
         }
 
         bitOffset = temp & 7;
@@ -222,7 +226,7 @@ public class BitBuf_reader {
 
         log.bytes[0] = b;
 
-        long c = (b & 0xffL) << ((byteLen - 1) * 8);
+        long c = (b & 0xffL) << ((byteLen - 1) << 3);
         for (int i = 1; i < byteLen; i++) {
             b = byteBuf.readByte();
             log.bytes[i] = b;
