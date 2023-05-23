@@ -8,6 +8,7 @@ import com.bcd.base.support_parser.processor.Processor;
 import com.bcd.base.support_parser.util.BitBuf_reader;
 import com.bcd.base.support_parser.util.BitBuf_writer;
 import com.bcd.base.support_parser.util.JavassistUtil;
+import com.bcd.base.support_parser.util.LogUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import javassist.*;
@@ -52,7 +53,7 @@ import java.util.stream.Collectors;
  * {@link #withDefaultLogCollector_deParse()}
  * {@link #append(ByteOrder, String)}
  * {@link #append(BitOrder, String)}
- *
+ * <p>
  * 注意:
  * 如果启动了解析和反解析日志、并不是所有字段都会打印、逻辑参考
  * {@link JavassistUtil#needLog(BuilderContext)}
@@ -124,24 +125,26 @@ public class Parser {
         /**
          * 收集每个字段解析的详情
          *
-         * @param fieldClass         字段类型
-         * @param fieldName          字段名称
-         * @param content            解析之前字节数组
-         * @param val                解析后的值
-         * @param processorClassName 解析器类名
+         * @param clazz               实体类
+         * @param fieldDeclaringClass 字段所属类
+         * @param fieldName           字段名称
+         * @param content             解析之前字节数组
+         * @param val                 解析后的值
+         * @param processorClassName  解析器类名
          */
-        void collect_field(Class<?> fieldClass, String fieldName, byte[] content, Object val, String processorClassName);
+        void collect_field(Class<?> clazz, Class<?> fieldDeclaringClass, String fieldName, byte[] content, Object val, String processorClassName);
 
         /**
          * 收集bit字段解析详情
          *
-         * @param fieldClass         字段类型
-         * @param fieldName          字段名称
-         * @param logRes             bit字段解析详情
-         * @param val                解析后的值
-         * @param processorClassName 解析器类名
+         * @param clazz               实体类
+         * @param fieldDeclaringClass 字段所属类
+         * @param fieldName           字段名称
+         * @param logRes              bit字段解析详情
+         * @param val                 解析后的值
+         * @param processorClassName  解析器类名
          */
-        void collect_field_bit(Class<?> fieldClass, String fieldName, BitBuf_reader.Log logRes, Object val, String processorClassName);
+        void collect_field_bit(Class<?> clazz, Class<?> fieldDeclaringClass, String fieldName, BitBuf_reader.Log logRes, Object val, String processorClassName);
     }
 
 
@@ -149,24 +152,26 @@ public class Parser {
         /**
          * 收集每个字段解析的详情
          *
-         * @param fieldClass         字段类型
-         * @param fieldName          字段名称
-         * @param val                值
-         * @param content            值转换成的字节数组
-         * @param processorClassName 解析器类名
+         * @param clazz               实体类
+         * @param fieldDeclaringClass 字段所属类
+         * @param fieldName           字段名称
+         * @param val                 值
+         * @param content             值转换成的字节数组
+         * @param processorClassName  解析器类名
          */
-        void collect_field(Class<?> fieldClass, String fieldName, Object val, byte[] content, String processorClassName);
+        void collect_field(Class<?> clazz, Class<?> fieldDeclaringClass, String fieldName, Object val, byte[] content, String processorClassName);
 
         /**
          * 收集bit字段解析详情
          *
-         * @param fieldClass         字段类型
-         * @param fieldName          字段名称
-         * @param val                解析后的字节数组
-         * @param logRes             反解析的bit字段详情
-         * @param processorClassName 解析器类名
+         * @param clazz               实体类
+         * @param fieldDeclaringClass 字段所属类
+         * @param fieldName           字段名称
+         * @param val                 解析后的字节数组
+         * @param logRes              反解析的bit字段详情
+         * @param processorClassName  解析器类名
          */
-        void collect_field_bit(Class<?> fieldClass, String fieldName, Object val, BitBuf_writer.Log logRes, String processorClassName);
+        void collect_field_bit(Class<?> clazz, Class<?> fieldDeclaringClass, String fieldName, Object val, BitBuf_writer.Log logRes, String processorClassName);
 
     }
 
@@ -182,9 +187,10 @@ public class Parser {
     public static void withDefaultLogCollector_parse() {
         logCollector_parse = new LogCollector_parse() {
             @Override
-            public void collect_field(Class<?> fieldClass, String fieldName, byte[] content, Object val, String processorClassName) {
-                logger.info("--parse field--[{}].[{}] [{}]->[{}]"
-                        , fieldClass.getSimpleName()
+            public void collect_field(Class<?> clazz, Class<?> fieldDeclaringClass, String fieldName, byte[] content, Object val, String processorClassName) {
+                logger.info("--parse field{}--[{}].[{}] [{}]->[{}]"
+                        , LogUtil.getDeclaredFieldStackTrace(fieldDeclaringClass, fieldName)
+                        , clazz.getSimpleName()
                         , fieldName
                         , ByteBufUtil.hexDump(content).toUpperCase()
                         , val
@@ -192,21 +198,24 @@ public class Parser {
             }
 
             @Override
-            public void collect_field_bit(Class<?> fieldClass, String fieldName, BitBuf_reader.Log logRes, Object val, String processorClassName) {
+            public void collect_field_bit(Class<?> clazz, Class<?> fieldDeclaringClass, String fieldName, BitBuf_reader.Log logRes, Object val, String processorClassName) {
                 if (logRes instanceof BitBuf_reader.ReadLog readLog) {
-                    logger.info("--parse field--[{}].[{}] bit_hex[{}] bit_pos[{}-{}] bit_bigEndian[{}] bit_unsigned[{}] bit_binary[{}->{}->{}] bit_val[{}->{}->{}]"
-                            , fieldClass.getSimpleName()
+                    logger.info("--parse field{}--[{}].[{}] bit_hex[{}] bit_pos[{}-{}] bit_bigEndian[{}] bit_unsigned[{}] bit_binary[{}->{}->{}] bit_val[{}->{}->{}]=[{}]"
+                            , LogUtil.getDeclaredFieldStackTrace(fieldDeclaringClass, fieldName)
+                            , clazz.getSimpleName()
                             , fieldName,
                             readLog.getLogHex().toUpperCase(),
                             readLog.bitStart, readLog.bitEnd,
                             readLog.bigEndian ? "yes" : "no",
                             readLog.unsigned ? "yes" : "no",
-                            readLog.getLogBit(readLog.val1,false), readLog.getLogBit(readLog.val2,false), readLog.getLogBit(readLog.val3,readLog.signed3),
-                            readLog.val1, readLog.val2, readLog.val3
+                            readLog.getLogBit(readLog.val1, false), readLog.getLogBit(readLog.val2, false), readLog.getLogBit(readLog.val3, readLog.signed3),
+                            readLog.val1, readLog.val2, readLog.val3,
+                            val
                     );
                 } else if (logRes instanceof BitBuf_reader.SkipLog skipLog) {
-                    logger.info("--parse field--[{}].[{}] skip bit_hex[{}] bit_pos[{}-{}] bit_binary[{}]"
-                            , fieldClass.getSimpleName()
+                    logger.info("--parse field{}--[{}].[{}] skip bit_hex[{}] bit_pos[{}-{}] bit_binary[{}]"
+                            , LogUtil.getDeclaredFieldStackTrace(fieldDeclaringClass, fieldName)
+                            , clazz.getSimpleName()
                             , fieldName
                             , skipLog.getLogHex().toUpperCase()
                             , skipLog.bitStart
@@ -223,31 +232,34 @@ public class Parser {
     public static void withDefaultLogCollector_deParse() {
         logCollector_deParse = new LogCollector_deParse() {
             @Override
-            public void collect_field(Class<?> fieldClass, String fieldName, Object val, byte[] content, String processorClassName) {
-                logger.info("--deParse field--[{}].[{}] [{}]->[{}]"
-                        , fieldClass.getSimpleName()
+            public void collect_field(Class<?> clazz, Class<?> fieldDeclaringClass, String fieldName, Object val, byte[] content, String processorClassName) {
+                logger.info("--deParse field{}--[{}].[{}] [{}]->[{}]"
+                        , LogUtil.getDeclaredFieldStackTrace(fieldDeclaringClass, fieldName)
+                        , clazz.getSimpleName()
                         , fieldName
                         , val
                         , ByteBufUtil.hexDump(content).toUpperCase());
             }
 
             @Override
-            public void collect_field_bit(Class<?> fieldClass, String fieldName, Object val, BitBuf_writer.Log logRes, String processorClassName) {
+            public void collect_field_bit(Class<?> clazz, Class<?> fieldDeclaringClass, String fieldName, Object val, BitBuf_writer.Log logRes, String processorClassName) {
                 if (logRes instanceof BitBuf_writer.WriteLog writeLog) {
-                    logger.info("--deParse field--[{}].[{}] [{}]->bit_unsigned[{}] bit_bigEndian[{}] bit_val[{}->{}->{}] bit_binary[{}->{}->{}] bit_hex[{}] bit_pos[{}-{}]"
-                            , fieldClass.getSimpleName()
+                    logger.info("--deParse field{}--[{}].[{}]=[{}] bit_unsigned[{}] bit_bigEndian[{}] bit_val[{}->{}->{}] bit_binary[{}->{}->{}] bit_hex[{}] bit_pos[{}-{}]"
+                            , LogUtil.getDeclaredFieldStackTrace(fieldDeclaringClass, fieldName)
+                            , clazz.getSimpleName()
                             , fieldName
                             , val,
                             writeLog.unsigned ? "yes" : "no",
                             writeLog.bigEndian ? "yes" : "no",
                             writeLog.val1, writeLog.val2, writeLog.val3,
-                            writeLog.getLogBit(writeLog.val1,writeLog.signed1), writeLog.getLogBit(writeLog.val2,false), writeLog.getLogBit(writeLog.val3,false),
+                            writeLog.getLogBit(writeLog.val1, writeLog.signed1), writeLog.getLogBit(writeLog.val2, false), writeLog.getLogBit(writeLog.val3, false),
                             writeLog.getLogHex().toUpperCase(),
                             writeLog.bitStart, writeLog.bitEnd
                     );
                 } else if (logRes instanceof BitBuf_writer.SkipLog skipLog) {
-                    logger.info("--deParse field--[{}].[{}] skip bit_hex[{}] bit_pos[{}-{}]"
-                            , fieldClass.getSimpleName()
+                    logger.info("--deParse field{}--[{}].[{}] skip bit_hex[{}] bit_pos[{}-{}]"
+                            , LogUtil.getDeclaredFieldStackTrace(fieldDeclaringClass, fieldName)
+                            , clazz.getSimpleName()
                             , fieldName
                             , skipLog.getLogHex().toUpperCase()
                             , skipLog.bitStart
@@ -758,10 +770,10 @@ public class Parser {
 
     @SuppressWarnings("unchecked")
     public static <T> T parse(Class<T> clazz, ByteBuf data, ProcessContext<?> parentContext) {
-        Processor<T> processor = (Processor<T>)beanClass_to_processor.get(clazz);
+        Processor<T> processor = (Processor<T>) beanClass_to_processor.get(clazz);
         if (processor == null) {
             synchronized (beanClass_to_processor) {
-                processor = (Processor<T>)beanClass_to_processor.get(clazz);
+                processor = (Processor<T>) beanClass_to_processor.get(clazz);
                 if (processor == null) {
                     try {
                         final Class<?> impl = buildClass(clazz);
@@ -782,7 +794,7 @@ public class Parser {
         Processor<T> processor = (Processor<T>) beanClass_to_processor.get(clazz);
         if (processor == null) {
             synchronized (beanClass_to_processor) {
-                processor = (Processor<T>)beanClass_to_processor.get(clazz);
+                processor = (Processor<T>) beanClass_to_processor.get(clazz);
                 if (processor == null) {
                     try {
                         final Class<?> impl = buildClass(clazz);
@@ -795,5 +807,17 @@ public class Parser {
             }
         }
         processor.deProcess(data, parentContext, instance);
+    }
+
+    public static void main(String[] args) throws Throwable {
+        StackTraceElement stackTraceElement = new StackTraceElement(
+                "",
+                "",
+                "Parser.java",
+                782
+        );
+        System.out.println(stackTraceElement.toString());
+        System.out.println(".(Parser.java:782)");
+        System.out.println(".(RedisUtil.java:60)");
     }
 }

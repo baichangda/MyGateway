@@ -189,6 +189,7 @@ public class JavassistUtil {
             append(context.body, "{}.logCollector_parse.collect_field_bit({}.class,\"{}\",{},{},\"{}\");\n",
                     Parser.class.getName(),
                     context.clazz.getName(),
+                    context.field.getDeclaringClass().getName(),
                     context.field.getName(),
                     context.varNameBitLog,
                     boxing(FieldBuilder.varNameInstance + "." + context.field.getName(), context.field.getType()),
@@ -198,9 +199,10 @@ public class JavassistUtil {
             final String fieldLogBytesVarName = getFieldLogBytesVarName(context);
             append(context.body, "final byte[] {}=new byte[{}.readerIndex()-{}];\n", fieldLogBytesVarName, FieldBuilder.varNameByteBuf, fieldByteBufReaderIndexVarName);
             append(context.body, "{}.getBytes({},{});\n", FieldBuilder.varNameByteBuf, fieldByteBufReaderIndexVarName, fieldLogBytesVarName);
-            append(context.body, "{}.logCollector_parse.collect_field({}.class,\"{}\",{},{},\"{}\");\n",
+            append(context.body, "{}.logCollector_parse.collect_field({}.class,{}.class,\"{}\",{},{},\"{}\");\n",
                     Parser.class.getName(),
                     context.clazz.getName(),
+                    context.field.getDeclaringClass().getName(),
                     context.field.getName(),
                     fieldLogBytesVarName,
                     boxing(FieldBuilder.varNameInstance + "." + context.field.getName(), context.field.getType()),
@@ -224,9 +226,10 @@ public class JavassistUtil {
             return;
         }
         if (context.logBit) {
-            append(context.body, "{}.logCollector_deParse.collect_field_bit({}.class,\"{}\",{},{},\"{}\");\n",
+            append(context.body, "{}.logCollector_deParse.collect_field_bit({}.class,{}.class,\"{}\",{},{},\"{}\");\n",
                     Parser.class.getName(),
                     context.clazz.getName(),
+                    context.field.getDeclaringClass().getName(),
                     context.field.getName(),
                     boxing(FieldBuilder.varNameInstance + "." + context.field.getName(), context.field.getType()),
                     context.varNameBitLog,
@@ -236,9 +239,10 @@ public class JavassistUtil {
             final String fieldLogBytesVarName = getFieldLogBytesVarName(context);
             append(context.body, "final byte[] {}=new byte[{}.writerIndex()-{}];\n", fieldLogBytesVarName, FieldBuilder.varNameByteBuf, fieldByteBufWriterIndexVarName);
             append(context.body, "{}.getBytes({},{});\n", FieldBuilder.varNameByteBuf, fieldByteBufWriterIndexVarName, fieldLogBytesVarName);
-            append(context.body, "{}.logCollector_deParse.collect_field({}.class,\"{}\",{},{},\"{}\");\n",
+            append(context.body, "{}.logCollector_deParse.collect_field({}.class,{}.class,\"{}\",{},{},\"{}\");\n",
                     Parser.class.getName(),
                     context.clazz.getName(),
+                    context.field.getDeclaringClass().getName(),
                     context.field.getName(),
                     boxing(FieldBuilder.varNameInstance + "." + context.field.getName(), context.field.getType()),
                     fieldLogBytesVarName,
@@ -356,7 +360,7 @@ public class JavassistUtil {
         }
     }
 
-    public static double round(double d) {
+    public static long round(double d) {
         if (d > 0d) {
             return Math.round(d);
         } else if (d == 0d) {
@@ -365,6 +369,17 @@ public class JavassistUtil {
             return -Math.round(-d);
         }
     }
+
+    public static int round(float f) {
+        if (f > 0d) {
+            return Math.round(f);
+        } else if (f == 0d) {
+            return 0;
+        } else {
+            return -Math.round(-f);
+        }
+    }
+
 
     public static double format(double d, int i) {
         if (d > 0) {
