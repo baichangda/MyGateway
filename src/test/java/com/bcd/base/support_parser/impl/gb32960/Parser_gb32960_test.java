@@ -2,13 +2,21 @@ package com.bcd.base.support_parser.impl.gb32960;
 
 import com.bcd.base.support_parser.Parser;
 import com.bcd.base.support_parser.impl.gb32960.data.Packet;
+import com.bcd.base.support_parser.impl.immotors.ep33.Parser_immotors_ep33_test;
+import com.bcd.base.support_parser.util.PerformanceUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class Parser_gb32960_test {
+
+    static Logger logger= LoggerFactory.getLogger(Parser_gb32960_test.class);
+
+
     @Test
     public void test(){
         Parser.withDefaultLogCollector_parse();
@@ -22,8 +30,19 @@ public class Parser_gb32960_test {
         Packet packet = Parser.parse(Packet.class, byteBuf, null);
         ByteBuf dest=Unpooled.buffer();
         Parser.deParse(packet, dest,null);
-        System.out.println(data.toUpperCase());
-        System.out.println(ByteBufUtil.hexDump(dest).toUpperCase());
+        logger.info(data.toUpperCase());
+        logger.info(ByteBufUtil.hexDump(dest).toUpperCase());
         assert data.equalsIgnoreCase(ByteBufUtil.hexDump(dest));
+    }
+
+    public void test_performance(){
+        Parser.enablePrintBuildLog();
+        Parser.enableGenerateClassFile();
+        String data = "232303FE4C534A4132343033304853313932393639010135" +
+                "1403190F0507010203010000000469B00EE5271055020F1FFF000002010103424E1E4E2045FFFF2710050006BE437001CF306A060160FFFF0101FFFF0118FF01010E070000000000000000000801010EE527100060000160FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF09010100180EFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFED";
+        int threadNum = 1;
+        logger.info("param threadNum[{}]", threadNum);
+        int num = 1000000000;
+        PerformanceUtil.testMultiThreadPerformance(ByteBufUtil.decodeHexDump(data), Packet.class, threadNum, num, true);
     }
 }

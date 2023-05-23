@@ -8,6 +8,7 @@ import com.bcd.base.support_parser.util.BitBuf_writer;
 import com.bcd.base.support_parser.util.JavassistUtil;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 
 public class FieldBuilder__F_customize extends FieldBuilder {
     @Override
@@ -42,8 +43,9 @@ public class FieldBuilder__F_customize extends FieldBuilder {
         } else {
             BuilderContext.fieldBuilderCache.computeIfAbsent(builderClass, k -> {
                 try {
-                    return (FieldBuilder) builderClass.newInstance();
-                } catch (InstantiationException | IllegalAccessException e) {
+                    return (FieldBuilder) builderClass.getDeclaredConstructor().newInstance();
+                } catch (InstantiationException | IllegalAccessException | NoSuchMethodException |
+                         InvocationTargetException e) {
                     throw BaseRuntimeException.getException(e);
                 }
             }).buildParse(context);
@@ -81,8 +83,9 @@ public class FieldBuilder__F_customize extends FieldBuilder {
         } else {
             BuilderContext.fieldBuilderCache.computeIfAbsent(builderClass, k -> {
                 try {
-                    return (FieldBuilder) builderClass.newInstance();
-                } catch (InstantiationException | IllegalAccessException e) {
+                    return (FieldBuilder) builderClass.getDeclaredConstructor().newInstance();
+                } catch (InstantiationException | IllegalAccessException | NoSuchMethodException |
+                         InvocationTargetException e) {
                     throw BaseRuntimeException.getException(e);
                 }
             }).buildDeParse(context);

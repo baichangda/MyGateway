@@ -16,18 +16,6 @@ public class Parser_someip{
     }
 
     public static void main(String[] args) {
-        Parser.enablePrintBuildLog();
-        Parser.enableGenerateClassFile();
-        String hex = "000100e4000000ac0009000a0304000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a1";
-
-        int threadNum=1;
-        if(args.length>=1){
-            threadNum=Integer.parseInt(args[0]);
-        }
-        logger.info("param threadNum[{}]",threadNum);
-        int num=1000000000;
-
-        PerformanceUtil.testMultiThreadPerformance(ByteBufUtil.decodeHexDump(hex),Packet.class,threadNum,num,true);
 
 
     }
