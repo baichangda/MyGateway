@@ -4,6 +4,7 @@ import io.netty.channel.Channel;
 
 import java.util.concurrent.ConcurrentHashMap;
 
+@SuppressWarnings("unchecked")
 public class Session {
     public final int type;
     public final String id;
