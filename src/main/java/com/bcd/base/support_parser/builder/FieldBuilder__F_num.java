@@ -1,7 +1,7 @@
 package com.bcd.base.support_parser.builder;
 
 import com.bcd.base.support_parser.anno.F_num;
-import com.bcd.base.support_parser.util.JavassistUtil;
+import com.bcd.base.support_parser.util.ParseUtil;
 import com.bcd.base.support_parser.util.RpnUtil;
 
 import java.lang.reflect.Field;
@@ -23,7 +23,7 @@ public class FieldBuilder__F_num extends FieldBuilder {
                 if (fieldTypeClass.isEnum()) {
                     sourceValTypeName = "int";
                 } else {
-                    JavassistUtil.notSupport_fieldType(field, annoClass);
+                    ParseUtil.notSupport_fieldType(field, annoClass);
                     sourceValTypeName = null;
                 }
             }
@@ -32,10 +32,10 @@ public class FieldBuilder__F_num extends FieldBuilder {
         final F_num anno = context.field.getAnnotation(annoClass);
         final StringBuilder body = context.body;
         final String varNameInstance = FieldBuilder.varNameInstance;
-        final String varNameField = JavassistUtil.getFieldVarName(context);
+        final String varNameField = ParseUtil.getFieldVarName(context);
 
         final boolean unsigned = anno.unsigned();
-        final boolean bigEndian = JavassistUtil.bigEndian(anno.order(), context.clazz);
+        final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.clazz);
         String funcName;
         switch (anno.len()) {
             case 1 -> {
@@ -53,18 +53,18 @@ public class FieldBuilder__F_num extends FieldBuilder {
                 funcName = bigEndian ? "readLong" : "readLongLE";
             }
             default -> {
-                JavassistUtil.notSupport_len(field, annoClass);
+                ParseUtil.notSupport_len(field, annoClass);
                 funcName = null;
             }
         }
         //读取原始数据
-        JavassistUtil.append(body, "final {} {}=({}){}.{}();\n", sourceValTypeName, varNameField, sourceValTypeName, FieldBuilder.varNameByteBuf, funcName);
+        ParseUtil.append(body, "final {} {}=({}){}.{}();\n", sourceValTypeName, varNameField, sourceValTypeName, FieldBuilder.varNameByteBuf, funcName);
         //表达式运算
-        final String valCode = JavassistUtil.replaceValExprToCode(anno.valExpr(), varNameField);
+        final String valCode = ParseUtil.replaceValExprToCode(anno.valExpr(), varNameField);
         if (fieldTypeClass.isEnum()) {
-            JavassistUtil.append(body, "{}.{}={}.fromInteger((int)({}));\n", varNameInstance, field.getName(), fieldTypeName, valCode);
+            ParseUtil.append(body, "{}.{}={}.fromInteger((int)({}));\n", varNameInstance, field.getName(), fieldTypeName, valCode);
         } else {
-            JavassistUtil.append(body, "{}.{}={};\n", varNameInstance, field.getName(), valCode);
+            ParseUtil.append(body, "{}.{}={};\n", varNameInstance, field.getName(), valCode);
         }
 
         final char var = anno.var();
@@ -78,56 +78,56 @@ public class FieldBuilder__F_num extends FieldBuilder {
         final Class<F_num> annoClass = F_num.class;
         final Field field = context.field;
         final F_num anno = context.field.getAnnotation(annoClass);
-        final boolean bigEndian = JavassistUtil.bigEndian(anno.order(), context.clazz);
+        final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.clazz);
         final String varNameInstance = FieldBuilder.varNameInstance;
         final StringBuilder body = context.body;
         final String fieldName = field.getName();
-        final String varNameField = JavassistUtil.getFieldVarName(context);
+        final String varNameField = ParseUtil.getFieldVarName(context);
         final Class<?> fieldType = field.getType();
         final boolean isFloat = fieldType == float.class || fieldType == double.class;
         final char var = anno.var();
         String valCode;
         //先判断是否是枚举类型、如果是枚举转换为int
         if (fieldType.isEnum()) {
-            valCode = JavassistUtil.format("{}.toInteger()", varNameInstance + "." + fieldName);
+            valCode = ParseUtil.format("{}.toInteger()", varNameInstance + "." + fieldName);
         } else {
             valCode = varNameInstance + "." + fieldName;
         }
 
         //判断是否用到变量中、如果用到了、需要定义变量
         if (var != '0') {
-            JavassistUtil.append(body, "final {} {}={};\n", fieldType.getName(), varNameField, valCode);
+            ParseUtil.append(body, "final {} {}={};\n", fieldType.getName(), varNameField, valCode);
             context.varToFieldName.put(var, varNameField);
         }
 
         //最后判断是否用了值表达式、如果用了、进行表达式处理
         if (!anno.valExpr().isEmpty()) {
             if(isFloat){
-                valCode = JavassistUtil.replaceValExprToCode_round(RpnUtil.reverseExpr(anno.valExpr()), valCode);
+                valCode = ParseUtil.replaceValExprToCode_round(RpnUtil.reverseExpr(anno.valExpr()), valCode);
             }else{
-                valCode = JavassistUtil.replaceValExprToCode(RpnUtil.reverseExpr(anno.valExpr()), valCode);
+                valCode = ParseUtil.replaceValExprToCode(RpnUtil.reverseExpr(anno.valExpr()), valCode);
             }
         }
 
 
         switch (anno.len()) {
             case 1 -> {
-                JavassistUtil.append(body, "{}.writeByte((int)({}));\n", FieldBuilder.varNameByteBuf, valCode);
+                ParseUtil.append(body, "{}.writeByte((int)({}));\n", FieldBuilder.varNameByteBuf, valCode);
             }
             case 2 -> {
                 final String funcName = bigEndian ? "writeShort" : "writeShortLE";
-                JavassistUtil.append(body, "{}.{}((int)({}));\n", FieldBuilder.varNameByteBuf, funcName, valCode);
+                ParseUtil.append(body, "{}.{}((int)({}));\n", FieldBuilder.varNameByteBuf, funcName, valCode);
             }
             case 4 -> {
                 final String funcName = bigEndian ? "writeInt" : "writeIntLE";
-                JavassistUtil.append(body, "{}.{}((int)({}));\n", FieldBuilder.varNameByteBuf, funcName, valCode);
+                ParseUtil.append(body, "{}.{}((int)({}));\n", FieldBuilder.varNameByteBuf, funcName, valCode);
             }
             case 8 -> {
                 final String funcName = bigEndian ? "writeLong" : "writeLongLE";
-                JavassistUtil.append(body, "{}.{}((long)({}));\n", FieldBuilder.varNameByteBuf, funcName, valCode);
+                ParseUtil.append(body, "{}.{}((long)({}));\n", FieldBuilder.varNameByteBuf, funcName, valCode);
             }
             default -> {
-                JavassistUtil.notSupport_len(field, annoClass);
+                ParseUtil.notSupport_len(field, annoClass);
             }
         }
 

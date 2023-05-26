@@ -1,7 +1,7 @@
 package com.bcd.base.support_parser.builder;
 
 import com.bcd.base.support_parser.anno.F_float_ieee754;
-import com.bcd.base.support_parser.util.JavassistUtil;
+import com.bcd.base.support_parser.util.ParseUtil;
 import com.bcd.base.support_parser.util.RpnUtil;
 
 import java.lang.reflect.Field;
@@ -18,13 +18,13 @@ public class FieldBuilder__F_float_ieee754 extends FieldBuilder {
             case "float", "double" -> {
             }
             default -> {
-                JavassistUtil.notSupport_fieldType(field, annoClass);
+                ParseUtil.notSupport_fieldType(field, annoClass);
             }
         }
 
 
         final F_float_ieee754 anno = context.field.getAnnotation(annoClass);
-        final boolean bigEndian = JavassistUtil.bigEndian(anno.order(), context.clazz);
+        final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.clazz);
         final StringBuilder body = context.body;
         final String varNameInstance = FieldBuilder.varNameInstance;
 
@@ -38,17 +38,17 @@ public class FieldBuilder__F_float_ieee754 extends FieldBuilder {
                 funcName = bigEndian ? "readDouble" : "readDoubleLE";
             }
             default -> {
-                JavassistUtil.notSupport_type(field, annoClass);
+                ParseUtil.notSupport_type(field, annoClass);
                 funcName = null;
             }
         }
 
-        final String valCode = JavassistUtil.format("{}.{}()", varNameByteBuf, funcName);
+        final String valCode = ParseUtil.format("{}.{}()", varNameByteBuf, funcName);
 
         if (anno.valPrecision() == -1) {
-            JavassistUtil.append(body, "{}.{}={};\n", varNameInstance, field.getName(), JavassistUtil.replaceValExprToCode(anno.valExpr(), JavassistUtil.format("(({}){})", fieldType, valCode)));
+            ParseUtil.append(body, "{}.{}={};\n", varNameInstance, field.getName(), ParseUtil.replaceValExprToCode(anno.valExpr(), ParseUtil.format("(({}){})", fieldType, valCode)));
         } else {
-            JavassistUtil.append(body, "{}.{}=({}){}.format((double)({}),{});\n", varNameInstance, field.getName(), fieldType, JavassistUtil.class.getName(), JavassistUtil.replaceValExprToCode(anno.valExpr(), valCode), anno.valPrecision());
+            ParseUtil.append(body, "{}.{}=({}){}.format((double)({}),{});\n", varNameInstance, field.getName(), fieldType, ParseUtil.class.getName(), ParseUtil.replaceValExprToCode(anno.valExpr(), valCode), anno.valPrecision());
         }
     }
 
@@ -57,7 +57,7 @@ public class FieldBuilder__F_float_ieee754 extends FieldBuilder {
         final Class<F_float_ieee754> annoClass = F_float_ieee754.class;
         final Field field = context.field;
         final F_float_ieee754 anno = context.field.getAnnotation(annoClass);
-        final boolean bigEndian = JavassistUtil.bigEndian(anno.order(), context.clazz);
+        final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.clazz);
         final StringBuilder body = context.body;
         final String fieldName = field.getName();
         final String varNameInstance = FieldBuilder.varNameInstance;
@@ -69,7 +69,7 @@ public class FieldBuilder__F_float_ieee754 extends FieldBuilder {
             valCode = varNameInstance + "." + fieldName;
         } else {
             final String reverseExpr = RpnUtil.reverseExpr(anno.valExpr());
-            valCode = JavassistUtil.replaceValExprToCode(reverseExpr, varNameInstance + "." + fieldName);
+            valCode = ParseUtil.replaceValExprToCode(reverseExpr, varNameInstance + "." + fieldName);
         }
 
         switch (anno.type()) {
@@ -82,11 +82,11 @@ public class FieldBuilder__F_float_ieee754 extends FieldBuilder {
                 funcParamTypeName = "double";
             }
             default -> {
-                JavassistUtil.notSupport_type(field, annoClass);
+                ParseUtil.notSupport_type(field, annoClass);
                 funcName = null;
                 funcParamTypeName = null;
             }
         }
-        JavassistUtil.append(body, "{}.{}(({})({}));\n", varNameByteBuf, funcName, funcParamTypeName, valCode);
+        ParseUtil.append(body, "{}.{}(({})({}));\n", varNameByteBuf, funcName, funcParamTypeName, valCode);
     }
 }

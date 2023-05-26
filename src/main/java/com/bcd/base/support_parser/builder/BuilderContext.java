@@ -3,8 +3,7 @@ package com.bcd.base.support_parser.builder;
 import com.bcd.base.support_parser.anno.*;
 import com.bcd.base.support_parser.processor.ProcessContext;
 import com.bcd.base.support_parser.processor.Processor;
-import com.bcd.base.support_parser.util.BitBuf_reader;
-import com.bcd.base.support_parser.util.JavassistUtil;
+import com.bcd.base.support_parser.util.ParseUtil;
 import io.netty.buffer.ByteBuf;
 import javassist.CtClass;
 
@@ -107,7 +106,7 @@ public class BuilderContext {
         if (processContextVarName == null) {
             processContextVarName = "processContext";
             final String proocessContextClassName = ProcessContext.class.getName();
-            JavassistUtil.append(body, "final {} {}=new {}({},{});\n",
+            ParseUtil.append(body, "final {} {}=new {}({},{});\n",
                     proocessContextClassName,
                     processContextVarName,
                     proocessContextClassName,
@@ -121,7 +120,7 @@ public class BuilderContext {
         if (varNameBitBuf == null) {
             final String bitBufClassName = bitBufClass.getName();
             final String bitBufClassSimpleName = bitBufClass.getSimpleName();
-            JavassistUtil.append(body, "final {} {}={}.get{}({});\n", bitBufClassName, FieldBuilder.varNameBitBuf, FieldBuilder.varNameParentProcessContext, bitBufClassSimpleName, FieldBuilder.varNameByteBuf);
+            ParseUtil.append(body, "final {} {}={}.get{}({},{});\n", bitBufClassName, FieldBuilder.varNameBitBuf, ProcessContext.class.getName(), bitBufClassSimpleName, FieldBuilder.varNameByteBuf, FieldBuilder.varNameParentProcessContext);
             varNameBitBuf = FieldBuilder.varNameBitBuf;
         }
         return varNameBitBuf;

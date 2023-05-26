@@ -1,13 +1,11 @@
 package com.bcd.base.support_parser.builder;
 
-import com.bcd.base.support_parser.anno.F_bit_num;
 import com.bcd.base.support_parser.anno.F_bit_num_array;
-import com.bcd.base.support_parser.anno.F_num_array;
 import com.bcd.base.support_parser.anno.F_skip;
 import com.bcd.base.support_parser.exception.BaseRuntimeException;
 import com.bcd.base.support_parser.util.BitBuf_reader;
 import com.bcd.base.support_parser.util.BitBuf_writer;
-import com.bcd.base.support_parser.util.JavassistUtil;
+import com.bcd.base.support_parser.util.ParseUtil;
 import com.bcd.base.support_parser.util.RpnUtil;
 
 import java.lang.reflect.Field;
@@ -21,7 +19,7 @@ public class FieldBuilder__F_bit_num_array extends FieldBuilder {
         final String arrayElementTypeName = arrayElementType.getName();
         final Class<F_bit_num_array> annoClass = F_bit_num_array.class;
         final F_bit_num_array anno = context.field.getAnnotation(annoClass);
-        final boolean bigEndian = JavassistUtil.bigEndian(anno.order(), context.clazz);
+        final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.clazz);
         final boolean unsigned = anno.unsigned();
         switch (arrayElementTypeName) {
             case "byte", "short", "int", "long", "float", "double" -> {
@@ -29,7 +27,7 @@ public class FieldBuilder__F_bit_num_array extends FieldBuilder {
             default -> {
                 if (arrayElementType.isEnum()) {
                 } else {
-                    JavassistUtil.notSupport_fieldType(field, annoClass);
+                    ParseUtil.notSupport_fieldType(field, annoClass);
                 }
             }
         }
@@ -39,7 +37,7 @@ public class FieldBuilder__F_bit_num_array extends FieldBuilder {
             if (anno.lenExpr().isEmpty()) {
                 throw BaseRuntimeException.getException("class[{}] field[{}] anno[] must have len or lenExpr", field.getDeclaringClass().getName(), field.getName(), F_skip.class.getName());
             } else {
-                arrLenRes = JavassistUtil.replaceLenExprToCode(anno.lenExpr(), context.varToFieldName, field);
+                arrLenRes = ParseUtil.replaceLenExprToCode(anno.lenExpr(), context.varToFieldName, field);
             }
         } else {
             arrLenRes = anno.len() + "";
@@ -50,24 +48,24 @@ public class FieldBuilder__F_bit_num_array extends FieldBuilder {
         final int singleSkip = anno.singleSkip();
         final String valExpr = anno.valExpr();
         final StringBuilder body = context.body;
-        final String varNameField = JavassistUtil.getFieldVarName(context);
+        final String varNameField = ParseUtil.getFieldVarName(context);
         String arrVarName = varNameField + "_arr";
         final String varNameArrayElement = varNameField + "_arrEle";
         final String varNameBitBuf = context.getVarNameBitBuf(BitBuf_reader.class);
 
-        JavassistUtil.append(body, "final {}[] {}=new {}[{}];\n", arrayElementTypeName, arrVarName, arrayElementTypeName, arrLenRes);
-        JavassistUtil.append(body, "for(int i=0;i<{}.length;i++){\n", arrVarName);
-        JavassistUtil.append(body, "final {} {}=({}){}.read({},{},{});\n", arrayElementTypeName, varNameArrayElement, arrayElementTypeName, varNameBitBuf, singleLen, bigEndian, unsigned);
+        ParseUtil.append(body, "final {}[] {}=new {}[{}];\n", arrayElementTypeName, arrVarName, arrayElementTypeName, arrLenRes);
+        ParseUtil.append(body, "for(int i=0;i<{}.length;i++){\n", arrVarName);
+        ParseUtil.append(body, "final {} {}=({}){}.read({},{},{});\n", arrayElementTypeName, varNameArrayElement, arrayElementTypeName, varNameBitBuf, singleLen, bigEndian, unsigned);
         if (singleSkip > 0) {
-            JavassistUtil.append(body, "{}.skip({});\n", varNameBitBuf, singleSkip);
+            ParseUtil.append(body, "{}.skip({});\n", varNameBitBuf, singleSkip);
         }
-        JavassistUtil.append(body, "{}[i]=({})({});\n", arrVarName, arrayElementTypeName, JavassistUtil.replaceValExprToCode(valExpr, varNameArrayElement));
-        JavassistUtil.append(body, "}\n");
+        ParseUtil.append(body, "{}[i]=({})({});\n", arrVarName, arrayElementTypeName, ParseUtil.replaceValExprToCode(valExpr, varNameArrayElement));
+        ParseUtil.append(body, "}\n");
 
         if (context.bitEndWhenBitField_process) {
-            JavassistUtil.append(body, "{}.finish();\n", context.varNameBitBuf);
+            ParseUtil.append(body, "{}.finish();\n", context.varNameBitBuf);
         }
-        JavassistUtil.append(body, "{}.{}={};\n", FieldBuilder.varNameInstance, field.getName(), arrVarName);
+        ParseUtil.append(body, "{}.{}={};\n", FieldBuilder.varNameInstance, field.getName(), arrVarName);
     }
 
     @Override
@@ -75,7 +73,7 @@ public class FieldBuilder__F_bit_num_array extends FieldBuilder {
         final Field field = context.field;
         final Class<F_bit_num_array> annoClass = F_bit_num_array.class;
         final F_bit_num_array anno = context.field.getAnnotation(annoClass);
-        final boolean bigEndian = JavassistUtil.bigEndian(anno.order(), context.clazz);
+        final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.clazz);
         final boolean unsigned = anno.unsigned();
         final Class<?> fieldTypeClass = field.getType();
         final int singleLen = anno.singleLen();
@@ -87,30 +85,30 @@ public class FieldBuilder__F_bit_num_array extends FieldBuilder {
         final String fieldName = field.getName();
 
         String valCode = varNameInstance + "." + fieldName;
-        final String varNameField = JavassistUtil.getFieldVarName(context);
+        final String varNameField = ParseUtil.getFieldVarName(context);
         final String varNameBitBuf = context.getVarNameBitBuf(BitBuf_writer.class);
-        JavassistUtil.append(body, "if({}!=null){\n", FieldBuilder.varNameInstance, valCode);
+        ParseUtil.append(body, "if({}!=null){\n", FieldBuilder.varNameInstance, valCode);
         final String varNameFieldArr = varNameField + "_arr";
-        JavassistUtil.append(body, "final {}[] {}={};\n", arrElementType, varNameFieldArr, valCode);
-        JavassistUtil.append(body, "for(int i=0;i<{}.length;i++){\n", varNameFieldArr);
+        ParseUtil.append(body, "final {}[] {}={};\n", arrElementType, varNameFieldArr, valCode);
+        ParseUtil.append(body, "for(int i=0;i<{}.length;i++){\n", varNameFieldArr);
         if (anno.valExpr().isEmpty()) {
-            JavassistUtil.append(body, "{}.write((long)({}),{},{},{});\n", varNameBitBuf, varNameFieldArr + "[i]", singleLen, bigEndian, unsigned);
+            ParseUtil.append(body, "{}.write((long)({}),{},{},{});\n", varNameBitBuf, varNameFieldArr + "[i]", singleLen, bigEndian, unsigned);
         } else {
             if (isFloat) {
-                JavassistUtil.append(body, "{}.write((long)({}),{},{},{});\n", varNameBitBuf, JavassistUtil.replaceValExprToCode_round(RpnUtil.reverseExpr(anno.valExpr()), varNameFieldArr + "[i]"), singleLen, bigEndian, unsigned);
+                ParseUtil.append(body, "{}.write((long)({}),{},{},{});\n", varNameBitBuf, ParseUtil.replaceValExprToCode_round(RpnUtil.reverseExpr(anno.valExpr()), varNameFieldArr + "[i]"), singleLen, bigEndian, unsigned);
             } else {
-                JavassistUtil.append(body, "{}.write((long)({}),{},{},{});\n", varNameBitBuf, JavassistUtil.replaceValExprToCode(RpnUtil.reverseExpr(anno.valExpr()), varNameFieldArr + "[i]"), singleLen, bigEndian, unsigned);
+                ParseUtil.append(body, "{}.write((long)({}),{},{},{});\n", varNameBitBuf, ParseUtil.replaceValExprToCode(RpnUtil.reverseExpr(anno.valExpr()), varNameFieldArr + "[i]"), singleLen, bigEndian, unsigned);
             }
         }
         if (singleSkip > 0) {
-            JavassistUtil.append(body, "{}.skip({});\n", varNameBitBuf, singleSkip);
+            ParseUtil.append(body, "{}.skip({});\n", varNameBitBuf, singleSkip);
         }
-        JavassistUtil.append(body, "}\n");
+        ParseUtil.append(body, "}\n");
 
         if (context.bitEndWhenBitField_deProcess) {
-            JavassistUtil.append(body, "{}.finish();\n", varNameBitBuf);
+            ParseUtil.append(body, "{}.finish();\n", varNameBitBuf);
         }
-        JavassistUtil.append(body, "}\n");
+        ParseUtil.append(body, "}\n");
 
     }
 }

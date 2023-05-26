@@ -7,7 +7,7 @@ import com.bcd.base.support_parser.processor.ProcessContext;
 import com.bcd.base.support_parser.processor.Processor;
 import com.bcd.base.support_parser.util.BitBuf_reader;
 import com.bcd.base.support_parser.util.BitBuf_writer;
-import com.bcd.base.support_parser.util.JavassistUtil;
+import com.bcd.base.support_parser.util.ParseUtil;
 import com.bcd.base.support_parser.util.LogUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
@@ -56,7 +56,7 @@ import java.util.stream.Collectors;
  * <p>
  * 注意:
  * 如果启动了解析和反解析日志、并不是所有字段都会打印、逻辑参考
- * {@link JavassistUtil#needLog(BuilderContext)}
+ * {@link ParseUtil#needLog(BuilderContext)}
  */
 
 public class Parser {
@@ -478,7 +478,7 @@ public class Parser {
             context.field = field;
             bitEndWhenBitField(fieldList, i, context);
             if (logCollector_parse != null) {
-                JavassistUtil.prependLogCode_parse(context);
+                ParseUtil.prependLogCode_parse(context);
             }
             try {
                 final F_num f_num = field.getAnnotation(F_num.class);
@@ -555,7 +555,7 @@ public class Parser {
                 }
             } finally {
                 if (logCollector_parse != null) {
-                    JavassistUtil.appendLogCode_parse(context);
+                    ParseUtil.appendLogCode_parse(context);
                 }
             }
         }
@@ -573,7 +573,7 @@ public class Parser {
             bitEndWhenBitField(fieldList, i, context);
             try {
                 if (logCollector_deParse != null) {
-                    JavassistUtil.prependLogCode_deParse(context);
+                    ParseUtil.prependLogCode_deParse(context);
                 }
                 final F_num f_num = field.getAnnotation(F_num.class);
                 if (f_num != null) {
@@ -649,7 +649,7 @@ public class Parser {
                 }
             } finally {
                 if (logCollector_deParse != null) {
-                    JavassistUtil.appendLogCode_deParse(context);
+                    ParseUtil.appendLogCode_deParse(context);
                 }
             }
         }
@@ -682,9 +682,9 @@ public class Parser {
         final List<Class<?>> processorClassList = Arrays.stream(clazz.getDeclaredFields()).map(f -> f.getAnnotation(F_customize.class)).filter(Objects::nonNull).map(F_customize::processorClass).filter(e -> e != void.class).collect(Collectors.toList());
         for (Class<?> processorClass : processorClassList) {
             final String processorClassName = processorClass.getName();
-            final String processorVarName = JavassistUtil.getProcessorVarName(processorClass);
+            final String processorVarName = ParseUtil.getProcessorVarName(processorClass);
             cc.addField(CtField.make("private final " + processorClassName + " " + processorVarName + ";", cc));
-            initBody.append(JavassistUtil.format("this.{}=new {}();\n", processorVarName, processorClassName));
+            initBody.append(ParseUtil.format("this.{}=new {}();\n", processorVarName, processorClassName));
         }
         initBody.append("}\n");
         if (printBuildLog) {
@@ -714,7 +714,7 @@ public class Parser {
         //process方法体
         StringBuilder processBody = new StringBuilder();
         processBody.append("\n{\n");
-        JavassistUtil.append(processBody, "final {} {}=new {}();\n", clazzName, FieldBuilder.varNameInstance, clazzName);
+        ParseUtil.append(processBody, "final {} {}=new {}();\n", clazzName, FieldBuilder.varNameInstance, clazzName);
         boolean hasFieldSkipModeReserved = Arrays.stream(clazz.getDeclaredFields()).anyMatch(e -> {
             final F_skip f_skip = e.getAnnotation(F_skip.class);
             if (f_skip == null) {
@@ -724,11 +724,11 @@ public class Parser {
             }
         });
         if (hasFieldSkipModeReserved) {
-            JavassistUtil.append(processBody, "final int {}={}.readerIndex();\n", FieldBuilder.varNameStartIndex, FieldBuilder.varNameByteBuf);
+            ParseUtil.append(processBody, "final int {}={}.readerIndex();\n", FieldBuilder.varNameStartIndex, FieldBuilder.varNameByteBuf);
         }
         BuilderContext parseContext = new BuilderContext(processBody, clazz, cc, classVarDefineToVarName);
         buildMethodBody_parse(clazz, parseContext);
-        JavassistUtil.append(processBody, "return {};\n", FieldBuilder.varNameInstance);
+        ParseUtil.append(processBody, "return {};\n", FieldBuilder.varNameInstance);
         processBody.append("}");
         if (printBuildLog) {
             logger.info("\n-----------class[{}] process-----------{}\n", clazz.getName(), processBody.toString());
@@ -749,9 +749,9 @@ public class Parser {
         //deProcess方法体
         StringBuilder deProcessBody = new StringBuilder();
         deProcessBody.append("\n{\n");
-        JavassistUtil.append(deProcessBody, "final {} {}=({})$3;\n", clazzName, FieldBuilder.varNameInstance, clazzName);
+        ParseUtil.append(deProcessBody, "final {} {}=({})$3;\n", clazzName, FieldBuilder.varNameInstance, clazzName);
         if (hasFieldSkipModeReserved) {
-            JavassistUtil.append(deProcessBody, "final int {}={}.writerIndex();\n", FieldBuilder.varNameStartIndex, FieldBuilder.varNameByteBuf);
+            ParseUtil.append(deProcessBody, "final int {}={}.writerIndex();\n", FieldBuilder.varNameStartIndex, FieldBuilder.varNameByteBuf);
         }
         BuilderContext deParseContext = new BuilderContext(deProcessBody, clazz, cc, classVarDefineToVarName);
         buildMethodBody_deParse(clazz, deParseContext);
@@ -785,7 +785,11 @@ public class Parser {
                 }
             }
         }
-        return processor.process(data, parentContext);
+//        if (parentContext == null) {
+//            return processor.process(data, new ProcessContext(null, null));
+//        } else {
+            return processor.process(data, parentContext);
+//        }
     }
 
     @SuppressWarnings("unchecked")
@@ -806,7 +810,11 @@ public class Parser {
                 }
             }
         }
-        processor.deProcess(data, parentContext, instance);
+//        if (parentContext == null) {
+//            processor.deProcess(data, new ProcessContext(null, null), instance);
+//        } else {
+            processor.deProcess(data, parentContext, instance);
+//        }
     }
 
     public static void main(String[] args) throws Throwable {

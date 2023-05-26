@@ -3,7 +3,7 @@ package com.bcd.base.support_parser.builder;
 import com.bcd.base.support_parser.anno.F_float_ieee754_array;
 import com.bcd.base.support_parser.anno.F_skip;
 import com.bcd.base.support_parser.exception.BaseRuntimeException;
-import com.bcd.base.support_parser.util.JavassistUtil;
+import com.bcd.base.support_parser.util.ParseUtil;
 import com.bcd.base.support_parser.util.RpnUtil;
 
 import java.lang.reflect.Field;
@@ -18,14 +18,14 @@ public class FieldBuilder__F_float_ieee754_array extends FieldBuilder {
         final String arrayElementType=fieldType.componentType().getName();
 
         final F_float_ieee754_array anno = context.field.getAnnotation(annoClass);
-        final boolean bigEndian = JavassistUtil.bigEndian(anno.order(), context.clazz);
+        final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.clazz);
 
         final String lenRes;
         if (anno.len() == 0) {
             if (anno.lenExpr().isEmpty()) {
                 throw BaseRuntimeException.getException("class[{}] field[{}] anno[] must have len or lenExpr", field.getDeclaringClass().getName(), fieldName, F_skip.class.getName());
             } else {
-                lenRes = JavassistUtil.replaceLenExprToCode(anno.lenExpr(), context.varToFieldName, field);
+                lenRes = ParseUtil.replaceLenExprToCode(anno.lenExpr(), context.varToFieldName, field);
             }
         } else {
             lenRes = anno.len() + "";
@@ -41,24 +41,24 @@ public class FieldBuilder__F_float_ieee754_array extends FieldBuilder {
                 funcName = bigEndian ? "readDouble" : "readDoubleLE";
             }
             default -> {
-                JavassistUtil.notSupport_type(field, annoClass);
+                ParseUtil.notSupport_type(field, annoClass);
                 funcName = null;
             }
         }
         final String varNameInstance = FieldBuilder.varNameInstance;
         final StringBuilder body = context.body;
-        final String varNameField = JavassistUtil.getFieldVarName(context);
+        final String varNameField = ParseUtil.getFieldVarName(context);
         String arrVarName = varNameField + "_arr";
-        JavassistUtil.append(body, "final {}[] {}=new {}[{}];\n", arrayElementType, arrVarName, arrayElementType, lenRes);
-        JavassistUtil.append(body, "for(int i=0;i<{}.length;i++){\n", arrVarName);
-        final String valCode = JavassistUtil.format("{}.{}()", varNameByteBuf, funcName);
+        ParseUtil.append(body, "final {}[] {}=new {}[{}];\n", arrayElementType, arrVarName, arrayElementType, lenRes);
+        ParseUtil.append(body, "for(int i=0;i<{}.length;i++){\n", arrVarName);
+        final String valCode = ParseUtil.format("{}.{}()", varNameByteBuf, funcName);
         if (anno.valPrecision() == -1) {
-            JavassistUtil.append(body, "{}[i]=({})({});\n", arrVarName, arrayElementType, JavassistUtil.replaceValExprToCode(anno.valExpr(), valCode));
+            ParseUtil.append(body, "{}[i]=({})({});\n", arrVarName, arrayElementType, ParseUtil.replaceValExprToCode(anno.valExpr(), valCode));
         } else {
-            JavassistUtil.append(body, "{}[i]=({}){}.format((double)({}),{});\n", arrVarName, fieldType, JavassistUtil.class.getName(), JavassistUtil.replaceValExprToCode(anno.valExpr(), valCode), anno.valPrecision());
+            ParseUtil.append(body, "{}[i]=({}){}.format((double)({}),{});\n", arrVarName, fieldType, ParseUtil.class.getName(), ParseUtil.replaceValExprToCode(anno.valExpr(), valCode), anno.valPrecision());
         }
-        JavassistUtil.append(body, "};\n");
-        JavassistUtil.append(body, "{}.{}={};\n", varNameInstance, fieldName, arrVarName);
+        ParseUtil.append(body, "};\n");
+        ParseUtil.append(body, "{}.{}={};\n", varNameInstance, fieldName, arrVarName);
     }
 
     @Override
@@ -67,12 +67,12 @@ public class FieldBuilder__F_float_ieee754_array extends FieldBuilder {
         final Field field = context.field;
         final Class<?> fieldType = field.getType();
         final F_float_ieee754_array anno = context.field.getAnnotation(annoClass);
-        final boolean bigEndian = JavassistUtil.bigEndian(anno.order(), context.clazz);
+        final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.clazz);
         final StringBuilder body = context.body;
         final String fieldName = field.getName();
         final String valCode = FieldBuilder.varNameInstance + "." + fieldName;
 
-        JavassistUtil.append(body, "if({}!=null){\n", FieldBuilder.varNameInstance, valCode);
+        ParseUtil.append(body, "if({}!=null){\n", FieldBuilder.varNameInstance, valCode);
 
         final String arrayElementType=fieldType.componentType().getName();
 
@@ -80,7 +80,7 @@ public class FieldBuilder__F_float_ieee754_array extends FieldBuilder {
             case "float", "double" -> {
             }
             default -> {
-                JavassistUtil.notSupport_fieldType(field, annoClass);
+                ParseUtil.notSupport_fieldType(field, annoClass);
             }
         }
 
@@ -96,25 +96,25 @@ public class FieldBuilder__F_float_ieee754_array extends FieldBuilder {
                 funcParamTypeName = "double";
             }
             default -> {
-                JavassistUtil.notSupport_type(field, annoClass);
+                ParseUtil.notSupport_type(field, annoClass);
                 funcName = null;
                 funcParamTypeName = null;
             }
         }
 
-        final String varNameField = JavassistUtil.getFieldVarName(context);
+        final String varNameField = ParseUtil.getFieldVarName(context);
         String arrVarName = varNameField + "_arr";
-        JavassistUtil.append(body, "final {}[] {}={};\n", arrayElementType, arrVarName, valCode);
-        JavassistUtil.append(body, "for(int i=0;i<{}.length;i++){\n", arrVarName);
+        ParseUtil.append(body, "final {}[] {}={};\n", arrayElementType, arrVarName, valCode);
+        ParseUtil.append(body, "for(int i=0;i<{}.length;i++){\n", arrVarName);
 
         if (anno.valExpr().isEmpty()) {
-            JavassistUtil.append(body, "{}.{}(({})({}[i]));\n", varNameByteBuf, funcName, funcParamTypeName, arrVarName);
+            ParseUtil.append(body, "{}.{}(({})({}[i]));\n", varNameByteBuf, funcName, funcParamTypeName, arrVarName);
         } else {
-            JavassistUtil.append(body, "{}.{}(({})({}));\n", varNameByteBuf, funcName, funcParamTypeName, JavassistUtil.replaceValExprToCode(RpnUtil.reverseExpr(anno.valExpr()), arrVarName + "[i]"));
+            ParseUtil.append(body, "{}.{}(({})({}));\n", varNameByteBuf, funcName, funcParamTypeName, ParseUtil.replaceValExprToCode(RpnUtil.reverseExpr(anno.valExpr()), arrVarName + "[i]"));
         }
 
-        JavassistUtil.append(body, "}\n");
+        ParseUtil.append(body, "}\n");
 
-        JavassistUtil.append(body, "}\n");
+        ParseUtil.append(body, "}\n");
     }
 }

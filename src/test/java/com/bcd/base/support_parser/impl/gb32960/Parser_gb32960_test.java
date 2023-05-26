@@ -35,6 +35,7 @@ public class Parser_gb32960_test {
         assert data.equalsIgnoreCase(ByteBufUtil.hexDump(dest));
     }
 
+    @Test
     public void test_performance(){
         Parser.enablePrintBuildLog();
         Parser.enableGenerateClassFile();

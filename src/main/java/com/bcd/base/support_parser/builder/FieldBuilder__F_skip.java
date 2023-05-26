@@ -3,7 +3,7 @@ package com.bcd.base.support_parser.builder;
 
 import com.bcd.base.support_parser.anno.F_skip;
 import com.bcd.base.support_parser.exception.BaseRuntimeException;
-import com.bcd.base.support_parser.util.JavassistUtil;
+import com.bcd.base.support_parser.util.ParseUtil;
 
 import java.lang.reflect.Field;
 
@@ -14,44 +14,44 @@ public class FieldBuilder__F_skip extends FieldBuilder {
         final Field field = context.field;
         final String fieldName = field.getName();
         final F_skip anno = field.getAnnotation(F_skip.class);
-        final String varNameField = JavassistUtil.getFieldVarName(context);
+        final String varNameField = ParseUtil.getFieldVarName(context);
         final String lenValCode;
         if (anno.len() == 0) {
             if (anno.lenExpr().isEmpty()) {
                 throw BaseRuntimeException.getException("class[{}] field[{}] anno[] must have len or lenExpr", field.getDeclaringClass().getName(), fieldName, F_skip.class.getName());
             } else {
-                lenValCode = JavassistUtil.replaceLenExprToCode(anno.lenExpr(), context.varToFieldName, field);
+                lenValCode = ParseUtil.replaceLenExprToCode(anno.lenExpr(), context.varToFieldName, field);
             }
         } else {
             lenValCode = anno.len() + "";
         }
         switch (anno.mode()) {
             case Skip -> {
-                JavassistUtil.append(body, "{}.skipBytes({});\n", FieldBuilder.varNameByteBuf, lenValCode);
+                ParseUtil.append(body, "{}.skipBytes({});\n", FieldBuilder.varNameByteBuf, lenValCode);
             }
             case ReservedFromStart -> {
                 final String skipVarName = varNameField + "_skip";
-                JavassistUtil.append(body, "final int {}={}-{}.readerIndex()+{};\n", skipVarName, lenValCode, FieldBuilder.varNameByteBuf, FieldBuilder.varNameStartIndex);
-                JavassistUtil.append(body, "if({}>0){\n", skipVarName);
-                JavassistUtil.append(body, "{}.skipBytes({});\n", FieldBuilder.varNameByteBuf, skipVarName);
-                JavassistUtil.append(body, "}\n");
+                ParseUtil.append(body, "final int {}={}-{}.readerIndex()+{};\n", skipVarName, lenValCode, FieldBuilder.varNameByteBuf, FieldBuilder.varNameStartIndex);
+                ParseUtil.append(body, "if({}>0){\n", skipVarName);
+                ParseUtil.append(body, "{}.skipBytes({});\n", FieldBuilder.varNameByteBuf, skipVarName);
+                ParseUtil.append(body, "}\n");
                 //完成后记录索引
                 if (context.indexFieldNameSet.contains(fieldName)) {
                     final String indexVarName = varNameField + "_index";
-                    JavassistUtil.append(body, "final int {}={}.readerIndex();\n", indexVarName, FieldBuilder.varNameByteBuf);
+                    ParseUtil.append(body, "final int {}={}.readerIndex();\n", indexVarName, FieldBuilder.varNameByteBuf);
                     context.prevSkipReservedIndexVarName = indexVarName;
                 }
             }
             case ReservedFromPrevReserved -> {
                 final String skipVarName = varNameField + "_skip";
-                JavassistUtil.append(body, "final int {}={}-{}.readerIndex()+{};\n", skipVarName, lenValCode, FieldBuilder.varNameByteBuf, context.prevSkipReservedIndexVarName);
-                JavassistUtil.append(body, "if({}>0){\n", skipVarName);
-                JavassistUtil.append(body, "{}.skipBytes({});\n", FieldBuilder.varNameByteBuf, skipVarName);
-                JavassistUtil.append(body, "}\n");
+                ParseUtil.append(body, "final int {}={}-{}.readerIndex()+{};\n", skipVarName, lenValCode, FieldBuilder.varNameByteBuf, context.prevSkipReservedIndexVarName);
+                ParseUtil.append(body, "if({}>0){\n", skipVarName);
+                ParseUtil.append(body, "{}.skipBytes({});\n", FieldBuilder.varNameByteBuf, skipVarName);
+                ParseUtil.append(body, "}\n");
                 //完成后记录索引
                 if (context.indexFieldNameSet.contains(fieldName)) {
                     final String indexVarName = varNameField + "_index";
-                    JavassistUtil.append(body, "final int {}={}.readerIndex();\n", indexVarName, FieldBuilder.varNameByteBuf);
+                    ParseUtil.append(body, "final int {}={}.readerIndex();\n", indexVarName, FieldBuilder.varNameByteBuf);
                     context.prevSkipReservedIndexVarName = indexVarName;
                 }
             }
@@ -65,44 +65,44 @@ public class FieldBuilder__F_skip extends FieldBuilder {
         final Field field = context.field;
         final String fieldName = field.getName();
         final F_skip anno = field.getAnnotation(F_skip.class);
-        final String varNameField = JavassistUtil.getFieldVarName(context);
+        final String varNameField = ParseUtil.getFieldVarName(context);
         final String lenValCode;
         if (anno.len() == 0) {
             if (anno.lenExpr().isEmpty()) {
                 throw BaseRuntimeException.getException("class[{}] field[{}] anno[] must have len or lenExpr", field.getDeclaringClass().getName(), fieldName, F_skip.class.getName());
             } else {
-                lenValCode = JavassistUtil.replaceLenExprToCode(anno.lenExpr(), context.varToFieldName, field);
+                lenValCode = ParseUtil.replaceLenExprToCode(anno.lenExpr(), context.varToFieldName, field);
             }
         } else {
             lenValCode = anno.len() + "";
         }
         switch (anno.mode()) {
             case Skip -> {
-                JavassistUtil.append(body, "{}.writeBytes(new byte[{}]);\n", FieldBuilder.varNameByteBuf, lenValCode);
+                ParseUtil.append(body, "{}.writeBytes(new byte[{}]);\n", FieldBuilder.varNameByteBuf, lenValCode);
             }
             case ReservedFromStart -> {
                 final String skipVarName = varNameField + "_skip";
-                JavassistUtil.append(body, "final int {}={}-{}.writerIndex()+{};\n", skipVarName, lenValCode, FieldBuilder.varNameByteBuf, FieldBuilder.varNameStartIndex);
-                JavassistUtil.append(body, "if({}>0){\n", skipVarName);
-                JavassistUtil.append(body, "{}.writeZero({});\n", FieldBuilder.varNameByteBuf, skipVarName);
-                JavassistUtil.append(body, "}\n");
+                ParseUtil.append(body, "final int {}={}-{}.writerIndex()+{};\n", skipVarName, lenValCode, FieldBuilder.varNameByteBuf, FieldBuilder.varNameStartIndex);
+                ParseUtil.append(body, "if({}>0){\n", skipVarName);
+                ParseUtil.append(body, "{}.writeZero({});\n", FieldBuilder.varNameByteBuf, skipVarName);
+                ParseUtil.append(body, "}\n");
                 //完成后记录索引
                 if (context.indexFieldNameSet.contains(fieldName)) {
                     final String indexVarName = varNameField + "_index";
-                    JavassistUtil.append(body, "final int {}={}.writerIndex();\n", indexVarName, FieldBuilder.varNameByteBuf);
+                    ParseUtil.append(body, "final int {}={}.writerIndex();\n", indexVarName, FieldBuilder.varNameByteBuf);
                     context.prevSkipReservedIndexVarName = indexVarName;
                 }
             }
             case ReservedFromPrevReserved -> {
                 final String skipVarName = varNameField + "_skip";
-                JavassistUtil.append(body, "final int {}={}-{}.writerIndex()+{};\n", skipVarName, lenValCode, FieldBuilder.varNameByteBuf, context.prevSkipReservedIndexVarName);
-                JavassistUtil.append(body, "if({}>0){\n", skipVarName);
-                JavassistUtil.append(body, "{}.writeZero({});\n", FieldBuilder.varNameByteBuf, skipVarName);
-                JavassistUtil.append(body, "}\n");
+                ParseUtil.append(body, "final int {}={}-{}.writerIndex()+{};\n", skipVarName, lenValCode, FieldBuilder.varNameByteBuf, context.prevSkipReservedIndexVarName);
+                ParseUtil.append(body, "if({}>0){\n", skipVarName);
+                ParseUtil.append(body, "{}.writeZero({});\n", FieldBuilder.varNameByteBuf, skipVarName);
+                ParseUtil.append(body, "}\n");
                 //完成后记录索引
                 if (context.indexFieldNameSet.contains(fieldName)) {
                     final String indexVarName = varNameField + "_index";
-                    JavassistUtil.append(body, "final int {}={}.writerIndex();\n", indexVarName, FieldBuilder.varNameByteBuf);
+                    ParseUtil.append(body, "final int {}={}.writerIndex();\n", indexVarName, FieldBuilder.varNameByteBuf);
                     context.prevSkipReservedIndexVarName = indexVarName;
                 }
             }

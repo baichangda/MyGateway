@@ -18,7 +18,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 
-public class JavassistUtil {
+public class ParseUtil {
 
     public static void notSupport_type(final Field field, Class annoClass) {
         throw BaseRuntimeException.getException("class[{}] field[{}] anno[{}] type not support", field.getDeclaringClass().getName(), field.getName(), annoClass.getName());
@@ -272,7 +272,7 @@ public class JavassistUtil {
 
     public static String replaceValExprToCode_round(final String expr, final String valExpr) {
         final StringBuilder sb = new StringBuilder();
-        sb.append(format("{}.round(", JavassistUtil.class.getName()));
+        sb.append(format("{}.round(", ParseUtil.class.getName()));
         sb.append(replaceValExprToCode(expr, valExpr));
         sb.append(")");
         return sb.toString();
