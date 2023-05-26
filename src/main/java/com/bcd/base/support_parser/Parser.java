@@ -17,7 +17,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -28,7 +27,7 @@ import java.util.stream.Collectors;
  * 配合注解完成解析工作
  * 会扫描当前类和其父类的所有字段
  * 会忽视如下字段
- * 1、没有被{@link #annoSet}中注解标注的字段
+ * 1、没有被{@link ParseUtil#annoSet}中注解标注的字段
  * 2、static或者final修饰的字段
  * 3、非public字段
  * 解析字段的顺序为 父类字段在子类之前
@@ -81,30 +80,7 @@ public class Parser {
      */
     private static int processorIndex = 0;
 
-    private final static Set<Class<?>> annoSet = new HashSet<>();
 
-    static {
-        annoSet.add(F_num.class);
-        annoSet.add(F_num_array.class);
-
-        annoSet.add(F_float_ieee754.class);
-        annoSet.add(F_float_ieee754_array.class);
-
-        annoSet.add(F_string.class);
-
-        annoSet.add(F_date.class);
-
-        annoSet.add(F_bean.class);
-        annoSet.add(F_bean_list.class);
-
-        annoSet.add(F_customize.class);
-
-        annoSet.add(F_skip.class);
-
-        annoSet.add(F_bit_num.class);
-        annoSet.add(F_bit_num_array.class);
-        annoSet.add(F_bit_skip.class);
-    }
 
 
     private final static Map<Class<?>, Processor<?>> beanClass_to_processor = new HashMap<>();
@@ -431,44 +407,9 @@ public class Parser {
         }
     }
 
-    private static boolean needParse(Field field) {
-        final Annotation[] annotations = field.getAnnotations();
-        for (Annotation annotation : annotations) {
-            if (annoSet.contains(annotation.annotationType())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static List<Field> getFields(Class<?> clazz) {
-        final List<Class<?>> classList = new ArrayList<>();
-        classList.add(clazz);
-        Class<?> temp = clazz;
-        while (true) {
-            temp = temp.getSuperclass();
-            if (temp == null || Object.class == temp) {
-                break;
-            } else {
-                classList.add(0, temp);
-            }
-        }
-        final List<Field> resList = new ArrayList<>();
-        for (Class<?> c : classList) {
-            //过滤掉 final、static关键字修饰、且不是public的字段
-            final List<Field> fieldList = Arrays.stream(c.getDeclaredFields())
-                    .filter(e ->
-                            needParse(e) &&
-                                    !Modifier.isFinal(e.getModifiers()) &&
-                                    !Modifier.isStatic(e.getModifiers()) &&
-                                    Modifier.isPublic(e.getModifiers())).toList();
-            resList.addAll(fieldList);
-        }
-        return resList;
-    }
 
     private static void buildMethodBody_parse(Class<?> clazz, BuilderContext context) {
-        final List<Field> fieldList = getFields(clazz);
+        final List<Field> fieldList = ParseUtil.getParseFields(clazz);
         if (fieldList.isEmpty()) {
             return;
         }
@@ -563,7 +504,7 @@ public class Parser {
     }
 
     private static void buildMethodBody_deParse(Class<?> clazz, BuilderContext context) {
-        final List<Field> fieldList = getFields(clazz);
+        final List<Field> fieldList = ParseUtil.getParseFields(clazz);
         if (fieldList.isEmpty()) {
             return;
         }

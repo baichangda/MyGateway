@@ -2,8 +2,7 @@ package com.bcd.base.support_parser.util;
 
 
 import com.bcd.base.support_parser.Parser;
-import com.bcd.base.support_parser.anno.BitOrder;
-import com.bcd.base.support_parser.anno.ByteOrder;
+import com.bcd.base.support_parser.anno.*;
 import com.bcd.base.support_parser.builder.BuilderContext;
 import com.bcd.base.support_parser.builder.FieldBuilder;
 import com.bcd.base.support_parser.exception.BaseRuntimeException;
@@ -11,12 +10,12 @@ import com.google.common.collect.Sets;
 import javassist.CannotCompileException;
 import javassist.CtClass;
 import javassist.CtField;
+import javassist.Modifier;
 import org.slf4j.helpers.MessageFormatter;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.util.Date;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class ParseUtil {
 
@@ -398,6 +397,69 @@ public class ParseUtil {
         } else {
             return 0;
         }
+    }
+
+
+    public final static Set<Class<?>> annoSet = new HashSet<>();
+
+    static {
+        annoSet.add(F_num.class);
+        annoSet.add(F_num_array.class);
+
+        annoSet.add(F_float_ieee754.class);
+        annoSet.add(F_float_ieee754_array.class);
+
+        annoSet.add(F_string.class);
+
+        annoSet.add(F_date.class);
+
+        annoSet.add(F_bean.class);
+        annoSet.add(F_bean_list.class);
+
+        annoSet.add(F_customize.class);
+
+        annoSet.add(F_skip.class);
+
+        annoSet.add(F_bit_num.class);
+        annoSet.add(F_bit_num_array.class);
+        annoSet.add(F_bit_skip.class);
+    }
+
+
+    public static boolean needParse(Field field) {
+        final Annotation[] annotations = field.getAnnotations();
+        for (Annotation annotation : annotations) {
+            if (annoSet.contains(annotation.annotationType())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static List<Field> getParseFields(Class<?> clazz) {
+        final List<Class<?>> classList = new ArrayList<>();
+        classList.add(clazz);
+        Class<?> temp = clazz;
+        while (true) {
+            temp = temp.getSuperclass();
+            if (temp == null || Object.class == temp) {
+                break;
+            } else {
+                classList.add(0, temp);
+            }
+        }
+        final List<Field> resList = new ArrayList<>();
+        for (Class<?> c : classList) {
+            //过滤掉 final、static关键字修饰、且不是public的字段
+            final List<Field> fieldList = Arrays.stream(c.getDeclaredFields())
+                    .filter(e ->
+                            needParse(e) &&
+                                    !Modifier.isFinal(e.getModifiers()) &&
+                                    !Modifier.isStatic(e.getModifiers()) &&
+                                    Modifier.isPublic(e.getModifiers())).toList();
+            resList.addAll(fieldList);
+        }
+        return resList;
     }
 
 }
