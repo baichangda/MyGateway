@@ -86,7 +86,7 @@ public class GoFieldBuilder__F_num extends GoFieldBuilder {
         ParseUtil.append(body, "}\n");
         String valCode = varNameReadVal;
         if (!goReadTypeName.equals(goFieldTypeName)) {
-            valCode = ParseUtil.replaceValExprToCode(valExpr, ParseUtil.format("{}({})", goFieldTypeName, valCode));
+            valCode = ParseUtil.format("{}({})", goFieldTypeName, valCode);
         }
         valCode = ParseUtil.replaceValExprToCode(valExpr, valCode);
         ParseUtil.append(body, "{}.{}={}\n\n", GoFieldBuilder.varNameInstance, goFieldName, valCode);

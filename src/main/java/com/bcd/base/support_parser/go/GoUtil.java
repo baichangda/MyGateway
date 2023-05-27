@@ -1,6 +1,7 @@
 package com.bcd.base.support_parser.go;
 
 import com.bcd.base.support_parser.anno.*;
+import com.bcd.base.support_parser.builder.BuilderContext;
 import com.bcd.base.support_parser.exception.BaseRuntimeException;
 import com.bcd.base.support_parser.util.ClassUtil;
 import com.bcd.base.support_parser.util.ParseUtil;
@@ -20,6 +21,7 @@ public class GoUtil {
     public final static GoFieldBuilder__F_num fieldBuilder__f_num = new GoFieldBuilder__F_num();
     public final static GoFieldBuilder__F_num_array fieldBuilder__f_num_array = new GoFieldBuilder__F_num_array();
     public final static GoFieldBuilder__F_bit_num fieldBuilder__f_bit_num = new GoFieldBuilder__F_bit_num();
+    public final static GoFieldBuilder__F_bit_num_array fieldBuilder__f_bit_num_array = new GoFieldBuilder__F_bit_num_array();
 
     private static boolean hasBitField(List<Field> parseFields) {
         return parseFields.stream().anyMatch(e -> e.isAnnotationPresent(F_bit_num.class) ||
@@ -28,7 +30,57 @@ public class GoUtil {
                 e.isAnnotationPresent(F_customize.class));
     }
 
-    public final static void toSourceCode(String pkg, ByteOrder byteOrder, BitOrder bitOrder, String goFilePath,String goPkg) {
+    private static void bitEndWhenBitField(List<Field> fieldList, int i, GoBuildContext context) {
+        final Field cur = fieldList.get(i);
+        final F_bit_num f_bit_num1 = cur.getAnnotation(F_bit_num.class);
+        final F_bit_num_array f_bit_num_array1 = cur.getAnnotation(F_bit_num_array.class);
+        final F_bit_skip f_bit_skip1 = cur.getAnnotation(F_bit_skip.class);
+        BitRemainingMode bitRemainingMode1 = null;
+        if (f_bit_num1 != null) {
+            bitRemainingMode1 = f_bit_num1.bitRemainingMode();
+        }
+        if (f_bit_num_array1 != null) {
+            bitRemainingMode1 = f_bit_num_array1.bitRemainingMode();
+        }
+        if (f_bit_skip1 != null) {
+            bitRemainingMode1 = f_bit_skip1.bitRemainingMode();
+        }
+
+        if (bitRemainingMode1 == null) {
+            return;
+        }
+
+        switch (bitRemainingMode1) {
+            case Ignore -> {
+                context.bitEndWhenBitField_process = true;
+                context.bitEndWhenBitField_deProcess = true;
+            }
+            case Not_ignore -> {
+                context.bitEndWhenBitField_process = false;
+                context.bitEndWhenBitField_deProcess = false;
+            }
+            default -> {
+                if (i == fieldList.size() - 1) {
+                    context.bitEndWhenBitField_process = true;
+                    context.bitEndWhenBitField_deProcess = true;
+                } else {
+                    final Field next = fieldList.get(i + 1);
+                    final F_bit_num f_bit_num2 = next.getAnnotation(F_bit_num.class);
+                    final F_bit_num_array f_bit_num_array2 = next.getAnnotation(F_bit_num_array.class);
+                    final F_bit_skip f_bit_skip2 = next.getAnnotation(F_bit_skip.class);
+                    if (f_bit_num2 == null && f_bit_skip2 == null && f_bit_num_array2 == null) {
+                        context.bitEndWhenBitField_process = true;
+                        context.bitEndWhenBitField_deProcess = true;
+                    } else {
+                        context.bitEndWhenBitField_process = false;
+                        context.bitEndWhenBitField_deProcess = false;
+                    }
+                }
+            }
+        }
+    }
+
+    public final static void toSourceCode(String pkg, ByteOrder byteOrder, BitOrder bitOrder, String goFilePath, String goPkg) {
         final StringBuilder body = new StringBuilder();
         final List<Class> classes;
         try {
@@ -59,6 +111,7 @@ public class GoUtil {
             for (int i = 0; i < parseFields.size(); i++) {
                 final Field field = parseFields.get(i);
                 context.setField(field, i);
+                bitEndWhenBitField(parseFields, i, context);
                 GoFieldBuilder goFieldBuilder = null;
                 if (field.isAnnotationPresent(F_num.class)) {
                     goFieldBuilder = fieldBuilder__f_num;
@@ -66,6 +119,8 @@ public class GoUtil {
                     goFieldBuilder = fieldBuilder__f_num_array;
                 } else if (field.isAnnotationPresent(F_bit_num.class)) {
                     goFieldBuilder = fieldBuilder__f_bit_num;
+                }else if (field.isAnnotationPresent(F_bit_num_array.class)) {
+                    goFieldBuilder = fieldBuilder__f_bit_num_array;
                 }
                 if (goFieldBuilder != null) {
                     goFieldBuilder.buildStruct(context);
@@ -87,7 +142,7 @@ public class GoUtil {
 
         final Path path = Paths.get(goFilePath);
         try (final BufferedWriter bw = Files.newBufferedWriter(path, StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING)) {
-            bw.write("package "+goPkg);
+            bw.write("package " + goPkg);
             bw.newLine();
             bw.write(body.toString());
             bw.flush();
@@ -226,8 +281,9 @@ public class GoUtil {
     }
 
     public static void main(String[] args) {
-        toSourceCode("com.bcd.base.support_parser.impl.immotors.ep33.data"
-                , ByteOrder.BigEndian, BitOrder.BigEndian,
-                "/Users/baichangda/bcd/goworkspace/MyGateway_go/test.go","main");
+        final String s = "com.bcd.base.support_parser.impl.immotors.ep33.data";
+//        final String s = "com.bcd.base.support_parser.impl.gb32960.data";
+        toSourceCode(s, ByteOrder.BigEndian, BitOrder.BigEndian,
+                "/Users/baichangda/bcd/goworkspace/MyGateway_go/test.go", "main");
     }
 }

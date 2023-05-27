@@ -34,6 +34,9 @@ public class GoBuildContext {
     public String varNameBitBuf_reader;
     public String varNameBitBuf_writer;
 
+    public boolean bitEndWhenBitField_process;
+    public boolean bitEndWhenBitField_deProcess;
+
     public GoBuildContext(Class<?> clazz, ByteOrder pkg_byteOrder, BitOrder pkg_bitOrder, StringBuilder structBody
             , StringBuilder parseBody, StringBuilder deParseBody) {
         this.clazz = clazz;

@@ -70,13 +70,13 @@ public class GoFieldBuilder__F_bit_num extends GoFieldBuilder {
         ParseUtil.append(body, "if err!=nil{\n");
         ParseUtil.append(body, "return nil,err\n");
         ParseUtil.append(body, "}\n");
-
-        String valCode = varNameReadVal;
-        if (!goReadTypeName.equals(goFieldTypeName)) {
-            valCode = ParseUtil.replaceValExprToCode(valExpr, ParseUtil.format("{}({})", goFieldTypeName, valCode));
+        if (context.bitEndWhenBitField_process) {
+            ParseUtil.append(body, "{}.Finish();\n", varNameBitBufReader);
         }
+        String valCode = varNameReadVal;
+        valCode = ParseUtil.format("{}({})", goFieldTypeName, valCode);
         valCode = ParseUtil.replaceValExprToCode(valExpr, valCode);
-        ParseUtil.append(body, "{}{}.{}={}({})\n\n", GoFieldBuilder.space,GoFieldBuilder.varNameInstance, goFieldName, goFieldTypeName, valCode);
+        ParseUtil.append(body, "{}.{}={}\n\n",GoFieldBuilder.varNameInstance, goFieldName, valCode);
         if (anno.var() != '0') {
             if (valExpr.isEmpty()) {
                 varToGoFieldName.put(anno.var(), varNameReadVal);
@@ -105,9 +105,12 @@ public class GoFieldBuilder__F_bit_num extends GoFieldBuilder {
             valCode = ParseUtil.replaceValExprToCode(RpnUtil.reverseExpr(valExpr), valCode);
         }
         if (!goReadTypeName.equals(goFieldTypeName)) {
-            valCode = ParseUtil.format("{}(util.Round(float64({})))", goReadTypeName, valCode);
+            valCode = ParseUtil.format("util.Round(float64({}))", valCode);
         }
         ParseUtil.append(body, "{}.Write(uint64({}),{},{},{})\n", varNameBitBufWriter, valCode, len, bigEndian, unsigned);
+        if (context.bitEndWhenBitField_deProcess) {
+            ParseUtil.append(body, "{}.Finish();\n", varNameBitBufWriter);
+        }
 
     }
 

@@ -138,13 +138,12 @@ public class GoFieldBuilder__F_num_array extends GoFieldBuilder {
             if (!goReadTypeName.equals(goFieldTypeName)) {
                 valCode = ParseUtil.format("{}(util.Round(float64({})))", goReadTypeName, valCode);
             }
-            ParseUtil.append(body, "e:={}\n", valCode);
             switch (singleLen) {
                 case 1 -> {
-                    ParseUtil.append(body, "{}.Write_{}(e)\n", GoFieldBuilder.varNameByteBuf, goFieldTypeName);
+                    ParseUtil.append(body, "{}.Write_{}({})\n", GoFieldBuilder.varNameByteBuf, goFieldTypeName, valCode);
                 }
                 case 2, 4, 8 -> {
-                    ParseUtil.append(body, "{}.Write_{}(e,{})\n", GoFieldBuilder.varNameByteBuf, goFieldTypeName, bigEndian);
+                    ParseUtil.append(body, "{}.Write_{}({},{})\n", GoFieldBuilder.varNameByteBuf, goFieldTypeName, valCode, bigEndian);
                 }
                 default -> {
                     ParseUtil.notSupport_len(field, annoClass);
