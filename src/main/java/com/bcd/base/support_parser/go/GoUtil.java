@@ -22,6 +22,8 @@ public class GoUtil {
     public final static GoFieldBuilder__F_bit_num fieldBuilder__f_bit_num = new GoFieldBuilder__F_bit_num();
     public final static GoFieldBuilder__F_bit_num_array fieldBuilder__f_bit_num_array = new GoFieldBuilder__F_bit_num_array();
     public final static GoFieldBuilder__F_float_ieee754 fieldBuilder__f_float_ieee754 = new GoFieldBuilder__F_float_ieee754();
+    public final static GoFieldBuilder__F_float_ieee754_array fieldBuilder__f_float_ieee754_array = new GoFieldBuilder__F_float_ieee754_array();
+    public final static GoFieldBuilder__F_string fieldBuilder__f_string = new GoFieldBuilder__F_string();
 
     private static boolean hasBitField(List<Field> parseFields) {
         return parseFields.stream().anyMatch(e -> e.isAnnotationPresent(F_bit_num.class) ||
@@ -123,6 +125,10 @@ public class GoUtil {
                     goFieldBuilder = fieldBuilder__f_bit_num_array;
                 } else if (field.isAnnotationPresent(F_float_ieee754.class)) {
                     goFieldBuilder = fieldBuilder__f_float_ieee754;
+                } else if (field.isAnnotationPresent(F_float_ieee754_array.class)) {
+                    goFieldBuilder = fieldBuilder__f_float_ieee754_array;
+                } else if (field.isAnnotationPresent(F_string.class)) {
+                    goFieldBuilder = fieldBuilder__f_string;
                 }
                 if (goFieldBuilder != null) {
                     goFieldBuilder.buildStruct(context);

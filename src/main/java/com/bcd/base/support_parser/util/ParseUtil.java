@@ -19,6 +19,10 @@ import java.util.*;
 
 public class ParseUtil {
 
+    public static void notSupport_charset(final Field field, Class<?> annoClass) {
+        throw BaseRuntimeException.getException("class[{}] field[{}] anno[{}] charset not support", field.getDeclaringClass().getName(), field.getName(), annoClass.getName());
+    }
+
     public static void notSupport_type(final Field field, Class<?> annoClass) {
         throw BaseRuntimeException.getException("class[{}] field[{}] anno[{}] type not support", field.getDeclaringClass().getName(), field.getName(), annoClass.getName());
     }

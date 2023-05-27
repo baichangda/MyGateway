@@ -100,7 +100,7 @@ public class GoFieldBuilder__F_num_array extends GoFieldBuilder {
             ParseUtil.append(body, "}\n");
             String valCode = "e";
             if (!goReadTypeName.equals(goFieldTypeName)) {
-                valCode = ParseUtil.replaceValExprToCode(anno.valExpr(), ParseUtil.format("{}({})", goFieldTypeName, valCode));
+                valCode = ParseUtil.format("{}({})", goFieldTypeName, valCode);
             }
             valCode = ParseUtil.replaceValExprToCode(anno.valExpr(), valCode);
             ParseUtil.append(body, "{}[i]={}\n", varNameArr, valCode);

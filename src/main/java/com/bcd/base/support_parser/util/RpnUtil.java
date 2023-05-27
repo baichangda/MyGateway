@@ -67,8 +67,8 @@ public class RpnUtil {
      * @param str
      */
     public static String reverseExpr(String str) {
-        if (str == null || str.isEmpty()) {
-            throw new IllegalArgumentException("param[str] must not be null or empty");
+        if (str.isEmpty()) {
+            return "";
         }
         List<String> operateList = new ArrayList<>();
         final Ele[] eles = toRpn(str);
