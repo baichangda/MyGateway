@@ -35,7 +35,7 @@ public class GoFieldBuilder__F_num_array extends GoFieldBuilder {
                 goReadTypeName = unsigned ? "uint64" : "int64";
             }
             default -> {
-                ParseUtil.notSupport_len(field, annoClass);
+                ParseUtil.notSupport_singleLen(field, annoClass);
                 goReadTypeName = null;
             }
         }

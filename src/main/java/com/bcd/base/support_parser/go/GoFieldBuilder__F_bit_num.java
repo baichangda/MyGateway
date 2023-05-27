@@ -19,15 +19,16 @@ public class GoFieldBuilder__F_bit_num extends GoFieldBuilder {
         final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.pkg_bitOrder);
         final boolean unsigned = anno.unsigned();
         final Class<?> fieldType = field.getType();
+        final int len = anno.len();
         final String goFieldTypeName;
         final String goReadTypeName;
-        if (anno.len() >= 1 && anno.len() <= 8) {
+        if (len >= 1 && len <= 8) {
             goReadTypeName = unsigned ? "uint8" : "int8";
-        } else if (anno.len() >= 9 && anno.len() <= 16) {
+        } else if (len >= 9 && len <= 16) {
             goReadTypeName = unsigned ? "uint16" : "int16";
-        } else if (anno.len() >= 17 && anno.len() <= 32) {
+        } else if (len >= 17 && len <= 32) {
             goReadTypeName = unsigned ? "uint32" : "int32";
-        } else if (anno.len() >= 33 && anno.len() <= 64) {
+        } else if (len >= 33 && len <= 64) {
             goReadTypeName = unsigned ? "uint64" : "int64";
         } else {
             ParseUtil.notSupport_len(field, annoClass);

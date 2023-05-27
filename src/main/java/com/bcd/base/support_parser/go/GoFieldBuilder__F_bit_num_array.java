@@ -20,25 +20,20 @@ public class GoFieldBuilder__F_bit_num_array extends GoFieldBuilder {
         final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.pkg_bitOrder);
         final boolean unsigned = anno.unsigned();
         final Class<?> fieldType = field.getType();
+        final int singleLen = anno.singleLen();
         final String goFieldTypeName;
         final String goReadTypeName;
-        switch (anno.singleLen()) {
-            case 1 -> {
-                goReadTypeName = unsigned ? "uint8" : "int8";
-            }
-            case 2 -> {
-                goReadTypeName = unsigned ? "uint16" : "int16";
-            }
-            case 4 -> {
-                goReadTypeName = unsigned ? "uint32" : "int32";
-            }
-            case 8 -> {
-                goReadTypeName = unsigned ? "uint64" : "int64";
-            }
-            default -> {
-                ParseUtil.notSupport_len(field, annoClass);
-                goReadTypeName = null;
-            }
+        if (singleLen >= 1 && singleLen <= 8) {
+            goReadTypeName = unsigned ? "uint8" : "int8";
+        } else if (singleLen >= 9 && singleLen <= 16) {
+            goReadTypeName = unsigned ? "uint16" : "int16";
+        } else if (singleLen >= 17 && singleLen <= 32) {
+            goReadTypeName = unsigned ? "uint32" : "int32";
+        } else if (singleLen >= 33 && singleLen <= 64) {
+            goReadTypeName = unsigned ? "uint64" : "int64";
+        } else {
+            ParseUtil.notSupport_singleLen(field, annoClass);
+            goReadTypeName = null;
         }
         if (fieldType == float.class) {
             goFieldTypeName = "float32";
