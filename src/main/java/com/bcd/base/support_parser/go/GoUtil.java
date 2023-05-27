@@ -1,7 +1,6 @@
 package com.bcd.base.support_parser.go;
 
 import com.bcd.base.support_parser.anno.*;
-import com.bcd.base.support_parser.builder.BuilderContext;
 import com.bcd.base.support_parser.exception.BaseRuntimeException;
 import com.bcd.base.support_parser.util.ClassUtil;
 import com.bcd.base.support_parser.util.ParseUtil;
@@ -22,6 +21,7 @@ public class GoUtil {
     public final static GoFieldBuilder__F_num_array fieldBuilder__f_num_array = new GoFieldBuilder__F_num_array();
     public final static GoFieldBuilder__F_bit_num fieldBuilder__f_bit_num = new GoFieldBuilder__F_bit_num();
     public final static GoFieldBuilder__F_bit_num_array fieldBuilder__f_bit_num_array = new GoFieldBuilder__F_bit_num_array();
+    public final static GoFieldBuilder__F_float_ieee754 fieldBuilder__f_float_ieee754 = new GoFieldBuilder__F_float_ieee754();
 
     private static boolean hasBitField(List<Field> parseFields) {
         return parseFields.stream().anyMatch(e -> e.isAnnotationPresent(F_bit_num.class) ||
@@ -107,7 +107,7 @@ public class GoUtil {
                 ParseUtil.append(parseBody, "func To{}({} *util.ByteBuf) (*{},error){\n", context.goStructName, GoFieldBuilder.varNameByteBuf, context.goStructName);
                 ParseUtil.append(deParseBody, "func({} *{})Write({} *util.ByteBuf){\n", GoFieldBuilder.varNameInstance, context.goStructName, GoFieldBuilder.varNameByteBuf);
             }
-            ParseUtil.append(parseBody, "  {}:={}{}\n", GoFieldBuilder.varNameInstance, context.goStructName);
+            ParseUtil.append(parseBody, "{}:={}{}\n", GoFieldBuilder.varNameInstance, context.goStructName);
             for (int i = 0; i < parseFields.size(); i++) {
                 final Field field = parseFields.get(i);
                 context.setField(field, i);
@@ -119,8 +119,10 @@ public class GoUtil {
                     goFieldBuilder = fieldBuilder__f_num_array;
                 } else if (field.isAnnotationPresent(F_bit_num.class)) {
                     goFieldBuilder = fieldBuilder__f_bit_num;
-                }else if (field.isAnnotationPresent(F_bit_num_array.class)) {
+                } else if (field.isAnnotationPresent(F_bit_num_array.class)) {
                     goFieldBuilder = fieldBuilder__f_bit_num_array;
+                } else if (field.isAnnotationPresent(F_float_ieee754.class)) {
+                    goFieldBuilder = fieldBuilder__f_float_ieee754;
                 }
                 if (goFieldBuilder != null) {
                     goFieldBuilder.buildStruct(context);
@@ -129,7 +131,7 @@ public class GoUtil {
                 }
             }
             ParseUtil.append(structBody, "}\n");
-            ParseUtil.append(parseBody, "  return &{},nil\n", GoFieldBuilder.varNameInstance);
+            ParseUtil.append(parseBody, "return &{},nil\n", GoFieldBuilder.varNameInstance);
             ParseUtil.append(parseBody, "}\n");
             ParseUtil.append(deParseBody, "}\n");
             body.append(structBody);
