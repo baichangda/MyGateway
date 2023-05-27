@@ -9,8 +9,8 @@ import org.slf4j.LoggerFactory;
 
 public class BitBuf_writer {
 
-    public final static boolean default_bigEndian=true;
-    public final static boolean default_unsigned=true;
+    public final static boolean default_bigEndian = true;
+    public final static boolean default_unsigned = true;
 
     static Logger logger = LoggerFactory.getLogger(BitBuf_writer.class);
     private final ByteBuf byteBuf;
@@ -160,6 +160,9 @@ public class BitBuf_writer {
 
 
     public final void write(long l, int bit, boolean bigEndian, boolean unsigned) {
+        final ByteBuf byteBuf = this.byteBuf;
+        int bitOffset = this.bitOffset;
+        byte b = this.b;
         if (!unsigned && l < 0) {
             l = (-l) & ((0x01L << bit) - 1);
         }
@@ -183,10 +186,16 @@ public class BitBuf_writer {
         if (bitOffset == 0) {
             byteBuf.writeByte(b);
         }
+
+        this.bitOffset = bitOffset;
+        this.b = b;
     }
 
 
     public final WriteLog write_log(long l, int bit, boolean bigEndian, boolean unsigned) {
+        final ByteBuf byteBuf = this.byteBuf;
+        int bitOffset = this.bitOffset;
+        byte b = this.b;
         final int temp = bit + bitOffset;
         final int byteLen = (temp >> 3) + ((temp & 7) == 0 ? 0 : 1);
         final WriteLog logRes = new WriteLog(byteLen, bitOffset, bit, bigEndian, unsigned);
@@ -224,11 +233,17 @@ public class BitBuf_writer {
             byteBuf.writeByte(b);
         }
 
+        this.bitOffset = bitOffset;
+        this.b = b;
+
         return logRes;
     }
 
 
     public final void skip(int bit) {
+        final ByteBuf byteBuf = this.byteBuf;
+        final int bitOffset = this.bitOffset;
+        byte b = this.b;
         final int temp = bit + bitOffset;
         final boolean newBitOffsetZero = (temp & 7) == 0;
         final int byteLen = (temp >> 3) + (newBitOffsetZero ? 0 : 1);
@@ -254,10 +269,14 @@ public class BitBuf_writer {
             }
             b = 0;
         }
-        bitOffset = temp & 7;
+        this.bitOffset = temp & 7;
+        this.b = b;
     }
 
     public final SkipLog skip_log(int bit) {
+        final ByteBuf byteBuf = this.byteBuf;
+        final int bitOffset = this.bitOffset;
+        byte b = this.b;
         final int temp = bit + bitOffset;
         final boolean newBitOffsetZero = (temp & 7) == 0;
         final int byteLen = (temp >> 3) + (newBitOffsetZero ? 0 : 1);
@@ -287,7 +306,8 @@ public class BitBuf_writer {
             b = 0;
         }
 
-        bitOffset = temp & 7;
+        this.bitOffset = temp & 7;
+        this.b = b;
 
         return log;
     }

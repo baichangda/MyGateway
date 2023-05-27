@@ -2,24 +2,33 @@ package com.bcd.base.support_parser.go;
 
 import com.bcd.base.support_parser.anno.*;
 import com.bcd.base.support_parser.exception.BaseRuntimeException;
-import com.bcd.base.support_parser.impl.gb32960.data.Packet;
-import com.bcd.base.support_parser.impl.gb32960.data.VehicleCommonData;
-import com.bcd.base.support_parser.impl.gb32960.data.VehicleSupplementData;
 import com.bcd.base.support_parser.util.ClassUtil;
 import com.bcd.base.support_parser.util.ParseUtil;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.util.HashMap;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.List;
-import java.util.Map;
 
 public class GoUtil {
 
     public final static GoFieldBuilder__F_num fieldBuilder__f_num = new GoFieldBuilder__F_num();
+    public final static GoFieldBuilder__F_num_array fieldBuilder__f_num_array = new GoFieldBuilder__F_num_array();
+    public final static GoFieldBuilder__F_bit_num fieldBuilder__f_bit_num = new GoFieldBuilder__F_bit_num();
 
-    public final static String toSourceCode(String pkg) {
+    private static boolean hasBitField(List<Field> parseFields) {
+        return parseFields.stream().anyMatch(e -> e.isAnnotationPresent(F_bit_num.class) ||
+                e.isAnnotationPresent(F_bit_num_array.class) ||
+                e.isAnnotationPresent(F_bit_skip.class) ||
+                e.isAnnotationPresent(F_customize.class));
+    }
+
+    public final static void toSourceCode(String pkg, ByteOrder byteOrder, BitOrder bitOrder, String goFilePath,String goPkg) {
         final StringBuilder body = new StringBuilder();
         final List<Class> classes;
         try {
@@ -33,36 +42,58 @@ public class GoUtil {
             if (parseFields.isEmpty()) {
                 continue;
             }
+            final boolean hasBitField = hasBitField(parseFields);
             final StringBuilder structBody = new StringBuilder();
-            final StringBuilder parseFuncBody = new StringBuilder();
-            final StringBuilder deParseFuncBody = new StringBuilder();
-            final GoBuildContext context = new GoBuildContext(clazz, structBody, parseFuncBody, deParseFuncBody);
+            final StringBuilder parseBody = new StringBuilder();
+            final StringBuilder deParseBody = new StringBuilder();
+            final GoBuildContext context = new GoBuildContext(clazz, byteOrder, bitOrder, structBody, parseBody, deParseBody);
             ParseUtil.append(structBody, "type {} struct{\n", context.goStructName);
-            ParseUtil.append(parseFuncBody, "func To{}(buf *util.ByteBuf) (*{},error){\n", context.goStructName, context.goStructName);
-            ParseUtil.append(parseFuncBody, "  e:={}{}\n", context.goStructName);
-            ParseUtil.append(deParseFuncBody, "func(e *{})Write(buf *util.ByteBuf){\n", context.goStructName);
+            if (hasBitField) {
+                ParseUtil.append(parseBody, "func To{}({} *util.ByteBuf,{} *util.BitBuf_reader) (*{},error){\n", context.goStructName, GoFieldBuilder.varNameByteBuf, GoFieldBuilder.varNameBitBuf, context.goStructName);
+                ParseUtil.append(deParseBody, "func({} *{})Write({} *util.ByteBuf,{} *util.BitBuf_writer){\n", GoFieldBuilder.varNameInstance, context.goStructName, GoFieldBuilder.varNameByteBuf, GoFieldBuilder.varNameBitBuf);
+            } else {
+                ParseUtil.append(parseBody, "func To{}({} *util.ByteBuf) (*{},error){\n", context.goStructName, GoFieldBuilder.varNameByteBuf, context.goStructName);
+                ParseUtil.append(deParseBody, "func({} *{})Write({} *util.ByteBuf){\n", GoFieldBuilder.varNameInstance, context.goStructName, GoFieldBuilder.varNameByteBuf);
+            }
+            ParseUtil.append(parseBody, "  {}:={}{}\n", GoFieldBuilder.varNameInstance, context.goStructName);
             for (int i = 0; i < parseFields.size(); i++) {
                 final Field field = parseFields.get(i);
                 context.setField(field, i);
-                final F_num f_num = field.getAnnotation(F_num.class);
-                if (f_num != null) {
-                    fieldBuilder__f_num.buildStruct(context);
-                    fieldBuilder__f_num.buildFunc(context);
-                    continue;
+                GoFieldBuilder goFieldBuilder = null;
+                if (field.isAnnotationPresent(F_num.class)) {
+                    goFieldBuilder = fieldBuilder__f_num;
+                } else if (field.isAnnotationPresent(F_num_array.class)) {
+                    goFieldBuilder = fieldBuilder__f_num_array;
+                } else if (field.isAnnotationPresent(F_bit_num.class)) {
+                    goFieldBuilder = fieldBuilder__f_bit_num;
+                }
+                if (goFieldBuilder != null) {
+                    goFieldBuilder.buildStruct(context);
+                    goFieldBuilder.buildParse(context);
+                    goFieldBuilder.buildDeParse(context);
                 }
             }
             ParseUtil.append(structBody, "}\n");
-            ParseUtil.append(parseFuncBody, "  return &e,nil\n");
-            ParseUtil.append(parseFuncBody, "}\n");
-            ParseUtil.append(deParseFuncBody, "}\n");
+            ParseUtil.append(parseBody, "  return &{},nil\n", GoFieldBuilder.varNameInstance);
+            ParseUtil.append(parseBody, "}\n");
+            ParseUtil.append(deParseBody, "}\n");
             body.append(structBody);
             body.append("\n");
-            body.append(parseFuncBody);
+            body.append(parseBody);
             body.append("\n");
-            body.append(deParseFuncBody);
+            body.append(deParseBody);
             body.append("\n");
         }
-        return body.toString();
+
+        final Path path = Paths.get(goFilePath);
+        try (final BufferedWriter bw = Files.newBufferedWriter(path, StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING)) {
+            bw.write("package "+goPkg);
+            bw.newLine();
+            bw.write(body.toString());
+            bw.flush();
+        } catch (IOException ex) {
+            throw BaseRuntimeException.getException(ex);
+        }
     }
 
     private static String toFieldDefine(Field field) {
@@ -195,7 +226,8 @@ public class GoUtil {
     }
 
     public static void main(String[] args) {
-        final String readSourceCode = toSourceCode("com.bcd.base.support_parser.impl.gb32960.data");
-        System.out.println(readSourceCode);
+        toSourceCode("com.bcd.base.support_parser.impl.immotors.ep33.data"
+                , ByteOrder.BigEndian, BitOrder.BigEndian,
+                "/Users/baichangda/bcd/goworkspace/MyGateway_go/test.go","main");
     }
 }

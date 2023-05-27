@@ -185,6 +185,9 @@ public class BitBuf_reader {
 
 
     public final long read(int bit, boolean bigEndian, boolean unsigned) {
+        final ByteBuf byteBuf = this.byteBuf;
+        final int bitOffset = this.bitOffset;
+        byte b = this.b;
         if (bitOffset == 0) {
             b = byteBuf.readByte();
         }
@@ -205,7 +208,8 @@ public class BitBuf_reader {
             cRight = Long.reverse(l) >>> (64 - (byteLen << 3) + bitOffset);
         }
 
-        bitOffset = temp & 7;
+        this.bitOffset = temp & 7;
+        this.b = b;
 
         if (!unsigned && ((cRight >> (bit - 1)) & 0x01) == 1) {
 //            return -(((~cRight) & ((0x01L << bit) - 1)) + 1);
@@ -216,6 +220,10 @@ public class BitBuf_reader {
     }
 
     public final ReadLog read_log(int bit, boolean bigEndian, boolean unsigned) {
+        final ByteBuf byteBuf = this.byteBuf;
+        final int bitOffset = this.bitOffset;
+        byte b = this.b;
+
         if (bitOffset == 0) {
             b = byteBuf.readByte();
         }
@@ -253,13 +261,18 @@ public class BitBuf_reader {
             log.val3 = cRight & ((0x01L << bit) - 1);
         }
 
-        bitOffset = temp & 7;
+        this.bitOffset = temp & 7;
+        this.b = b;
 
         return log;
     }
 
 
     public final void skip(int bit) {
+        final ByteBuf byteBuf = this.byteBuf;
+        final int bitOffset = this.bitOffset;
+        byte b = this.b;
+
         final int temp = bit + bitOffset;
         final boolean newBitOffsetZero = (temp & 7) == 0;
         final int byteLen = (temp >> 3) + (newBitOffsetZero ? 0 : 1);
@@ -284,11 +297,16 @@ public class BitBuf_reader {
                 }
             }
         }
-        bitOffset = temp & 7;
+        this.bitOffset = temp & 7;
+        this.b = b;
     }
 
 
     public final SkipLog skip_log(int bit) {
+        final ByteBuf byteBuf = this.byteBuf;
+        final int bitOffset = this.bitOffset;
+        byte b = this.b;
+
         final int temp = bit + bitOffset;
         final boolean newBitOffsetZero = (temp & 7) == 0;
         final int byteLen = (temp >> 3) + (newBitOffsetZero ? 0 : 1);
@@ -320,7 +338,9 @@ public class BitBuf_reader {
                 }
             }
         }
-        bitOffset = temp & 7;
+
+        this.bitOffset = temp & 7;
+        this.b = b;
 
         return log;
     }

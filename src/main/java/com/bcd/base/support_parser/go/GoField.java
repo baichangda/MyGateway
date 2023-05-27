@@ -7,6 +7,7 @@ public class GoField {
     public final String goFieldName;
 
     public String goFieldTypeName;
+    public String goReadTypeName;
 
     public GoField(Field field) {
         this.field = field;

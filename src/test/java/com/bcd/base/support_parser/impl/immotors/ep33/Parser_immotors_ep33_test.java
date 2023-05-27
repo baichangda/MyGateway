@@ -54,6 +54,6 @@ public class Parser_immotors_ep33_test {
         int threadNum = 1;
         logger.info("param threadNum[{}]", threadNum);
         int num = 100000000;
-        PerformanceUtil.testMultiThreadPerformance(ByteBufUtil.decodeHexDump(hex), Packet.class, threadNum, num, true);
+        PerformanceUtil.testMultiThreadPerformance(ByteBufUtil.decodeHexDump(hex), Packet.class, threadNum, num, false);
     }
 }

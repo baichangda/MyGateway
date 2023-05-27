@@ -47,6 +47,26 @@ public class ParseUtil {
         return "_" + toFirstLowerCase(processorClass.getSimpleName());
     }
 
+    public static boolean bigEndian(BitOrder order, BitOrder pkgOrder) {
+        if (pkgOrder == null) {
+            if (order == BitOrder.Default) {
+                return true;
+            } else {
+                return order == BitOrder.BigEndian;
+            }
+        } else {
+            if (order == BitOrder.Default) {
+                if (pkgOrder == BitOrder.Default) {
+                    return true;
+                } else {
+                    return pkgOrder == BitOrder.BigEndian;
+                }
+            } else {
+                return order == BitOrder.BigEndian;
+            }
+        }
+    }
+
     /**
      * @param order
      * @param clazz
@@ -60,22 +80,25 @@ public class ParseUtil {
                 configOrder = config.order();
             }
         }
+        return bigEndian(order, configOrder);
+    }
 
-        if (configOrder == null) {
-            if (order == BitOrder.Default) {
+    public static boolean bigEndian(ByteOrder order, ByteOrder pkgOrder) {
+        if (pkgOrder == null) {
+            if (order == ByteOrder.Default) {
                 return true;
             } else {
-                return order == BitOrder.BigEndian;
+                return order == ByteOrder.BigEndian;
             }
         } else {
-            if (order == BitOrder.Default) {
-                if (configOrder == BitOrder.Default) {
+            if (order == ByteOrder.Default) {
+                if (pkgOrder == ByteOrder.Default) {
                     return true;
                 } else {
-                    return configOrder == BitOrder.BigEndian;
+                    return pkgOrder == ByteOrder.BigEndian;
                 }
             } else {
-                return order == BitOrder.BigEndian;
+                return order == ByteOrder.BigEndian;
             }
         }
     }
@@ -93,24 +116,9 @@ public class ParseUtil {
                 configOrder = config.order();
             }
         }
+        return bigEndian(order,configOrder);
 
-        if (configOrder == null) {
-            if (order == ByteOrder.Default) {
-                return true;
-            } else {
-                return order == ByteOrder.BigEndian;
-            }
-        } else {
-            if (order == ByteOrder.Default) {
-                if (configOrder == ByteOrder.Default) {
-                    return true;
-                } else {
-                    return configOrder == ByteOrder.BigEndian;
-                }
-            } else {
-                return order == ByteOrder.BigEndian;
-            }
-        }
+
     }
 
     /**
