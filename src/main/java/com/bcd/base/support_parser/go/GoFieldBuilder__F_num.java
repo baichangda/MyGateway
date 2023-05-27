@@ -61,13 +61,12 @@ public class GoFieldBuilder__F_num extends GoFieldBuilder {
         final String goFieldTypeName = goField.goFieldTypeName;
         final String goReadTypeName = goField.goReadTypeName;
         final Class<? extends F_num> annoClass = anno.getClass();
-        final Map<Character, String> varToGoFieldName = context.varToGoFieldName;
+        final Map<Character, String> varToGoFieldName = context.varToGoFieldName_parse;
         final StringBuilder body = context.parseBody;
         final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.pkg_byteOrder);
         final boolean unsigned = anno.unsigned();
-        final int fieldIndex = context.fieldIndex;
         final Class<?> fieldType = field.getType();
-        final String varNameReadVal = "v" + fieldIndex;
+        final String varNameReadVal = goFieldName + "_v";
         final String valExpr = anno.valExpr();
         switch (anno.len()) {
             case 1 -> {
@@ -107,7 +106,7 @@ public class GoFieldBuilder__F_num extends GoFieldBuilder {
         final String goFieldTypeName = goField.goFieldTypeName;
         final String goReadTypeName = goField.goReadTypeName;
         final Class<? extends F_num> annoClass = anno.getClass();
-        final Map<Character, String> varToGoFieldName = context.varToGoFieldName;
+        final Map<Character, String> varToGoFieldName = context.varToGoFieldName_deParse;
         final StringBuilder body = context.deParseBody;
         final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.pkg_byteOrder);
         final boolean unsigned = anno.unsigned();
@@ -130,6 +129,10 @@ public class GoFieldBuilder__F_num extends GoFieldBuilder {
                 ParseUtil.notSupport_len(field, annoClass);
                 valCode = "";
             }
+        }
+
+        if (anno.var() != '0') {
+            varToGoFieldName.put(anno.var(), ParseUtil.format("{}.{}", GoFieldBuilder.varNameInstance, goFieldName));
         }
 
     }

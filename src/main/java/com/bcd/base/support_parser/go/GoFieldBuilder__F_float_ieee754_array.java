@@ -1,7 +1,6 @@
 package com.bcd.base.support_parser.go;
 
 import com.bcd.base.support_parser.anno.F_float_ieee754_array;
-import com.bcd.base.support_parser.anno.F_num_array;
 import com.bcd.base.support_parser.anno.FloatType_ieee754;
 import com.bcd.base.support_parser.util.ParseUtil;
 import com.bcd.base.support_parser.util.RpnUtil;
@@ -44,12 +43,11 @@ public class GoFieldBuilder__F_float_ieee754_array extends GoFieldBuilder {
         final String goFieldName = goField.goFieldName;
         final String goFieldTypeName = goField.goFieldTypeName;
         final Class<? extends F_float_ieee754_array> annoClass = anno.getClass();
-        final Map<Character, String> varToGoFieldName = context.varToGoFieldName;
+        final Map<Character, String> varToGoFieldName = context.varToGoFieldName_parse;
         final StringBuilder body = context.parseBody;
         final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.pkg_byteOrder);
-        final int fieldIndex = context.fieldIndex;
         final String valExpr = anno.valExpr();
-        String varNameLen = ParseUtil.format("len{}", fieldIndex);
+        String varNameLen = goFieldName+"_len";
         final int len = anno.len();
         if (len == 0) {
             ParseUtil.append(body, "{}:={}\n", varNameLen, ParseUtil.replaceLenExprToCode(anno.lenExpr(), varToGoFieldName, field));
@@ -57,7 +55,7 @@ public class GoFieldBuilder__F_float_ieee754_array extends GoFieldBuilder {
             ParseUtil.append(body, "{}:={}\n", varNameLen, len);
         }
 
-        final String varNameArr = ParseUtil.format("arr{}", fieldIndex);
+        final String varNameArr = goFieldName+"_arr";
 
         ParseUtil.append(body, "{}:=make([]{},{})\n", varNameArr, goFieldTypeName, varNameLen);
         ParseUtil.append(body, "for i:=0;i<{};i++{\n", varNameLen);
@@ -81,10 +79,9 @@ public class GoFieldBuilder__F_float_ieee754_array extends GoFieldBuilder {
         final Class<? extends F_float_ieee754_array> annoClass = anno.getClass();
         final StringBuilder body = context.deParseBody;
         final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.pkg_byteOrder);
-        final int fieldIndex = context.fieldIndex;
         final String valExpr = anno.valExpr();
 
-        final String varNameArr = ParseUtil.format("arr{}", fieldIndex);
+        final String varNameArr = goFieldName+"_arr";
         ParseUtil.append(body, "{}:={}.{}\n", varNameArr, GoFieldBuilder.varNameInstance, goFieldName);
         ParseUtil.append(body, "for i:=0;i<len({});i++{\n", varNameArr);
         String valCode = ParseUtil.format("{}[i]", varNameArr);

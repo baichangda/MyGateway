@@ -25,6 +25,7 @@ public class GoUtil {
     public final static GoFieldBuilder__F_float_ieee754_array fieldBuilder__f_float_ieee754_array = new GoFieldBuilder__F_float_ieee754_array();
     public final static GoFieldBuilder__F_string fieldBuilder__f_string = new GoFieldBuilder__F_string();
     public final static GoFieldBuilder__F_skip fieldBuilder__f_skip = new GoFieldBuilder__F_skip();
+    public final static GoFieldBuilder__F_date fieldBuilder__f_date = new GoFieldBuilder__F_date();
 
     private static boolean hasBitField(List<Field> parseFields) {
         return parseFields.stream().anyMatch(e -> e.isAnnotationPresent(F_bit_num.class) ||
@@ -131,7 +132,7 @@ public class GoUtil {
             ParseUtil.append(parseBody, "{}:={}{}\n", GoFieldBuilder.varNameInstance, context.goStructName);
             for (int i = 0; i < parseFields.size(); i++) {
                 final Field field = parseFields.get(i);
-                context.setField(field, i);
+                context.setField(field);
                 bitEndWhenBitField(parseFields, i, context);
                 GoFieldBuilder goFieldBuilder = null;
                 if (field.isAnnotationPresent(F_num.class)) {
@@ -150,6 +151,8 @@ public class GoUtil {
                     goFieldBuilder = fieldBuilder__f_string;
                 } else if (field.isAnnotationPresent(F_skip.class)) {
                     goFieldBuilder = fieldBuilder__f_skip;
+                } else if (field.isAnnotationPresent(F_date.class)) {
+                    goFieldBuilder = fieldBuilder__f_date;
                 }
                 if (goFieldBuilder != null) {
                     goFieldBuilder.buildStruct(context);
@@ -311,8 +314,8 @@ public class GoUtil {
 
     public static void main(String[] args) {
 //        final String s = "com.bcd.base.support_parser.impl.immotors.ep33.data";
-        final String s = "com.bcd.base.support_parser.impl.icd.data";
-//        final String s = "com.bcd.base.support_parser.impl.gb32960.data";
+//        final String s = "com.bcd.base.support_parser.impl.icd.data";
+        final String s = "com.bcd.base.support_parser.impl.gb32960.data";
         toSourceCode(s, ByteOrder.BigEndian, BitOrder.BigEndian,
                 "/Users/baichangda/bcd/goworkspace/MyGateway_go/test.go", "main");
     }

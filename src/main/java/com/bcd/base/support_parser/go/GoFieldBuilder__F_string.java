@@ -23,19 +23,18 @@ public class GoFieldBuilder__F_string extends GoFieldBuilder {
         final Field field = context.field;
         final F_string anno = field.getAnnotation(F_string.class);
         final Class<? extends F_string> annoClass = anno.getClass();
-        final Map<Character, String> varToGoFieldName = context.varToGoFieldName;
+        final Map<Character, String> varToGoFieldName = context.varToGoFieldName_deParse;
         final GoField goField = context.goField;
         final String goFieldName = goField.goFieldName;
         final StringBuilder body = context.parseBody;
         final int len = anno.len();
-        final int fieldIndex = context.fieldIndex;
         final String charset = anno.charset();
 
         if (Charset.forName(charset) != StandardCharsets.UTF_8) {
             ParseUtil.notSupport_charset(field, annoClass);
         }
 
-        final String varNameLen = ParseUtil.format("len{}", fieldIndex);
+        final String varNameLen = goFieldName + "_len";
         if (len == 0) {
             ParseUtil.append(body, "{}:={}\n", varNameLen, ParseUtil.replaceLenExprToCode(anno.lenExpr(), varToGoFieldName, field));
         } else {
@@ -43,7 +42,7 @@ public class GoFieldBuilder__F_string extends GoFieldBuilder {
         }
 
         final StringAppendMode stringAppendMode = anno.appendMode();
-        final String varNameReadVal = "v" + fieldIndex;
+        final String varNameReadVal = goFieldName + "_v";
         ParseUtil.append(body, "{},err:={}.Read_bytes({})\n", varNameReadVal, GoFieldBuilder.varNameByteBuf, varNameLen);
         ParseUtil.append(body, "if err!=nil{\n");
         ParseUtil.append(body, "return nil,err\n");
@@ -53,7 +52,7 @@ public class GoFieldBuilder__F_string extends GoFieldBuilder {
                 ParseUtil.append(body, "{}.{}=string({})\n\n", GoFieldBuilder.varNameInstance, goFieldName, varNameReadVal);
             }
             case HighAddressAppend -> {
-                final String varNameCount = "count" + fieldIndex;
+                final String varNameCount = goFieldName + "_count";
                 ParseUtil.append(body, "{}:=0\n", varNameCount);
                 ParseUtil.append(body, "for i:={}-1;i>=0;i--{\n", varNameLen);
                 ParseUtil.append(body, "if {}[i]==0{\n", varNameReadVal);
@@ -65,7 +64,7 @@ public class GoFieldBuilder__F_string extends GoFieldBuilder {
                 ParseUtil.append(body, "{}.{}=string({}[:({}-{})])\n\n", GoFieldBuilder.varNameInstance, goFieldName, varNameReadVal, varNameLen, varNameCount);
             }
             case LowAddressAppend -> {
-                final String varNameCount = "count" + fieldIndex;
+                final String varNameCount = goFieldName + "_count";
                 ParseUtil.append(body, "{}:=0\n", varNameCount);
                 ParseUtil.append(body, "for i:=0;i<{};i++{\n", varNameLen);
                 ParseUtil.append(body, "if {}[i]==0{\n", varNameReadVal);
@@ -83,12 +82,11 @@ public class GoFieldBuilder__F_string extends GoFieldBuilder {
         final Field field = context.field;
         final F_string anno = field.getAnnotation(F_string.class);
         final Class<? extends F_string> annoClass = anno.getClass();
-        final Map<Character, String> varToGoFieldName = context.varToGoFieldName;
+        final Map<Character, String> varToGoFieldName = context.varToGoFieldName_deParse;
         final GoField goField = context.goField;
         final String goFieldName = goField.goFieldName;
         final StringBuilder body = context.deParseBody;
         final int len = anno.len();
-        final int fieldIndex = context.fieldIndex;
         final String charset = anno.charset();
         final StringAppendMode stringAppendMode = anno.appendMode();
         if (Charset.forName(charset) != StandardCharsets.UTF_8) {
@@ -99,13 +97,13 @@ public class GoFieldBuilder__F_string extends GoFieldBuilder {
         if (stringAppendMode == StringAppendMode.NoAppend) {
             ParseUtil.append(body, "{}.Write_string_utf8({})\n", GoFieldBuilder.varNameByteBuf, valCode);
         } else {
-            final String varNameLen = ParseUtil.format("len{}", fieldIndex);
+            final String varNameLen = goFieldName + "_len";
             if (len == 0) {
                 ParseUtil.append(body, "{}:={}\n", varNameLen, ParseUtil.replaceLenExprToCode(anno.lenExpr(), varToGoFieldName, field));
             } else {
                 ParseUtil.append(body, "{}:={}\n", varNameLen, len);
             }
-            final String varNameBytes = "v" + fieldIndex;
+            final String varNameBytes = goFieldName + "_v";
             switch (stringAppendMode) {
                 case HighAddressAppend -> {
                     ParseUtil.append(body, "{}:=[]byte({})\n", varNameBytes, valCode);

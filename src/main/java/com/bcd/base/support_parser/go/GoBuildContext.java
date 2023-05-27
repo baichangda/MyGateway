@@ -17,13 +17,9 @@ public class GoBuildContext {
     public Field field;
     public GoField goField;
 
-    public int fieldIndex;
 
-
-    /**
-     * 当前字段所属class中的变量名称对应字段名称
-     */
-    public final Map<Character, String> varToGoFieldName = new HashMap<>();
+    public final Map<Character, String> varToGoFieldName_parse = new HashMap<>();
+    public final Map<Character, String> varToGoFieldName_deParse = new HashMap<>();
 
     public final ByteOrder pkg_byteOrder;
     public final BitOrder pkg_bitOrder;
@@ -51,10 +47,9 @@ public class GoBuildContext {
         this.deParseBody = deParseBody;
     }
 
-    public void setField(Field field, int index) {
+    public void setField(Field field) {
         this.field = field;
         this.goField = new GoField(field);
-        this.fieldIndex = index;
     }
 
 

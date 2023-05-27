@@ -56,14 +56,13 @@ public class GoFieldBuilder__F_bit_num extends GoFieldBuilder {
         final String goFieldTypeName = goField.goFieldTypeName;
         final String goReadTypeName = goField.goReadTypeName;
         final Class<? extends F_bit_num> annoClass = anno.getClass();
-        final Map<Character, String> varToGoFieldName = context.varToGoFieldName;
+        final Map<Character, String> varToGoFieldName = context.varToGoFieldName_parse;
         final StringBuilder body = context.parseBody;
         final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.pkg_bitOrder);
         final boolean unsigned = anno.unsigned();
-        final int fieldIndex = context.fieldIndex;
         final Class<?> fieldType = field.getType();
         final String varNameBitBufReader = context.getVarNameBitBuf_reader();
-        final String varNameReadVal = "v" + fieldIndex;
+        final String varNameReadVal = goFieldName+"_v";
         final int len = anno.len();
         final String valExpr = anno.valExpr();
 
@@ -94,6 +93,7 @@ public class GoFieldBuilder__F_bit_num extends GoFieldBuilder {
         final String goFieldName = goField.goFieldName;
         final String goFieldTypeName = goField.goFieldTypeName;
         final String goReadTypeName = goField.goReadTypeName;
+        final Map<Character, String> varToGoFieldName = context.varToGoFieldName_deParse;
         final Class<? extends F_bit_num> annoClass = anno.getClass();
         final StringBuilder body = context.deParseBody;
         final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.pkg_bitOrder);
@@ -111,6 +111,10 @@ public class GoFieldBuilder__F_bit_num extends GoFieldBuilder {
         ParseUtil.append(body, "{}.Write(uint64({}),{},{},{})\n", varNameBitBufWriter, valCode, len, bigEndian, unsigned);
         if (context.bitEndWhenBitField_deProcess) {
             ParseUtil.append(body, "{}.Finish();\n", varNameBitBufWriter);
+        }
+
+        if (anno.var() != '0') {
+            varToGoFieldName.put(anno.var(), ParseUtil.format("{}.{}", GoFieldBuilder.varNameInstance, goFieldName));
         }
 
     }

@@ -60,14 +60,13 @@ public class GoFieldBuilder__F_num_array extends GoFieldBuilder {
         final String goReadTypeName = goField.goReadTypeName;
         final String goFieldTypeName = goField.goFieldTypeName;
         final Class<? extends F_num_array> annoClass = anno.getClass();
-        final Map<Character, String> varToGoFieldName = context.varToGoFieldName;
+        final Map<Character, String> varToGoFieldName = context.varToGoFieldName_parse;
         final StringBuilder body = context.parseBody;
         final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.pkg_byteOrder);
         final boolean unsigned = anno.unsigned();
         final int singleLen = anno.singleLen();
-        final int fieldIndex = context.fieldIndex;
         final String valExpr = anno.valExpr();
-        String varNameLen = ParseUtil.format("len{}", fieldIndex);
+        String varNameLen = goFieldName+"_len";
         final int len = anno.len();
         if (len == 0) {
             ParseUtil.append(body, "{}:={}\n", varNameLen, ParseUtil.replaceLenExprToCode(anno.lenExpr(), varToGoFieldName, field));
@@ -75,7 +74,7 @@ public class GoFieldBuilder__F_num_array extends GoFieldBuilder {
             ParseUtil.append(body, "{}:={}\n", varNameLen, len);
         }
 
-        final String varNameArr = ParseUtil.format("arr{}", fieldIndex);
+        final String varNameArr = goFieldName+"_arr";
         if (singleLen == 1 && unsigned && valExpr.isEmpty()) {
             ParseUtil.append(body, "{},err:={}.Read_bytes({})\n", varNameArr, GoFieldBuilder.varNameByteBuf, varNameLen);
             ParseUtil.append(body, "if err!=nil{\n");
@@ -117,15 +116,14 @@ public class GoFieldBuilder__F_num_array extends GoFieldBuilder {
         final String goReadTypeName = goField.goReadTypeName;
         final String goFieldTypeName = goField.goFieldTypeName;
         final Class<? extends F_num_array> annoClass = anno.getClass();
-        final Map<Character, String> varToGoFieldName = context.varToGoFieldName;
+        final Map<Character, String> varToGoFieldName = context.varToGoFieldName_deParse;
         final StringBuilder body = context.deParseBody;
         final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.pkg_byteOrder);
         final boolean unsigned = anno.unsigned();
         final int singleLen = anno.singleLen();
-        final int fieldIndex = context.fieldIndex;
         final String valExpr = anno.valExpr();
 
-        final String varNameArr = ParseUtil.format("arr{}", fieldIndex);
+        final String varNameArr = goFieldName+"_arr";
         ParseUtil.append(body, "{}:={}.{}\n", varNameArr, GoFieldBuilder.varNameInstance, goFieldName);
         if (singleLen == 1 && unsigned && valExpr.isEmpty()) {
             ParseUtil.append(body, "{}.Write_bytes({})\n", GoFieldBuilder.varNameByteBuf, varNameArr);
