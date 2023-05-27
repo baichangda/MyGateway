@@ -19,23 +19,23 @@ import java.util.*;
 
 public class ParseUtil {
 
-    public static void notSupport_type(final Field field, Class annoClass) {
+    public static void notSupport_type(final Field field, Class<?> annoClass) {
         throw BaseRuntimeException.getException("class[{}] field[{}] anno[{}] type not support", field.getDeclaringClass().getName(), field.getName(), annoClass.getName());
     }
 
-    public static void notSupport_order(final Field field, Class annoClass) {
+    public static void notSupport_order(final Field field, Class<?> annoClass) {
         throw BaseRuntimeException.getException("class[{}] field[{}] anno[{}] order not support", field.getDeclaringClass().getName(), field.getName(), annoClass.getName());
     }
 
-    public static void notSupport_fieldType(final Field field, Class annoClass) {
+    public static void notSupport_fieldType(final Field field, Class<?> annoClass) {
         throw BaseRuntimeException.getException("class[{}] field[{}] anno[{}] not support", field.getDeclaringClass().getName(), field.getName(), annoClass.getName());
     }
 
-    public static void notSupport_len(final Field field, Class annoClass) {
+    public static void notSupport_len(final Field field, Class<?> annoClass) {
         throw BaseRuntimeException.getException("class[{}] field[{}] anno[{}] len not support", field.getDeclaringClass().getName(), field.getName(), annoClass.getName());
     }
 
-    public static void notSupport_singleLen(final Field field, Class annoClass) {
+    public static void notSupport_singleLen(final Field field, Class<?> annoClass) {
         throw BaseRuntimeException.getException("class[{}] field[{}] anno[{}] singleLen not support", field.getDeclaringClass().getName(), field.getName(), annoClass.getName());
     }
 
@@ -43,7 +43,7 @@ public class ParseUtil {
         return str.substring(0, 1).toLowerCase() + str.substring(1);
     }
 
-    public static String getProcessorVarName(final Class processorClass) {
+    public static String getProcessorVarName(final Class<?> processorClass) {
         return "_" + toFirstLowerCase(processorClass.getSimpleName());
     }
 
@@ -72,7 +72,7 @@ public class ParseUtil {
      * @param clazz
      * @return
      */
-    public static boolean bigEndian(BitOrder order, Class clazz) {
+    public static boolean bigEndian(BitOrder order, Class<?> clazz) {
         BitOrder configOrder = null;
         final String className = clazz.getName();
         for (Parser.BitOrderConfig config : Parser.bitOrderConfigs) {
@@ -108,7 +108,7 @@ public class ParseUtil {
      * @param clazz
      * @return
      */
-    public static boolean bigEndian(ByteOrder order, Class clazz) {
+    public static boolean bigEndian(ByteOrder order, Class<?> clazz) {
         ByteOrder configOrder = null;
         final String className = clazz.getName();
         for (Parser.ByteOrderConfig config : Parser.byteOrderConfigs) {
@@ -129,7 +129,7 @@ public class ParseUtil {
      * @param params
      * @return
      */
-    public static String defineClassVar(final BuilderContext context, Class varClass, final String valDefine, Object... params) {
+    public static String defineClassVar(final BuilderContext context, Class<?> varClass, final String valDefine, Object... params) {
         return context.classVarDefineToVarName.computeIfAbsent(format(valDefine, params), k -> {
             final int size = context.classVarDefineToVarName.size();
             final String varName = "_" + size + "_" + varClass.getSimpleName();
