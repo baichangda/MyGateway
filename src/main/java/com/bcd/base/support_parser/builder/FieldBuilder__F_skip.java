@@ -35,27 +35,7 @@ public class FieldBuilder__F_skip extends FieldBuilder {
                 ParseUtil.append(body, "if({}>0){\n", skipVarName);
                 ParseUtil.append(body, "{}.skipBytes({});\n", FieldBuilder.varNameByteBuf, skipVarName);
                 ParseUtil.append(body, "}\n");
-                //完成后记录索引
-                if (context.indexFieldNameSet.contains(fieldName)) {
-                    final String indexVarName = varNameField + "_index";
-                    ParseUtil.append(body, "final int {}={}.readerIndex();\n", indexVarName, FieldBuilder.varNameByteBuf);
-                    context.prevSkipReservedIndexVarName = indexVarName;
-                }
             }
-            case ReservedFromPrevReserved -> {
-                final String skipVarName = varNameField + "_skip";
-                ParseUtil.append(body, "final int {}={}-{}.readerIndex()+{};\n", skipVarName, lenValCode, FieldBuilder.varNameByteBuf, context.prevSkipReservedIndexVarName);
-                ParseUtil.append(body, "if({}>0){\n", skipVarName);
-                ParseUtil.append(body, "{}.skipBytes({});\n", FieldBuilder.varNameByteBuf, skipVarName);
-                ParseUtil.append(body, "}\n");
-                //完成后记录索引
-                if (context.indexFieldNameSet.contains(fieldName)) {
-                    final String indexVarName = varNameField + "_index";
-                    ParseUtil.append(body, "final int {}={}.readerIndex();\n", indexVarName, FieldBuilder.varNameByteBuf);
-                    context.prevSkipReservedIndexVarName = indexVarName;
-                }
-            }
-
         }
     }
 
@@ -86,25 +66,6 @@ public class FieldBuilder__F_skip extends FieldBuilder {
                 ParseUtil.append(body, "if({}>0){\n", skipVarName);
                 ParseUtil.append(body, "{}.writeZero({});\n", FieldBuilder.varNameByteBuf, skipVarName);
                 ParseUtil.append(body, "}\n");
-                //完成后记录索引
-                if (context.indexFieldNameSet.contains(fieldName)) {
-                    final String indexVarName = varNameField + "_index";
-                    ParseUtil.append(body, "final int {}={}.writerIndex();\n", indexVarName, FieldBuilder.varNameByteBuf);
-                    context.prevSkipReservedIndexVarName = indexVarName;
-                }
-            }
-            case ReservedFromPrevReserved -> {
-                final String skipVarName = varNameField + "_skip";
-                ParseUtil.append(body, "final int {}={}-{}.writerIndex()+{};\n", skipVarName, lenValCode, FieldBuilder.varNameByteBuf, context.prevSkipReservedIndexVarName);
-                ParseUtil.append(body, "if({}>0){\n", skipVarName);
-                ParseUtil.append(body, "{}.writeZero({});\n", FieldBuilder.varNameByteBuf, skipVarName);
-                ParseUtil.append(body, "}\n");
-                //完成后记录索引
-                if (context.indexFieldNameSet.contains(fieldName)) {
-                    final String indexVarName = varNameField + "_index";
-                    ParseUtil.append(body, "final int {}={}.writerIndex();\n", indexVarName, FieldBuilder.varNameByteBuf);
-                    context.prevSkipReservedIndexVarName = indexVarName;
-                }
             }
         }
 

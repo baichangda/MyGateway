@@ -2,6 +2,7 @@ package com.bcd.base.support_parser.go;
 
 import com.bcd.base.support_parser.anno.BitOrder;
 import com.bcd.base.support_parser.anno.ByteOrder;
+import com.bcd.base.support_parser.builder.FieldBuilder;
 import com.bcd.base.support_parser.util.ParseUtil;
 
 import java.lang.reflect.Field;
@@ -36,6 +37,8 @@ public class GoBuildContext {
 
     public boolean bitEndWhenBitField_process;
     public boolean bitEndWhenBitField_deProcess;
+
+    public String prevSkipReservedIndexVarName = FieldBuilder.varNameStartIndex;
 
     public GoBuildContext(Class<?> clazz, ByteOrder pkg_byteOrder, BitOrder pkg_bitOrder, StringBuilder structBody
             , StringBuilder parseBody, StringBuilder deParseBody) {

@@ -1,11 +1,8 @@
 package com.bcd.base.support_parser.go;
 
-import com.bcd.base.support_parser.anno.F_num;
 import com.bcd.base.support_parser.anno.F_string;
 import com.bcd.base.support_parser.anno.StringAppendMode;
-import com.bcd.base.support_parser.exception.BaseRuntimeException;
 import com.bcd.base.support_parser.util.ParseUtil;
-import com.bcd.base.support_parser.util.RpnUtil;
 
 import java.lang.reflect.Field;
 import java.nio.charset.Charset;

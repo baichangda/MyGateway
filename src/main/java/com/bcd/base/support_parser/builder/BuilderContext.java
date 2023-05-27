@@ -61,45 +61,14 @@ public class BuilderContext {
      */
     public final Map<String, String> classVarDefineToVarName;
 
-    /**
-     * 用于{@link F_skip#mode()} 为 {@link SkipMode#ReservedFromPrevReserved} 时候
-     * <p>
-     * 此变量名称代表相同bean内上一个字段
-     * {@link F_skip#mode()}为
-     * {@link SkipMode#ReservedFromStart} 或
-     * {@link SkipMode#ReservedFromPrevReserved}
-     * 时候索引的位置变量名称
-     * 如果没有上一个这样的字段、则取值是{@link FieldBuilder#varNameStartIndex}
-     */
-    public String prevSkipReservedIndexVarName = FieldBuilder.varNameStartIndex;
     public final Set<String> indexFieldNameSet = new HashSet<>();
 
-    private void initIndexFieldNameSet() {
-        String prevSkipReservedFieldName = null;
-        for (Field declaredField : clazz.getDeclaredFields()) {
-            final F_skip f_skip = declaredField.getAnnotation(F_skip.class);
-            if (f_skip != null) {
-                switch (f_skip.mode()) {
-                    case ReservedFromStart -> {
-                        prevSkipReservedFieldName = declaredField.getName();
-                    }
-                    case ReservedFromPrevReserved -> {
-                        if (prevSkipReservedFieldName != null) {
-                            indexFieldNameSet.add(prevSkipReservedFieldName);
-                        }
-                        prevSkipReservedFieldName = declaredField.getName();
-                    }
-                }
-            }
-        }
-    }
 
     public BuilderContext(StringBuilder body, Class clazz, CtClass implCc, Map<String, String> classVarDefineToVarName) {
         this.body = body;
         this.clazz = clazz;
         this.implCc = implCc;
         this.classVarDefineToVarName = classVarDefineToVarName;
-        initIndexFieldNameSet();
     }
 
     public final String getProcessContextVarName() {

@@ -22,8 +22,6 @@ public @interface F_skip {
      * 直接跳过当前指定长度的字节数
      * {@link SkipMode#ReservedFromStart}
      * 从当前字段所属对象开始记录索引a、当前字段索引b、跳过(规定长度-(b-a)))
-     * {@link SkipMode#ReservedFromPrevReserved}
-     * 从当前字段上一个字段带此注解且{@link F_skip#mode()}为{@link SkipMode#ReservedFromStart}或{@link SkipMode#ReservedFromPrevReserved}、计算到当前字段的字节数、跳过(规定长度-已经计入的字节数)
      */
     SkipMode mode() default SkipMode.Skip;
 

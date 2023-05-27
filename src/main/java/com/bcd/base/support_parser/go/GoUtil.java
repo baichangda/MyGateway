@@ -24,12 +24,24 @@ public class GoUtil {
     public final static GoFieldBuilder__F_float_ieee754 fieldBuilder__f_float_ieee754 = new GoFieldBuilder__F_float_ieee754();
     public final static GoFieldBuilder__F_float_ieee754_array fieldBuilder__f_float_ieee754_array = new GoFieldBuilder__F_float_ieee754_array();
     public final static GoFieldBuilder__F_string fieldBuilder__f_string = new GoFieldBuilder__F_string();
+    public final static GoFieldBuilder__F_skip fieldBuilder__f_skip = new GoFieldBuilder__F_skip();
 
     private static boolean hasBitField(List<Field> parseFields) {
         return parseFields.stream().anyMatch(e -> e.isAnnotationPresent(F_bit_num.class) ||
                 e.isAnnotationPresent(F_bit_num_array.class) ||
                 e.isAnnotationPresent(F_bit_skip.class) ||
                 e.isAnnotationPresent(F_customize.class));
+    }
+
+    private static boolean hasFieldSkipModeReserved(List<Field> parseFields) {
+        return parseFields.stream().anyMatch(e -> {
+            final F_skip f_skip = e.getAnnotation(F_skip.class);
+            if (f_skip == null) {
+                return false;
+            } else {
+                return f_skip.mode() == SkipMode.ReservedFromStart;
+            }
+        });
     }
 
     private static void bitEndWhenBitField(List<Field> fieldList, int i, GoBuildContext context) {
@@ -97,6 +109,7 @@ public class GoUtil {
                 continue;
             }
             final boolean hasBitField = hasBitField(parseFields);
+            final boolean hasFieldSkipModeReserved = hasFieldSkipModeReserved(parseFields);
             final StringBuilder structBody = new StringBuilder();
             final StringBuilder parseBody = new StringBuilder();
             final StringBuilder deParseBody = new StringBuilder();
@@ -109,6 +122,12 @@ public class GoUtil {
                 ParseUtil.append(parseBody, "func To{}({} *util.ByteBuf) (*{},error){\n", context.goStructName, GoFieldBuilder.varNameByteBuf, context.goStructName);
                 ParseUtil.append(deParseBody, "func({} *{})Write({} *util.ByteBuf){\n", GoFieldBuilder.varNameInstance, context.goStructName, GoFieldBuilder.varNameByteBuf);
             }
+
+            if (hasFieldSkipModeReserved) {
+                ParseUtil.append(parseBody, "{}:={}.ReaderIndex()\n", GoFieldBuilder.varNameStartIndex, GoFieldBuilder.varNameByteBuf);
+                ParseUtil.append(deParseBody, "{}:={}.WriterIndex()\n", GoFieldBuilder.varNameStartIndex, GoFieldBuilder.varNameByteBuf);
+            }
+
             ParseUtil.append(parseBody, "{}:={}{}\n", GoFieldBuilder.varNameInstance, context.goStructName);
             for (int i = 0; i < parseFields.size(); i++) {
                 final Field field = parseFields.get(i);
@@ -129,6 +148,8 @@ public class GoUtil {
                     goFieldBuilder = fieldBuilder__f_float_ieee754_array;
                 } else if (field.isAnnotationPresent(F_string.class)) {
                     goFieldBuilder = fieldBuilder__f_string;
+                } else if (field.isAnnotationPresent(F_skip.class)) {
+                    goFieldBuilder = fieldBuilder__f_skip;
                 }
                 if (goFieldBuilder != null) {
                     goFieldBuilder.buildStruct(context);
@@ -289,7 +310,8 @@ public class GoUtil {
     }
 
     public static void main(String[] args) {
-        final String s = "com.bcd.base.support_parser.impl.immotors.ep33.data";
+//        final String s = "com.bcd.base.support_parser.impl.immotors.ep33.data";
+        final String s = "com.bcd.base.support_parser.impl.icd.data";
 //        final String s = "com.bcd.base.support_parser.impl.gb32960.data";
         toSourceCode(s, ByteOrder.BigEndian, BitOrder.BigEndian,
                 "/Users/baichangda/bcd/goworkspace/MyGateway_go/test.go", "main");
