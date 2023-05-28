@@ -39,9 +39,9 @@ public class GoFieldBuilder__F_num_array extends GoFieldBuilder {
                 goReadTypeName = null;
             }
         }
-        if (fieldType == float.class) {
+        if (fieldType == float[].class) {
             goFieldTypeName = "float32";
-        } else if (fieldType == double.class) {
+        } else if (fieldType == double[].class) {
             goFieldTypeName = "float64";
         } else {
             goFieldTypeName = goReadTypeName;
@@ -134,14 +134,14 @@ public class GoFieldBuilder__F_num_array extends GoFieldBuilder {
                 valCode = ParseUtil.replaceValExprToCode(RpnUtil.reverseExpr(valExpr), valCode);
             }
             if (!goReadTypeName.equals(goFieldTypeName)) {
-                valCode = ParseUtil.format("{}(util.Round(float64({})))", goReadTypeName, valCode);
+                valCode = ParseUtil.format("{}(parse.Round(float64({})))", goReadTypeName, valCode);
             }
             switch (singleLen) {
                 case 1 -> {
-                    ParseUtil.append(body, "{}.Write_{}({})\n", GoFieldBuilder.varNameByteBuf, goFieldTypeName, valCode);
+                    ParseUtil.append(body, "{}.Write_{}({})\n", GoFieldBuilder.varNameByteBuf, goReadTypeName, valCode);
                 }
                 case 2, 4, 8 -> {
-                    ParseUtil.append(body, "{}.Write_{}({},{})\n", GoFieldBuilder.varNameByteBuf, goFieldTypeName, valCode, bigEndian);
+                    ParseUtil.append(body, "{}.Write_{}({},{})\n", GoFieldBuilder.varNameByteBuf, goReadTypeName, valCode, bigEndian);
                 }
                 default -> {
                     ParseUtil.notSupport_len(field, annoClass);

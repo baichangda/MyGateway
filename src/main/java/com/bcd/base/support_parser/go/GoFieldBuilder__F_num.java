@@ -116,7 +116,7 @@ public class GoFieldBuilder__F_num extends GoFieldBuilder {
             valCode = ParseUtil.replaceValExprToCode(RpnUtil.reverseExpr(valExpr), valCode);
         }
         if (!goReadTypeName.equals(goFieldTypeName)) {
-            valCode = ParseUtil.format("{}(util.Round(float64({})))", goReadTypeName, valCode);
+            valCode = ParseUtil.format("{}(parse.Round(float64({})))", goReadTypeName, valCode);
         }
         switch (anno.len()) {
             case 1 -> {

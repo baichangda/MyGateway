@@ -112,7 +112,7 @@ public class GoUtil {
         }
     }
 
-    public final static void toSourceCode(String pkg, ByteOrder byteOrder, BitOrder bitOrder, String goFilePath, String goPkg) {
+    public final static void toSourceCode(String pkg, ByteOrder byteOrder, BitOrder bitOrder, String goFilePath) {
         final StringBuilder body = new StringBuilder();
         final List<Class> classes;
         try {
@@ -130,29 +130,24 @@ public class GoUtil {
             if (parseFields.isEmpty()) {
                 continue;
             }
-            final boolean hasBitField = bitStructSet.contains(clazz.getSimpleName());
             final boolean hasFieldSkipModeReserved = hasFieldSkipModeReserved(parseFields);
             final StringBuilder structBody = new StringBuilder();
             final StringBuilder parseBody = new StringBuilder();
             final StringBuilder deParseBody = new StringBuilder();
-            final GoBuildContext context = new GoBuildContext(clazz, byteOrder, bitOrder, structBody, parseBody, deParseBody, hasBitField);
+            final GoBuildContext context = new GoBuildContext(clazz, byteOrder, bitOrder, structBody, parseBody, deParseBody);
             ParseUtil.append(structBody, "type {} struct{\n", context.goStructName);
-            if (hasBitField) {
-                ParseUtil.append(parseBody, "func To{}({} *util.ByteBuf,{} *util.BitBuf_reader) (*{},error){\n", context.goStructName, GoFieldBuilder.varNameByteBuf, GoFieldBuilder.varNameBitBuf, context.goStructName);
-                ParseUtil.append(deParseBody, "func(_{} *{})Write({} *util.ByteBuf,{} *util.BitBuf_writer){\n", GoFieldBuilder.varNameInstance, context.goStructName, GoFieldBuilder.varNameByteBuf, GoFieldBuilder.varNameBitBuf);
-            } else {
-                ParseUtil.append(parseBody, "func To{}({} *util.ByteBuf) (*{},error){\n", context.goStructName, GoFieldBuilder.varNameByteBuf, context.goStructName);
-                ParseUtil.append(deParseBody, "func(_{} *{})Write({} *util.ByteBuf){\n", GoFieldBuilder.varNameInstance, context.goStructName, GoFieldBuilder.varNameByteBuf);
-            }
-
+            ParseUtil.append(parseBody, "func To{}({} *parse.ByteBuf,{} *parse.ParseContext) (*{},error){\n",
+                    context.goStructName, GoFieldBuilder.varNameByteBuf, GoFieldBuilder.varNameParentParseContext, context.goStructName);
+            ParseUtil.append(parseBody, "{}:={}{}\n", GoFieldBuilder.varNameInstance, context.goStructName);
+            ParseUtil.append(deParseBody, "func(_{} *{})Write({} *parse.ByteBuf,{} *parse.ParseContext){\n",
+                    GoFieldBuilder.varNameInstance, context.goStructName,
+                    GoFieldBuilder.varNameByteBuf, GoFieldBuilder.varNameParentParseContext);
             if (hasFieldSkipModeReserved) {
                 ParseUtil.append(parseBody, "{}:={}.ReaderIndex()\n", GoFieldBuilder.varNameStartIndex, GoFieldBuilder.varNameByteBuf);
                 ParseUtil.append(deParseBody, "{}:={}.WriterIndex()\n", GoFieldBuilder.varNameStartIndex, GoFieldBuilder.varNameByteBuf);
             }
-            ParseUtil.append(parseBody, "{}:={}{}\n", GoFieldBuilder.varNameInstance, context.goStructName);
-
-            final int parseBodyIndex = parseBody.length();
-            final int deParseBodyIndex = deParseBody.length();
+            ParseUtil.append(parseBody, "var err error\n");
+            ParseUtil.append(deParseBody, "{}:=*_{}\n", GoFieldBuilder.varNameInstance, GoFieldBuilder.varNameInstance);
 
             for (int i = 0; i < parseFields.size(); i++) {
                 final Field field = parseFields.get(i);
@@ -183,7 +178,7 @@ public class GoUtil {
                     goFieldBuilder = fieldBuilder__f_bean;
                 } else if (field.isAnnotationPresent(F_bean_list.class)) {
                     goFieldBuilder = fieldBuilder__f_bean_list;
-                }else if (field.isAnnotationPresent(F_customize.class)) {
+                } else if (field.isAnnotationPresent(F_customize.class)) {
                     goFieldBuilder = fieldBuilder__f_customize;
                 }
                 if (goFieldBuilder != null) {
@@ -193,13 +188,6 @@ public class GoUtil {
                 }
             }
 
-            if (parseBody.length() > parseBodyIndex) {
-                ParseUtil.insert(parseBody, parseBodyIndex, "var err error\n");
-            }
-
-            if (deParseBody.length() > deParseBodyIndex) {
-                ParseUtil.insert(deParseBody, deParseBodyIndex, "{}:=*_{}\n", GoFieldBuilder.varNameInstance, GoFieldBuilder.varNameInstance);
-            }
 
             ParseUtil.append(structBody, "}\n");
             ParseUtil.append(parseBody, "return &{},nil\n", GoFieldBuilder.varNameInstance);
@@ -214,6 +202,8 @@ public class GoUtil {
         }
 
         final Path path = Paths.get(goFilePath);
+        final Path parent = path.getParent();
+        final Path goPkg = parent.getName(parent.getNameCount() - 1);
         try (final BufferedWriter bw = Files.newBufferedWriter(path, StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING)) {
             bw.write("package " + goPkg);
             bw.newLine();
@@ -358,6 +348,6 @@ public class GoUtil {
 //        final String s = "com.bcd.base.support_parser.impl.icd.data";
         final String s = "com.bcd.base.support_parser.impl.gb32960.data";
         toSourceCode(s, ByteOrder.BigEndian, BitOrder.BigEndian,
-                "/Users/baichangda/bcd/goworkspace/MyGateway_go/gb32960/java.go", "gb32960");
+                "/Users/baichangda/bcd/goworkspace/MyGateway_go/gb32960/java.go");
     }
 }

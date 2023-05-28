@@ -106,7 +106,7 @@ public class GoFieldBuilder__F_bit_num extends GoFieldBuilder {
             valCode = ParseUtil.replaceValExprToCode(RpnUtil.reverseExpr(valExpr), valCode);
         }
         if (!goReadTypeName.equals(goFieldTypeName)) {
-            valCode = ParseUtil.format("util.Round(float64({}))", valCode);
+            valCode = ParseUtil.format("parse.Round(float64({}))", valCode);
         }
         ParseUtil.append(body, "{}.Write(int64({}),{},{},{})\n", varNameBitBufWriter, valCode, len, bigEndian, unsigned);
         if (context.bitEndWhenBitField_deProcess) {

@@ -31,16 +31,15 @@ public class GoBuildContext {
 
     public String varNameBitBuf_reader;
     public String varNameBitBuf_writer;
+    public String varNameParseContext;
+    public String varNameDeParseContext;
 
     public boolean bitEndWhenBitField_process;
     public boolean bitEndWhenBitField_deProcess;
 
-    public boolean hasBitField;
-
-
 
     public GoBuildContext(Class<?> clazz, ByteOrder pkg_byteOrder, BitOrder pkg_bitOrder, StringBuilder structBody
-            , StringBuilder parseBody, StringBuilder deParseBody, boolean hasBitField) {
+            , StringBuilder parseBody, StringBuilder deParseBody) {
         this.clazz = clazz;
         this.goStructName = GoUtil.toFirstUpperCase(clazz.getSimpleName());
         this.pkg_byteOrder = pkg_byteOrder;
@@ -48,7 +47,6 @@ public class GoBuildContext {
         this.structBody = structBody;
         this.parseBody = parseBody;
         this.deParseBody = deParseBody;
-        this.hasBitField = hasBitField;
     }
 
     public void setField(Field field) {
@@ -58,15 +56,9 @@ public class GoBuildContext {
 
 
     public final String getVarNameBitBuf_reader() {
-
         if (varNameBitBuf_reader == null) {
-            if (hasBitField) {
-                ParseUtil.append(parseBody, "if {}==nil{\n", GoFieldBuilder.varNameBitBuf);
-                ParseUtil.append(parseBody, "{}=util.ToBitBuf_reader({})\n", GoFieldBuilder.varNameBitBuf, GoFieldBuilder.varNameByteBuf);
-                ParseUtil.append(parseBody, "}\n");
-            } else {
-                ParseUtil.append(parseBody, "{}:=util.ToBitBuf_reader({})\n", GoFieldBuilder.varNameBitBuf, GoFieldBuilder.varNameByteBuf);
-            }
+            ParseUtil.append(parseBody, "{}:={}.GetBitBuf_reader({})\n"
+                    , GoFieldBuilder.varNameBitBuf, GoFieldBuilder.varNameParentParseContext,GoFieldBuilder.varNameByteBuf);
             varNameBitBuf_reader = GoFieldBuilder.varNameBitBuf;
         }
         return varNameBitBuf_reader;
@@ -74,16 +66,27 @@ public class GoBuildContext {
 
     public final String getVarNameBitBuf_writer() {
         if (varNameBitBuf_writer == null) {
-            if (hasBitField) {
-                ParseUtil.append(deParseBody, "if {}==nil{\n", GoFieldBuilder.varNameBitBuf);
-                ParseUtil.append(deParseBody, "{}=util.ToBitBuf_writer({})\n", GoFieldBuilder.varNameBitBuf, GoFieldBuilder.varNameByteBuf);
-                ParseUtil.append(deParseBody, "}\n");
-            } else {
-                ParseUtil.append(deParseBody, "{}:=util.ToBitBuf_writer({})\n", GoFieldBuilder.varNameBitBuf, GoFieldBuilder.varNameByteBuf);
-            }
+            ParseUtil.append(deParseBody, "{}:={}.GetBitBuf_writer({})\n"
+                    , GoFieldBuilder.varNameBitBuf, GoFieldBuilder.varNameParentParseContext,GoFieldBuilder.varNameByteBuf);
             varNameBitBuf_writer = GoFieldBuilder.varNameBitBuf;
         }
         return varNameBitBuf_writer;
+    }
+
+    public final String getVarNameParseContext() {
+        if (varNameParseContext == null) {
+            ParseUtil.append(parseBody, "{}:=parse.ToParseContext(&{},{})\n", GoFieldBuilder.varNameParseContext, GoFieldBuilder.varNameInstance, GoFieldBuilder.varNameParentParseContext);
+            varNameParseContext = GoFieldBuilder.varNameParseContext;
+        }
+        return varNameParseContext;
+    }
+
+    public final String getVarNameDeParseContext() {
+        if (varNameDeParseContext == null) {
+            ParseUtil.append(deParseBody, "{}:=parse.ToParseContext(_{},{})\n", GoFieldBuilder.varNameParseContext, GoFieldBuilder.varNameInstance, GoFieldBuilder.varNameParentParseContext);
+            varNameDeParseContext = GoFieldBuilder.varNameParseContext;
+        }
+        return varNameDeParseContext;
     }
 
 }
