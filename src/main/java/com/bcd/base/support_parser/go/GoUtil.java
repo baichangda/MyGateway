@@ -13,9 +13,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class GoUtil {
+
+    public final static Set<String> bitStructSet = new HashSet<>();
 
     public final static GoFieldBuilder__F_num fieldBuilder__f_num = new GoFieldBuilder__F_num();
     public final static GoFieldBuilder__F_num_array fieldBuilder__f_num_array = new GoFieldBuilder__F_num_array();
@@ -26,13 +30,25 @@ public class GoUtil {
     public final static GoFieldBuilder__F_string fieldBuilder__f_string = new GoFieldBuilder__F_string();
     public final static GoFieldBuilder__F_skip fieldBuilder__f_skip = new GoFieldBuilder__F_skip();
     public final static GoFieldBuilder__F_date fieldBuilder__f_date = new GoFieldBuilder__F_date();
+    public final static GoFieldBuilder__F_bit_skip fieldBuilder__f_bit_skip = new GoFieldBuilder__F_bit_skip();
+    public final static GoFieldBuilder__F_bean fieldBuilder__f_bean = new GoFieldBuilder__F_bean();
+    public final static GoFieldBuilder__F_bean_list fieldBuilder__f_bean_list = new GoFieldBuilder__F_bean_list();
 
-    private static boolean hasBitField(List<Field> parseFields) {
-        return parseFields.stream().anyMatch(e -> e.isAnnotationPresent(F_bit_num.class) ||
-                e.isAnnotationPresent(F_bit_num_array.class) ||
-                e.isAnnotationPresent(F_bit_skip.class) ||
-                e.isAnnotationPresent(F_customize.class));
+    private static void initBitClassSet(Class<?> clazz) {
+        final List<Field> parseFields = ParseUtil.getParseFields(clazz);
+        if (parseFields.isEmpty()) {
+            return;
+        }
+        parseFields.forEach(e -> {
+            if (e.isAnnotationPresent(F_bit_num.class) ||
+                    e.isAnnotationPresent(F_bit_num_array.class) ||
+                    e.isAnnotationPresent(F_bit_skip.class) ||
+                    e.isAnnotationPresent(F_customize.class)) {
+                bitStructSet.add(clazz.getSimpleName());
+            }
+        });
     }
+
 
     private static boolean hasFieldSkipModeReserved(List<Field> parseFields) {
         return parseFields.stream().anyMatch(e -> {
@@ -105,31 +121,38 @@ public class GoUtil {
         }
 
         for (Class clazz : classes) {
+            initBitClassSet(clazz);
+        }
+
+        for (Class clazz : classes) {
             final List<Field> parseFields = ParseUtil.getParseFields(clazz);
             if (parseFields.isEmpty()) {
                 continue;
             }
-            final boolean hasBitField = hasBitField(parseFields);
+            final boolean hasBitField = bitStructSet.contains(clazz.getSimpleName());
             final boolean hasFieldSkipModeReserved = hasFieldSkipModeReserved(parseFields);
             final StringBuilder structBody = new StringBuilder();
             final StringBuilder parseBody = new StringBuilder();
             final StringBuilder deParseBody = new StringBuilder();
-            final GoBuildContext context = new GoBuildContext(clazz, byteOrder, bitOrder, structBody, parseBody, deParseBody);
+            final GoBuildContext context = new GoBuildContext(clazz, byteOrder, bitOrder, structBody, parseBody, deParseBody, hasBitField);
             ParseUtil.append(structBody, "type {} struct{\n", context.goStructName);
             if (hasBitField) {
                 ParseUtil.append(parseBody, "func To{}({} *util.ByteBuf,{} *util.BitBuf_reader) (*{},error){\n", context.goStructName, GoFieldBuilder.varNameByteBuf, GoFieldBuilder.varNameBitBuf, context.goStructName);
-                ParseUtil.append(deParseBody, "func({} *{})Write({} *util.ByteBuf,{} *util.BitBuf_writer){\n", GoFieldBuilder.varNameInstance, context.goStructName, GoFieldBuilder.varNameByteBuf, GoFieldBuilder.varNameBitBuf);
+                ParseUtil.append(deParseBody, "func(_{} *{})Write({} *util.ByteBuf,{} *util.BitBuf_writer){\n", GoFieldBuilder.varNameInstance, context.goStructName, GoFieldBuilder.varNameByteBuf, GoFieldBuilder.varNameBitBuf);
             } else {
                 ParseUtil.append(parseBody, "func To{}({} *util.ByteBuf) (*{},error){\n", context.goStructName, GoFieldBuilder.varNameByteBuf, context.goStructName);
-                ParseUtil.append(deParseBody, "func({} *{})Write({} *util.ByteBuf){\n", GoFieldBuilder.varNameInstance, context.goStructName, GoFieldBuilder.varNameByteBuf);
+                ParseUtil.append(deParseBody, "func(_{} *{})Write({} *util.ByteBuf){\n", GoFieldBuilder.varNameInstance, context.goStructName, GoFieldBuilder.varNameByteBuf);
             }
 
             if (hasFieldSkipModeReserved) {
                 ParseUtil.append(parseBody, "{}:={}.ReaderIndex()\n", GoFieldBuilder.varNameStartIndex, GoFieldBuilder.varNameByteBuf);
                 ParseUtil.append(deParseBody, "{}:={}.WriterIndex()\n", GoFieldBuilder.varNameStartIndex, GoFieldBuilder.varNameByteBuf);
             }
-
             ParseUtil.append(parseBody, "{}:={}{}\n", GoFieldBuilder.varNameInstance, context.goStructName);
+
+            final int parseBodyIndex = parseBody.length();
+            final int deParseBodyIndex = deParseBody.length();
+
             for (int i = 0; i < parseFields.size(); i++) {
                 final Field field = parseFields.get(i);
                 context.setField(field);
@@ -153,6 +176,12 @@ public class GoUtil {
                     goFieldBuilder = fieldBuilder__f_skip;
                 } else if (field.isAnnotationPresent(F_date.class)) {
                     goFieldBuilder = fieldBuilder__f_date;
+                } else if (field.isAnnotationPresent(F_bit_skip.class)) {
+                    goFieldBuilder = fieldBuilder__f_bit_skip;
+                } else if (field.isAnnotationPresent(F_bean.class)) {
+                    goFieldBuilder = fieldBuilder__f_bean;
+                } else if (field.isAnnotationPresent(F_bean_list.class)) {
+                    goFieldBuilder = fieldBuilder__f_bean_list;
                 }
                 if (goFieldBuilder != null) {
                     goFieldBuilder.buildStruct(context);
@@ -160,6 +189,15 @@ public class GoUtil {
                     goFieldBuilder.buildDeParse(context);
                 }
             }
+
+            if (parseBody.length() > parseBodyIndex) {
+                ParseUtil.insert(parseBody, parseBodyIndex, "var err error\n");
+            }
+
+            if (deParseBody.length() > deParseBodyIndex) {
+                ParseUtil.insert(deParseBody, deParseBodyIndex, "{}:=*_{}\n", GoFieldBuilder.varNameInstance, GoFieldBuilder.varNameInstance);
+            }
+
             ParseUtil.append(structBody, "}\n");
             ParseUtil.append(parseBody, "return &{},nil\n", GoFieldBuilder.varNameInstance);
             ParseUtil.append(parseBody, "}\n");

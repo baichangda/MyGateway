@@ -362,6 +362,10 @@ public class ParseUtil {
         sb.append(format(message, params));
     }
 
+    public static void insert(final StringBuilder sb,int index, final String message, Object... params) {
+        sb.insert(index,format(message, params));
+    }
+
     static final double[] pows;
 
     static {

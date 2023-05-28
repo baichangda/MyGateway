@@ -2,6 +2,7 @@ package com.bcd.base.support_parser.builder;
 
 
 import com.bcd.base.support_parser.Parser;
+import com.bcd.base.support_parser.anno.BitRemainingMode;
 import com.bcd.base.support_parser.anno.F_bit_skip;
 import com.bcd.base.support_parser.util.BitBuf_reader;
 import com.bcd.base.support_parser.util.BitBuf_writer;
@@ -19,7 +20,6 @@ public class FieldBuilder__F_bit_skip extends FieldBuilder {
         final String varNameField = ParseUtil.getFieldVarName(context);
 
         final String varNameBitBuf = context.getVarNameBitBuf(BitBuf_reader.class);
-
         if (Parser.logCollector_parse == null) {
             ParseUtil.append(body, "{}.skip({});\n", varNameBitBuf, anno.len());
         } else {

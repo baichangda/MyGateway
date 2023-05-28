@@ -5,7 +5,6 @@ import java.lang.reflect.Field;
 public class GoField {
     public final Field field;
     public final String goFieldName;
-
     public String goFieldTypeName;
     public String goReadTypeName;
 
