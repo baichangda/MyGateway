@@ -358,6 +358,6 @@ public class GoUtil {
 //        final String s = "com.bcd.base.support_parser.impl.icd.data";
         final String s = "com.bcd.base.support_parser.impl.gb32960.data";
         toSourceCode(s, ByteOrder.BigEndian, BitOrder.BigEndian,
-                "/Users/baichangda/bcd/goworkspace/MyGateway_go/test.go", "main");
+                "/Users/baichangda/bcd/goworkspace/MyGateway_go/gb32960/java.go", "gb32960");
     }
 }

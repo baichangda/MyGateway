@@ -14,15 +14,9 @@ public class VehicleCommonDataFieldProcessor implements Processor<VehicleCommonD
     @Override
     public VehicleCommonData process(final ByteBuf byteBuf, final ProcessContext parentContext) {
         final VehicleCommonData vehicleCommonData = new VehicleCommonData();
-        int allLen = ((Packet) parentContext.parentContext.instance).contentLength - 6;
         ProcessContext<VehicleCommonData> processContext = new ProcessContext<>(vehicleCommonData, parentContext);
-        int beginLeave = byteBuf.readableBytes();
         A:
         while (byteBuf.isReadable()) {
-            int curLeave = byteBuf.readableBytes();
-            if (beginLeave - curLeave >= allLen) {
-                break;
-            }
             short flag = byteBuf.readUnsignedByte();
             switch (flag) {
                 case 1: {

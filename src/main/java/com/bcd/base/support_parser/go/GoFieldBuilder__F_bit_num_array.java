@@ -110,7 +110,7 @@ public class GoFieldBuilder__F_bit_num_array extends GoFieldBuilder {
         if (!goReadTypeName.equals(goFieldTypeName)) {
             valCode = ParseUtil.format("util.Round(float64({}))", valCode);
         }
-        ParseUtil.append(body, "{}.Write(uint64({}),{},{},{})\n", varNameBitBufWriter, valCode, singleLen, bigEndian, unsigned);
+        ParseUtil.append(body, "{}.Write(int64({}),{},{},{})\n", varNameBitBufWriter, valCode, singleLen, bigEndian, unsigned);
         ParseUtil.append(body, "}\n");
     }
 

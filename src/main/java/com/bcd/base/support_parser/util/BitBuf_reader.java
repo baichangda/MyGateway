@@ -38,7 +38,7 @@ public class BitBuf_reader {
                 (byte) 0xF0, (byte) 0xe4,
                 (byte) 0xF0, (byte) 0xe4
         };
-        for (int i = 0; i < 100000000; i++) {
+        for (int i = 0; i < 1; i++) {
 //            ByteBuf bb = Unpooled.wrappedBuffer(source);
 //            BitBuf_reader bitBuf = BitBuf_reader.newBitBuf(bb);
 //            final long bitVal1 = bitBuf.read(1);
@@ -85,9 +85,9 @@ public class BitBuf_reader {
 //            res2.print();
 //            skip1.print();
 //            res3.print();
-//            System.out.println(l1);
-//            System.out.println(l2);
-//            System.out.println(l3);
+            System.out.println(res1);
+            System.out.println(res2);
+            System.out.println(res3);
         }
         System.out.println(System.currentTimeMillis() - t1);
 
