@@ -33,6 +33,7 @@ public class GoUtil {
     public final static GoFieldBuilder__F_bit_skip fieldBuilder__f_bit_skip = new GoFieldBuilder__F_bit_skip();
     public final static GoFieldBuilder__F_bean fieldBuilder__f_bean = new GoFieldBuilder__F_bean();
     public final static GoFieldBuilder__F_bean_list fieldBuilder__f_bean_list = new GoFieldBuilder__F_bean_list();
+    public final static GoFieldBuilder__F_customize fieldBuilder__f_customize = new GoFieldBuilder__F_customize();
 
     private static void initBitClassSet(Class<?> clazz) {
         final List<Field> parseFields = ParseUtil.getParseFields(clazz);
@@ -182,6 +183,8 @@ public class GoUtil {
                     goFieldBuilder = fieldBuilder__f_bean;
                 } else if (field.isAnnotationPresent(F_bean_list.class)) {
                     goFieldBuilder = fieldBuilder__f_bean_list;
+                }else if (field.isAnnotationPresent(F_customize.class)) {
+                    goFieldBuilder = fieldBuilder__f_customize;
                 }
                 if (goFieldBuilder != null) {
                     goFieldBuilder.buildStruct(context);
