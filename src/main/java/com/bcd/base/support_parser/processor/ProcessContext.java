@@ -18,25 +18,19 @@ public class ProcessContext<T> {
         this.parentContext = parentContext;
     }
 
-    public final static BitBuf_reader getBitBuf_reader(ByteBuf byteBuf, ProcessContext context) {
-        if (context == null) {
+    public final static BitBuf_reader getBitBuf_reader(ByteBuf byteBuf, ProcessContext parentContext) {
+        if (parentContext == null || parentContext.bitBuf_reader == null) {
             return BitBuf_reader.newBitBuf(byteBuf);
         } else {
-            if (context.bitBuf_reader == null) {
-                context.bitBuf_reader = BitBuf_reader.newBitBuf(byteBuf);
-            }
-            return context.bitBuf_reader;
+            return parentContext.bitBuf_reader;
         }
     }
 
-    public final static BitBuf_writer getBitBuf_writer(ByteBuf byteBuf, ProcessContext context) {
-        if (context == null) {
+    public final static BitBuf_writer getBitBuf_writer(ByteBuf byteBuf, ProcessContext parentContext) {
+        if (parentContext == null || parentContext.bitBuf_writer == null) {
             return BitBuf_writer.newBitBuf(byteBuf);
         } else {
-            if (context.bitBuf_writer == null) {
-                context.bitBuf_writer = BitBuf_writer.newBitBuf(byteBuf);
-            }
-            return context.bitBuf_writer;
+            return parentContext.bitBuf_writer;
         }
     }
 

@@ -17,7 +17,7 @@ public class GoFieldBuilder__F_bean extends GoFieldBuilder {
         final String goFieldName = goField.goFieldName;
         final String goFieldTypeName = field.getType().getSimpleName();
         goField.goFieldTypeName = goFieldTypeName;
-        ParseUtil.append(body, "{} *{}\n", goFieldName, goFieldTypeName);
+        ParseUtil.append(body, "{} {}\n", goFieldName, goFieldTypeName);
     }
 
     @Override
@@ -31,17 +31,13 @@ public class GoFieldBuilder__F_bean extends GoFieldBuilder {
         final GoField goField = context.goField;
         final String goFieldName = goField.goFieldName;
         final String goFieldTypeName = goField.goFieldTypeName;
-        final String varNameVal = goFieldName + "_v";
         final String varNameParseContext = context.getVarNameParseContext();
         if (passBitBuf) {
             final String varNameBitBuf = context.getVarNameBitBuf_reader();
             ParseUtil.append(body, "{}.BitBuf_reader={}\n", varNameParseContext, varNameBitBuf);
         }
-        ParseUtil.append(body, "{},err:=To{}({},{})\n", varNameVal, goFieldTypeName,GoFieldBuilder.varNameByteBuf, varNameParseContext);
-        ParseUtil.append(body, "if err!=nil{\n");
-        ParseUtil.append(body, "return nil,err\n");
-        ParseUtil.append(body, "}\n");
-        ParseUtil.append(body, "{}.{}={}\n", GoFieldBuilder.varNameInstance, goFieldName, varNameVal);
+        final String valCode = ParseUtil.format("To{}({},{})", goFieldTypeName, GoFieldBuilder.varNameByteBuf, varNameParseContext);
+        ParseUtil.append(body, "{}.{}={}\n", GoFieldBuilder.varNameInstance, goFieldName, valCode);
     }
 
     public void buildDeParse(GoBuildContext context) {
@@ -53,13 +49,12 @@ public class GoFieldBuilder__F_bean extends GoFieldBuilder {
         final GoField goField = context.goField;
         final String goFieldName = goField.goFieldName;
         final String varNameParseContext = context.getVarNameDeParseContext();
-        final String varNameVal = goFieldName + "_v";
-        ParseUtil.append(body, "{}:={}.{}\n", varNameVal, GoFieldBuilder.varNameInstance, goFieldName);
+        final String valCode = ParseUtil.format("{}.{}", GoFieldBuilder.varNameInstance, goFieldName);
         if (passBitBuf) {
             final String varNameBitBuf = context.getVarNameBitBuf_writer();
             ParseUtil.append(body, "{}.BitBuf_writer={}\n", varNameParseContext, varNameBitBuf);
         }
-        ParseUtil.append(body, "{}.Write({},{})\n", varNameVal,GoFieldBuilder.varNameByteBuf, varNameParseContext);
+        ParseUtil.append(body, "{}.Write({},{})\n", valCode, GoFieldBuilder.varNameByteBuf, varNameParseContext);
     }
 
 }

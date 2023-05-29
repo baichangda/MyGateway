@@ -49,10 +49,7 @@ public class GoFieldBuilder__F_float_ieee754 extends GoFieldBuilder {
         final String varNameReadVal = goFieldName+"_v";
         final String valExpr = anno.valExpr();
         final FloatType_ieee754 type = anno.type();
-        ParseUtil.append(body, "{},err:={}.Read_{}({})\n", varNameReadVal, GoFieldBuilder.varNameByteBuf, goFieldTypeName, bigEndian);
-        ParseUtil.append(body, "if err!=nil{\n");
-        ParseUtil.append(body, "return nil,err\n");
-        ParseUtil.append(body, "}\n");
+        ParseUtil.append(body, "{}:={}.Read_{}({})\n", varNameReadVal, GoFieldBuilder.varNameByteBuf, goFieldTypeName, bigEndian);
         String valCode = varNameReadVal;
         valCode = ParseUtil.replaceValExprToCode(valExpr, valCode);
         ParseUtil.append(body, "{}.{}={}\n\n", GoFieldBuilder.varNameInstance, goFieldName, valCode);

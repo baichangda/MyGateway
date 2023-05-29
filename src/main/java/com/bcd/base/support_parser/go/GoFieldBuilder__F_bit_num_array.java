@@ -73,10 +73,7 @@ public class GoFieldBuilder__F_bit_num_array extends GoFieldBuilder {
         final String varNameArr = goFieldName + "_arr";
         ParseUtil.append(body, "{}:=make([]{},{})\n", varNameArr, goFieldTypeName, varNameLen);
         ParseUtil.append(body, "for i:=0;i<{};i++{\n", varNameLen);
-        ParseUtil.append(body, "e,err:={}.Read({},{},{})\n", varNameBitBufReader, singleLen, bigEndian, unsigned);
-        ParseUtil.append(body, "if err!=nil{\n");
-        ParseUtil.append(body, "return nil,err\n");
-        ParseUtil.append(body, "}\n");
+        ParseUtil.append(body, "e:={}.Read({},{},{})\n", varNameBitBufReader, singleLen, bigEndian, unsigned);
         String valCode = "e";
         valCode = ParseUtil.format("{}({})", goFieldTypeName, valCode);
         valCode = ParseUtil.replaceValExprToCode(valExpr, valCode);

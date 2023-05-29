@@ -59,10 +59,7 @@ public class GoFieldBuilder__F_float_ieee754_array extends GoFieldBuilder {
 
         ParseUtil.append(body, "{}:=make([]{},{})\n", varNameArr, goFieldTypeName, varNameLen);
         ParseUtil.append(body, "for i:=0;i<{};i++{\n", varNameLen);
-        ParseUtil.append(body, "e,err:={}.Read_{}({})\n", GoFieldBuilder.varNameByteBuf, goFieldTypeName, bigEndian);
-        ParseUtil.append(body, "if err!=nil{\n");
-        ParseUtil.append(body, "return nil,err\n");
-        ParseUtil.append(body, "}\n");
+        ParseUtil.append(body, "e:={}.Read_{}({})\n", GoFieldBuilder.varNameByteBuf, goFieldTypeName, bigEndian);
         String valCode = "e";
         valCode = ParseUtil.replaceValExprToCode(valExpr, valCode);
         ParseUtil.append(body, "{}[i]={}\n", varNameArr, valCode);

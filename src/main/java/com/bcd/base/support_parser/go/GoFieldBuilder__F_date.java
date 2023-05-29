@@ -32,21 +32,17 @@ public class GoFieldBuilder__F_date extends GoFieldBuilder {
         final DateMode mode = anno.mode();
         final String zoneId = anno.zoneId();
         final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.pkg_byteOrder);
-        final String varNameLocation = goFieldName + "_location";
+        final String varNameLocation;
         if (mode == DateMode.Bytes_yyMMddHHmmss || mode == DateMode.Bytes_yyyyMMddHHmmss) {
-            ParseUtil.append(body, "{},err:=time.LoadLocation(\"{}\")", varNameLocation, zoneId);
-            ParseUtil.append(body, "if err!=nil{\n");
-            ParseUtil.append(body, "return nil,err\n");
-            ParseUtil.append(body, "}\n");
+            varNameLocation = context.getVarNameLocation(zoneId);
+        } else {
+            varNameLocation = null;
         }
 
         switch (mode) {
             case Bytes_yyMMddHHmmss -> {
                 final String varNameBytes = goFieldName + "_bytes";
-                ParseUtil.append(body, "{},err:={}.Read_bytes(6)\n", varNameBytes, GoFieldBuilder.varNameByteBuf);
-                ParseUtil.append(body, "if err!=nil{\n");
-                ParseUtil.append(body, "return nil,err\n");
-                ParseUtil.append(body, "}\n");
+                ParseUtil.append(body, "{}:={}.Read_bytes(6)\n", varNameBytes, GoFieldBuilder.varNameByteBuf);
                 ParseUtil.append(body, "{}.{}=time.Date({}+int({}[0]),time.Month(int({}[1])),int({}[2]),int({}[3]),int({}[4]),int({}[5]),0,{})\n",
                         GoFieldBuilder.varNameInstance, goFieldName,
                         baseYear, varNameBytes, varNameBytes, varNameBytes, varNameBytes, varNameBytes, varNameBytes,
@@ -55,10 +51,7 @@ public class GoFieldBuilder__F_date extends GoFieldBuilder {
             case Bytes_yyyyMMddHHmmss -> {
                 final String varNameYear = goFieldName + "_year";
                 final String varNameBytes = goFieldName + "_bytes";
-                ParseUtil.append(body, "{},err:={}.Read_uint16({})\n", varNameYear, GoFieldBuilder.varNameByteBuf, bigEndian);
-                ParseUtil.append(body, "if err!=nil{\n");
-                ParseUtil.append(body, "return nil,err\n");
-                ParseUtil.append(body, "}\n");
+                ParseUtil.append(body, "{}:={}.Read_uint16({})\n", varNameYear, GoFieldBuilder.varNameByteBuf, bigEndian);
                 ParseUtil.append(body, "{},err:={}.Read_bytes(5)\n", varNameBytes, GoFieldBuilder.varNameByteBuf);
                 ParseUtil.append(body, "if err!=nil{\n");
                 ParseUtil.append(body, "return nil,err\n");
@@ -70,42 +63,27 @@ public class GoFieldBuilder__F_date extends GoFieldBuilder {
             }
             case Uint64_millisecond -> {
                 final String varNameReadVal = goFieldName + "_v";
-                ParseUtil.append(body, "{},err:={}.Read_int64({})\n", varNameReadVal, GoFieldBuilder.varNameByteBuf, bigEndian);
-                ParseUtil.append(body, "if err!=nil{\n");
-                ParseUtil.append(body, "return nil,err\n");
-                ParseUtil.append(body, "}\n");
+                ParseUtil.append(body, "{}:={}.Read_int64({})\n", varNameReadVal, GoFieldBuilder.varNameByteBuf, bigEndian);
                 ParseUtil.append(body, "{}.{}=time.UnixMilli({})\n", GoFieldBuilder.varNameInstance, goFieldName, varNameReadVal);
             }
             case Uint64_second -> {
                 final String varNameReadVal = goFieldName + "_v";
-                ParseUtil.append(body, "{},err:={}.Read_int64({})\n", varNameReadVal, GoFieldBuilder.varNameByteBuf, bigEndian);
-                ParseUtil.append(body, "if err!=nil{\n");
-                ParseUtil.append(body, "return nil,err\n");
-                ParseUtil.append(body, "}\n");
+                ParseUtil.append(body, "{}:={}.Read_int64({})\n", varNameReadVal, GoFieldBuilder.varNameByteBuf, bigEndian);
                 ParseUtil.append(body, "{}.{}=time.UnixMilli({}*1000)\n", GoFieldBuilder.varNameInstance, goFieldName, varNameReadVal);
             }
             case Uint32_second -> {
                 final String varNameReadVal = goFieldName + "_v";
-                ParseUtil.append(body, "{},err:={}.Read_int32({})\n", varNameReadVal, GoFieldBuilder.varNameByteBuf, bigEndian);
-                ParseUtil.append(body, "if err!=nil{\n");
-                ParseUtil.append(body, "return nil,err\n");
-                ParseUtil.append(body, "}\n");
+                ParseUtil.append(body, "{}:={}.Read_int32({})\n", varNameReadVal, GoFieldBuilder.varNameByteBuf, bigEndian);
                 ParseUtil.append(body, "{}.{}=time.UnixMilli(int64({})*1000)\n", GoFieldBuilder.varNameInstance, goFieldName, varNameReadVal);
             }
             case Float64_millisecond -> {
                 final String varNameReadVal = goFieldName + "_v";
-                ParseUtil.append(body, "{},err:={}.Read_float64({})\n", varNameReadVal, GoFieldBuilder.varNameByteBuf, bigEndian);
-                ParseUtil.append(body, "if err!=nil{\n");
-                ParseUtil.append(body, "return nil,err\n");
-                ParseUtil.append(body, "}\n");
+                ParseUtil.append(body, "{}:={}.Read_float64({})\n", varNameReadVal, GoFieldBuilder.varNameByteBuf, bigEndian);
                 ParseUtil.append(body, "{}.{}=time.UnixMilli(int64({}))\n", GoFieldBuilder.varNameInstance, goFieldName, varNameReadVal);
             }
             case Float64_second -> {
                 final String varNameReadVal = goFieldName + "_v";
-                ParseUtil.append(body, "{},err:={}.Read_float64({})\n", varNameReadVal, GoFieldBuilder.varNameByteBuf, bigEndian);
-                ParseUtil.append(body, "if err!=nil{\n");
-                ParseUtil.append(body, "return nil,err\n");
-                ParseUtil.append(body, "}\n");
+                ParseUtil.append(body, "{}:={}.Read_float64({})\n", varNameReadVal, GoFieldBuilder.varNameByteBuf, bigEndian);
                 ParseUtil.append(body, "{}.{}=time.UnixMilli(int64({}*1000))\n", GoFieldBuilder.varNameInstance, goFieldName, varNameReadVal);
             }
         }

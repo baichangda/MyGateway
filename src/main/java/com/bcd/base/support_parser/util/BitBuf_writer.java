@@ -164,7 +164,7 @@ public class BitBuf_writer {
         int bitOffset = this.bitOffset;
         byte b = this.b;
         if (!unsigned && l < 0) {
-            l = (-l) & ((0x01L << bit) - 1);
+            l = l & ((0x01L << bit) - 1);
         }
         if (!bigEndian) {
             l = Long.reverse(l) >>> (64 - bit);
@@ -193,6 +193,9 @@ public class BitBuf_writer {
 
 
     public final WriteLog write_log(long l, int bit, boolean bigEndian, boolean unsigned) {
+        if(l==-1015L){
+            System.out.println(l);
+        }
         final ByteBuf byteBuf = this.byteBuf;
         int bitOffset = this.bitOffset;
         byte b = this.b;

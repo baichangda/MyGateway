@@ -26,8 +26,7 @@ public class PerformanceUtil {
      * @param num
      * @param <T>
      */
-    public static <T> void testMultiThreadPerformance(byte[] bytes,Class<T> clazz, int threadNum, int num, boolean parse) {
-        logger.info("threadNum:{}", threadNum);
+    public static <T> void testMultiThreadPerformance(byte[] bytes, Class<T> clazz, int threadNum, int num, boolean parse) {
         final LongAdder count = new LongAdder();
         final ExecutorService[] pools = new ExecutorService[threadNum];
         for (int i = 0; i < pools.length; i++) {
@@ -51,7 +50,7 @@ public class PerformanceUtil {
         final ScheduledExecutorService monitor = Executors.newSingleThreadScheduledExecutor();
         monitor.scheduleAtFixedRate(() -> {
             long sum = count.sumThenReset() / 3;
-            logger.info("{} , threadNum:{} , totalSpeed/s:{} , perThreadSpeed/s:{}", "parse", threadNum, sum, sum / threadNum);
+            logger.info("{} threadNum:{} num:{} totalSpeed/s:{} perThreadSpeed/s:{}", "parse", threadNum, num, sum, sum / threadNum);
         }, 3, 3, TimeUnit.SECONDS);
 
         try {

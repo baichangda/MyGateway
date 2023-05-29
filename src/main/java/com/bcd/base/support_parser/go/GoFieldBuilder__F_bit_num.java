@@ -66,10 +66,7 @@ public class GoFieldBuilder__F_bit_num extends GoFieldBuilder {
         final int len = anno.len();
         final String valExpr = anno.valExpr();
 
-        ParseUtil.append(body, "{},err:={}.Read({},{},{})\n", varNameReadVal, varNameBitBufReader, len, bigEndian, unsigned);
-        ParseUtil.append(body, "if err!=nil{\n");
-        ParseUtil.append(body, "return nil,err\n");
-        ParseUtil.append(body, "}\n");
+        ParseUtil.append(body, "{}:={}.Read({},{},{})\n", varNameReadVal, varNameBitBufReader, len, bigEndian, unsigned);
         if (context.bitEndWhenBitField_process) {
             ParseUtil.append(body, "{}.Finish();\n", varNameBitBufReader);
         }

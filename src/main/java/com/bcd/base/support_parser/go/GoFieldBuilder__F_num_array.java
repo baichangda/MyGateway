@@ -76,27 +76,21 @@ public class GoFieldBuilder__F_num_array extends GoFieldBuilder {
 
         final String varNameArr = goFieldName+"_arr";
         if (singleLen == 1 && unsigned && valExpr.isEmpty()) {
-            ParseUtil.append(body, "{},err:={}.Read_bytes({})\n", varNameArr, GoFieldBuilder.varNameByteBuf, varNameLen);
-            ParseUtil.append(body, "if err!=nil{\n");
-            ParseUtil.append(body, "return nil,err\n");
-            ParseUtil.append(body, "}\n");
+            ParseUtil.append(body, "{}:={}.Read_bytes({})\n", varNameArr, GoFieldBuilder.varNameByteBuf, varNameLen);
         } else {
             ParseUtil.append(body, "{}:=make([]{},{})\n", varNameArr, goFieldTypeName, varNameLen);
             ParseUtil.append(body, "for i:=0;i<{};i++{\n", varNameLen);
             switch (singleLen) {
                 case 1 -> {
-                    ParseUtil.append(body, "e,err:={}.Read_{}()\n", GoFieldBuilder.varNameByteBuf, goFieldTypeName);
+                    ParseUtil.append(body, "e:={}.Read_{}()\n", GoFieldBuilder.varNameByteBuf, goReadTypeName);
                 }
                 case 2, 4, 8 -> {
-                    ParseUtil.append(body, "e,err:={}.Read_{}({})\n", GoFieldBuilder.varNameByteBuf, goFieldTypeName, bigEndian);
+                    ParseUtil.append(body, "e:={}.Read_{}({})\n", GoFieldBuilder.varNameByteBuf, goReadTypeName, bigEndian);
                 }
                 default -> {
                     ParseUtil.notSupport_len(field, annoClass);
                 }
             }
-            ParseUtil.append(body, "if err!=nil{\n");
-            ParseUtil.append(body, "return nil,err\n");
-            ParseUtil.append(body, "}\n");
             String valCode = "e";
             if (!goReadTypeName.equals(goFieldTypeName)) {
                 valCode = ParseUtil.format("{}({})", goFieldTypeName, valCode);
@@ -134,7 +128,7 @@ public class GoFieldBuilder__F_num_array extends GoFieldBuilder {
                 valCode = ParseUtil.replaceValExprToCode(RpnUtil.reverseExpr(valExpr), valCode);
             }
             if (!goReadTypeName.equals(goFieldTypeName)) {
-                valCode = ParseUtil.format("{}(parse.Round(float64({})))", goReadTypeName, valCode);
+                valCode = ParseUtil.format("{}(parse.Round({}))", goReadTypeName, valCode);
             }
             switch (singleLen) {
                 case 1 -> {

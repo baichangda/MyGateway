@@ -43,10 +43,7 @@ public class GoFieldBuilder__F_string extends GoFieldBuilder {
 
         final StringAppendMode stringAppendMode = anno.appendMode();
         final String varNameReadVal = goFieldName + "_v";
-        ParseUtil.append(body, "{},err:={}.Read_bytes({})\n", varNameReadVal, GoFieldBuilder.varNameByteBuf, varNameLen);
-        ParseUtil.append(body, "if err!=nil{\n");
-        ParseUtil.append(body, "return nil,err\n");
-        ParseUtil.append(body, "}\n");
+        ParseUtil.append(body, "{}:={}.Read_bytes({})\n", varNameReadVal, GoFieldBuilder.varNameByteBuf, varNameLen);
         switch (stringAppendMode) {
             case NoAppend -> {
                 ParseUtil.append(body, "{}.{}=string({})\n\n", GoFieldBuilder.varNameInstance, goFieldName, varNameReadVal);

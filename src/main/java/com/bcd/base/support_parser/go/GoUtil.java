@@ -13,13 +13,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class GoUtil {
 
     public final static Set<String> bitStructSet = new HashSet<>();
+    public final static Map<String, String> zoneId_varNameLocation = new HashMap<>();
 
     public final static GoFieldBuilder__F_num fieldBuilder__f_num = new GoFieldBuilder__F_num();
     public final static GoFieldBuilder__F_num_array fieldBuilder__f_num_array = new GoFieldBuilder__F_num_array();
@@ -114,18 +113,19 @@ public class GoUtil {
 
     public final static void toSourceCode(String pkg, ByteOrder byteOrder, BitOrder bitOrder, String goFilePath) {
         final StringBuilder body = new StringBuilder();
-        final List<Class> classes;
+        final List<Class<?>> classes;
         try {
             classes = ClassUtil.getClasses(pkg);
         } catch (IOException | ClassNotFoundException ex) {
             throw BaseRuntimeException.getException(ex);
         }
 
-        for (Class clazz : classes) {
+        for (Class<?> clazz : classes) {
             initBitClassSet(clazz);
         }
 
-        for (Class clazz : classes) {
+        final StringBuilder globalBody = new StringBuilder();
+        for (Class<?> clazz : classes) {
             final List<Field> parseFields = ParseUtil.getParseFields(clazz);
             if (parseFields.isEmpty()) {
                 continue;
@@ -134,20 +134,18 @@ public class GoUtil {
             final StringBuilder structBody = new StringBuilder();
             final StringBuilder parseBody = new StringBuilder();
             final StringBuilder deParseBody = new StringBuilder();
-            final GoBuildContext context = new GoBuildContext(clazz, byteOrder, bitOrder, structBody, parseBody, deParseBody);
+            final GoBuildContext context = new GoBuildContext(clazz, byteOrder, bitOrder, globalBody, structBody, parseBody, deParseBody);
             ParseUtil.append(structBody, "type {} struct{\n", context.goStructName);
-            ParseUtil.append(parseBody, "func To{}({} *parse.ByteBuf,{} *parse.ParseContext) (*{},error){\n",
+            ParseUtil.append(parseBody, "func To{}({} *parse.ByteBuf,{} *parse.ParseContext) {}{\n",
                     context.goStructName, GoFieldBuilder.varNameByteBuf, GoFieldBuilder.varNameParentParseContext, context.goStructName);
             ParseUtil.append(parseBody, "{}:={}{}\n", GoFieldBuilder.varNameInstance, context.goStructName);
-            ParseUtil.append(deParseBody, "func(_{} *{})Write({} *parse.ByteBuf,{} *parse.ParseContext){\n",
+            ParseUtil.append(deParseBody, "func({} {})Write({} *parse.ByteBuf,{} *parse.ParseContext){\n",
                     GoFieldBuilder.varNameInstance, context.goStructName,
                     GoFieldBuilder.varNameByteBuf, GoFieldBuilder.varNameParentParseContext);
             if (hasFieldSkipModeReserved) {
                 ParseUtil.append(parseBody, "{}:={}.ReaderIndex()\n", GoFieldBuilder.varNameStartIndex, GoFieldBuilder.varNameByteBuf);
                 ParseUtil.append(deParseBody, "{}:={}.WriterIndex()\n", GoFieldBuilder.varNameStartIndex, GoFieldBuilder.varNameByteBuf);
             }
-            ParseUtil.append(parseBody, "var err error\n");
-            ParseUtil.append(deParseBody, "{}:=*_{}\n", GoFieldBuilder.varNameInstance, GoFieldBuilder.varNameInstance);
 
             for (int i = 0; i < parseFields.size(); i++) {
                 final Field field = parseFields.get(i);
@@ -190,9 +188,10 @@ public class GoUtil {
 
 
             ParseUtil.append(structBody, "}\n");
-            ParseUtil.append(parseBody, "return &{},nil\n", GoFieldBuilder.varNameInstance);
+            ParseUtil.append(parseBody, "return {}\n", GoFieldBuilder.varNameInstance);
             ParseUtil.append(parseBody, "}\n");
             ParseUtil.append(deParseBody, "}\n");
+
             body.append(structBody);
             body.append("\n");
             body.append(parseBody);
@@ -201,14 +200,19 @@ public class GoUtil {
             body.append("\n");
         }
 
+        body.insert(0, globalBody);
+
         final Path path = Paths.get(goFilePath);
         final Path parent = path.getParent();
         final Path goPkg = parent.getName(parent.getNameCount() - 1);
-        try (final BufferedWriter bw = Files.newBufferedWriter(path, StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING)) {
-            bw.write("package " + goPkg);
-            bw.newLine();
-            bw.write(body.toString());
-            bw.flush();
+        try {
+            Files.createDirectories(parent);
+            try (final BufferedWriter bw = Files.newBufferedWriter(path, StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING)) {
+                bw.write("package " + goPkg);
+                bw.newLine();
+                bw.write(body.toString());
+                bw.flush();
+            }
         } catch (IOException ex) {
             throw BaseRuntimeException.getException(ex);
         }
@@ -344,10 +348,12 @@ public class GoUtil {
     }
 
     public static void main(String[] args) {
-//        final String s = "com.bcd.base.support_parser.impl.immotors.ep33.data";
 //        final String s = "com.bcd.base.support_parser.impl.icd.data";
-        final String s = "com.bcd.base.support_parser.impl.gb32960.data";
+//        final String s = "com.bcd.base.support_parser.impl.gb32960.data";
+//        toSourceCode(s, ByteOrder.BigEndian, BitOrder.BigEndian,
+//                "/Users/baichangda/bcd/goworkspace/MyGateway_go/gb32960/java.go");
+        final String s = "com.bcd.base.support_parser.impl.immotors.ep33.data";
         toSourceCode(s, ByteOrder.BigEndian, BitOrder.BigEndian,
-                "/Users/baichangda/bcd/goworkspace/MyGateway_go/gb32960/java.go");
+                "/Users/baichangda/bcd/goworkspace/MyGateway_go/immotors/ep33/java.go");
     }
 }

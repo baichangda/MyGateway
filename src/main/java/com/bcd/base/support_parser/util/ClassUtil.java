@@ -124,9 +124,9 @@ public class ClassUtil {
      * @param packageName
      * @return
      */
-    public static List<Class> getClasses(String packageName) throws IOException, ClassNotFoundException {
+    public static List<Class<?>> getClasses(String packageName) throws IOException, ClassNotFoundException {
         // 第一个class类的集合
-        List<Class> classes = new ArrayList<>();
+        List<Class<?>> classes = new ArrayList<>();
         // 是否循环迭代
         boolean recursive = true;
         // 获取包的名字 并进行替换
@@ -195,7 +195,7 @@ public class ClassUtil {
      * @param recursive
      * @param classes
      */
-    private static void findAndAddClassesInPackageByFile(String packageName, String packagePath, final boolean recursive, List<Class> classes) throws ClassNotFoundException {
+    private static void findAndAddClassesInPackageByFile(String packageName, String packagePath, final boolean recursive, List<Class<?>> classes) throws ClassNotFoundException {
         // 获取此包的目录 建立一个File
         File dir = new File(packagePath);
         // 如果不存在或者 也不是目录就直接返回
