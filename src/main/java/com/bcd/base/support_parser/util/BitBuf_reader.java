@@ -187,9 +187,11 @@ public class BitBuf_reader {
     public final long read(int bit, boolean bigEndian, boolean unsigned) {
         final ByteBuf byteBuf = this.byteBuf;
         final int bitOffset = this.bitOffset;
-        byte b = this.b;
+        byte b;
         if (bitOffset == 0) {
             b = byteBuf.readByte();
+        } else {
+            b = this.b;
         }
         final int temp = bit + bitOffset;
         final int byteLen = (temp >> 3) + ((temp & 7) == 0 ? 0 : 1);
@@ -222,10 +224,11 @@ public class BitBuf_reader {
     public final ReadLog read_log(int bit, boolean bigEndian, boolean unsigned) {
         final ByteBuf byteBuf = this.byteBuf;
         final int bitOffset = this.bitOffset;
-        byte b = this.b;
-
+        byte b;
         if (bitOffset == 0) {
             b = byteBuf.readByte();
+        } else {
+            b = this.b;
         }
         final int temp = bit + bitOffset;
         final int byteLen = (temp >> 3) + ((temp & 7) == 0 ? 0 : 1);
