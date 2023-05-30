@@ -15,10 +15,9 @@ public class GoBuildContext {
     public final Class<?> clazz;
     public final String goStructName;
 
-
     public Field field;
-    public GoField goField;
 
+    public GoField goField;
 
     public final Map<Character, String> varToGoFieldName_parse = new HashMap<>();
     public final Map<Character, String> varToGoFieldName_deParse = new HashMap<>();
@@ -80,7 +79,11 @@ public class GoBuildContext {
 
     public final String getVarNameParseContext() {
         if (varNameParseContext == null) {
-            ParseUtil.append(parseBody, "{}:=parse.ToParseContext(&{},{})\n", GoFieldBuilder.varNameParseContext, GoFieldBuilder.varNameInstance, GoFieldBuilder.varNameParentParseContext);
+            if(GoUtil.noPointerStructSet.contains(goStructName)) {
+                ParseUtil.append(parseBody, "{}:=parse.ToParseContext({},{})\n", GoFieldBuilder.varNameParseContext, GoFieldBuilder.varNameInstance, GoFieldBuilder.varNameParentParseContext);
+            }else {
+                ParseUtil.append(parseBody, "{}:=parse.ToParseContext(&{},{})\n", GoFieldBuilder.varNameParseContext, GoFieldBuilder.varNameInstance, GoFieldBuilder.varNameParentParseContext);
+            }
             varNameParseContext = GoFieldBuilder.varNameParseContext;
         }
         return varNameParseContext;
@@ -88,7 +91,11 @@ public class GoBuildContext {
 
     public final String getVarNameDeParseContext() {
         if (varNameDeParseContext == null) {
-            ParseUtil.append(deParseBody, "{}:=parse.ToParseContext(&{},{})\n", GoFieldBuilder.varNameParseContext, GoFieldBuilder.varNameInstance, GoFieldBuilder.varNameParentParseContext);
+            if(GoUtil.noPointerStructSet.contains(goStructName)){
+                ParseUtil.append(deParseBody, "{}:=parse.ToParseContext({},{})\n", GoFieldBuilder.varNameParseContext, GoFieldBuilder.varNameInstance, GoFieldBuilder.varNameParentParseContext);
+            }else{
+                ParseUtil.append(deParseBody, "{}:=parse.ToParseContext(_{},{})\n", GoFieldBuilder.varNameParseContext, GoFieldBuilder.varNameInstance, GoFieldBuilder.varNameParentParseContext);
+            }
             varNameDeParseContext = GoFieldBuilder.varNameParseContext;
         }
         return varNameDeParseContext;
@@ -100,7 +107,7 @@ public class GoBuildContext {
         String varName = GoUtil.zoneId_varNameLocation.get(zoneId);
         if (varName == null) {
             final int size = GoUtil.zoneId_varNameLocation.size();
-            varName = "_location" + size;
+            varName = "_Location" + size;
             ParseUtil.append(globalBody, "var {},_=time.LoadLocation(\"{}\")\n", varName, of.getId());
             GoUtil.zoneId_varNameLocation.put(zoneId, varName);
         }

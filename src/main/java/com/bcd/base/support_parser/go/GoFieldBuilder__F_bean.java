@@ -17,7 +17,7 @@ public class GoFieldBuilder__F_bean extends GoFieldBuilder {
         final String goFieldName = goField.goFieldName;
         final String goFieldTypeName = field.getType().getSimpleName();
         goField.goFieldTypeName = goFieldTypeName;
-        ParseUtil.append(body, "{} {}\n", goFieldName, goFieldTypeName);
+        ParseUtil.append(body, "{} *{}\n", goFieldName, goFieldTypeName);
     }
 
     @Override

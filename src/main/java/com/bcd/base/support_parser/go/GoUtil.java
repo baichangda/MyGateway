@@ -9,16 +9,19 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class GoUtil {
 
-    public final static Set<String> bitStructSet = new HashSet<>();
     public final static Map<String, String> zoneId_varNameLocation = new HashMap<>();
+
+    public final static Set<String> noPointerStructSet = new HashSet<>();
 
     public final static GoFieldBuilder__F_num fieldBuilder__f_num = new GoFieldBuilder__F_num();
     public final static GoFieldBuilder__F_num_array fieldBuilder__f_num_array = new GoFieldBuilder__F_num_array();
@@ -34,19 +37,17 @@ public class GoUtil {
     public final static GoFieldBuilder__F_bean_list fieldBuilder__f_bean_list = new GoFieldBuilder__F_bean_list();
     public final static GoFieldBuilder__F_customize fieldBuilder__f_customize = new GoFieldBuilder__F_customize();
 
-    private static void initBitClassSet(Class<?> clazz) {
-        final List<Field> parseFields = ParseUtil.getParseFields(clazz);
-        if (parseFields.isEmpty()) {
-            return;
-        }
-        parseFields.forEach(e -> {
-            if (e.isAnnotationPresent(F_bit_num.class) ||
-                    e.isAnnotationPresent(F_bit_num_array.class) ||
-                    e.isAnnotationPresent(F_bit_skip.class) ||
-                    e.isAnnotationPresent(F_customize.class)) {
-                bitStructSet.add(clazz.getSimpleName());
+    private static void initNoPointerStructSet(Class<?> clazz) {
+        noPointerStructSet.addAll(ParseUtil.getParseFields(clazz).stream().filter(e -> e.isAnnotationPresent(F_bean_list.class)).map(field -> {
+            final Class<?> fieldType = field.getType();
+            final Class<?> c;
+            if (fieldType.isArray()) {
+                c = fieldType.getComponentType();
+            } else {
+                c = ((Class<?>) (((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0]));
             }
-        });
+            return toFirstUpperCase(c.getSimpleName());
+        }).collect(Collectors.toSet()));
     }
 
 
@@ -122,7 +123,7 @@ public class GoUtil {
         }
 
         for (Class<?> clazz : classes) {
-            initBitClassSet(clazz);
+            initNoPointerStructSet(clazz);
         }
 
         final StringBuilder globalBody = new StringBuilder();
@@ -136,17 +137,29 @@ public class GoUtil {
             final StringBuilder parseBody = new StringBuilder();
             final StringBuilder deParseBody = new StringBuilder();
             final GoBuildContext context = new GoBuildContext(clazz, byteOrder, bitOrder, globalBody, structBody, parseBody, deParseBody, customizeBody);
-            ParseUtil.append(structBody, "type {} struct{\n", context.goStructName);
-            ParseUtil.append(parseBody, "func To{}({} *parse.ByteBuf,{} *parse.ParseContext) {}{\n",
-                    context.goStructName, GoFieldBuilder.varNameByteBuf, GoFieldBuilder.varNameParentParseContext, context.goStructName);
-            ParseUtil.append(parseBody, "{}:={}{}\n", GoFieldBuilder.varNameInstance, context.goStructName);
-            ParseUtil.append(deParseBody, "func({} {})Write({} *parse.ByteBuf,{} *parse.ParseContext){\n",
-                    GoFieldBuilder.varNameInstance, context.goStructName,
-                    GoFieldBuilder.varNameByteBuf, GoFieldBuilder.varNameParentParseContext);
+            final String goStructName = context.goStructName;
+            ParseUtil.append(structBody, "type {} struct{\n", goStructName);
+            if (GoUtil.noPointerStructSet.contains(goStructName)) {
+                ParseUtil.append(parseBody, "func To{}({} *parse.ByteBuf,{} *parse.ParseContext) {}{\n",
+                        goStructName, GoFieldBuilder.varNameByteBuf, GoFieldBuilder.varNameParentParseContext, goStructName);
+                ParseUtil.append(deParseBody, "func({} {})Write({} *parse.ByteBuf,{} *parse.ParseContext){\n",
+                        GoFieldBuilder.varNameInstance, goStructName,
+                        GoFieldBuilder.varNameByteBuf, GoFieldBuilder.varNameParentParseContext);
+            }else{
+                ParseUtil.append(parseBody, "func To{}({} *parse.ByteBuf,{} *parse.ParseContext) *{}{\n",
+                        goStructName, GoFieldBuilder.varNameByteBuf, GoFieldBuilder.varNameParentParseContext, goStructName);
+                ParseUtil.append(deParseBody, "func(_{} *{})Write({} *parse.ByteBuf,{} *parse.ParseContext){\n",
+                        GoFieldBuilder.varNameInstance, goStructName,
+                        GoFieldBuilder.varNameByteBuf, GoFieldBuilder.varNameParentParseContext);
+                ParseUtil.append(deParseBody, "{}:= *_{}\n", GoFieldBuilder.varNameInstance, GoFieldBuilder.varNameInstance);
+            }
+            ParseUtil.append(parseBody, "{}:={}{}\n", GoFieldBuilder.varNameInstance, goStructName);
             if (hasFieldSkipModeReserved) {
                 ParseUtil.append(parseBody, "{}:={}.ReaderIndex()\n", GoFieldBuilder.varNameStartIndex, GoFieldBuilder.varNameByteBuf);
                 ParseUtil.append(deParseBody, "{}:={}.WriterIndex()\n", GoFieldBuilder.varNameStartIndex, GoFieldBuilder.varNameByteBuf);
             }
+
+
 
             for (int i = 0; i < parseFields.size(); i++) {
                 final Field field = parseFields.get(i);
@@ -189,7 +202,11 @@ public class GoUtil {
 
 
             ParseUtil.append(structBody, "}\n");
-            ParseUtil.append(parseBody, "return {}\n", GoFieldBuilder.varNameInstance);
+            if (GoUtil.noPointerStructSet.contains(goStructName)) {
+                ParseUtil.append(parseBody, "return {}\n", GoFieldBuilder.varNameInstance);
+            }else{
+                ParseUtil.append(parseBody, "return &{}\n", GoFieldBuilder.varNameInstance);
+            }
             ParseUtil.append(parseBody, "}\n");
             ParseUtil.append(deParseBody, "}\n");
 
@@ -362,9 +379,9 @@ public class GoUtil {
 
     public static void main(String[] args) {
 //        final String s = "com.bcd.base.support_parser.impl.icd.data";
-//        final String s = "com.bcd.base.support_parser.impl.gb32960.data";
-//        toSourceCode(s, ByteOrder.BigEndian, BitOrder.BigEndian, "/Users/baichangda/bcd/goworkspace/MyGateway_go/support_parse/gb32960/java.go");
-        final String s = "com.bcd.base.support_parser.impl.immotors.ep33.data";
-        toSourceCode(s, ByteOrder.BigEndian, BitOrder.BigEndian, "/Users/baichangda/bcd/goworkspace/MyGateway_go/support_parse/immotors/ep33/java.go");
+        final String s = "com.bcd.base.support_parser.impl.gb32960.data";
+        toSourceCode(s, ByteOrder.BigEndian, BitOrder.BigEndian, "/Users/baichangda/bcd/goworkspace/MyGateway_go/support_parse/gb32960/java.go");
+//        final String s = "com.bcd.base.support_parser.impl.immotors.ep33.data";
+//        toSourceCode(s, ByteOrder.BigEndian, BitOrder.BigEndian, "/Users/baichangda/bcd/goworkspace/MyGateway_go/support_parse/immotors/ep33/java.go");
     }
 }

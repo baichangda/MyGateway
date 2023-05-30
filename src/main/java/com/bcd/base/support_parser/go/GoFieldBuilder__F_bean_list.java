@@ -57,7 +57,12 @@ public class GoFieldBuilder__F_bean_list extends GoFieldBuilder {
             ParseUtil.append(body, "{}.BitBuf_reader={}\n", varNameParseContext, varNameBitBuf);
         }
         ParseUtil.append(body, "for i:=0;i<{};i++{\n", varNameLen);
-        final String valCode = ParseUtil.format("To{}({},{})", goFieldTypeName, GoFieldBuilder.varNameByteBuf, varNameParseContext);
+        final String valCode;
+        if (GoUtil.noPointerStructSet.contains(goFieldTypeName)) {
+            valCode = ParseUtil.format("To{}({},{})", goFieldTypeName, GoFieldBuilder.varNameByteBuf, varNameParseContext);
+        } else {
+            valCode = ParseUtil.format("*To{}({},{})", goFieldTypeName, GoFieldBuilder.varNameByteBuf, varNameParseContext);
+        }
         ParseUtil.append(body, "{}[i]={}\n", varNameArr, valCode);
         ParseUtil.append(body, "}\n", varNameLen);
         ParseUtil.append(body, "{}.{}={}\n", GoFieldBuilder.varNameInstance, goFieldName, varNameArr);
