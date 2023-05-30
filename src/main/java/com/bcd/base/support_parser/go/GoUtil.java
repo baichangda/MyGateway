@@ -18,10 +18,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class GoUtil {
+    public final static Set<String> noPointerStructSet = new HashSet<>();
 
     public final static Map<String, String> zoneId_varNameLocation = new HashMap<>();
-
-    public final static Set<String> noPointerStructSet = new HashSet<>();
 
     public final static GoFieldBuilder__F_num fieldBuilder__f_num = new GoFieldBuilder__F_num();
     public final static GoFieldBuilder__F_num_array fieldBuilder__f_num_array = new GoFieldBuilder__F_num_array();
@@ -37,6 +36,7 @@ public class GoUtil {
     public final static GoFieldBuilder__F_bean_list fieldBuilder__f_bean_list = new GoFieldBuilder__F_bean_list();
     public final static GoFieldBuilder__F_customize fieldBuilder__f_customize = new GoFieldBuilder__F_customize();
 
+
     private static void initNoPointerStructSet(Class<?> clazz) {
         noPointerStructSet.addAll(ParseUtil.getParseFields(clazz).stream().filter(e -> e.isAnnotationPresent(F_bean_list.class)).map(field -> {
             final Class<?> fieldType = field.getType();
@@ -49,7 +49,6 @@ public class GoUtil {
             return toFirstUpperCase(c.getSimpleName());
         }).collect(Collectors.toSet()));
     }
-
 
     private static boolean hasFieldSkipModeReserved(List<Field> parseFields) {
         return parseFields.stream().anyMatch(e -> {
@@ -121,7 +120,6 @@ public class GoUtil {
         } catch (IOException | ClassNotFoundException ex) {
             throw BaseRuntimeException.getException(ex);
         }
-
         for (Class<?> clazz : classes) {
             initNoPointerStructSet(clazz);
         }
@@ -139,7 +137,7 @@ public class GoUtil {
             final GoBuildContext context = new GoBuildContext(clazz, byteOrder, bitOrder, globalBody, structBody, parseBody, deParseBody, customizeBody);
             final String goStructName = context.goStructName;
             ParseUtil.append(structBody, "type {} struct{\n", goStructName);
-            if (GoUtil.noPointerStructSet.contains(goStructName)) {
+            if(noPointerStructSet.contains(goStructName)){
                 ParseUtil.append(parseBody, "func To{}({} *parse.ByteBuf,{} *parse.ParseContext) {}{\n",
                         goStructName, GoFieldBuilder.varNameByteBuf, GoFieldBuilder.varNameParentParseContext, goStructName);
                 ParseUtil.append(deParseBody, "func({} {})Write({} *parse.ByteBuf,{} *parse.ParseContext){\n",
@@ -154,11 +152,12 @@ public class GoUtil {
                 ParseUtil.append(deParseBody, "{}:= *_{}\n", GoFieldBuilder.varNameInstance, GoFieldBuilder.varNameInstance);
             }
             ParseUtil.append(parseBody, "{}:={}{}\n", GoFieldBuilder.varNameInstance, goStructName);
+
+
             if (hasFieldSkipModeReserved) {
                 ParseUtil.append(parseBody, "{}:={}.ReaderIndex()\n", GoFieldBuilder.varNameStartIndex, GoFieldBuilder.varNameByteBuf);
                 ParseUtil.append(deParseBody, "{}:={}.WriterIndex()\n", GoFieldBuilder.varNameStartIndex, GoFieldBuilder.varNameByteBuf);
             }
-
 
 
             for (int i = 0; i < parseFields.size(); i++) {
@@ -202,9 +201,9 @@ public class GoUtil {
 
 
             ParseUtil.append(structBody, "}\n");
-            if (GoUtil.noPointerStructSet.contains(goStructName)) {
+            if(noPointerStructSet.contains(goStructName)){
                 ParseUtil.append(parseBody, "return {}\n", GoFieldBuilder.varNameInstance);
-            }else{
+            }else {
                 ParseUtil.append(parseBody, "return &{}\n", GoFieldBuilder.varNameInstance);
             }
             ParseUtil.append(parseBody, "}\n");
@@ -379,9 +378,9 @@ public class GoUtil {
 
     public static void main(String[] args) {
 //        final String s = "com.bcd.base.support_parser.impl.icd.data";
-        final String s = "com.bcd.base.support_parser.impl.gb32960.data";
-        toSourceCode(s, ByteOrder.BigEndian, BitOrder.BigEndian, "/Users/baichangda/bcd/goworkspace/MyGateway_go/support_parse/gb32960/java.go");
-//        final String s = "com.bcd.base.support_parser.impl.immotors.ep33.data";
-//        toSourceCode(s, ByteOrder.BigEndian, BitOrder.BigEndian, "/Users/baichangda/bcd/goworkspace/MyGateway_go/support_parse/immotors/ep33/java.go");
+//        final String s = "com.bcd.base.support_parser.impl.gb32960.data";
+//        toSourceCode(s, ByteOrder.BigEndian, BitOrder.BigEndian, "/Users/baichangda/bcd/goworkspace/MyGateway_go/support_parse/gb32960/java.go");
+        final String s = "com.bcd.base.support_parser.impl.immotors.ep33.data";
+        toSourceCode(s, ByteOrder.BigEndian, BitOrder.BigEndian, "/Users/baichangda/bcd/goworkspace/MyGateway_go/support_parse/immotors/ep33/java.go");
     }
 }
