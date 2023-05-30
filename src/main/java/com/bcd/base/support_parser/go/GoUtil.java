@@ -113,6 +113,7 @@ public class GoUtil {
 
     public final static void toSourceCode(String pkg, ByteOrder byteOrder, BitOrder bitOrder, String goFilePath) {
         final StringBuilder body = new StringBuilder();
+        final StringBuilder customizeBody = new StringBuilder();
         final List<Class<?>> classes;
         try {
             classes = ClassUtil.getClasses(pkg);
@@ -134,7 +135,7 @@ public class GoUtil {
             final StringBuilder structBody = new StringBuilder();
             final StringBuilder parseBody = new StringBuilder();
             final StringBuilder deParseBody = new StringBuilder();
-            final GoBuildContext context = new GoBuildContext(clazz, byteOrder, bitOrder, globalBody, structBody, parseBody, deParseBody);
+            final GoBuildContext context = new GoBuildContext(clazz, byteOrder, bitOrder, globalBody, structBody, parseBody, deParseBody, customizeBody);
             ParseUtil.append(structBody, "type {} struct{\n", context.goStructName);
             ParseUtil.append(parseBody, "func To{}({} *parse.ByteBuf,{} *parse.ParseContext) {}{\n",
                     context.goStructName, GoFieldBuilder.varNameByteBuf, GoFieldBuilder.varNameParentParseContext, context.goStructName);
@@ -216,6 +217,18 @@ public class GoUtil {
         } catch (IOException ex) {
             throw BaseRuntimeException.getException(ex);
         }
+        final Path customizePath = Paths.get(parent + "/customize.go");
+        if (!customizeBody.isEmpty() && !Files.exists(customizePath)) {
+            try (final BufferedWriter bw = Files.newBufferedWriter(customizePath, StandardOpenOption.CREATE_NEW, StandardOpenOption.WRITE)) {
+                bw.write("package " + goPkg);
+                bw.newLine();
+                bw.write(customizeBody.toString());
+                bw.flush();
+            } catch (IOException ex) {
+                throw BaseRuntimeException.getException(ex);
+            }
+        }
+
     }
 
     private static String toFieldDefine(Field field) {
@@ -350,10 +363,8 @@ public class GoUtil {
     public static void main(String[] args) {
 //        final String s = "com.bcd.base.support_parser.impl.icd.data";
 //        final String s = "com.bcd.base.support_parser.impl.gb32960.data";
-//        toSourceCode(s, ByteOrder.BigEndian, BitOrder.BigEndian,
-//                "/Users/baichangda/bcd/goworkspace/MyGateway_go/gb32960/java.go");
+//        toSourceCode(s, ByteOrder.BigEndian, BitOrder.BigEndian, "/Users/baichangda/bcd/goworkspace/MyGateway_go/gb32960/java.go");
         final String s = "com.bcd.base.support_parser.impl.immotors.ep33.data";
-        toSourceCode(s, ByteOrder.BigEndian, BitOrder.BigEndian,
-                "/Users/baichangda/bcd/goworkspace/MyGateway_go/immotors/ep33/java.go");
+        toSourceCode(s, ByteOrder.BigEndian, BitOrder.BigEndian, "/Users/baichangda/bcd/goworkspace/MyGateway_go/immotors/ep33/java.go");
     }
 }

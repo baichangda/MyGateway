@@ -1,12 +1,12 @@
 package com.bcd.base.support_parser.util;
 
 
-
 import com.bcd.base.exception.BaseRuntimeException;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -222,5 +222,75 @@ public class ClassUtil {
 
             }
         }
+    }
+
+
+    public static boolean isPrimitiveWrapper(Class<?> clazz) {
+        try {
+            final Field field = clazz.getField("TYPE");
+            field.setAccessible(true);
+            return ((Class<?>) field.get(null)).isPrimitive();
+        } catch (NoSuchFieldException | SecurityException | IllegalAccessException ex) {
+            return false;
+        }
+    }
+
+    /**
+     * 判断是否是实体类
+     * - 非java基础类型及包装类型
+     * - 非接口、抽象类
+     * - 非枚举类
+     * - 非数组类
+     * - 非List、Map及其子类
+     *
+     * @param clazz
+     * @return
+     */
+    public static boolean isBeanType(Class<?> clazz) {
+        if (clazz.isPrimitive() || isPrimitiveWrapper(clazz)) {
+            return false;
+        } else if (clazz.isInterface() || javassist.Modifier.isAbstract(clazz.getModifiers())) {
+            return false;
+        } else if (clazz.isEnum()) {
+            return false;
+        } else if (clazz.isArray()) {
+            return false;
+        } else if (List.class.isAssignableFrom(clazz) || Map.class.isAssignableFrom(clazz)) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+
+    /**
+     * 获取class所有字段、会获取其父类字段
+     * public、非static
+     *
+     * @param clazz
+     * @return
+     */
+    public static List<Field> getAllFields(Class<?> clazz) {
+        final List<Class<?>> classList = new ArrayList<>();
+        classList.add(clazz);
+        Class<?> temp = clazz;
+        while (true) {
+            temp = temp.getSuperclass();
+            if (temp == null || Object.class == temp) {
+                break;
+            } else {
+                classList.add(0, temp);
+            }
+        }
+        final List<Field> resList = new ArrayList<>();
+        for (Class<?> c : classList) {
+            //过滤掉 final、static关键字修饰、且不是public的字段
+            final List<Field> fieldList = Arrays.stream(c.getDeclaredFields())
+                    .filter(e -> !Modifier.isStatic(e.getModifiers()) &&
+                                    Modifier.isPublic(e.getModifiers())).toList();
+            resList.addAll(fieldList);
+        }
+        return resList;
+
     }
 }

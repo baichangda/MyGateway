@@ -16,6 +16,7 @@ import org.slf4j.helpers.MessageFormatter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class ParseUtil {
 
@@ -120,7 +121,7 @@ public class ParseUtil {
                 configOrder = config.order();
             }
         }
-        return bigEndian(order,configOrder);
+        return bigEndian(order, configOrder);
 
 
     }
@@ -362,8 +363,8 @@ public class ParseUtil {
         sb.append(format(message, params));
     }
 
-    public static void insert(final StringBuilder sb,int index, final String message, Object... params) {
-        sb.insert(index,format(message, params));
+    public static void insert(final StringBuilder sb, int index, final String message, Object... params) {
+        sb.insert(index, format(message, params));
     }
 
     static final double[] pows;
@@ -453,29 +454,7 @@ public class ParseUtil {
     }
 
     public static List<Field> getParseFields(Class<?> clazz) {
-        final List<Class<?>> classList = new ArrayList<>();
-        classList.add(clazz);
-        Class<?> temp = clazz;
-        while (true) {
-            temp = temp.getSuperclass();
-            if (temp == null || Object.class == temp) {
-                break;
-            } else {
-                classList.add(0, temp);
-            }
-        }
-        final List<Field> resList = new ArrayList<>();
-        for (Class<?> c : classList) {
-            //过滤掉 final、static关键字修饰、且不是public的字段
-            final List<Field> fieldList = Arrays.stream(c.getDeclaredFields())
-                    .filter(e ->
-                            needParse(e) &&
-                                    !Modifier.isFinal(e.getModifiers()) &&
-                                    !Modifier.isStatic(e.getModifiers()) &&
-                                    Modifier.isPublic(e.getModifiers())).toList();
-            resList.addAll(fieldList);
-        }
-        return resList;
+        return ClassUtil.getAllFields(clazz).stream().filter(ParseUtil::needParse).collect(Collectors.toList());
     }
 
 }

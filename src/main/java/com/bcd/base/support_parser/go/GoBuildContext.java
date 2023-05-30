@@ -30,6 +30,7 @@ public class GoBuildContext {
     public final StringBuilder structBody;
     public final StringBuilder parseBody;
     public final StringBuilder deParseBody;
+    public final StringBuilder customizeBody;
 
     public String varNameBitBuf_reader;
     public String varNameBitBuf_writer;
@@ -41,7 +42,7 @@ public class GoBuildContext {
 
 
     public GoBuildContext(Class<?> clazz, ByteOrder pkg_byteOrder, BitOrder pkg_bitOrder, StringBuilder globalBody, StringBuilder structBody
-            , StringBuilder parseBody, StringBuilder deParseBody) {
+            , StringBuilder parseBody, StringBuilder deParseBody, StringBuilder customizeBody) {
         this.clazz = clazz;
         this.goStructName = GoUtil.toFirstUpperCase(clazz.getSimpleName());
         this.pkg_byteOrder = pkg_byteOrder;
@@ -50,6 +51,7 @@ public class GoBuildContext {
         this.structBody = structBody;
         this.parseBody = parseBody;
         this.deParseBody = deParseBody;
+        this.customizeBody = customizeBody;
     }
 
     public void setField(Field field) {
