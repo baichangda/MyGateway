@@ -363,8 +363,8 @@ public class GoUtil {
     public static void main(String[] args) {
 //        final String s = "com.bcd.base.support_parser.impl.icd.data";
 //        final String s = "com.bcd.base.support_parser.impl.gb32960.data";
-//        toSourceCode(s, ByteOrder.BigEndian, BitOrder.BigEndian, "/Users/baichangda/bcd/goworkspace/MyGateway_go/gb32960/java.go");
+//        toSourceCode(s, ByteOrder.BigEndian, BitOrder.BigEndian, "/Users/baichangda/bcd/goworkspace/MyGateway_go/support_parse/gb32960/java.go");
         final String s = "com.bcd.base.support_parser.impl.immotors.ep33.data";
-        toSourceCode(s, ByteOrder.BigEndian, BitOrder.BigEndian, "/Users/baichangda/bcd/goworkspace/MyGateway_go/immotors/ep33/java.go");
+        toSourceCode(s, ByteOrder.BigEndian, BitOrder.BigEndian, "/Users/baichangda/bcd/goworkspace/MyGateway_go/support_parse/immotors/ep33/java.go");
     }
 }
