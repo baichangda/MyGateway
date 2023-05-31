@@ -202,16 +202,16 @@ public class BitBuf_reader {
             l |= ((b & 0xffL) << ((byteLen - 1 - i) << 3));
         }
 
+        this.bitOffset = temp & 7;
+        this.b = b;
+
         //如果是小端模式、则翻转bit
         final long cRight;
         if (bigEndian) {
-            cRight = l >>> (byteLen * 8 - bitOffset - bit);
+            cRight = l >>> (byteLen << 3 - bitOffset - bit);
         } else {
             cRight = Long.reverse(l) >>> (64 - (byteLen << 3) + bitOffset);
         }
-
-        this.bitOffset = temp & 7;
-        this.b = b;
 
         if (!unsigned && ((cRight >> (bit - 1)) & 0x01) == 1) {
 //            return -(((~cRight) & ((0x01L << bit) - 1)) + 1);
@@ -244,12 +244,15 @@ public class BitBuf_reader {
             c |= (b & 0xffL) << ((byteLen - 1 - i) << 3);
         }
 
+        this.bitOffset = temp & 7;
+        this.b = b;
+
         log.val1 = (c >>> (byteLen * 8 - bitOffset - bit)) & ((0x01L << bit) - 1);
 
         //如果是小端模式、则翻转bit
         final long cRight;
         if (bigEndian) {
-            cRight = c >>> (byteLen * 8 - bitOffset - bit);
+            cRight = c >>> (byteLen <<3 - bitOffset - bit);
         } else {
             cRight = Long.reverse(c) >>> (64 - (byteLen << 3) + bitOffset);
         }
@@ -263,10 +266,6 @@ public class BitBuf_reader {
         } else {
             log.val3 = cRight & ((0x01L << bit) - 1);
         }
-
-        this.bitOffset = temp & 7;
-        this.b = b;
-
         return log;
     }
 
