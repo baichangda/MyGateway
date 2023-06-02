@@ -170,9 +170,16 @@ public class BitBuf_writer {
             l = Long.reverse(l) >>> (64 - bit);
         }
         final int temp = bit + bitOffset;
-        final int byteLen = (temp >> 3) + ((temp & 7) == 0 ? 0 : 1);
-        final int left = (byteLen << 3) - temp;
-        final long newL = l << left;
+        final int finalBitOffset = temp & 7;
+        final long newL;
+        final int byteLen;
+        if (finalBitOffset == 0) {
+            byteLen = temp >> 3;
+            newL = l;
+        } else {
+            byteLen = (temp >> 3) + 1;
+            newL = l << (8 - finalBitOffset);
+        }
         if (bitOffset == 0) {
             b = (byte) (newL >> ((byteLen - 1) << 3));
         } else {
@@ -182,7 +189,7 @@ public class BitBuf_writer {
             byteBuf.writeByte(b);
             b = (byte) (newL >> ((byteLen - i - 1) << 3));
         }
-        bitOffset = temp & 7;
+        bitOffset = finalBitOffset;
         if (bitOffset == 0) {
             byteBuf.writeByte(b);
         }
@@ -193,14 +200,19 @@ public class BitBuf_writer {
 
 
     public final WriteLog write_log(long l, int bit, boolean bigEndian, boolean unsigned) {
-        if(l==-1015L){
-            System.out.println(l);
-        }
         final ByteBuf byteBuf = this.byteBuf;
         int bitOffset = this.bitOffset;
         byte b = this.b;
+
         final int temp = bit + bitOffset;
-        final int byteLen = (temp >> 3) + ((temp & 7) == 0 ? 0 : 1);
+        final int finalBitOffset = temp & 7;
+        final int byteLen;
+        if (finalBitOffset == 0) {
+            byteLen = temp >> 3;
+        } else {
+            byteLen = (temp >> 3) + 1;
+        }
+
         final WriteLog logRes = new WriteLog(byteLen, bitOffset, bit, bigEndian, unsigned);
 
         logRes.val1 = l;
@@ -218,8 +230,12 @@ public class BitBuf_writer {
 
         logRes.val3 = l;
 
-        final int left = (byteLen << 3) - temp;
-        final long newL = l << left;
+        final long newL;
+        if (finalBitOffset == 0) {
+            newL = l;
+        } else {
+            newL = l << (8 - finalBitOffset);
+        }
         if (bitOffset == 0) {
             b = (byte) (newL >> ((byteLen - 1) << 3));
         } else {

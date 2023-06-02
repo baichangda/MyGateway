@@ -193,28 +193,35 @@ public class BitBuf_reader {
         } else {
             b = this.b;
         }
-        final int temp = bit + bitOffset;
-        final int byteLen = (temp >> 3) + ((temp & 7) == 0 ? 0 : 1);
 
-        long l = (b & 0xffL) << ((byteLen - 1) << 3);
+        final int temp = bit + bitOffset;
+        final int finalBitOffset = temp & 7;
+        final int byteLen;
+        long l;
+        if (finalBitOffset == 0) {
+            byteLen = temp >> 3;
+            l = (b & 0xffL) << (temp - 8);
+        } else {
+            byteLen = (temp >> 3) + 1;
+            l = (b & 0xffL) << (temp - finalBitOffset);
+        }
         for (int i = 1; i < byteLen; i++) {
             b = byteBuf.readByte();
             l |= ((b & 0xffL) << ((byteLen - 1 - i) << 3));
         }
 
-        this.bitOffset = temp & 7;
+        this.bitOffset = finalBitOffset;
         this.b = b;
 
         //如果是小端模式、则翻转bit
         final long cRight;
         if (bigEndian) {
-            cRight = l >>> (byteLen << 3 - bitOffset - bit);
+            cRight = l >>> ((byteLen << 3) - bitOffset - bit);
         } else {
             cRight = Long.reverse(l) >>> (64 - (byteLen << 3) + bitOffset);
         }
 
         if (!unsigned && ((cRight >> (bit - 1)) & 0x01) == 1) {
-//            return -(((~cRight) & ((0x01L << bit) - 1)) + 1);
             return cRight | (-1L << bit);
         } else {
             return cRight & ((0x01L << bit) - 1);
@@ -230,37 +237,44 @@ public class BitBuf_reader {
         } else {
             b = this.b;
         }
+
         final int temp = bit + bitOffset;
-        final int byteLen = (temp >> 3) + ((temp & 7) == 0 ? 0 : 1);
+        final int finalBitOffset = temp & 7;
+        final int byteLen;
+        long l;
+        if (finalBitOffset == 0) {
+            byteLen = temp >> 3;
+            l = (b & 0xffL) << (temp - 8);
+        } else {
+            byteLen = (temp >> 3) + 1;
+            l = (b & 0xffL) << (temp - finalBitOffset);
+        }
 
         final ReadLog log = new ReadLog(byteLen, bitOffset, bit, bigEndian, unsigned);
-
         log.bytes[0] = b;
 
-        long c = (b & 0xffL) << ((byteLen - 1) << 3);
         for (int i = 1; i < byteLen; i++) {
             b = byteBuf.readByte();
             log.bytes[i] = b;
-            c |= (b & 0xffL) << ((byteLen - 1 - i) << 3);
+            l |= (b & 0xffL) << ((byteLen - 1 - i) << 3);
         }
 
-        this.bitOffset = temp & 7;
+        this.bitOffset = finalBitOffset;
         this.b = b;
 
-        log.val1 = (c >>> (byteLen * 8 - bitOffset - bit)) & ((0x01L << bit) - 1);
+        log.val1 = (l >>> (byteLen * 8 - bitOffset - bit)) & ((0x01L << bit) - 1);
 
         //如果是小端模式、则翻转bit
         final long cRight;
         if (bigEndian) {
-            cRight = c >>> (byteLen <<3 - bitOffset - bit);
+            cRight = l >>> ((byteLen << 3) - bitOffset - bit);
         } else {
-            cRight = Long.reverse(c) >>> (64 - (byteLen << 3) + bitOffset);
+            cRight = Long.reverse(l) >>> (64 - (byteLen << 3) + bitOffset);
         }
 
         log.val2 = cRight & ((0x01L << bit) - 1);
 
         if (!unsigned && ((cRight >> (bit - 1)) & 0x01) == 1) {
-//            log.val3 = -(((~cRight) & ((0x01L << bit) - 1)) + 1);
             log.val3 = cRight | (-1L << bit);
             log.signed3 = true;
         } else {

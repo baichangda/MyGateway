@@ -50,7 +50,7 @@ public class PerformanceUtil {
         final ScheduledExecutorService monitor = Executors.newSingleThreadScheduledExecutor();
         monitor.scheduleAtFixedRate(() -> {
             long sum = count.sumThenReset() / 3;
-            logger.info("{} threadNum:{} num:{} totalSpeed/s:{} perThreadSpeed/s:{}", "parse", threadNum, num, sum, sum / threadNum);
+            logger.info("{} threadNum:{} num:{} totalSpeed/s:{} perThreadSpeed/s:{}", parse ? "parse" : "deParse", threadNum, num, sum, sum / threadNum);
         }, 3, 3, TimeUnit.SECONDS);
 
         try {
