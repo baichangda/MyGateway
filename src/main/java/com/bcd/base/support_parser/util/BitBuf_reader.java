@@ -79,7 +79,7 @@ public class BitBuf_reader {
 //            final ReadLog res3 = bitBuf2.read_log(9, false, false);
             final long res1 = bitBuf2.read(3, true, true);
             final long res2 = bitBuf2.read(3, true, true);
-            final long skip1 = bitBuf2.read(3);
+            bitBuf2.skip(3);
             final long res3 = bitBuf2.read(9, false, false);
 //            res1.print();
 //            res2.print();
