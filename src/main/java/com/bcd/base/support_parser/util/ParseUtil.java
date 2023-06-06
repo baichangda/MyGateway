@@ -180,26 +180,88 @@ public class ParseUtil {
         }
     }
 
-    public static void appendBitLog_parse(final BuilderContext context, String varNameBitLog) {
-        append(context.body, "{}.logCollector_parse.collect_field_bit({}.class,{}.class,\"{}\",{},{},\"{}\");\n",
-                Parser.class.getName(),
-                context.clazz.getName(),
-                context.field.getDeclaringClass().getName(),
-                context.field.getName(),
-                varNameBitLog,
-                boxing(FieldBuilder.varNameInstance + "." + context.field.getName(), context.field.getType()),
-                context.implCc.getSimpleName());
+    public static boolean needBitBuf(List<Field> fieldList) {
+        return fieldList.stream().anyMatch(e -> {
+            if (e.isAnnotationPresent(F_bit_num.class) || e.isAnnotationPresent(F_bit_num_array.class) || e.isAnnotationPresent(F_bit_skip.class)) {
+                return true;
+            } else {
+                final F_bean f_bean = e.getAnnotation(F_bean.class);
+                if (f_bean != null && f_bean.passBitBuf()) {
+                    return true;
+                }
+                final F_bean_list f_bean_list = e.getAnnotation(F_bean_list.class);
+                if (f_bean_list != null && f_bean_list.passBitBuf()) {
+                    return true;
+                }
+                final F_customize f_customize = e.getAnnotation(F_customize.class);
+                if (f_customize != null && f_customize.passBitBuf()) {
+                    return true;
+                }
+            }
+            return false;
+        });
     }
 
-    public static void appendBitLog_deParse(final BuilderContext context, String varNameBitLog) {
-        append(context.body, "{}.logCollector_deParse.collect_field_bit({}.class,{}.class,\"{}\",{},{},\"{}\");\n",
-                Parser.class.getName(),
-                context.clazz.getName(),
-                context.field.getDeclaringClass().getName(),
-                context.field.getName(),
-                boxing(FieldBuilder.varNameInstance + "." + context.field.getName(), context.field.getType()),
-                varNameBitLog,
-                context.implCc.getSimpleName());
+    public static void newBitBuf_parse(BuilderContext context) {
+        final StringBuilder body = context.body;
+        final String bitBuf_reader_className = BitBuf_reader.class.getName();
+        final String bitBuf_reader_log_className = BitBuf_reader_log.class.getName();
+        ParseUtil.append(body, "final {} {};\n", bitBuf_reader_className, FieldBuilder.varNameBitBuf);
+        ParseUtil.append(body, "if ({} == null || {}.bitBuf_reader == null) {\n", FieldBuilder.varNameParentProcessContext, FieldBuilder.varNameParentProcessContext);
+        if (Parser.logCollector_parse == null) {
+            ParseUtil.append(body, "{}=new {}({});\n", FieldBuilder.varNameBitBuf, bitBuf_reader_className, FieldBuilder.varNameByteBuf);
+        } else {
+            ParseUtil.append(body, "{}=new {}({});\n", FieldBuilder.varNameBitBuf, bitBuf_reader_log_className, FieldBuilder.varNameByteBuf);
+        }
+        ParseUtil.append(body, "}else{\n");
+        ParseUtil.append(body, "{}={}.bitBuf_reader;\n", FieldBuilder.varNameBitBuf, FieldBuilder.varNameParentProcessContext);
+        ParseUtil.append(body, "}\n");
+        context.varNameBitBuf = FieldBuilder.varNameBitBuf;
+    }
+
+    public static void newBitBuf_deParse(BuilderContext context) {
+        final StringBuilder body = context.body;
+        final String bitBuf_writer_className = BitBuf_writer.class.getName();
+        final String bitBuf_writer_log_className = BitBuf_writer_log.class.getName();
+        ParseUtil.append(body, "final {} {};\n", bitBuf_writer_className, FieldBuilder.varNameBitBuf);
+        ParseUtil.append(body, "if ({} == null || {}.bitBuf_writer == null) {\n", FieldBuilder.varNameParentProcessContext, FieldBuilder.varNameParentProcessContext);
+        if (Parser.logCollector_parse == null) {
+            ParseUtil.append(body, "{}=new {}({});\n", FieldBuilder.varNameBitBuf, bitBuf_writer_className, FieldBuilder.varNameByteBuf);
+        } else {
+            ParseUtil.append(body, "{}=new {}({});\n", FieldBuilder.varNameBitBuf, bitBuf_writer_log_className, FieldBuilder.varNameByteBuf);
+        }
+        ParseUtil.append(body, "}else{\n");
+        ParseUtil.append(body, "{}={}.bitBuf_writer;\n", FieldBuilder.varNameBitBuf, FieldBuilder.varNameParentProcessContext);
+        ParseUtil.append(body, "}\n");
+        context.varNameBitBuf = FieldBuilder.varNameBitBuf;
+    }
+
+    public static void prependBitLogCode_parse(final BuilderContext context) {
+        final String varNameBitBuf = context.getVarNameBitBuf_reader();
+        if (varNameBitBuf != null) {
+            final Class<?> clazz = context.clazz;
+            final Class<?> declaringClass = context.field.getDeclaringClass();
+            final String fieldName = context.field.getName();
+            final String logPrefix = ParseUtil.format("--parse field{}--[{}].[{}]",
+                    LogUtil.getDeclaredFieldStackTrace(declaringClass, fieldName)
+                    , clazz.getSimpleName()
+                    , fieldName);
+            append(context.body, "(({}){}).logPrefix=\"{}\";\n", BitBuf_reader_log.class.getName(), varNameBitBuf, logPrefix);
+        }
+    }
+
+    public static void prependBitLogCode_deParse(final BuilderContext context) {
+        final String varNameBitBuf = context.getVarNameBitBuf_writer();
+        if (varNameBitBuf != null) {
+            final Class<?> clazz = context.clazz;
+            final Class<?> declaringClass = context.field.getDeclaringClass();
+            final String fieldName = context.field.getName();
+            final String logPrefix = ParseUtil.format("--deParse field{}--[{}].[{}]",
+                    LogUtil.getDeclaredFieldStackTrace(declaringClass, fieldName)
+                    , clazz.getSimpleName()
+                    , fieldName);
+            append(context.body, "(({}){}).logPrefix=\"{}\";\n", BitBuf_writer_log.class.getName(), varNameBitBuf, logPrefix);
+        }
     }
 
     public static void prependLogCode_parse(final BuilderContext context) {
@@ -209,7 +271,6 @@ public class ParseUtil {
         final String varName = getFieldByteBufReaderIndexVarName(context);
         append(context.body, "final int {}={}.readerIndex();\n", varName, FieldBuilder.varNameByteBuf);
     }
-
 
 
     public static void appendLogCode_parse(final BuilderContext context) {

@@ -41,24 +41,13 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
             throw BaseRuntimeException.getException("class[{}] field[{}] anno[{}] len[{}] must in range [1,64]", field.getDeclaringClass().getName(), field.getName(), annoClass.getName(), len);
         }
 
-        final String varNameBitBuf = context.getVarNameBitBuf(BitBuf_reader.class);
+        final String varNameBitBuf = context.getVarNameBitBuf_reader();
 
-        if (Parser.logCollector_parse == null) {
-            ParseUtil.append(body, "final long {}={}.read({},{},{});\n", varNameField, varNameBitBuf, len, bigEndian, unsigned);
-            if (context.bitEndWhenBitField_process) {
-                ParseUtil.append(body, "{}.finish();\n", varNameBitBuf);
-            }
-        } else {
-            final String varNameReadBitLog = varNameField + "_readBitLog";
-            ParseUtil.append(body, "final {} {}={}.read_log({},{},{});\n", BitBuf_reader.ReadLog.class.getName(), varNameReadBitLog, varNameBitBuf, len, bigEndian, unsigned);
-            ParseUtil.append(body, "final long {}={}.val3;\n", varNameField, varNameReadBitLog);
-            ParseUtil.appendBitLog_parse(context, varNameReadBitLog);
-            if (context.bitEndWhenBitField_process) {
-                final String varNameFinishBitLog = varNameField + "_finishBitLog";
-                ParseUtil.append(body, "{} {}={}.finish_log();\n", BitBuf_reader.FinishLog.class.getName(), varNameFinishBitLog, varNameBitBuf);
-                ParseUtil.appendBitLog_parse(context, varNameFinishBitLog);
-            }
+        ParseUtil.append(body, "final long {}={}.read({},{},{});\n", varNameField, varNameBitBuf, len, bigEndian, unsigned);
+        if (context.bitEndWhenBitField_process) {
+            ParseUtil.append(body, "{}.finish();\n", varNameBitBuf);
         }
+
         if (fieldTypeClass.isEnum()) {
             ParseUtil.append(body, "{}.{}={}.fromInteger((int){});\n", varNameInstance, field.getName(), fieldTypeName, ParseUtil.replaceValExprToCode(anno.valExpr(), varNameField));
         } else {
@@ -113,24 +102,12 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
             throw BaseRuntimeException.getException("class[{}] field[{}] anno[{}] len[{}] must in range [1,64]", field.getDeclaringClass().getName(), field.getName(), annoClass.getName(), len);
         }
 
-        final String varNameBitBuf = context.getVarNameBitBuf(BitBuf_writer.class);
+        final String varNameBitBuf = context.getVarNameBitBuf_writer();
 
-        if (Parser.logCollector_deParse == null) {
-            ParseUtil.append(body, "{}.write((long)({}),{},{},{});\n", varNameBitBuf, valCode, len, bigEndian, unsigned);
-            if (context.bitEndWhenBitField_deProcess) {
-                ParseUtil.append(body, "{}.finish();\n", varNameBitBuf);
-            }
-        } else {
-            final String varNameWriteBitLog = varNameField + "_writeBitLog";
-            ParseUtil.append(body, "final {} {}={}.write_log((long)({}),{},{},{});\n", BitBuf_writer.WriteLog.class.getName(), varNameWriteBitLog, varNameBitBuf, valCode, len, bigEndian, unsigned);
-            ParseUtil.appendBitLog_deParse(context, varNameWriteBitLog);
-            if (context.bitEndWhenBitField_deProcess) {
-                final String varNameFinishBitLog = varNameField + "_finishBitLog";
-                ParseUtil.append(body, "{} {}={}.finish_log();\n", BitBuf_writer.FinishLog.class.getName(), varNameFinishBitLog, varNameBitBuf);
-                ParseUtil.appendBitLog_deParse(context, varNameFinishBitLog);
-            }
+        ParseUtil.append(body, "{}.write((long)({}),{},{},{});\n", varNameBitBuf, valCode, len, bigEndian, unsigned);
+        if (context.bitEndWhenBitField_deProcess) {
+            ParseUtil.append(body, "{}.finish();\n", varNameBitBuf);
         }
-
 
     }
 }

@@ -28,7 +28,7 @@ public class FieldBuilder__F_customize extends FieldBuilder {
                 final String fieldTypeClassName = field.getType().getName();
                 final String processContextVarName = context.getProcessContextVarName();
                 if (anno.passBitBuf()) {
-                    final String varNameBitBuf = context.getVarNameBitBuf(BitBuf_reader.class);
+                    final String varNameBitBuf = context.getVarNameBitBuf_reader();
                     ParseUtil.append(body, "{}.bitBuf_reader={};\n", processContextVarName, varNameBitBuf);
                 }
                 final String unBoxing = ParseUtil.unBoxing(ParseUtil.format("{}.process({},{})", processorClassVarName, FieldBuilder.varNameByteBuf, processContextVarName), field.getType());
@@ -74,7 +74,7 @@ public class FieldBuilder__F_customize extends FieldBuilder {
             } else {
                 final String processContextVarName = context.getProcessContextVarName();
                 if (anno.passBitBuf()) {
-                    final String varNameBitBuf = context.getVarNameBitBuf(BitBuf_writer.class);
+                    final String varNameBitBuf = context.getVarNameBitBuf_writer();
                     ParseUtil.append(body, "{}.bitBuf_writer={};\n", processContextVarName, varNameBitBuf);
                 }
                 final String processorClassVarName = ParseUtil.getProcessorVarName(processorClass);

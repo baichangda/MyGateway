@@ -5,8 +5,6 @@ import com.bcd.base.support_parser.builder.*;
 import com.bcd.base.support_parser.exception.BaseRuntimeException;
 import com.bcd.base.support_parser.processor.ProcessContext;
 import com.bcd.base.support_parser.processor.Processor;
-import com.bcd.base.support_parser.util.BitBuf_reader;
-import com.bcd.base.support_parser.util.BitBuf_writer;
 import com.bcd.base.support_parser.util.ParseUtil;
 import com.bcd.base.support_parser.util.LogUtil;
 import io.netty.buffer.ByteBuf;
@@ -107,18 +105,6 @@ public class Parser {
          * @param processorClassName  解析器类名
          */
         void collect_field(Class<?> clazz, Class<?> fieldDeclaringClass, String fieldName, byte[] content, Object val, String processorClassName);
-
-        /**
-         * 收集bit字段解析详情
-         *
-         * @param clazz               实体类
-         * @param fieldDeclaringClass 字段所属类
-         * @param fieldName           字段名称
-         * @param logRes              bit字段解析详情
-         * @param val                 解析后的值
-         * @param processorClassName  解析器类名
-         */
-        void collect_field_bit(Class<?> clazz, Class<?> fieldDeclaringClass, String fieldName, BitBuf_reader.Log logRes, Object val, String processorClassName);
     }
 
 
@@ -134,19 +120,6 @@ public class Parser {
          * @param processorClassName  解析器类名
          */
         void collect_field(Class<?> clazz, Class<?> fieldDeclaringClass, String fieldName, Object val, byte[] content, String processorClassName);
-
-        /**
-         * 收集bit字段解析详情
-         *
-         * @param clazz               实体类
-         * @param fieldDeclaringClass 字段所属类
-         * @param fieldName           字段名称
-         * @param val                 解析后的字节数组
-         * @param logRes              反解析的bit字段详情
-         * @param processorClassName  解析器类名
-         */
-        void collect_field_bit(Class<?> clazz, Class<?> fieldDeclaringClass, String fieldName, Object val, BitBuf_writer.Log logRes, String processorClassName);
-
     }
 
     /**
@@ -170,14 +143,6 @@ public class Parser {
                         , val
                 );
             }
-
-            @Override
-            public void collect_field_bit(Class<?> clazz, Class<?> fieldDeclaringClass, String fieldName, BitBuf_reader.Log logRes, Object val, String processorClassName) {
-                final String logPrefix = ParseUtil.format("--parse field{}--[{}].[{}]", LogUtil.getDeclaredFieldStackTrace(fieldDeclaringClass, fieldName)
-                        , clazz.getSimpleName()
-                        , fieldName);
-                logRes.print(logPrefix);
-            }
         };
 
     }
@@ -192,14 +157,6 @@ public class Parser {
                         , fieldName
                         , val
                         , ByteBufUtil.hexDump(content).toUpperCase());
-            }
-
-            @Override
-            public void collect_field_bit(Class<?> clazz, Class<?> fieldDeclaringClass, String fieldName, Object val, BitBuf_writer.Log logRes, String processorClassName) {
-                final String logPrefix = ParseUtil.format("--deParse field{}--[{}].[{}]", LogUtil.getDeclaredFieldStackTrace(fieldDeclaringClass, fieldName)
-                        , clazz.getSimpleName()
-                        , fieldName);
-                logRes.print(logPrefix);
             }
         };
     }
@@ -317,6 +274,9 @@ public class Parser {
         final F_bit_num f_bit_num1 = cur.getAnnotation(F_bit_num.class);
         final F_bit_num_array f_bit_num_array1 = cur.getAnnotation(F_bit_num_array.class);
         final F_bit_skip f_bit_skip1 = cur.getAnnotation(F_bit_skip.class);
+        if (f_bit_num1 != null || f_bit_skip1 != null) {
+            context.logBit = true;
+        }
         BitRemainingMode bitRemainingMode1 = null;
         if (f_bit_num1 != null) {
             bitRemainingMode1 = f_bit_num1.bitRemainingMode();
@@ -362,19 +322,24 @@ public class Parser {
         }
     }
 
-
     private static void buildMethodBody_parse(Class<?> clazz, BuilderContext context) {
         final List<Field> fieldList = ParseUtil.getParseFields(clazz);
         if (fieldList.isEmpty()) {
             return;
         }
-
+        if (ParseUtil.needBitBuf(fieldList)) {
+            ParseUtil.newBitBuf_parse(context);
+        }
         for (int i = 0; i < fieldList.size(); i++) {
             Field field = fieldList.get(i);
             context.field = field;
             bitEndWhenBitField(fieldList, i, context);
+
             if (logCollector_parse != null) {
-                ParseUtil.prependLogCode_parse(context);
+                if (!context.logBit) {
+                    ParseUtil.prependLogCode_parse(context);
+                }
+                ParseUtil.prependBitLogCode_parse(context);
             }
             try {
                 final F_num f_num = field.getAnnotation(F_num.class);
@@ -451,7 +416,9 @@ public class Parser {
                 }
             } finally {
                 if (logCollector_parse != null) {
-                    ParseUtil.appendLogCode_parse(context);
+                    if (!context.logBit) {
+                        ParseUtil.appendLogCode_parse(context);
+                    }
                 }
             }
         }
@@ -463,13 +430,19 @@ public class Parser {
         if (fieldList.isEmpty()) {
             return;
         }
+        if (ParseUtil.needBitBuf(fieldList)) {
+            ParseUtil.newBitBuf_deParse(context);
+        }
         for (int i = 0; i < fieldList.size(); i++) {
             Field field = fieldList.get(i);
             context.field = field;
             bitEndWhenBitField(fieldList, i, context);
             try {
                 if (logCollector_deParse != null) {
-                    ParseUtil.prependLogCode_deParse(context);
+                    if (!context.logBit) {
+                        ParseUtil.prependLogCode_deParse(context);
+                    }
+                    ParseUtil.prependBitLogCode_deParse(context);
                 }
                 final F_num f_num = field.getAnnotation(F_num.class);
                 if (f_num != null) {
@@ -545,7 +518,9 @@ public class Parser {
                 }
             } finally {
                 if (logCollector_deParse != null) {
-                    ParseUtil.appendLogCode_deParse(context);
+                    if (!context.logBit) {
+                        ParseUtil.appendLogCode_deParse(context);
+                    }
                 }
             }
         }

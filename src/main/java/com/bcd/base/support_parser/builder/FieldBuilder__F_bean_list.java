@@ -43,7 +43,7 @@ public class FieldBuilder__F_bean_list extends FieldBuilder {
         final String typeClassName = typeClass.getName();
         final String processContextVarName = context.getProcessContextVarName();
         if (anno.passBitBuf()) {
-            final String varNameBitBuf = context.getVarNameBitBuf(BitBuf_reader.class);
+            final String varNameBitBuf = context.getVarNameBitBuf_reader();
             ParseUtil.append(body, "{}.bitBuf_reader={};\n", processContextVarName, varNameBitBuf);
         }
         switch (fieldTypeFlag) {
@@ -97,7 +97,7 @@ public class FieldBuilder__F_bean_list extends FieldBuilder {
         final String parserClassName = Parser.class.getName();
         final String processContextVarName = context.getProcessContextVarName();
         if (anno.passBitBuf()) {
-            final String varNameBitBuf = context.getVarNameBitBuf(BitBuf_writer.class);
+            final String varNameBitBuf = context.getVarNameBitBuf_writer();
             ParseUtil.append(body, "{}.bitBuf_writer={};\n", processContextVarName, varNameBitBuf);
         }
         final String fieldVarNameTemp = varNameField + "_temp";

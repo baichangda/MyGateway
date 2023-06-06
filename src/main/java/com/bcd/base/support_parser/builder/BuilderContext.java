@@ -1,9 +1,10 @@
 package com.bcd.base.support_parser.builder;
 
+import com.bcd.base.support_parser.Parser;
 import com.bcd.base.support_parser.anno.*;
 import com.bcd.base.support_parser.processor.ProcessContext;
 import com.bcd.base.support_parser.processor.Processor;
-import com.bcd.base.support_parser.util.ParseUtil;
+import com.bcd.base.support_parser.util.*;
 import io.netty.buffer.ByteBuf;
 import javassist.CtClass;
 
@@ -38,6 +39,8 @@ public class BuilderContext {
     public String varNameBitBuf;
     public boolean bitEndWhenBitField_process;
     public boolean bitEndWhenBitField_deProcess;
+
+    public boolean logBit;
 
     /**
      * 用于给
@@ -82,13 +85,11 @@ public class BuilderContext {
         return processContextVarName;
     }
 
-    public final String getVarNameBitBuf(Class bitBufClass) {
-        if (varNameBitBuf == null) {
-            final String bitBufClassName = bitBufClass.getName();
-            final String bitBufClassSimpleName = bitBufClass.getSimpleName();
-            ParseUtil.append(body, "final {} {}={}.get{}({},{});\n", bitBufClassName, FieldBuilder.varNameBitBuf, ProcessContext.class.getName(), bitBufClassSimpleName, FieldBuilder.varNameByteBuf, FieldBuilder.varNameParentProcessContext);
-            varNameBitBuf = FieldBuilder.varNameBitBuf;
-        }
+    public final String getVarNameBitBuf_reader() {
+        return varNameBitBuf;
+    }
+
+    public final String getVarNameBitBuf_writer() {
         return varNameBitBuf;
     }
 }

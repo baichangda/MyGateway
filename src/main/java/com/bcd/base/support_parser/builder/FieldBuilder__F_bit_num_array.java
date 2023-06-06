@@ -51,7 +51,7 @@ public class FieldBuilder__F_bit_num_array extends FieldBuilder {
         final String varNameField = ParseUtil.getFieldVarName(context);
         String arrVarName = varNameField + "_arr";
         final String varNameArrayElement = varNameField + "_arrEle";
-        final String varNameBitBuf = context.getVarNameBitBuf(BitBuf_reader.class);
+        final String varNameBitBuf = context.getVarNameBitBuf_reader();
 
         ParseUtil.append(body, "final {}[] {}=new {}[{}];\n", arrayElementTypeName, arrVarName, arrayElementTypeName, arrLenRes);
         ParseUtil.append(body, "for(int i=0;i<{}.length;i++){\n", arrVarName);
@@ -85,7 +85,7 @@ public class FieldBuilder__F_bit_num_array extends FieldBuilder {
 
         String valCode = varNameInstance + "." + fieldName;
         final String varNameField = ParseUtil.getFieldVarName(context);
-        final String varNameBitBuf = context.getVarNameBitBuf(BitBuf_writer.class);
+        final String varNameBitBuf = context.getVarNameBitBuf_writer();
         ParseUtil.append(body, "if({}!=null){\n", FieldBuilder.varNameInstance, valCode);
         final String varNameFieldArr = varNameField + "_arr";
         ParseUtil.append(body, "final {}[] {}={};\n", arrElementType, varNameFieldArr, valCode);
