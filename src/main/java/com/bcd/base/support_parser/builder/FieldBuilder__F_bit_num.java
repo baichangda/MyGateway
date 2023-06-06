@@ -45,14 +45,19 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
 
         if (Parser.logCollector_parse == null) {
             ParseUtil.append(body, "final long {}={}.read({},{},{});\n", varNameField, varNameBitBuf, len, bigEndian, unsigned);
+            if (context.bitEndWhenBitField_process) {
+                ParseUtil.append(body, "{}.finish();\n", varNameBitBuf);
+            }
         } else {
-            context.varNameBitLog = varNameField + "_bitLog";
-            ParseUtil.append(body, "final {} {}={}.read_log({},{},{});\n", BitBuf_reader.ReadLog.class.getName(), context.varNameBitLog, varNameBitBuf, len, bigEndian, unsigned);
-            ParseUtil.append(body, "final long {}={}.val3;\n", varNameField, context.varNameBitLog);
-        }
-
-        if (context.bitEndWhenBitField_process) {
-            ParseUtil.append(body, "{}.finish();\n", varNameBitBuf);
+            final String varNameReadBitLog = varNameField + "_readBitLog";
+            ParseUtil.append(body, "final {} {}={}.read_log({},{},{});\n", BitBuf_reader.ReadLog.class.getName(), varNameReadBitLog, varNameBitBuf, len, bigEndian, unsigned);
+            ParseUtil.append(body, "final long {}={}.val3;\n", varNameField, varNameReadBitLog);
+            ParseUtil.appendBitLog_parse(context, varNameReadBitLog);
+            if (context.bitEndWhenBitField_process) {
+                final String varNameFinishBitLog = varNameField + "_finishBitLog";
+                ParseUtil.append(body, "{} {}={}.finish_log();\n", BitBuf_reader.FinishLog.class.getName(), varNameFinishBitLog, varNameBitBuf);
+                ParseUtil.appendBitLog_parse(context, varNameFinishBitLog);
+            }
         }
         if (fieldTypeClass.isEnum()) {
             ParseUtil.append(body, "{}.{}={}.fromInteger((int){});\n", varNameInstance, field.getName(), fieldTypeName, ParseUtil.replaceValExprToCode(anno.valExpr(), varNameField));
@@ -96,9 +101,9 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
 
         //最后判断是否用了值表达式、如果用了、进行表达式处理
         if (!anno.valExpr().isEmpty()) {
-            if(isFloat){
+            if (isFloat) {
                 valCode = ParseUtil.replaceValExprToCode_round(RpnUtil.reverseExpr(anno.valExpr()), valCode);
-            }else {
+            } else {
                 valCode = ParseUtil.replaceValExprToCode(RpnUtil.reverseExpr(anno.valExpr()), valCode);
             }
         }
@@ -112,13 +117,18 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
 
         if (Parser.logCollector_deParse == null) {
             ParseUtil.append(body, "{}.write((long)({}),{},{},{});\n", varNameBitBuf, valCode, len, bigEndian, unsigned);
+            if (context.bitEndWhenBitField_deProcess) {
+                ParseUtil.append(body, "{}.finish();\n", varNameBitBuf);
+            }
         } else {
-            context.varNameBitLog = varNameField + "_bitLog";
-            ParseUtil.append(body, "final {} {}={}.write_log((long)({}),{},{},{});\n", BitBuf_writer.WriteLog.class.getName(), context.varNameBitLog, varNameBitBuf, valCode, len, bigEndian, unsigned);
-        }
-
-        if (context.bitEndWhenBitField_deProcess) {
-            ParseUtil.append(body, "{}.finish();\n", varNameBitBuf);
+            final String varNameWriteBitLog = varNameField + "_writeBitLog";
+            ParseUtil.append(body, "final {} {}={}.write_log((long)({}),{},{},{});\n", BitBuf_writer.WriteLog.class.getName(), varNameWriteBitLog, varNameBitBuf, valCode, len, bigEndian, unsigned);
+            ParseUtil.appendBitLog_deParse(context, varNameWriteBitLog);
+            if (context.bitEndWhenBitField_deProcess) {
+                final String varNameFinishBitLog = varNameField + "_finishBitLog";
+                ParseUtil.append(body, "{} {}={}.finish_log();\n", BitBuf_writer.FinishLog.class.getName(), varNameFinishBitLog, varNameBitBuf);
+                ParseUtil.appendBitLog_deParse(context, varNameFinishBitLog);
+            }
         }
 
 

@@ -2,7 +2,6 @@ package com.bcd.base.support_parser.builder;
 
 
 import com.bcd.base.support_parser.Parser;
-import com.bcd.base.support_parser.anno.BitRemainingMode;
 import com.bcd.base.support_parser.anno.F_bit_skip;
 import com.bcd.base.support_parser.util.BitBuf_reader;
 import com.bcd.base.support_parser.util.BitBuf_writer;
@@ -22,13 +21,20 @@ public class FieldBuilder__F_bit_skip extends FieldBuilder {
         final String varNameBitBuf = context.getVarNameBitBuf(BitBuf_reader.class);
         if (Parser.logCollector_parse == null) {
             ParseUtil.append(body, "{}.skip({});\n", varNameBitBuf, anno.len());
+            if (context.bitEndWhenBitField_process) {
+                ParseUtil.append(body, "{}.finish();\n", varNameBitBuf);
+            }
         } else {
-            context.varNameBitLog = varNameField + "_bitLog";
-            ParseUtil.append(body, "final {} {}={}.skip_log({});\n", BitBuf_reader.SkipLog.class.getName(), context.varNameBitLog, varNameBitBuf, anno.len());
+            final String varNameSkipBitLog = varNameField + "_skipBitLog";
+            ParseUtil.append(body, "final {} {}={}.skip_log({});\n", BitBuf_reader.SkipLog.class.getName(), varNameSkipBitLog, varNameBitBuf, anno.len());
+            ParseUtil.appendBitLog_parse(context, varNameSkipBitLog);
+            if (context.bitEndWhenBitField_process) {
+                final String varNameFinishBitLog = varNameField + "_finishBitLog";
+                ParseUtil.append(body, "{} {}={}.finish_log();\n", BitBuf_reader.FinishLog.class.getName(), varNameFinishBitLog, varNameBitBuf);
+                ParseUtil.appendBitLog_parse(context, varNameFinishBitLog);
+            }
         }
-        if (context.bitEndWhenBitField_process) {
-            ParseUtil.append(body, "{}.finish();\n", varNameBitBuf);
-        }
+
     }
 
     @Override
@@ -43,14 +49,18 @@ public class FieldBuilder__F_bit_skip extends FieldBuilder {
 
         if (Parser.logCollector_deParse == null) {
             ParseUtil.append(body, "{}.skip_log({});\n", varNameBitBuf, anno.len());
+            if (context.bitEndWhenBitField_deProcess) {
+                ParseUtil.append(body, "{}.finish();\n", varNameBitBuf);
+            }
         } else {
-            context.varNameBitLog = varNameField + "_bitLog";
-            ParseUtil.append(body, "final {} {}={}.skip_log({});\n", BitBuf_writer.SkipLog.class.getName(), context.varNameBitLog, varNameBitBuf, anno.len());
+            final String varNameSkipBitLog = varNameField + "_skipBitLog";
+            ParseUtil.append(body, "final {} {}={}.skip_log({});\n", BitBuf_writer.SkipLog.class.getName(), varNameSkipBitLog, varNameBitBuf, anno.len());
+            ParseUtil.appendBitLog_deParse(context, varNameSkipBitLog);
+            if (context.bitEndWhenBitField_deProcess) {
+                final String varNameFinishBitLog = varNameField + "_finishBitLog";
+                ParseUtil.append(body, "{} {}={}.finish_log();\n", BitBuf_writer.FinishLog.class.getName(), varNameFinishBitLog, varNameBitBuf);
+                ParseUtil.appendBitLog_deParse(context, varNameFinishBitLog);
+            }
         }
-
-        if (context.bitEndWhenBitField_deProcess) {
-            ParseUtil.append(body, "{}.finish();\n", varNameBitBuf);
-        }
-
     }
 }

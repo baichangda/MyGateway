@@ -1,5 +1,6 @@
 package com.bcd.base.support_parser.util;
 
+import com.bcd.base.support_parser.Parser;
 import com.google.common.base.Strings;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
@@ -12,7 +13,6 @@ public class BitBuf_writer {
     public final static boolean default_bigEndian = true;
     public final static boolean default_unsigned = true;
 
-    static Logger logger = LoggerFactory.getLogger(BitBuf_writer.class);
     private final ByteBuf byteBuf;
 
     private byte b;
@@ -64,10 +64,10 @@ public class BitBuf_writer {
             final WriteLog res2 = bitBufWriter.write_log(0, 3, true, true);
             final SkipLog skip1 = bitBufWriter.skip_log(3);
             final WriteLog res3 = bitBufWriter.write_log(-217, 9, false, false);
-            res1.print();
-            res2.print();
-            skip1.print();
-            res3.print();
+            res1.print(null);
+            res2.print(null);
+            skip1.print(null);
+            res3.print(null);
             bitBufWriter.finish();
 //            System.out.println(ByteBufUtil.hexDump(bb));
         }
@@ -82,7 +82,21 @@ public class BitBuf_writer {
         bitOffset = 0;
     }
 
-    public static class Log {
+    public final FinishLog finish_log() {
+        final FinishLog finishLog;
+        if (bitOffset == 0) {
+            finishLog = new FinishLog();
+        } else {
+            byteBuf.writeByte(b);
+            finishLog = new FinishLog(1, bitOffset, 8 - bitOffset);
+            finishLog.bytes[0] = b;
+        }
+        b = 0;
+        bitOffset = 0;
+        return finishLog;
+    }
+
+    public static abstract class Log {
         public final byte[] bytes;
 
         public final int bitStart;
@@ -102,7 +116,39 @@ public class BitBuf_writer {
             return ByteBufUtil.hexDump(bytes) + ((bitEnd & 7) == 7 ? "" : "?");
         }
 
+        public abstract void print(String logPrefix);
 
+    }
+
+    public static class FinishLog extends Log {
+
+        public boolean write;
+
+        public FinishLog(int byteLen, int bitStart, int bit) {
+            super(byteLen, bitStart, bit);
+            this.write = true;
+        }
+
+        public FinishLog() {
+            super(0, 0, 0);
+            this.write = false;
+        }
+
+        public final String getLogBit() {
+            final StringBuilder sb = new StringBuilder();
+            for (byte b : bytes) {
+                sb.append(Strings.padStart(Integer.toBinaryString(b & 0xff), 8, '0'));
+            }
+            return sb.substring(bitStart, bitEnd + 1);
+        }
+
+        public final void print(String logPrefix) {
+            if (write) {
+                Parser.logger.info("{} finish write bit_hex[{}] bit_pos[{}-{}] bit_binary[{}]", logPrefix == null ? "" : logPrefix, getLogHex().toUpperCase(), bitStart, bitEnd, getLogBit());
+            } else {
+                Parser.logger.info("{} finish no write", logPrefix == null ? "" : logPrefix);
+            }
+        }
     }
 
     public static class SkipLog extends Log {
@@ -110,8 +156,8 @@ public class BitBuf_writer {
             super(byteLen, bitStart, bit);
         }
 
-        public final void print() {
-            logger.info("skip bit_hex[{}] bit_pos[{}-{}]", getLogHex(), bitStart, bitEnd);
+        public final void print(String logPrefix) {
+            Parser.logger.info("{} skip bit_hex[{}] bit_pos[{}-{}]", logPrefix == null ? "" : logPrefix, getLogHex().toUpperCase(), bitStart, bitEnd);
         }
     }
 
@@ -138,13 +184,14 @@ public class BitBuf_writer {
             }
         }
 
-        public final void print() {
-            logger.info("write bit_unsigned[{}] bit_bigEndian[{}] bit_val[{}->{}->{}] bit_binary[{}->{}->{}] bit_hex[{}] bit_pos[{}-{}]",
+        public final void print(String logPrefix) {
+            Parser.logger.info("{} write bit_unsigned[{}] bit_bigEndian[{}] bit_val[{}->{}->{}] bit_binary[{}->{}->{}] bit_hex[{}] bit_pos[{}-{}]",
+                    logPrefix == null ? "" : logPrefix,
                     unsigned ? "yes" : "no",
                     bigEndian ? "yes" : "no",
                     val1, val2, val3,
                     getLogBit(val1, signed1), getLogBit(val2, false), getLogBit(val3, false),
-                    getLogHex(),
+                    getLogHex().toUpperCase(),
                     bitStart, bitEnd
             );
         }

@@ -2,14 +2,12 @@ package com.bcd.base.support_parser.impl.immotors.ep33.processor;
 
 import com.bcd.base.support_parser.Parser;
 import com.bcd.base.support_parser.exception.BaseRuntimeException;
-import com.bcd.base.support_parser.impl.icd.data.*;
 import com.bcd.base.support_parser.impl.immotors.Evt;
-import com.bcd.base.support_parser.impl.immotors.Evt_4_x;
 import com.bcd.base.support_parser.impl.immotors.ep33.data.*;
 import com.bcd.base.support_parser.processor.ProcessContext;
 import com.bcd.base.support_parser.processor.Processor;
-import com.google.common.base.Strings;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -100,14 +98,15 @@ public class Packet_evts_processor implements Processor<List<Evt>> {
                             || evtId == 0XFFFF
                     ) {
                         evt = Parser.parse(Evt_2_6_unknown.class, data, parentContext);
-//                        final String evtIdHex = Strings.padStart(Integer.toHexString(evtId).toUpperCase(), 4, '0');
+//                        final String evtIdHex = ByteBufUtil.hexDump(new byte[]{(byte) (evtId>>8), (byte) evtId});
 //                        logger.warn("evtId[{}] 2+6 not support,skip[8]", evtIdHex);
                     } else if (evtId >= 0xD000 && evtId <= 0xDFFF) {
                         evt = Parser.parse(Evt_4_x_unknown.class, data, parentContext);
-//                        final String evtIdHex = Strings.padStart(Integer.toHexString(evtId).toUpperCase(), 4, '0');
+//                        final int len = ((Evt_4_x) evt).evtLen;
+//                        final String evtIdHex = ByteBufUtil.hexDump(new byte[]{(byte) (evtId>>8), (byte) evtId});
 //                        logger.warn("evtId[{}] 4+X not support,skip[{}]", evtIdHex, 4 + len);
                     } else {
-                        final String evtIdHex = Strings.padStart(Integer.toHexString(evtId).toUpperCase(), 4, '0');
+                        final String evtIdHex = ByteBufUtil.hexDump(new byte[]{(byte) (evtId>>8), (byte) evtId});
                         throw BaseRuntimeException.getException("evtId[{}] not support", evtIdHex);
                     }
                 }

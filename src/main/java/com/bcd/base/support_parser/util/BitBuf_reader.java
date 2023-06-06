@@ -1,5 +1,6 @@
 package com.bcd.base.support_parser.util;
 
+import com.bcd.base.support_parser.Parser;
 import com.google.common.base.Strings;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
@@ -12,7 +13,6 @@ public class BitBuf_reader {
     public final static boolean default_bigEndian = true;
     public final static boolean default_unsigned = true;
 
-    static final Logger logger = LoggerFactory.getLogger(BitBuf_reader.class);
 
     private final ByteBuf byteBuf;
     private byte b;
@@ -81,10 +81,10 @@ public class BitBuf_reader {
             final long res2 = bitBuf2.read(3, true, true);
             bitBuf2.skip(3);
             final long res3 = bitBuf2.read(9, false, false);
-//            res1.print();
-//            res2.print();
-//            skip1.print();
-//            res3.print();
+//            res1.print(null);
+//            res2.print(null);
+//            skip1.print(null);
+//            res3.print(null);
             System.out.println(res1);
             System.out.println(res2);
             System.out.println(res3);
@@ -98,7 +98,20 @@ public class BitBuf_reader {
         bitOffset = 0;
     }
 
-    public static class Log {
+    public final FinishLog finish_log() {
+        final FinishLog finishLog;
+        if (bitOffset == 0) {
+            finishLog = new FinishLog();
+        } else {
+            finishLog = new FinishLog(1, bitOffset, 8 - bitOffset);
+            finishLog.bytes[0] = b;
+        }
+        b = 0;
+        bitOffset = 0;
+        return finishLog;
+    }
+
+    public static abstract class Log {
         public final byte[] bytes;
 
         public final int bitStart;
@@ -117,6 +130,39 @@ public class BitBuf_reader {
         public final String getLogHex() {
             return ByteBufUtil.hexDump(bytes) + ((bitEnd & 7) == 7 ? "" : "?");
         }
+
+        public abstract void print(String logPrefix);
+    }
+
+    public static class FinishLog extends Log {
+
+        public boolean skip;
+
+        public FinishLog(int byteLen, int bitStart, int bit) {
+            super(byteLen, bitStart, bit);
+            this.skip = true;
+        }
+
+        public FinishLog() {
+            super(0, 0, 0);
+            this.skip = false;
+        }
+
+        public final String getLogBit() {
+            final StringBuilder sb = new StringBuilder();
+            for (byte b : bytes) {
+                sb.append(Strings.padStart(Integer.toBinaryString(b & 0xff), 8, '0'));
+            }
+            return sb.substring(bitStart, bitEnd + 1);
+        }
+
+        public final void print(String logPrefix) {
+            if (skip) {
+                Parser.logger.info("{} finish skip bit_hex[{}] bit_pos[{}-{}] bit_binary[{}]", logPrefix==null?"":logPrefix, getLogHex().toUpperCase(), bitStart, bitEnd, getLogBit());
+            } else {
+                Parser.logger.info("{} finish no skip", logPrefix==null?"":logPrefix);
+            }
+        }
     }
 
     public static class SkipLog extends Log {
@@ -133,8 +179,8 @@ public class BitBuf_reader {
             return sb.substring(bitStart, bitEnd + 1);
         }
 
-        public final void print() {
-            logger.info("skip bit_hex[{}] bit_pos[{}-{}] bit_binary[{}]", getLogHex(), bitStart, bitEnd, getLogBit());
+        public final void print(String logPrefix) {
+            Parser.logger.info("{} skip bit_hex[{}] bit_pos[{}-{}] bit_binary[{}]", logPrefix==null?"":logPrefix, getLogHex().toUpperCase(), bitStart, bitEnd, getLogBit());
         }
     }
 
@@ -143,10 +189,13 @@ public class BitBuf_reader {
         public final boolean unsigned;
 
         public final boolean bigEndian;
-
+        //原始值
         public long val1;
+        //处理大小端之后的值
         public long val2;
+        //是否有符号
         public boolean signed3;
+        //最终解析值
         public long val3;
 
         public ReadLog(int byteLen, int bitStart, int bit, boolean bigEndian, boolean unsigned) {
@@ -163,9 +212,10 @@ public class BitBuf_reader {
             }
         }
 
-        public final void print() {
-            logger.info("read bit_hex[{}] bit_pos[{}-{}] bit_bigEndian[{}] bit_unsigned[{}] bit_binary[{}->{}->{}] bit_val[{}->{}->{}]",
-                    getLogHex(),
+        public final void print(String logPrefix) {
+            Parser.logger.info("{} read bit_hex[{}] bit_pos[{}-{}] bit_bigEndian[{}] bit_unsigned[{}] bit_binary[{}->{}->{}] bit_val[{}->{}->{}]",
+                    logPrefix==null?"":logPrefix,
+                    getLogHex().toUpperCase(),
                     bitStart, bitEnd,
                     bigEndian ? "yes" : "no",
                     unsigned ? "yes" : "no",

@@ -61,7 +61,6 @@ public class FieldBuilder__F_bit_num_array extends FieldBuilder {
         }
         ParseUtil.append(body, "{}[i]=({})({});\n", arrVarName, arrayElementTypeName, ParseUtil.replaceValExprToCode(valExpr, varNameArrayElement));
         ParseUtil.append(body, "}\n");
-
         if (context.bitEndWhenBitField_process) {
             ParseUtil.append(body, "{}.finish();\n", context.varNameBitBuf);
         }

@@ -36,9 +36,6 @@ public class BuilderContext {
     public Field field;
 
     public String varNameBitBuf;
-
-    public boolean logBit;
-    public String varNameBitLog;
     public boolean bitEndWhenBitField_process;
     public boolean bitEndWhenBitField_deProcess;
 

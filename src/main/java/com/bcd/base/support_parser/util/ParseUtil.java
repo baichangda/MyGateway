@@ -10,7 +10,6 @@ import com.google.common.collect.Sets;
 import javassist.CannotCompileException;
 import javassist.CtClass;
 import javassist.CtField;
-import javassist.Modifier;
 import org.slf4j.helpers.MessageFormatter;
 
 import java.lang.annotation.Annotation;
@@ -181,85 +180,81 @@ public class ParseUtil {
         }
     }
 
+    public static void appendBitLog_parse(final BuilderContext context, String varNameBitLog) {
+        append(context.body, "{}.logCollector_parse.collect_field_bit({}.class,{}.class,\"{}\",{},{},\"{}\");\n",
+                Parser.class.getName(),
+                context.clazz.getName(),
+                context.field.getDeclaringClass().getName(),
+                context.field.getName(),
+                varNameBitLog,
+                boxing(FieldBuilder.varNameInstance + "." + context.field.getName(), context.field.getType()),
+                context.implCc.getSimpleName());
+    }
+
+    public static void appendBitLog_deParse(final BuilderContext context, String varNameBitLog) {
+        append(context.body, "{}.logCollector_deParse.collect_field_bit({}.class,{}.class,\"{}\",{},{},\"{}\");\n",
+                Parser.class.getName(),
+                context.clazz.getName(),
+                context.field.getDeclaringClass().getName(),
+                context.field.getName(),
+                boxing(FieldBuilder.varNameInstance + "." + context.field.getName(), context.field.getType()),
+                varNameBitLog,
+                context.implCc.getSimpleName());
+    }
+
     public static void prependLogCode_parse(final BuilderContext context) {
         if (!needLog(context)) {
             return;
         }
-
-        if (!context.logBit) {
-            final String varName = getFieldByteBufReaderIndexVarName(context);
-            append(context.body, "final int {}={}.readerIndex();\n", varName, FieldBuilder.varNameByteBuf);
-        }
+        final String varName = getFieldByteBufReaderIndexVarName(context);
+        append(context.body, "final int {}={}.readerIndex();\n", varName, FieldBuilder.varNameByteBuf);
     }
+
+
 
     public static void appendLogCode_parse(final BuilderContext context) {
         if (!needLog(context)) {
             return;
         }
-
-        if (context.logBit) {
-            append(context.body, "{}.logCollector_parse.collect_field_bit({}.class,{}.class,\"{}\",{},{},\"{}\");\n",
-                    Parser.class.getName(),
-                    context.clazz.getName(),
-                    context.field.getDeclaringClass().getName(),
-                    context.field.getName(),
-                    context.varNameBitLog,
-                    boxing(FieldBuilder.varNameInstance + "." + context.field.getName(), context.field.getType()),
-                    context.implCc.getSimpleName());
-        } else {
-            final String fieldByteBufReaderIndexVarName = getFieldByteBufReaderIndexVarName(context);
-            final String fieldLogBytesVarName = getFieldLogBytesVarName(context);
-            append(context.body, "final byte[] {}=new byte[{}.readerIndex()-{}];\n", fieldLogBytesVarName, FieldBuilder.varNameByteBuf, fieldByteBufReaderIndexVarName);
-            append(context.body, "{}.getBytes({},{});\n", FieldBuilder.varNameByteBuf, fieldByteBufReaderIndexVarName, fieldLogBytesVarName);
-            append(context.body, "{}.logCollector_parse.collect_field({}.class,{}.class,\"{}\",{},{},\"{}\");\n",
-                    Parser.class.getName(),
-                    context.clazz.getName(),
-                    context.field.getDeclaringClass().getName(),
-                    context.field.getName(),
-                    fieldLogBytesVarName,
-                    boxing(FieldBuilder.varNameInstance + "." + context.field.getName(), context.field.getType()),
-                    context.implCc.getSimpleName());
-        }
+        final String fieldByteBufReaderIndexVarName = getFieldByteBufReaderIndexVarName(context);
+        final String fieldLogBytesVarName = getFieldLogBytesVarName(context);
+        append(context.body, "final byte[] {}=new byte[{}.readerIndex()-{}];\n", fieldLogBytesVarName, FieldBuilder.varNameByteBuf, fieldByteBufReaderIndexVarName);
+        append(context.body, "{}.getBytes({},{});\n", FieldBuilder.varNameByteBuf, fieldByteBufReaderIndexVarName, fieldLogBytesVarName);
+        append(context.body, "{}.logCollector_parse.collect_field({}.class,{}.class,\"{}\",{},{},\"{}\");\n",
+                Parser.class.getName(),
+                context.clazz.getName(),
+                context.field.getDeclaringClass().getName(),
+                context.field.getName(),
+                fieldLogBytesVarName,
+                boxing(FieldBuilder.varNameInstance + "." + context.field.getName(), context.field.getType()),
+                context.implCc.getSimpleName());
     }
 
     public static void prependLogCode_deParse(final BuilderContext context) {
         if (!needLog(context)) {
             return;
         }
-        if (!context.logBit) {
-            final String varName = getFieldByteBufWriterIndexVarName(context);
-            append(context.body, "final int {}={}.writerIndex();\n", varName, FieldBuilder.varNameByteBuf);
-        }
-
+        final String varName = getFieldByteBufWriterIndexVarName(context);
+        append(context.body, "final int {}={}.writerIndex();\n", varName, FieldBuilder.varNameByteBuf);
     }
 
     public static void appendLogCode_deParse(final BuilderContext context) {
         if (!needLog(context)) {
             return;
         }
-        if (context.logBit) {
-            append(context.body, "{}.logCollector_deParse.collect_field_bit({}.class,{}.class,\"{}\",{},{},\"{}\");\n",
-                    Parser.class.getName(),
-                    context.clazz.getName(),
-                    context.field.getDeclaringClass().getName(),
-                    context.field.getName(),
-                    boxing(FieldBuilder.varNameInstance + "." + context.field.getName(), context.field.getType()),
-                    context.varNameBitLog,
-                    context.implCc.getSimpleName());
-        } else {
-            final String fieldByteBufWriterIndexVarName = getFieldByteBufWriterIndexVarName(context);
-            final String fieldLogBytesVarName = getFieldLogBytesVarName(context);
-            append(context.body, "final byte[] {}=new byte[{}.writerIndex()-{}];\n", fieldLogBytesVarName, FieldBuilder.varNameByteBuf, fieldByteBufWriterIndexVarName);
-            append(context.body, "{}.getBytes({},{});\n", FieldBuilder.varNameByteBuf, fieldByteBufWriterIndexVarName, fieldLogBytesVarName);
-            append(context.body, "{}.logCollector_deParse.collect_field({}.class,{}.class,\"{}\",{},{},\"{}\");\n",
-                    Parser.class.getName(),
-                    context.clazz.getName(),
-                    context.field.getDeclaringClass().getName(),
-                    context.field.getName(),
-                    boxing(FieldBuilder.varNameInstance + "." + context.field.getName(), context.field.getType()),
-                    fieldLogBytesVarName,
-                    context.implCc.getSimpleName());
-        }
+
+        final String fieldByteBufWriterIndexVarName = getFieldByteBufWriterIndexVarName(context);
+        final String fieldLogBytesVarName = getFieldLogBytesVarName(context);
+        append(context.body, "final byte[] {}=new byte[{}.writerIndex()-{}];\n", fieldLogBytesVarName, FieldBuilder.varNameByteBuf, fieldByteBufWriterIndexVarName);
+        append(context.body, "{}.getBytes({},{});\n", FieldBuilder.varNameByteBuf, fieldByteBufWriterIndexVarName, fieldLogBytesVarName);
+        append(context.body, "{}.logCollector_deParse.collect_field({}.class,{}.class,\"{}\",{},{},\"{}\");\n",
+                Parser.class.getName(),
+                context.clazz.getName(),
+                context.field.getDeclaringClass().getName(),
+                context.field.getName(),
+                boxing(FieldBuilder.varNameInstance + "." + context.field.getName(), context.field.getType()),
+                fieldLogBytesVarName,
+                context.implCc.getSimpleName());
     }
 
     public static String getFieldVarName(final BuilderContext context) {

@@ -60,7 +60,7 @@ import java.util.stream.Collectors;
 
 public class Parser {
 
-    private final static Logger logger = LoggerFactory.getLogger(Parser.class);
+    public final static Logger logger = LoggerFactory.getLogger(Parser.class);
 
     private final static FieldBuilder__F_bean fieldBuilder__f_bean = new FieldBuilder__F_bean();
     private final static FieldBuilder__F_bean_list fieldBuilder__f_bean_list = new FieldBuilder__F_bean_list();
@@ -79,8 +79,6 @@ public class Parser {
      * javassist生成类序号
      */
     private static int processorIndex = 0;
-
-
 
 
     private final static Map<Class<?>, Processor<?>> beanClass_to_processor = new HashMap<>();
@@ -175,31 +173,10 @@ public class Parser {
 
             @Override
             public void collect_field_bit(Class<?> clazz, Class<?> fieldDeclaringClass, String fieldName, BitBuf_reader.Log logRes, Object val, String processorClassName) {
-                if (logRes instanceof BitBuf_reader.ReadLog readLog) {
-                    logger.info("--parse field{}--[{}].[{}] bit_hex[{}] bit_pos[{}-{}] bit_bigEndian[{}] bit_unsigned[{}] bit_binary[{}->{}->{}] bit_val[{}->{}->{}]=[{}]"
-                            , LogUtil.getDeclaredFieldStackTrace(fieldDeclaringClass, fieldName)
-                            , clazz.getSimpleName()
-                            , fieldName,
-                            readLog.getLogHex().toUpperCase(),
-                            readLog.bitStart, readLog.bitEnd,
-                            readLog.bigEndian ? "yes" : "no",
-                            readLog.unsigned ? "yes" : "no",
-                            readLog.getLogBit(readLog.val1, false), readLog.getLogBit(readLog.val2, false), readLog.getLogBit(readLog.val3, readLog.signed3),
-                            readLog.val1, readLog.val2, readLog.val3,
-                            val
-                    );
-                } else if (logRes instanceof BitBuf_reader.SkipLog skipLog) {
-                    logger.info("--parse field{}--[{}].[{}] skip bit_hex[{}] bit_pos[{}-{}] bit_binary[{}]"
-                            , LogUtil.getDeclaredFieldStackTrace(fieldDeclaringClass, fieldName)
-                            , clazz.getSimpleName()
-                            , fieldName
-                            , skipLog.getLogHex().toUpperCase()
-                            , skipLog.bitStart
-                            , skipLog.bitEnd
-                            , skipLog.getLogBit()
-                    );
-                }
-
+                final String logPrefix = ParseUtil.format("--parse field{}--[{}].[{}]", LogUtil.getDeclaredFieldStackTrace(fieldDeclaringClass, fieldName)
+                        , clazz.getSimpleName()
+                        , fieldName);
+                logRes.print(logPrefix);
             }
         };
 
@@ -219,29 +196,10 @@ public class Parser {
 
             @Override
             public void collect_field_bit(Class<?> clazz, Class<?> fieldDeclaringClass, String fieldName, Object val, BitBuf_writer.Log logRes, String processorClassName) {
-                if (logRes instanceof BitBuf_writer.WriteLog writeLog) {
-                    logger.info("--deParse field{}--[{}].[{}]=[{}] bit_unsigned[{}] bit_bigEndian[{}] bit_val[{}->{}->{}] bit_binary[{}->{}->{}] bit_hex[{}] bit_pos[{}-{}]"
-                            , LogUtil.getDeclaredFieldStackTrace(fieldDeclaringClass, fieldName)
-                            , clazz.getSimpleName()
-                            , fieldName
-                            , val,
-                            writeLog.unsigned ? "yes" : "no",
-                            writeLog.bigEndian ? "yes" : "no",
-                            writeLog.val1, writeLog.val2, writeLog.val3,
-                            writeLog.getLogBit(writeLog.val1, writeLog.signed1), writeLog.getLogBit(writeLog.val2, false), writeLog.getLogBit(writeLog.val3, false),
-                            writeLog.getLogHex().toUpperCase(),
-                            writeLog.bitStart, writeLog.bitEnd
-                    );
-                } else if (logRes instanceof BitBuf_writer.SkipLog skipLog) {
-                    logger.info("--deParse field{}--[{}].[{}] skip bit_hex[{}] bit_pos[{}-{}]"
-                            , LogUtil.getDeclaredFieldStackTrace(fieldDeclaringClass, fieldName)
-                            , clazz.getSimpleName()
-                            , fieldName
-                            , skipLog.getLogHex().toUpperCase()
-                            , skipLog.bitStart
-                            , skipLog.bitEnd);
-                }
-
+                final String logPrefix = ParseUtil.format("--deParse field{}--[{}].[{}]", LogUtil.getDeclaredFieldStackTrace(fieldDeclaringClass, fieldName)
+                        , clazz.getSimpleName()
+                        , fieldName);
+                logRes.print(logPrefix);
             }
         };
     }
@@ -359,9 +317,6 @@ public class Parser {
         final F_bit_num f_bit_num1 = cur.getAnnotation(F_bit_num.class);
         final F_bit_num_array f_bit_num_array1 = cur.getAnnotation(F_bit_num_array.class);
         final F_bit_skip f_bit_skip1 = cur.getAnnotation(F_bit_skip.class);
-        if (f_bit_num1 != null || f_bit_skip1 != null) {
-            context.logBit = true;
-        }
         BitRemainingMode bitRemainingMode1 = null;
         if (f_bit_num1 != null) {
             bitRemainingMode1 = f_bit_num1.bitRemainingMode();
@@ -729,7 +684,7 @@ public class Parser {
 //        if (parentContext == null) {
 //            return processor.process(data, new ProcessContext(null, null));
 //        } else {
-            return processor.process(data, parentContext);
+        return processor.process(data, parentContext);
 //        }
     }
 
@@ -754,7 +709,7 @@ public class Parser {
 //        if (parentContext == null) {
 //            processor.deProcess(data, new ProcessContext(null, null), instance);
 //        } else {
-            processor.deProcess(data, parentContext, instance);
+        processor.deProcess(data, parentContext, instance);
 //        }
     }
 
