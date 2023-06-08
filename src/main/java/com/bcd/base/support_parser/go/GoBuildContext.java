@@ -39,7 +39,6 @@ public class GoBuildContext {
     public boolean bitEndWhenBitField_process;
     public boolean bitEndWhenBitField_deProcess;
 
-
     public GoBuildContext(Class<?> clazz, ByteOrder pkg_byteOrder, BitOrder pkg_bitOrder, StringBuilder globalBody, StringBuilder structBody
             , StringBuilder parseBody, StringBuilder deParseBody, StringBuilder customizeBody) {
         this.clazz = clazz;
@@ -87,7 +86,11 @@ public class GoBuildContext {
 
     public final String getVarNameDeParseContext() {
         if (varNameDeParseContext == null) {
-            ParseUtil.append(deParseBody, "{}:=parse.ToParseContext(_{},{})\n", GoFieldBuilder.varNameParseContext, GoFieldBuilder.varNameInstance, GoFieldBuilder.varNameParentParseContext);
+            if (GoUtil.noPointerStructSet.contains(goStructName)) {
+                ParseUtil.append(deParseBody, "{}:=parse.ToParseContext({},{})\n", GoFieldBuilder.varNameParseContext, GoFieldBuilder.varNameInstance, GoFieldBuilder.varNameParentParseContext);
+            } else {
+                ParseUtil.append(deParseBody, "{}:=parse.ToParseContext(_{},{})\n", GoFieldBuilder.varNameParseContext, GoFieldBuilder.varNameInstance, GoFieldBuilder.varNameParentParseContext);
+            }
             varNameDeParseContext = GoFieldBuilder.varNameParseContext;
         }
         return varNameDeParseContext;

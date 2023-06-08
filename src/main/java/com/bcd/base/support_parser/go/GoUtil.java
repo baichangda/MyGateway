@@ -19,6 +19,22 @@ import java.util.stream.Collectors;
 
 public class GoUtil {
     public final static Set<String> noPointerStructSet = new HashSet<>();
+    public final static Set<String> unsafePointerStructSet = new HashSet<>();
+    public final static Set<String> unsafePointerStructFieldTypeSet = new HashSet<>();
+    static {
+        unsafePointerStructFieldTypeSet.add("int8");
+        unsafePointerStructFieldTypeSet.add("int8");
+        unsafePointerStructFieldTypeSet.add("int16");
+        unsafePointerStructFieldTypeSet.add("int16");
+        unsafePointerStructFieldTypeSet.add("int32");
+        unsafePointerStructFieldTypeSet.add("int32");
+        unsafePointerStructFieldTypeSet.add("int64");
+        unsafePointerStructFieldTypeSet.add("int64");
+        unsafePointerStructFieldTypeSet.add("float32");
+        unsafePointerStructFieldTypeSet.add("float32");
+        unsafePointerStructFieldTypeSet.add("float64");
+        unsafePointerStructFieldTypeSet.add("float64");
+    }
 
     public final static Map<String, String> zoneId_varNameLocation = new HashMap<>();
 
@@ -48,6 +64,16 @@ public class GoUtil {
             }
             return toFirstUpperCase(c.getSimpleName());
         }).collect(Collectors.toSet()));
+    }
+
+    private static void initUnsafePointerStructSet(List<Class<?>> classes) {
+        for (Class<?> clazz : classes) {
+            final List<Field> parseFields = ParseUtil.getParseFields(clazz);
+            for (Field field : parseFields) {
+                final Class<?> fieldType = field.getType();
+            }
+
+        }
     }
 
     private static boolean hasFieldSkipModeReserved(List<Field> parseFields) {
@@ -137,13 +163,13 @@ public class GoUtil {
             final GoBuildContext context = new GoBuildContext(clazz, byteOrder, bitOrder, globalBody, structBody, parseBody, deParseBody, customizeBody);
             final String goStructName = context.goStructName;
             ParseUtil.append(structBody, "type {} struct{\n", goStructName);
-            if(noPointerStructSet.contains(goStructName)){
+            if (noPointerStructSet.contains(goStructName)) {
                 ParseUtil.append(parseBody, "func To{}({} *parse.ByteBuf,{} *parse.ParseContext) {}{\n",
                         goStructName, GoFieldBuilder.varNameByteBuf, GoFieldBuilder.varNameParentParseContext, goStructName);
                 ParseUtil.append(deParseBody, "func({} {})Write({} *parse.ByteBuf,{} *parse.ParseContext){\n",
                         GoFieldBuilder.varNameInstance, goStructName,
                         GoFieldBuilder.varNameByteBuf, GoFieldBuilder.varNameParentParseContext);
-            }else{
+            } else {
                 ParseUtil.append(parseBody, "func To{}({} *parse.ByteBuf,{} *parse.ParseContext) *{}{\n",
                         goStructName, GoFieldBuilder.varNameByteBuf, GoFieldBuilder.varNameParentParseContext, goStructName);
                 ParseUtil.append(deParseBody, "func(_{} *{})Write({} *parse.ByteBuf,{} *parse.ParseContext){\n",
@@ -201,9 +227,9 @@ public class GoUtil {
 
 
             ParseUtil.append(structBody, "}\n");
-            if(noPointerStructSet.contains(goStructName)){
+            if (noPointerStructSet.contains(goStructName)) {
                 ParseUtil.append(parseBody, "return {}\n", GoFieldBuilder.varNameInstance);
-            }else {
+            } else {
                 ParseUtil.append(parseBody, "return &{}\n", GoFieldBuilder.varNameInstance);
             }
             ParseUtil.append(parseBody, "}\n");
@@ -378,6 +404,7 @@ public class GoUtil {
 
     public static void main(String[] args) {
 //        final String s = "com.bcd.base.support_parser.impl.icd.data";
+//        toSourceCode(s, ByteOrder.BigEndian, BitOrder.BigEndian, "/Users/baichangda/bcd/goworkspace/MyGateway_go/support_parse/icd/java.go");
 //        final String s = "com.bcd.base.support_parser.impl.gb32960.data";
 //        toSourceCode(s, ByteOrder.BigEndian, BitOrder.BigEndian, "/Users/baichangda/bcd/goworkspace/MyGateway_go/support_parse/gb32960/java.go");
         final String s = "com.bcd.base.support_parser.impl.immotors.ep33.data";

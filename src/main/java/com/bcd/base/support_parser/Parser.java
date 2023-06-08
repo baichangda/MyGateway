@@ -687,16 +687,4 @@ public class Parser {
         processor.deProcess(data, parentContext, instance);
 //        }
     }
-
-    public static void main(String[] args) throws Throwable {
-        StackTraceElement stackTraceElement = new StackTraceElement(
-                "",
-                "",
-                "Parser.java",
-                782
-        );
-        System.out.println(stackTraceElement.toString());
-        System.out.println(".(Parser.java:782)");
-        System.out.println(".(RedisUtil.java:60)");
-    }
 }
