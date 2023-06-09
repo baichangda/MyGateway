@@ -51,10 +51,8 @@ public class GoFieldBuilder__F_num_array extends GoFieldBuilder {
         goField.goReadTypeName = goReadTypeName;
         if (len == 0) {
             ParseUtil.append(body, "{} []{}\n", goFieldName, goFieldTypeName);
-            goField.goFieldIsArray = false;
         } else {
             ParseUtil.append(body, "{} [{}]{}\n", goFieldName, len, goFieldTypeName);
-            goField.goFieldIsArray = true;
         }
     }
 
@@ -66,29 +64,33 @@ public class GoFieldBuilder__F_num_array extends GoFieldBuilder {
         final String goFieldName = goField.goFieldName;
         final String goReadTypeName = goField.goReadTypeName;
         final String goFieldTypeName = goField.goFieldTypeName;
-        final boolean goFieldIsArray = goField.goFieldIsArray;
         final Class<? extends F_num_array> annoClass = anno.getClass();
         final Map<Character, String> varToGoFieldName = context.varToGoFieldName_parse;
         final StringBuilder body = context.parseBody;
         final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.pkg_byteOrder);
         final boolean unsigned = anno.unsigned();
         final int singleLen = anno.singleLen();
+        final int singleSkip = anno.singleSkip();
         final String valExpr = anno.valExpr();
         String varNameLen = goFieldName + "_len";
         final int len = anno.len();
         final String varNameArr = goFieldName + "_arr";
-        if (goFieldIsArray) {
-            if (singleLen == 1 && unsigned && valExpr.isEmpty()) {
-                ParseUtil.append(body, "{}:=[{}]{}({}.Read_bytes({}))\n", varNameArr, len, goFieldTypeName, GoFieldBuilder.varNameByteBuf, len);
+        if (len > 0 && unsigned && valExpr.isEmpty() && singleSkip == 0) {
+            if (singleLen == 1) {
+                ParseUtil.append(body, "{}:={}\n", varNameArr, GoParseUtil.get_unsafe_slice_to_array_1(goFieldTypeName, len));
             } else {
-                ParseUtil.append(body, "{}:=(*[{}]{})(unsafe.Pointer(unsafe.SliceData({}.Read_bytes({}))))\n", varNameArr, len, goFieldTypeName, GoFieldBuilder.varNameByteBuf, len);
+                ParseUtil.append(body, "{}:=(*{})\n", varNameArr, GoParseUtil.get_unsafe_slice_to_array_2(goFieldTypeName, len, len * singleLen));
             }
         } else {
             ParseUtil.append(body, "{}:={}\n", varNameLen, ParseUtil.replaceLenExprToCode(anno.lenExpr(), varToGoFieldName, field));
-            if (singleLen == 1 && unsigned && valExpr.isEmpty()) {
+            if (singleLen == 1 && unsigned && valExpr.isEmpty() && singleSkip == 0) {
                 ParseUtil.append(body, "{}:={}.Read_bytes({})\n", varNameArr, GoFieldBuilder.varNameByteBuf, varNameLen);
             } else {
-                ParseUtil.append(body, "{}:=make([]{},{})\n", varNameArr, goFieldTypeName, varNameLen);
+                if (len == 0) {
+                    ParseUtil.append(body, "{}:=make([]{},{})\n", varNameArr, goFieldTypeName, varNameLen);
+                } else {
+                    ParseUtil.append(body, "{}:=[{}]{}{}\n", varNameArr, varNameLen, goFieldTypeName);
+                }
                 ParseUtil.append(body, "for i:=0;i<{};i++{\n", varNameLen);
                 switch (singleLen) {
                     case 1 -> {
@@ -100,6 +102,9 @@ public class GoFieldBuilder__F_num_array extends GoFieldBuilder {
                     default -> {
                         ParseUtil.notSupport_len(field, annoClass);
                     }
+                }
+                if (singleSkip > 0) {
+                    ParseUtil.append(body, "e:={}.Skip({})\n", GoFieldBuilder.varNameByteBuf, singleSkip);
                 }
                 String valCode = "e";
                 if (!goReadTypeName.equals(goFieldTypeName)) {
@@ -120,26 +125,22 @@ public class GoFieldBuilder__F_num_array extends GoFieldBuilder {
         final String goFieldName = goField.goFieldName;
         final String goReadTypeName = goField.goReadTypeName;
         final String goFieldTypeName = goField.goFieldTypeName;
-        final boolean goFieldIsArray = goField.goFieldIsArray;
         final Class<? extends F_num_array> annoClass = anno.getClass();
         final Map<Character, String> varToGoFieldName = context.varToGoFieldName_deParse;
         final StringBuilder body = context.deParseBody;
         final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.pkg_byteOrder);
         final boolean unsigned = anno.unsigned();
         final int singleLen = anno.singleLen();
+        final int singleSkip = anno.singleSkip();
         final int len = anno.len();
         final String valExpr = anno.valExpr();
         final String varNameArr = goFieldName + "_arr";
         ParseUtil.append(body, "{}:={}.{}\n", varNameArr, GoFieldBuilder.varNameInstance, goFieldName);
-        if (goFieldIsArray) {
-            if (singleLen == 1 && unsigned && valExpr.isEmpty()) {
-                ParseUtil.append(body, "{}.Write_bytes({}[:])\n", GoFieldBuilder.varNameByteBuf, varNameArr);
+        if (len > 0 && unsigned && valExpr.isEmpty() && singleSkip == 0) {
+            if (singleLen == 1) {
+                ParseUtil.append(body, "{}.Write_bytes({})\n", GoFieldBuilder.varNameByteBuf, GoParseUtil.get_unsafe_array_to_slice_1(varNameArr));
             } else {
-                ParseUtil.append(body, "{}.Write_bytes((*[]byte)(unsafe.Pointer(&reflect.SliceHeader{\n");
-                ParseUtil.append(body, "Data: uintptr(unsafe.Pointer(&{})),\n", varNameArr);
-                ParseUtil.append(body, "Len:  {},\n", len);
-                ParseUtil.append(body, "Cap:  {},\n", len);
-                ParseUtil.append(body, "})))\n");
+                ParseUtil.append(body, "{}.Write_bytes(*({}))\n", GoFieldBuilder.varNameByteBuf, GoParseUtil.get_unsafe_array_to_slice_2(varNameArr, (singleLen + singleSkip) * len));
             }
         } else {
             if (singleLen == 1 && unsigned && valExpr.isEmpty()) {
@@ -163,6 +164,9 @@ public class GoFieldBuilder__F_num_array extends GoFieldBuilder {
                     default -> {
                         ParseUtil.notSupport_len(field, annoClass);
                     }
+                }
+                if (singleSkip > 0) {
+                    ParseUtil.append(body, "{}.Write_zero({})\n", GoFieldBuilder.varNameByteBuf, singleSkip);
                 }
                 ParseUtil.append(body, "}\n");
             }

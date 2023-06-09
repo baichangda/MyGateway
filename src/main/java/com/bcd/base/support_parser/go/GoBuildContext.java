@@ -42,7 +42,7 @@ public class GoBuildContext {
     public GoBuildContext(Class<?> clazz, ByteOrder pkg_byteOrder, BitOrder pkg_bitOrder, StringBuilder globalBody, StringBuilder structBody
             , StringBuilder parseBody, StringBuilder deParseBody, StringBuilder customizeBody) {
         this.clazz = clazz;
-        this.goStructName = GoUtil.toFirstUpperCase(clazz.getSimpleName());
+        this.goStructName = GoParseUtil.toFirstUpperCase(clazz.getSimpleName());
         this.pkg_byteOrder = pkg_byteOrder;
         this.pkg_bitOrder = pkg_bitOrder;
         this.globalBody = globalBody;
@@ -86,7 +86,7 @@ public class GoBuildContext {
 
     public final String getVarNameDeParseContext() {
         if (varNameDeParseContext == null) {
-            if (GoUtil.noPointerStructSet.contains(goStructName)) {
+            if (GoParseUtil.noPointerStructSet.contains(goStructName)) {
                 ParseUtil.append(deParseBody, "{}:=parse.ToParseContext({},{})\n", GoFieldBuilder.varNameParseContext, GoFieldBuilder.varNameInstance, GoFieldBuilder.varNameParentParseContext);
             } else {
                 ParseUtil.append(deParseBody, "{}:=parse.ToParseContext(_{},{})\n", GoFieldBuilder.varNameParseContext, GoFieldBuilder.varNameInstance, GoFieldBuilder.varNameParentParseContext);

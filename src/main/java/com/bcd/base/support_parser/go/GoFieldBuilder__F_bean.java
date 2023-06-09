@@ -17,7 +17,11 @@ public class GoFieldBuilder__F_bean extends GoFieldBuilder {
         final String goFieldName = goField.goFieldName;
         final String goFieldTypeName = field.getType().getSimpleName();
         goField.goFieldTypeName = goFieldTypeName;
-        ParseUtil.append(body, "{} *{}\n", goFieldName, goFieldTypeName);
+        if (GoParseUtil.noPointerStructSet.contains(goFieldTypeName)) {
+            ParseUtil.append(body, "{} {}\n", goFieldName, goFieldTypeName);
+        } else {
+            ParseUtil.append(body, "{} *{}\n", goFieldName, goFieldTypeName);
+        }
     }
 
     @Override
@@ -48,6 +52,7 @@ public class GoFieldBuilder__F_bean extends GoFieldBuilder {
         final boolean passBitBuf = anno.passBitBuf();
         final GoField goField = context.goField;
         final String goFieldName = goField.goFieldName;
+        final String goFieldTypeName = goField.goFieldTypeName;
         final String varNameParseContext = context.getVarNameDeParseContext();
         final String valCode = ParseUtil.format("{}.{}", GoFieldBuilder.varNameInstance, goFieldName);
         if (passBitBuf) {

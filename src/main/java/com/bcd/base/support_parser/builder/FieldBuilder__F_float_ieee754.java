@@ -45,11 +45,7 @@ public class FieldBuilder__F_float_ieee754 extends FieldBuilder {
 
         final String valCode = ParseUtil.format("{}.{}()", varNameByteBuf, funcName);
 
-        if (anno.valPrecision() == -1) {
-            ParseUtil.append(body, "{}.{}={};\n", varNameInstance, field.getName(), ParseUtil.replaceValExprToCode(anno.valExpr(), ParseUtil.format("(({}){})", fieldType, valCode)));
-        } else {
-            ParseUtil.append(body, "{}.{}=({}){}.format((double)({}),{});\n", varNameInstance, field.getName(), fieldType, ParseUtil.class.getName(), ParseUtil.replaceValExprToCode(anno.valExpr(), valCode), anno.valPrecision());
-        }
+        ParseUtil.append(body, "{}.{}={};\n", varNameInstance, field.getName(), ParseUtil.replaceValExprToCode(anno.valExpr(), ParseUtil.format("(({}){})", fieldType, valCode)));
     }
 
     @Override

@@ -15,7 +15,7 @@ public class FieldBuilder__F_float_ieee754_array extends FieldBuilder {
         final Field field = context.field;
         final Class<?> fieldType = field.getType();
         final String fieldName = field.getName();
-        final String arrayElementType=fieldType.componentType().getName();
+        final String arrayElementType = fieldType.componentType().getName();
 
         final F_float_ieee754_array anno = context.field.getAnnotation(annoClass);
         final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.clazz);
@@ -52,11 +52,7 @@ public class FieldBuilder__F_float_ieee754_array extends FieldBuilder {
         ParseUtil.append(body, "final {}[] {}=new {}[{}];\n", arrayElementType, arrVarName, arrayElementType, lenRes);
         ParseUtil.append(body, "for(int i=0;i<{}.length;i++){\n", arrVarName);
         final String valCode = ParseUtil.format("{}.{}()", varNameByteBuf, funcName);
-        if (anno.valPrecision() == -1) {
-            ParseUtil.append(body, "{}[i]=({})({});\n", arrVarName, arrayElementType, ParseUtil.replaceValExprToCode(anno.valExpr(), valCode));
-        } else {
-            ParseUtil.append(body, "{}[i]=({}){}.format((double)({}),{});\n", arrVarName, fieldType, ParseUtil.class.getName(), ParseUtil.replaceValExprToCode(anno.valExpr(), valCode), anno.valPrecision());
-        }
+        ParseUtil.append(body, "{}[i]=({})({});\n", arrVarName, arrayElementType, ParseUtil.replaceValExprToCode(anno.valExpr(), valCode));
         ParseUtil.append(body, "};\n");
         ParseUtil.append(body, "{}.{}={};\n", varNameInstance, fieldName, arrVarName);
     }
@@ -74,7 +70,7 @@ public class FieldBuilder__F_float_ieee754_array extends FieldBuilder {
 
         ParseUtil.append(body, "if({}!=null){\n", FieldBuilder.varNameInstance, valCode);
 
-        final String arrayElementType=fieldType.componentType().getName();
+        final String arrayElementType = fieldType.componentType().getName();
 
         switch (arrayElementType) {
             case "float", "double" -> {

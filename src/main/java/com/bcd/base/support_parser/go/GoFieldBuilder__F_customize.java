@@ -46,7 +46,7 @@ public class GoFieldBuilder__F_customize extends GoFieldBuilder {
 
     private String getGoFieldType(Class<?> fieldType) {
         if (ClassUtil.isBeanType(fieldType)) {
-            return GoUtil.toFirstUpperCase(fieldType.getSimpleName());
+            return GoParseUtil.toFirstUpperCase(fieldType.getSimpleName());
         } else {
             if (fieldType.isEnum()) {
                 return "int";
@@ -80,7 +80,7 @@ public class GoFieldBuilder__F_customize extends GoFieldBuilder {
                     for (Field f : fields) {
                         final Class<?> fType = f.getType();
                         String goFType = null;
-                        final String goFName = GoUtil.toFirstUpperCase(f.getName());
+                        final String goFName = GoParseUtil.toFirstUpperCase(f.getName());
                         if (List.class.isAssignableFrom(fType)) {
                             final Class<?> actualTypeArgument = (Class<?>) (((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0]);
                             final String temp = getGoFieldType(actualTypeArgument);

@@ -18,15 +18,20 @@ public class GoFieldBuilder__F_bean_list extends GoFieldBuilder {
         final GoField goField = context.goField;
         final String goFieldName = goField.goFieldName;
         final Class<?> fieldType = field.getType();
+        final int listLen = anno.listLen();
         final Class<?> goFieldType;
         if (fieldType.isArray()) {
             goFieldType = fieldType.getComponentType();
         } else {
             goFieldType = ((Class<?>) (((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0]));
         }
-        final String goFieldTypeName = GoUtil.toFirstUpperCase(goFieldType.getSimpleName());
+        final String goFieldTypeName = GoParseUtil.toFirstUpperCase(goFieldType.getSimpleName());
         goField.goFieldTypeName = goFieldTypeName;
-        ParseUtil.append(body, "{} []{}\n", goFieldName, goFieldTypeName);
+        if (listLen == 0) {
+            ParseUtil.append(body, "{} []{}\n", goFieldName, goFieldTypeName);
+        } else {
+            ParseUtil.append(body, "{} [{}]{}\n", goFieldName, listLen, goFieldTypeName);
+        }
     }
 
     @Override
@@ -48,9 +53,12 @@ public class GoFieldBuilder__F_bean_list extends GoFieldBuilder {
         } else {
             ParseUtil.append(body, "{}:={}\n", varNameLen, listLen);
         }
-
         final String varNameArr = goFieldName + "_arr";
-        ParseUtil.append(body, "{}:=make([]{},{})\n", varNameArr, goFieldTypeName, varNameLen);
+        if (listLen == 0) {
+            ParseUtil.append(body, "{}:=make([]{},{})\n", varNameArr, goFieldTypeName, varNameLen);
+        } else {
+            ParseUtil.append(body, "{}:=[{}]{}\n", varNameArr, varNameLen, goFieldTypeName);
+        }
         final String varNameParseContext = context.getVarNameParseContext();
         if (passBitBuf) {
             final String varNameBitBuf = context.getVarNameBitBuf_reader();
@@ -73,9 +81,12 @@ public class GoFieldBuilder__F_bean_list extends GoFieldBuilder {
         final boolean passBitBuf = anno.passBitBuf();
         final GoField goField = context.goField;
         final String goFieldName = goField.goFieldName;
+        final String goFieldTypeName = goField.goFieldTypeName;
         final String varNameParseContext = context.getVarNameDeParseContext();
+        final int listLen = anno.listLen();
         final String varNameArr = goFieldName + "_arr";
         ParseUtil.append(body, "{}:={}.{}\n", varNameArr, GoFieldBuilder.varNameInstance, goFieldName);
+        final Integer byteLen = GoParseUtil.unsafePointerStruct_byteLen.get(goFieldTypeName);
         if (passBitBuf) {
             final String varNameBitBuf = context.getVarNameBitBuf_writer();
             ParseUtil.append(body, "{}.BitBuf_writer={}\n", varNameParseContext, varNameBitBuf);
