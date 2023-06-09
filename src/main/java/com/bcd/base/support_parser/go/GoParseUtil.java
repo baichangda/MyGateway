@@ -10,7 +10,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class GoParseUtil {
+    //非指针结构体、parse和deParse 对象都为结构体
     public final static Set<String> noPointerStructSet = new HashSet<>();
+
+    //可以直接使用unsafe指针转换的结构体
     public final static Map<String, Integer> unsafePointerStruct_byteLen = new HashMap<>();
 
     static void initNoPointerStructSet(Class<?> clazz) {
