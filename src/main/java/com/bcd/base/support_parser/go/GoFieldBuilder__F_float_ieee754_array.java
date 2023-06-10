@@ -78,7 +78,7 @@ public class GoFieldBuilder__F_float_ieee754_array extends GoFieldBuilder {
                 ParseUtil.append(body, "{}:={}\n", varNameLen, len);
             }
             final String varNameArr = goFieldName + "_arr";
-            ParseUtil.append(body, "{}:=make([]{},{})\n", varNameArr, goFieldTypeName, varNameLen);
+            ParseUtil.append(body, "{}:=make([]{},{},{})\n", varNameArr, goFieldTypeName, varNameLen, varNameLen);
             ParseUtil.append(body, "for i:=0;i<{};i++{\n", varNameLen);
             ParseUtil.append(body, "e:={}.Read_{}({})\n", GoFieldBuilder.varNameByteBuf, goFieldTypeName, bigEndian);
             if (singleSkip > 0) {

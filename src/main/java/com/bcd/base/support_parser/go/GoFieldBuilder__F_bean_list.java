@@ -55,7 +55,7 @@ public class GoFieldBuilder__F_bean_list extends GoFieldBuilder {
         }
         final String varNameArr = goFieldName + "_arr";
         if (listLen == 0) {
-            ParseUtil.append(body, "{}:=make([]{},{})\n", varNameArr, goFieldTypeName, varNameLen);
+            ParseUtil.append(body, "{}:=make([]{},{},{})\n", varNameArr, goFieldTypeName, varNameLen,varNameLen);
         } else {
             ParseUtil.append(body, "{}:=[{}]{}\n", varNameArr, varNameLen, goFieldTypeName);
         }

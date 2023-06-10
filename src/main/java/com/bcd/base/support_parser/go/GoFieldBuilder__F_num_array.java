@@ -87,7 +87,7 @@ public class GoFieldBuilder__F_num_array extends GoFieldBuilder {
                 ParseUtil.append(body, "{}:={}.Read_bytes({})\n", varNameArr, GoFieldBuilder.varNameByteBuf, varNameLen);
             } else {
                 if (len == 0) {
-                    ParseUtil.append(body, "{}:=make([]{},{})\n", varNameArr, goFieldTypeName, varNameLen);
+                    ParseUtil.append(body, "{}:=make([]{},{},{})\n", varNameArr, goFieldTypeName, varNameLen, varNameLen);
                 } else {
                     ParseUtil.append(body, "{}:=[{}]{}{}\n", varNameArr, varNameLen, goFieldTypeName);
                 }
