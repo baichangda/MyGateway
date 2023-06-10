@@ -19,6 +19,7 @@ public class FieldBuilder__F_float_ieee754_array extends FieldBuilder {
 
         final F_float_ieee754_array anno = context.field.getAnnotation(annoClass);
         final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.clazz);
+        final int singleSkip = anno.singleSkip();
 
         final String lenRes;
         if (anno.len() == 0) {
@@ -53,6 +54,9 @@ public class FieldBuilder__F_float_ieee754_array extends FieldBuilder {
         ParseUtil.append(body, "for(int i=0;i<{}.length;i++){\n", arrVarName);
         final String valCode = ParseUtil.format("{}.{}()", varNameByteBuf, funcName);
         ParseUtil.append(body, "{}[i]=({})({});\n", arrVarName, arrayElementType, ParseUtil.replaceValExprToCode(anno.valExpr(), valCode));
+        if (singleSkip > 0) {
+            ParseUtil.append(body, "{}.skipBytes({});\n", varNameByteBuf, singleSkip);
+        }
         ParseUtil.append(body, "};\n");
         ParseUtil.append(body, "{}.{}={};\n", varNameInstance, fieldName, arrVarName);
     }
@@ -67,6 +71,7 @@ public class FieldBuilder__F_float_ieee754_array extends FieldBuilder {
         final StringBuilder body = context.body;
         final String fieldName = field.getName();
         final String valCode = FieldBuilder.varNameInstance + "." + fieldName;
+        final int singleSkip = anno.singleSkip();
 
         ParseUtil.append(body, "if({}!=null){\n", FieldBuilder.varNameInstance, valCode);
 
@@ -107,6 +112,9 @@ public class FieldBuilder__F_float_ieee754_array extends FieldBuilder {
             ParseUtil.append(body, "{}.{}(({})({}[i]));\n", varNameByteBuf, funcName, funcParamTypeName, arrVarName);
         } else {
             ParseUtil.append(body, "{}.{}(({})({}));\n", varNameByteBuf, funcName, funcParamTypeName, ParseUtil.replaceValExprToCode(RpnUtil.reverseExpr(anno.valExpr()), arrVarName + "[i]"));
+        }
+        if (singleSkip > 0) {
+            ParseUtil.append(body, "{}.writeZero({});\n", varNameByteBuf, singleSkip);
         }
 
         ParseUtil.append(body, "}\n");

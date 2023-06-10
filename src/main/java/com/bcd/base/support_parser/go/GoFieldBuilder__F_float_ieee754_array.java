@@ -54,7 +54,8 @@ public class GoFieldBuilder__F_float_ieee754_array extends GoFieldBuilder {
         final String valExpr = anno.valExpr();
         final FloatType_ieee754 type = anno.type();
         final int len = anno.len();
-        if (len > 0 && valExpr.isEmpty() && bigEndian) {
+        final int singleSkip = anno.singleSkip();
+        if (len > 0 && valExpr.isEmpty() && bigEndian && singleSkip == 0) {
             int sliceLen;
             switch (type) {
                 case Float32 -> {
@@ -80,11 +81,15 @@ public class GoFieldBuilder__F_float_ieee754_array extends GoFieldBuilder {
             ParseUtil.append(body, "{}:=make([]{},{})\n", varNameArr, goFieldTypeName, varNameLen);
             ParseUtil.append(body, "for i:=0;i<{};i++{\n", varNameLen);
             ParseUtil.append(body, "e:={}.Read_{}({})\n", GoFieldBuilder.varNameByteBuf, goFieldTypeName, bigEndian);
+            if (singleSkip > 0) {
+                ParseUtil.append(body, "{}.Skip({})\n", GoFieldBuilder.varNameByteBuf, singleSkip);
+            }
             String valCode = "e";
             valCode = ParseUtil.replaceValExprToCode(valExpr, valCode);
             ParseUtil.append(body, "{}[i]={}\n", varNameArr, valCode);
             ParseUtil.append(body, "}\n");
             ParseUtil.append(body, "{}.{}={}\n", GoFieldBuilder.varNameInstance, goFieldName, varNameArr);
+
         }
     }
 
@@ -99,15 +104,19 @@ public class GoFieldBuilder__F_float_ieee754_array extends GoFieldBuilder {
         final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.pkg_byteOrder);
         final String valExpr = anno.valExpr();
         final int len = anno.len();
+        final int singleSkip = anno.singleSkip();
         final String varNameArr = goFieldName + "_arr";
         ParseUtil.append(body, "{}:={}.{}\n", varNameArr, GoFieldBuilder.varNameInstance, goFieldName);
-        if (len > 0 && valExpr.isEmpty() && bigEndian) {
+        if (len > 0 && valExpr.isEmpty() && bigEndian && singleSkip == 0) {
             ParseUtil.append(body, "{}.Write_bytes(*({}))\n", GoFieldBuilder.varNameByteBuf, GoParseUtil.get_unsafe_array_to_slice_2(varNameArr, len));
         } else {
             ParseUtil.append(body, "for i:=0;i<len({});i++{\n", varNameArr);
             String valCode = ParseUtil.format("{}[i]", varNameArr);
             valCode = ParseUtil.replaceValExprToCode(RpnUtil.reverseExpr(valExpr), valCode);
             ParseUtil.append(body, "{}.Write_{}({},{})\n", GoFieldBuilder.varNameByteBuf, goFieldTypeName, valCode, bigEndian);
+            if (singleSkip > 0) {
+                ParseUtil.append(body, "{}.Write_zero({})\n", GoFieldBuilder.varNameByteBuf, singleSkip);
+            }
             ParseUtil.append(body, "}\n");
         }
     }

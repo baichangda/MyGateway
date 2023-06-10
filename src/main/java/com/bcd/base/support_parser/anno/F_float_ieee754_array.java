@@ -42,6 +42,11 @@ public @interface F_float_ieee754_array {
     String lenExpr() default "";
 
     /**
+     * 每个数组元素在读取后、应该skip的byte长度
+     */
+    int singleSkip() default 0;
+
+    /**
      * 值处理表达式
      * 在解析出的原始值得基础上,进行运算
      * 公式中的x变量代表字段原始的值
