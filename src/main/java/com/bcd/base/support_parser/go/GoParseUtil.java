@@ -307,6 +307,14 @@ public class GoParseUtil {
         }
     }
 
+    public static String wrapTypeNameFunc(String goTypeName, boolean bigEndian) {
+        if ("uin8".equals(goTypeName) || "int8".equals(goTypeName)) {
+            return goTypeName;
+        } else {
+            return goTypeName + (bigEndian ? "" : "_le");
+        }
+    }
+
 
     public static String toFirstUpperCase(String str) {
         return str.substring(0, 1).toUpperCase() + str.substring(1);

@@ -92,17 +92,7 @@ public class GoFieldBuilder__F_num_array extends GoFieldBuilder {
                     ParseUtil.append(body, "{}:=[{}]{}{}\n", varNameArr, varNameLen, goFieldTypeName);
                 }
                 ParseUtil.append(body, "for i:=0;i<{};i++{\n", varNameLen);
-                switch (singleLen) {
-                    case 1 -> {
-                        ParseUtil.append(body, "e:={}.Read_{}()\n", GoFieldBuilder.varNameByteBuf, goReadTypeName);
-                    }
-                    case 2, 4, 8 -> {
-                        ParseUtil.append(body, "e:={}.Read_{}({})\n", GoFieldBuilder.varNameByteBuf, goReadTypeName, bigEndian);
-                    }
-                    default -> {
-                        ParseUtil.notSupport_len(field, annoClass);
-                    }
-                }
+                ParseUtil.append(body, "e:={}.Read_{}()\n", GoFieldBuilder.varNameByteBuf, GoParseUtil.wrapTypeNameFunc(goReadTypeName, bigEndian));
                 if (singleSkip > 0) {
                     ParseUtil.append(body, "e:={}.Skip({})\n", GoFieldBuilder.varNameByteBuf, singleSkip);
                 }
@@ -154,17 +144,7 @@ public class GoFieldBuilder__F_num_array extends GoFieldBuilder {
                 if (!goReadTypeName.equals(goFieldTypeName)) {
                     valCode = ParseUtil.format("{}(parse.Round({}))", goReadTypeName, valCode);
                 }
-                switch (singleLen) {
-                    case 1 -> {
-                        ParseUtil.append(body, "{}.Write_{}({})\n", GoFieldBuilder.varNameByteBuf, goReadTypeName, valCode);
-                    }
-                    case 2, 4, 8 -> {
-                        ParseUtil.append(body, "{}.Write_{}({},{})\n", GoFieldBuilder.varNameByteBuf, goReadTypeName, valCode, bigEndian);
-                    }
-                    default -> {
-                        ParseUtil.notSupport_len(field, annoClass);
-                    }
-                }
+                ParseUtil.append(body, "{}.Write_{}({})\n", GoFieldBuilder.varNameByteBuf, GoParseUtil.wrapTypeNameFunc(goReadTypeName,bigEndian), valCode);
                 if (singleSkip > 0) {
                     ParseUtil.append(body, "{}.Write_zero({})\n", GoFieldBuilder.varNameByteBuf, singleSkip);
                 }

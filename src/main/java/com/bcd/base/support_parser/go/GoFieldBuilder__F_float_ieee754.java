@@ -46,10 +46,10 @@ public class GoFieldBuilder__F_float_ieee754 extends GoFieldBuilder {
         final Class<? extends F_float_ieee754> annoClass = anno.getClass();
         final StringBuilder body = context.parseBody;
         final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.pkg_byteOrder);
-        final String varNameReadVal = goFieldName+"_v";
+        final String varNameReadVal = goFieldName + "_v";
         final String valExpr = anno.valExpr();
         final FloatType_ieee754 type = anno.type();
-        ParseUtil.append(body, "{}:={}.Read_{}({})\n", varNameReadVal, GoFieldBuilder.varNameByteBuf, goFieldTypeName, bigEndian);
+        ParseUtil.append(body, "{}:={}.Read_{}()\n", varNameReadVal, GoFieldBuilder.varNameByteBuf, GoParseUtil.wrapTypeNameFunc(goFieldTypeName, bigEndian));
         String valCode = varNameReadVal;
         valCode = ParseUtil.replaceValExprToCode(valExpr, valCode);
         ParseUtil.append(body, "{}.{}={}\n\n", GoFieldBuilder.varNameInstance, goFieldName, valCode);
@@ -69,7 +69,7 @@ public class GoFieldBuilder__F_float_ieee754 extends GoFieldBuilder {
         if (!valExpr.isEmpty()) {
             valCode = ParseUtil.replaceValExprToCode(RpnUtil.reverseExpr(valExpr), valCode);
         }
-        ParseUtil.append(body, "{}.Write_{}({},{})\n", GoFieldBuilder.varNameByteBuf, goFieldTypeName, valCode, bigEndian);
+        ParseUtil.append(body, "{}.Write_{}({})\n", GoFieldBuilder.varNameByteBuf, GoParseUtil.wrapTypeNameFunc(goFieldTypeName, bigEndian), valCode);
     }
 
 }

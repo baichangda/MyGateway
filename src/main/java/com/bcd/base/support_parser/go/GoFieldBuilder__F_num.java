@@ -68,17 +68,7 @@ public class GoFieldBuilder__F_num extends GoFieldBuilder {
         final Class<?> fieldType = field.getType();
         final String varNameReadVal = goFieldName + "_v";
         final String valExpr = anno.valExpr();
-        switch (anno.len()) {
-            case 1 -> {
-                ParseUtil.append(body, "{}:={}.Read_{}()\n", varNameReadVal, GoFieldBuilder.varNameByteBuf, goReadTypeName);
-            }
-            case 2, 4, 8 -> {
-                ParseUtil.append(body, "{}:={}.Read_{}({})\n", varNameReadVal, GoFieldBuilder.varNameByteBuf, goReadTypeName, bigEndian);
-            }
-            default -> {
-                ParseUtil.notSupport_len(field, annoClass);
-            }
-        }
+        ParseUtil.append(body, "{}:={}.Read_{}()\n", varNameReadVal, GoFieldBuilder.varNameByteBuf, GoParseUtil.wrapTypeNameFunc(goReadTypeName,bigEndian));
 
         String valCode = varNameReadVal;
         if (!goReadTypeName.equals(goFieldTypeName)) {
@@ -115,18 +105,7 @@ public class GoFieldBuilder__F_num extends GoFieldBuilder {
         if (!goReadTypeName.equals(goFieldTypeName)) {
             valCode = ParseUtil.format("{}(parse.Round({}))", goReadTypeName, valCode);
         }
-        switch (anno.len()) {
-            case 1 -> {
-                ParseUtil.append(body, "{}.Write_{}({})\n", GoFieldBuilder.varNameByteBuf, goReadTypeName, valCode);
-            }
-            case 2, 4, 8 -> {
-                ParseUtil.append(body, "{}.Write_{}({},{})\n", GoFieldBuilder.varNameByteBuf, goReadTypeName, valCode, bigEndian);
-            }
-            default -> {
-                ParseUtil.notSupport_len(field, annoClass);
-                valCode = "";
-            }
-        }
+        ParseUtil.append(body, "{}.Write_{}({})\n", GoFieldBuilder.varNameByteBuf, GoParseUtil.wrapTypeNameFunc(goReadTypeName,bigEndian), valCode);
 
         if (anno.var() != '0') {
             varToGoFieldName.put(anno.var(), ParseUtil.format("{}.{}", GoFieldBuilder.varNameInstance, goFieldName));
