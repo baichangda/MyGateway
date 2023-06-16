@@ -656,11 +656,7 @@ public class Parser {
                 }
             }
         }
-//        if (parentContext == null) {
-//            return processor.process(data, new ProcessContext(null, null));
-//        } else {
         return processor.process(data, parentContext);
-//        }
     }
 
     @SuppressWarnings("unchecked")
@@ -681,10 +677,6 @@ public class Parser {
                 }
             }
         }
-//        if (parentContext == null) {
-//            processor.deProcess(data, new ProcessContext(null, null), instance);
-//        } else {
         processor.deProcess(data, parentContext, instance);
-//        }
     }
 }
