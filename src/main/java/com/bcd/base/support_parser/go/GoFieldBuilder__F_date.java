@@ -17,7 +17,8 @@ public class GoFieldBuilder__F_date extends GoFieldBuilder {
         final StringBuilder body = context.structBody;
         final GoField goField = context.goField;
         final String goFieldName = goField.goFieldName;
-        ParseUtil.append(body, "{} time.Time\n", goFieldName);
+        final String jsonExt = goField.jsonExt;
+        ParseUtil.append(body, "{} time.Time {}\n", goFieldName,jsonExt);
     }
 
     @Override

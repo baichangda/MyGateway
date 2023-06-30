@@ -15,7 +15,8 @@ public class GoFieldBuilder__F_string extends GoFieldBuilder {
         final StringBuilder body = context.structBody;
         final GoField goField = context.goField;
         final String goFieldName = goField.goFieldName;
-        ParseUtil.append(body, "{} string\n", goFieldName);
+        final String jsonExt = goField.jsonExt;
+        ParseUtil.append(body, "{} string {}\n", goFieldName, jsonExt);
     }
 
     @Override

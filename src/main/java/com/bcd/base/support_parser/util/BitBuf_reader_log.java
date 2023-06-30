@@ -1,13 +1,21 @@
 package com.bcd.base.support_parser.util;
 
-import com.bcd.base.support_parser.Parser;
+import com.bcd.base.util.StringUtil;
 import com.google.common.base.Strings;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public final class BitBuf_reader_log extends BitBuf_reader{
-    public volatile String logPrefix;
+import java.util.ArrayList;
+import java.util.List;
+
+public final class BitBuf_reader_log extends BitBuf_reader {
+
+    static Logger logger= LoggerFactory.getLogger(BitBuf_reader_log.class);
+
+    public List<Log> logs=new ArrayList<>();
 
     public BitBuf_reader_log(ByteBuf byteBuf) {
         super(byteBuf);
@@ -60,7 +68,11 @@ public final class BitBuf_reader_log extends BitBuf_reader{
             return ByteBufUtil.hexDump(bytes) + ((bitEnd & 7) == 7 ? "" : "?");
         }
 
-        public abstract void print(String logPrefix);
+        public void print(){
+            logger.info(msg());
+        }
+
+        public abstract String msg();
     }
 
     public static class FinishLog extends Log {
@@ -85,11 +97,12 @@ public final class BitBuf_reader_log extends BitBuf_reader{
             return sb.substring(bitStart, bitEnd + 1);
         }
 
-        public final void print(String logPrefix) {
+        @Override
+        public String msg() {
             if (skip) {
-                Parser.logger.info("{}finish skip bit_hex[{}] bit_pos[{}-{}] bit_binary[{}]", logPrefix == null ? "" : (logPrefix + " "), getLogHex().toUpperCase(), bitStart, bitEnd, getLogBit());
+                return StringUtil.format("finish skip bit_hex[{}] bit_pos[{}-{}] bit_binary[{}]", getLogHex().toUpperCase(), bitStart, bitEnd, getLogBit());
             } else {
-                Parser.logger.info("{}finish no skip", logPrefix == null ? "" : (logPrefix+" "));
+                return StringUtil.format("finish no skip");
             }
         }
     }
@@ -108,8 +121,8 @@ public final class BitBuf_reader_log extends BitBuf_reader{
             return sb.substring(bitStart, bitEnd + 1);
         }
 
-        public final void print(String logPrefix) {
-            Parser.logger.info("{}skip bit_hex[{}] bit_pos[{}-{}] bit_binary[{}]", logPrefix == null ? "" : (logPrefix + " "), getLogHex().toUpperCase(), bitStart, bitEnd, getLogBit());
+        public final String msg() {
+            return StringUtil.format("skip bit_hex[{}] bit_pos[{}-{}] bit_binary[{}]", getLogHex().toUpperCase(), bitStart, bitEnd, getLogBit());
         }
     }
 
@@ -141,16 +154,15 @@ public final class BitBuf_reader_log extends BitBuf_reader{
             }
         }
 
-        public final void print(String logPrefix) {
-            Parser.logger.info("{}read bit_hex[{}] bit_pos[{}-{}] bit_bigEndian[{}] bit_unsigned[{}] bit_binary[{}->{}->{}] bit_val[{}->{}->{}]",
-                    logPrefix == null ? "" : (logPrefix + " "),
+        @Override
+        public String msg() {
+            return StringUtil.format("read bit_hex[{}] bit_pos[{}-{}] bit_bigEndian[{}] bit_unsigned[{}] bit_binary[{}->{}->{}] bit_val[{}->{}->{}]",
                     getLogHex().toUpperCase(),
                     bitStart, bitEnd,
                     bigEndian ? "yes" : "no",
                     unsigned ? "yes" : "no",
                     getLogBit(val1, false), getLogBit(val2, false), getLogBit(val3, signed3),
-                    val1, val2, val3
-            );
+                    val1, val2, val3);
         }
     }
 
@@ -210,7 +222,7 @@ public final class BitBuf_reader_log extends BitBuf_reader{
         } else {
             log.val3 = cRight & ((0x01L << bit) - 1);
         }
-        log.print(logPrefix);
+        logs.add(log);
         return log.val3;
     }
 
@@ -253,20 +265,25 @@ public final class BitBuf_reader_log extends BitBuf_reader{
         }
         this.bitOffset = temp & 7;
         this.b = b;
-        log.print(logPrefix);
+        logs.add(log);
     }
 
     public final void finish() {
-        final FinishLog finishLog;
+        final FinishLog log;
         if (bitOffset == 0) {
-            finishLog = new FinishLog();
+            log = new FinishLog();
         } else {
-            finishLog = new FinishLog(1, bitOffset, 8 - bitOffset);
-            finishLog.bytes[0] = b;
+            log = new FinishLog(1, bitOffset, 8 - bitOffset);
+            log.bytes[0] = b;
         }
         b = 0;
         bitOffset = 0;
-        finishLog.print(logPrefix);
+        logs.add(log);
     }
 
+    public Log[] takeLogs() {
+        Log[] temp = logs.toArray(new Log[0]);
+        logs.clear();
+        return temp;
+    }
 }

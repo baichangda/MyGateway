@@ -71,6 +71,7 @@ public class GoFieldBuilder__F_customize extends GoFieldBuilder {
         final Class<?> clazz = context.clazz;
         final Class<?> fieldType = field.getType();
         final GoField goField = context.goField;
+        final String jsonExt = goField.jsonExt;
         final String goFieldName = goField.goFieldName;
         if (!customizeClassSet.contains(fieldType)) {
             if (ClassUtil.isBeanType(fieldType)) {
@@ -100,7 +101,7 @@ public class GoFieldBuilder__F_customize extends GoFieldBuilder {
             }
 
         }
-        ParseUtil.append(body, "{} any\n", goFieldName);
+        ParseUtil.append(body, "{} any {}\n", goFieldName,jsonExt);
     }
 
     @Override
@@ -114,7 +115,7 @@ public class GoFieldBuilder__F_customize extends GoFieldBuilder {
         final String goFieldName = goField.goFieldName;
         final F_customize f_customize = field.getAnnotation(F_customize.class);
         final boolean passBitBuf = f_customize.passBitBuf();
-        final String toFunName = "To" + goFieldName;
+        final String toFunName = "To_" + goFieldName;
         if (!customizeClassSet.contains(fieldType)) {
             ParseUtil.append(customizeBody, "func {}({} *parse.ByteBuf,{} *parse.ParseContext)any{\n", toFunName, GoFieldBuilder.varNameByteBuf, GoFieldBuilder.varNameParentParseContext);
             if (passBitBuf) {
@@ -145,7 +146,7 @@ public class GoFieldBuilder__F_customize extends GoFieldBuilder {
         final String goFieldName = goField.goFieldName;
         final F_customize f_customize = field.getAnnotation(F_customize.class);
         final boolean passBitBuf = f_customize.passBitBuf();
-        final String writeFunName = "Write" + goFieldName;
+        final String writeFunName = "Write_" + goFieldName;
         if (!customizeClassSet.contains(fieldType)) {
             ParseUtil.append(customizeBody, "func {}({} *parse.ByteBuf,_{} any,{} *parse.ParseContext){\n",
                     writeFunName, GoFieldBuilder.varNameByteBuf,

@@ -18,6 +18,7 @@ public class GoFieldBuilder__F_bean_list extends GoFieldBuilder {
         final GoField goField = context.goField;
         final String goFieldName = goField.goFieldName;
         final Class<?> fieldType = field.getType();
+        final String jsonExt = goField.jsonExt;
         final int listLen = anno.listLen();
         final Class<?> goFieldType;
         if (fieldType.isArray()) {
@@ -28,9 +29,9 @@ public class GoFieldBuilder__F_bean_list extends GoFieldBuilder {
         final String goFieldTypeName = GoParseUtil.toFirstUpperCase(goFieldType.getSimpleName());
         goField.goFieldTypeName = goFieldTypeName;
         if (listLen == 0) {
-            ParseUtil.append(body, "{} []{}\n", goFieldName, goFieldTypeName);
+            ParseUtil.append(body, "{} []{} {}\n", goFieldName, goFieldTypeName,jsonExt);
         } else {
-            ParseUtil.append(body, "{} [{}]{}\n", goFieldName, listLen, goFieldTypeName);
+            ParseUtil.append(body, "{} [{}]{} {}\n", goFieldName, listLen, goFieldTypeName,jsonExt);
         }
     }
 
@@ -66,7 +67,7 @@ public class GoFieldBuilder__F_bean_list extends GoFieldBuilder {
         }
         ParseUtil.append(body, "for i:=0;i<{};i++{\n", varNameLen);
         final String valCode;
-        valCode = ParseUtil.format("To{}({},{})", goFieldTypeName, GoFieldBuilder.varNameByteBuf, varNameParseContext);
+        valCode = ParseUtil.format("To_{}({},{})", goFieldTypeName, GoFieldBuilder.varNameByteBuf, varNameParseContext);
         ParseUtil.append(body, "{}[i]={}\n", varNameArr, valCode);
         ParseUtil.append(body, "}\n", varNameLen);
         ParseUtil.append(body, "{}.{}={}\n", GoFieldBuilder.varNameInstance, goFieldName, varNameArr);

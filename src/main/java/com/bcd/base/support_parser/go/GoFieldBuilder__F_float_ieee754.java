@@ -16,6 +16,7 @@ public class GoFieldBuilder__F_float_ieee754 extends GoFieldBuilder {
         final F_float_ieee754 anno = field.getAnnotation(F_float_ieee754.class);
         final GoField goField = context.goField;
         final String goFieldName = goField.goFieldName;
+        final String jsonExt = goField.jsonExt;
         final Class<? extends F_float_ieee754> annoClass = anno.getClass();
         final StringBuilder body = context.structBody;
         final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.pkg_byteOrder);
@@ -33,7 +34,7 @@ public class GoFieldBuilder__F_float_ieee754 extends GoFieldBuilder {
             }
         }
         goField.goFieldTypeName = goFieldTypeName;
-        ParseUtil.append(body, "{} {}\n", goFieldName, goFieldTypeName);
+        ParseUtil.append(body, "{} {} {}\n", goFieldName, goFieldTypeName,jsonExt);
     }
 
     @Override

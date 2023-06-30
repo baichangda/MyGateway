@@ -16,11 +16,12 @@ public class GoFieldBuilder__F_bean extends GoFieldBuilder {
         final GoField goField = context.goField;
         final String goFieldName = goField.goFieldName;
         final String goFieldTypeName = field.getType().getSimpleName();
+        final String jsonExt = goField.jsonExt;
         goField.goFieldTypeName = goFieldTypeName;
         if (GoParseUtil.noPointerStructSet.contains(goFieldTypeName)) {
-            ParseUtil.append(body, "{} {}\n", goFieldName, goFieldTypeName);
+            ParseUtil.append(body, "{} {} {}\n", goFieldName, goFieldTypeName, jsonExt);
         } else {
-            ParseUtil.append(body, "{} *{}\n", goFieldName, goFieldTypeName);
+            ParseUtil.append(body, "{} *{} {}\n", goFieldName, goFieldTypeName, jsonExt);
         }
     }
 
@@ -40,7 +41,7 @@ public class GoFieldBuilder__F_bean extends GoFieldBuilder {
             final String varNameBitBuf = context.getVarNameBitBuf_reader();
             ParseUtil.append(body, "{}.BitBuf_reader={}\n", varNameParseContext, varNameBitBuf);
         }
-        final String valCode = ParseUtil.format("To{}({},{})", goFieldTypeName, GoFieldBuilder.varNameByteBuf, varNameParseContext);
+        final String valCode = ParseUtil.format("To_{}({},{})", goFieldTypeName, GoFieldBuilder.varNameByteBuf, varNameParseContext);
         ParseUtil.append(body, "{}.{}={}\n", GoFieldBuilder.varNameInstance, goFieldName, valCode);
     }
 

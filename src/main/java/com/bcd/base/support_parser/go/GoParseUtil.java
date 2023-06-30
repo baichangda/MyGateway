@@ -370,7 +370,7 @@ public class GoParseUtil {
     public static void appendUnsafeStructFunc(StringBuilder body, String goStructName, int structByteLen) {
         if (GoParseUtil.noPointerStructSet.contains(goStructName)) {
             ParseUtil.append(body, """
-                            func To{}({} *parse.ByteBuf, {} *parse.ParseContext) {} {
+                            func To_{}({} *parse.ByteBuf, {} *parse.ParseContext) {} {
                                  return *(*{})(unsafe.Pointer(unsafe.SliceData({}.Read_bytes({}))))
                             }
                             func({} {})Write({} *parse.ByteBuf,{} *parse.ParseContext){
@@ -385,7 +385,7 @@ public class GoParseUtil {
                     GoFieldBuilder.varNameInstance, goStructName, GoFieldBuilder.varNameByteBuf, GoFieldBuilder.varNameParentParseContext, GoFieldBuilder.varNameByteBuf, GoFieldBuilder.varNameInstance, structByteLen, structByteLen);
         } else {
             ParseUtil.append(body, """
-                            func To{}({} *parse.ByteBuf, {} *parse.ParseContext) *{} {
+                            func To_{}({} *parse.ByteBuf, {} *parse.ParseContext) *{} {
                                  return (*{})(unsafe.Pointer(unsafe.SliceData({}.Read_bytes({}))))
                             }
                             func(_{} *{})Write({} *parse.ByteBuf,{} *parse.ParseContext){

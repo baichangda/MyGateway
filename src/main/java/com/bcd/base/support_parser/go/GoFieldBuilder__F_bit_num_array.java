@@ -20,6 +20,7 @@ public class GoFieldBuilder__F_bit_num_array extends GoFieldBuilder {
         final boolean unsigned = anno.unsigned();
         final Class<?> fieldType = field.getType();
         final int singleLen = anno.singleLen();
+        final String jsonExt = goField.jsonExt;
         final String goFieldTypeName;
         final String goReadTypeName;
         if (singleLen >= 1 && singleLen <= 8) {
@@ -43,7 +44,7 @@ public class GoFieldBuilder__F_bit_num_array extends GoFieldBuilder {
         }
         goField.goFieldTypeName = goFieldTypeName;
         goField.goReadTypeName = goReadTypeName;
-        ParseUtil.append(body, "{} []{}\n", goFieldName, goFieldTypeName);
+        ParseUtil.append(body, "{} []{} {}\n", goFieldName, goFieldTypeName,jsonExt);
     }
 
     @Override

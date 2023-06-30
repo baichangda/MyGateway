@@ -14,6 +14,7 @@ public class GoFieldBuilder__F_num extends GoFieldBuilder {
         final F_num anno = field.getAnnotation(F_num.class);
         final GoField goField = context.goField;
         final String goFieldName = goField.goFieldName;
+        final String jsonExt = goField.jsonExt;
         final Class<? extends F_num> annoClass = anno.getClass();
         final StringBuilder body = context.structBody;
         final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.pkg_byteOrder);
@@ -49,7 +50,7 @@ public class GoFieldBuilder__F_num extends GoFieldBuilder {
 
         goField.goFieldTypeName = goFieldTypeName;
         goField.goReadTypeName = goReadTypeName;
-        ParseUtil.append(body, "{} {}\n", goFieldName, goFieldTypeName);
+        ParseUtil.append(body, "{} {} {}\n", goFieldName, goFieldTypeName,jsonExt);
     }
 
     @Override

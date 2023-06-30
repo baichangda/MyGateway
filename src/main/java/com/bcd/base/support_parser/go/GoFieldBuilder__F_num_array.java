@@ -16,6 +16,7 @@ public class GoFieldBuilder__F_num_array extends GoFieldBuilder {
         final String goFieldName = goField.goFieldName;
         final Class<? extends F_num_array> annoClass = anno.getClass();
         final StringBuilder body = context.structBody;
+        final String jsonExt = goField.jsonExt;
         final int len = anno.len();
         final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.pkg_byteOrder);
         final boolean unsigned = anno.unsigned();
@@ -50,9 +51,13 @@ public class GoFieldBuilder__F_num_array extends GoFieldBuilder {
         goField.goFieldTypeName = goFieldTypeName;
         goField.goReadTypeName = goReadTypeName;
         if (len == 0) {
-            ParseUtil.append(body, "{} []{}\n", goFieldName, goFieldTypeName);
+            if ("uint8".equals(goReadTypeName)) {
+                ParseUtil.append(body, "{} parse.JsonUint8Arr {}\n", goFieldName,jsonExt);
+            } else {
+                ParseUtil.append(body, "{} []{} {}\n", goFieldName, goFieldTypeName,jsonExt);
+            }
         } else {
-            ParseUtil.append(body, "{} [{}]{}\n", goFieldName, len, goFieldTypeName);
+            ParseUtil.append(body, "{} [{}]{} {}\n", goFieldName, len, goFieldTypeName,jsonExt);
         }
     }
 
@@ -144,7 +149,7 @@ public class GoFieldBuilder__F_num_array extends GoFieldBuilder {
                 if (!goReadTypeName.equals(goFieldTypeName)) {
                     valCode = ParseUtil.format("{}(parse.Round({}))", goReadTypeName, valCode);
                 }
-                ParseUtil.append(body, "{}.Write_{}({})\n", GoFieldBuilder.varNameByteBuf, GoParseUtil.wrapTypeNameFunc(goReadTypeName,bigEndian), valCode);
+                ParseUtil.append(body, "{}.Write_{}({})\n", GoFieldBuilder.varNameByteBuf, GoParseUtil.wrapTypeNameFunc(goReadTypeName, bigEndian), valCode);
                 if (singleSkip > 0) {
                     ParseUtil.append(body, "{}.Write_zero({})\n", GoFieldBuilder.varNameByteBuf, singleSkip);
                 }

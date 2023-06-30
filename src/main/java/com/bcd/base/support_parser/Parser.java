@@ -5,8 +5,10 @@ import com.bcd.base.support_parser.builder.*;
 import com.bcd.base.support_parser.exception.BaseRuntimeException;
 import com.bcd.base.support_parser.processor.ProcessContext;
 import com.bcd.base.support_parser.processor.Processor;
-import com.bcd.base.support_parser.util.ParseUtil;
+import com.bcd.base.support_parser.util.BitBuf_reader_log;
+import com.bcd.base.support_parser.util.BitBuf_writer_log;
 import com.bcd.base.support_parser.util.LogUtil;
+import com.bcd.base.support_parser.util.ParseUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import javassist.*;
@@ -105,6 +107,18 @@ public class Parser {
          * @param processorClassName  解析器类名
          */
         void collect_field(Class<?> clazz, Class<?> fieldDeclaringClass, String fieldName, byte[] content, Object val, String processorClassName);
+
+        /**
+         * 收集每个字段解析的详情
+         *
+         * @param clazz               实体类
+         * @param fieldDeclaringClass 字段所属类
+         * @param fieldName           字段名称
+         * @param logs                bit解析日志
+         * @param val                 解析后的值
+         * @param processorClassName  解析器类名
+         */
+        void collect_field_bit(Class<?> clazz, Class<?> fieldDeclaringClass, String fieldName, BitBuf_reader_log.Log[] logs, Object val, String processorClassName);
     }
 
 
@@ -120,6 +134,18 @@ public class Parser {
          * @param processorClassName  解析器类名
          */
         void collect_field(Class<?> clazz, Class<?> fieldDeclaringClass, String fieldName, Object val, byte[] content, String processorClassName);
+
+        /**
+         * 收集每个字段解析的详情
+         *
+         * @param clazz               实体类
+         * @param fieldDeclaringClass 字段所属类
+         * @param fieldName           字段名称
+         * @param val                 值
+         * @param logs                bit解析日志
+         * @param processorClassName  解析器类名
+         */
+        void collect_field_bit(Class<?> clazz, Class<?> fieldDeclaringClass, String fieldName, Object val, BitBuf_writer_log.Log[] logs, String processorClassName);
     }
 
     /**
@@ -143,6 +169,18 @@ public class Parser {
                         , val
                 );
             }
+
+            @Override
+            public void collect_field_bit(Class<?> clazz, Class<?> fieldDeclaringClass, String fieldName, BitBuf_reader_log.Log[] logs, Object val, String processorClassName) {
+                for (BitBuf_reader_log.Log log : logs) {
+                    logger.info("--parse field{}--[{}].[{}] val[{}] {}"
+                            , LogUtil.getDeclaredFieldStackTrace(fieldDeclaringClass, fieldName)
+                            , clazz.getSimpleName()
+                            , fieldName
+                            , val
+                            , log.msg());
+                }
+            }
         };
 
     }
@@ -157,6 +195,18 @@ public class Parser {
                         , fieldName
                         , val
                         , ByteBufUtil.hexDump(content).toUpperCase());
+            }
+
+            @Override
+            public void collect_field_bit(Class<?> clazz, Class<?> fieldDeclaringClass, String fieldName, Object val, BitBuf_writer_log.Log[] logs, String processorClassName) {
+                for (BitBuf_writer_log.Log log : logs) {
+                    logger.info("--deParse field{}--[{}].[{}] val[{}] {}"
+                            , LogUtil.getDeclaredFieldStackTrace(fieldDeclaringClass, fieldName)
+                            , clazz.getSimpleName()
+                            , fieldName
+                            , val
+                            , log.msg());
+                }
             }
         };
     }
@@ -339,7 +389,6 @@ public class Parser {
                 if (!context.logBit) {
                     ParseUtil.prependLogCode_parse(context);
                 }
-                ParseUtil.prependBitLogCode_parse(context);
             }
             try {
                 final F_num f_num = field.getAnnotation(F_num.class);
@@ -416,7 +465,9 @@ public class Parser {
                 }
             } finally {
                 if (logCollector_parse != null) {
-                    if (!context.logBit) {
+                    if (context.logBit) {
+                        ParseUtil.appendBitLogCode_parse(context);
+                    } else {
                         ParseUtil.appendLogCode_parse(context);
                     }
                 }
@@ -442,7 +493,7 @@ public class Parser {
                     if (!context.logBit) {
                         ParseUtil.prependLogCode_deParse(context);
                     }
-                    ParseUtil.prependBitLogCode_deParse(context);
+
                 }
                 final F_num f_num = field.getAnnotation(F_num.class);
                 if (f_num != null) {
@@ -518,7 +569,9 @@ public class Parser {
                 }
             } finally {
                 if (logCollector_deParse != null) {
-                    if (!context.logBit) {
+                    if (context.logBit) {
+                        ParseUtil.appendBitLogCode_deParse(context);
+                    } else {
                         ParseUtil.appendLogCode_deParse(context);
                     }
                 }

@@ -50,6 +50,9 @@ public class Packet_evts_processor implements Processor<List<Evt>> {
                 case 0x000A -> {
                     evt = Parser.parse(Evt_000A.class, data, parentContext);
                 }
+                case 0x0800 -> {
+                    evt = Parser.parse(Evt_0800.class, data, parentContext);
+                }
                 case 0x0801 -> {
                     evt = Parser.parse(Evt_0801.class, data, parentContext);
                 }

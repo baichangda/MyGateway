@@ -60,13 +60,13 @@ public class GoUtil {
             final String goStructName = context.goStructName;
             ParseUtil.append(structBody, "type {} struct{\n", goStructName);
             if (GoParseUtil.noPointerStructSet.contains(goStructName)) {
-                ParseUtil.append(parseBody, "func To{}({} *parse.ByteBuf,{} *parse.ParseContext) {}{\n",
+                ParseUtil.append(parseBody, "func To_{}({} *parse.ByteBuf,{} *parse.ParseContext) {}{\n",
                         goStructName, GoFieldBuilder.varNameByteBuf, GoFieldBuilder.varNameParentParseContext, goStructName);
                 ParseUtil.append(deParseBody, "func({} {})Write({} *parse.ByteBuf,{} *parse.ParseContext){\n",
                         GoFieldBuilder.varNameInstance, goStructName,
                         GoFieldBuilder.varNameByteBuf, GoFieldBuilder.varNameParentParseContext);
             } else {
-                ParseUtil.append(parseBody, "func To{}({} *parse.ByteBuf,{} *parse.ParseContext) *{}{\n",
+                ParseUtil.append(parseBody, "func To_{}({} *parse.ByteBuf,{} *parse.ParseContext) *{}{\n",
                         goStructName, GoFieldBuilder.varNameByteBuf, GoFieldBuilder.varNameParentParseContext, goStructName);
                 ParseUtil.append(deParseBody, "func(_{} *{})Write({} *parse.ByteBuf,{} *parse.ParseContext){\n",
                         GoFieldBuilder.varNameInstance, goStructName,
@@ -182,7 +182,7 @@ public class GoUtil {
 //        final String s = "com.bcd.base.support_parser.impl.gb32960.data";
 //        toSourceCode(s, ByteOrder.BigEndian, BitOrder.BigEndian, "/Users/baichangda/bcd/goworkspace/MyGateway_go/support_parse/gb32960/java.go");
         final String s = "com.bcd.base.support_parser.impl.immotors.ep33.data";
-        toSourceCode(s, ByteOrder.BigEndian, BitOrder.BigEndian, "/Users/baichangda/bcd/goworkspace/MyGateway_go/support_parse/immotors/ep33/java.go");
+        toSourceCode(s, ByteOrder.BigEndian, BitOrder.BigEndian, "D:/work/bcd/MyGateway_go/support_parse/immotors/ep33/java.go");
 //        final String s = "com.bcd.base.support_parser.impl.icd.data";
 //        toSourceCode(s, ByteOrder.BigEndian, BitOrder.BigEndian, "/Users/baichangda/bcd/goworkspace/MyGateway_go/support_parse/icd/java.go");
     }

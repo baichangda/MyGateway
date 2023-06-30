@@ -18,6 +18,7 @@ public class GoFieldBuilder__F_bit_num extends GoFieldBuilder {
         final StringBuilder body = context.structBody;
         final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.pkg_bitOrder);
         final boolean unsigned = anno.unsigned();
+        final String jsonExt = goField.jsonExt;
         final Class<?> fieldType = field.getType();
         final int len = anno.len();
         final String goFieldTypeName;
@@ -44,7 +45,7 @@ public class GoFieldBuilder__F_bit_num extends GoFieldBuilder {
 
         goField.goFieldTypeName = goFieldTypeName;
         goField.goReadTypeName = goReadTypeName;
-        ParseUtil.append(body, "{} {}\n", goFieldName, goFieldTypeName);
+        ParseUtil.append(body, "{} {} {}\n", goFieldName, goFieldTypeName,jsonExt);
     }
 
     @Override

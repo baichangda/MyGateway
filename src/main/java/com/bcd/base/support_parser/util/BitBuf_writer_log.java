@@ -1,13 +1,20 @@
 package com.bcd.base.support_parser.util;
 
-import com.bcd.base.support_parser.Parser;
+import com.bcd.base.util.StringUtil;
 import com.google.common.base.Strings;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class BitBuf_writer_log extends BitBuf_writer{
-    public volatile String logPrefix;
+import java.util.ArrayList;
+import java.util.List;
+
+public class BitBuf_writer_log extends BitBuf_writer {
+
+    static Logger logger = LoggerFactory.getLogger(BitBuf_reader_log.class);
+    public List<Log> logs = new ArrayList<>();
 
     public BitBuf_writer_log(ByteBuf byteBuf) {
         super(byteBuf);
@@ -30,7 +37,6 @@ public class BitBuf_writer_log extends BitBuf_writer{
     }
 
 
-
     public static abstract class Log {
         public final byte[] bytes;
 
@@ -51,8 +57,11 @@ public class BitBuf_writer_log extends BitBuf_writer{
             return ByteBufUtil.hexDump(bytes) + ((bitEnd & 7) == 7 ? "" : "?");
         }
 
-        public abstract void print(String logPrefix);
+        public void print() {
+            logger.info(msg());
+        }
 
+        public abstract String msg();
     }
 
     public static class FinishLog extends Log {
@@ -77,11 +86,12 @@ public class BitBuf_writer_log extends BitBuf_writer{
             return sb.substring(bitStart, bitEnd + 1);
         }
 
-        public final void print(String logPrefix) {
+        @Override
+        public String msg() {
             if (write) {
-                Parser.logger.info("{} finish write bit_hex[{}] bit_pos[{}-{}] bit_binary[{}]", logPrefix == null ? "" : logPrefix, getLogHex().toUpperCase(), bitStart, bitEnd, getLogBit());
+                return StringUtil.format("finish write bit_hex[{}] bit_pos[{}-{}] bit_binary[{}]", getLogHex().toUpperCase(), bitStart, bitEnd, getLogBit());
             } else {
-                Parser.logger.info("{} finish no write", logPrefix == null ? "" : logPrefix);
+                return StringUtil.format("finish no write");
             }
         }
     }
@@ -91,8 +101,9 @@ public class BitBuf_writer_log extends BitBuf_writer{
             super(byteLen, bitStart, bit);
         }
 
-        public final void print(String logPrefix) {
-            Parser.logger.info("{} skip bit_hex[{}] bit_pos[{}-{}]", logPrefix == null ? "" : logPrefix, getLogHex().toUpperCase(), bitStart, bitEnd);
+        @Override
+        public String msg() {
+            return StringUtil.format("skip bit_hex[{}] bit_pos[{}-{}]", getLogHex().toUpperCase(), bitStart, bitEnd);
         }
     }
 
@@ -119,16 +130,15 @@ public class BitBuf_writer_log extends BitBuf_writer{
             }
         }
 
-        public final void print(String logPrefix) {
-            Parser.logger.info("{} write bit_unsigned[{}] bit_bigEndian[{}] bit_val[{}->{}->{}] bit_binary[{}->{}->{}] bit_hex[{}] bit_pos[{}-{}]",
-                    logPrefix == null ? "" : logPrefix,
+        @Override
+        public String msg() {
+            return StringUtil.format("write bit_unsigned[{}] bit_bigEndian[{}] bit_val[{}->{}->{}] bit_binary[{}->{}->{}] bit_hex[{}] bit_pos[{}-{}]",
                     unsigned ? "yes" : "no",
                     bigEndian ? "yes" : "no",
                     val1, val2, val3,
                     getLogBit(val1, signed1), getLogBit(val2, false), getLogBit(val3, false),
                     getLogHex().toUpperCase(),
-                    bitStart, bitEnd
-            );
+                    bitStart, bitEnd);
         }
     }
 
@@ -151,22 +161,22 @@ public class BitBuf_writer_log extends BitBuf_writer{
             byteLen = (temp >> 3) + 1;
         }
 
-        final WriteLog logRes = new WriteLog(byteLen, bitOffset, bit, bigEndian, unsigned);
+        final WriteLog log = new WriteLog(byteLen, bitOffset, bit, bigEndian, unsigned);
 
-        logRes.val1 = l;
+        log.val1 = l;
 
         if (!unsigned && l < 0) {
-            logRes.signed1 = true;
+            log.signed1 = true;
             l = l & ((0x01L << bit) - 1);
         }
 
-        logRes.val2 = l;
+        log.val2 = l;
 
         if (!bigEndian) {
             l = Long.reverse(l) >>> (64 - bit);
         }
 
-        logRes.val3 = l;
+        log.val3 = l;
 
         final long newL;
         if (finalBitOffset == 0) {
@@ -179,11 +189,11 @@ public class BitBuf_writer_log extends BitBuf_writer{
         } else {
             b |= (byte) (newL >> ((byteLen - 1) << 3));
         }
-        logRes.bytes[0] = b;
+        log.bytes[0] = b;
         for (int i = 1; i < byteLen; i++) {
             byteBuf.writeByte(b);
             b = (byte) (newL >> ((byteLen - i - 1) << 3));
-            logRes.bytes[i] = b;
+            log.bytes[i] = b;
         }
         bitOffset = temp & 7;
         if (bitOffset == 0) {
@@ -193,7 +203,7 @@ public class BitBuf_writer_log extends BitBuf_writer{
         this.bitOffset = bitOffset;
         this.b = b;
 
-        logRes.print(logPrefix);
+        logs.add(log);
     }
 
 
@@ -232,20 +242,26 @@ public class BitBuf_writer_log extends BitBuf_writer{
 
         this.bitOffset = temp & 7;
         this.b = b;
-        log.print(logPrefix);
+        logs.add(log);
     }
 
     public final void finish() {
-        final FinishLog finishLog;
+        final FinishLog log;
         if (bitOffset == 0) {
-            finishLog = new FinishLog();
+            log = new FinishLog();
         } else {
             byteBuf.writeByte(b);
-            finishLog = new FinishLog(1, bitOffset, 8 - bitOffset);
-            finishLog.bytes[0] = b;
+            log = new FinishLog(1, bitOffset, 8 - bitOffset);
+            log.bytes[0] = b;
         }
         b = 0;
         bitOffset = 0;
-        finishLog.print(logPrefix);
+        logs.add(log);
+    }
+
+    public Log[] takeLogs() {
+        Log[] temp = logs.toArray(new Log[0]);
+        logs.clear();
+        return temp;
     }
 }
