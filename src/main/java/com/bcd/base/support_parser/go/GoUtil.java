@@ -178,7 +178,7 @@ public class GoUtil {
 //        final String s = "com.bcd.base.support_parser.impl.immotors.ep33.data";
 //        toSourceCode(s, ByteOrder.bigEndian, BitOrder.bigEndian, "D:/work/bcd/MyGateway_go/support_parse/immotors/ep33/java.go");
         final String s = "com.bcd.base.support_parser.impl.immotors.ep33.data";
-        toSourceCode(s, ByteOrder.bigEndian, BitOrder.bigEndian, "D:/work/bcd/MyGateway_go/support_parse/immotors/ep33_noValExpr/java.go");
+        toSourceCode(s, ByteOrder.bigEndian, BitOrder.bigEndian, "D:\\work\\immotors\\immotors-util\\support_parse\\immotors/ep33_noValExpr/java.go");
 //        final String s = "com.bcd.base.support_parser.impl.icd.data";
 //        toSourceCode(s, ByteOrder.bigEndian, BitOrder.bigEndian, "D:/work/bcd/MyGateway_go/support_parse/icd/java.go");
     }
