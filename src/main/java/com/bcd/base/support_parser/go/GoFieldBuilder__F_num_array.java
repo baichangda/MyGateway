@@ -1,6 +1,7 @@
 package com.bcd.base.support_parser.go;
 
 import com.bcd.base.support_parser.anno.F_num_array;
+import com.bcd.base.support_parser.anno.NumType;
 import com.bcd.base.support_parser.util.ParseUtil;
 import com.bcd.base.support_parser.util.RpnUtil;
 
@@ -18,46 +19,94 @@ public class GoFieldBuilder__F_num_array extends GoFieldBuilder {
         final StringBuilder body = context.structBody;
         final String jsonExt = goField.jsonExt;
         final int len = anno.len();
-        final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.pkg_byteOrder);
-        final boolean unsigned = anno.unsigned();
+        final boolean bigEndian = ParseUtil.bigEndian(anno.singleOrder(), context.pkg_byteOrder);
         final Class<?> fieldType = field.getType();
+        final NumType singleType = anno.singleType();
+        final NumType singleValType = anno.singleValType();
         final String goFieldTypeName;
         final String goReadTypeName;
-        switch (anno.singleLen()) {
-            case 1 -> {
-                goReadTypeName = unsigned ? "uint8" : "int8";
+        switch (singleType) {
+            case uint8 -> {
+                goReadTypeName = "uint8";
             }
-            case 2 -> {
-                goReadTypeName = unsigned ? "uint16" : "int16";
+            case int8 -> {
+                goReadTypeName = "int8";
             }
-            case 4 -> {
-                goReadTypeName = unsigned ? "uint32" : "int32";
+            case uint16 -> {
+                goReadTypeName = "uint16";
             }
-            case 8 -> {
-                goReadTypeName = unsigned ? "uint64" : "int64";
+            case int16 -> {
+                goReadTypeName = "int16";
+            }
+            case uint32 -> {
+                goReadTypeName = "uint32";
+            }
+            case int32 -> {
+                goReadTypeName = "int32";
+            }
+            case uint64 -> {
+                goReadTypeName = "uint64";
+            }
+            case int64 -> {
+                goReadTypeName = "int64";
+            }
+            case float32 -> {
+                goReadTypeName = "float32";
+            }
+            case float64 -> {
+                goReadTypeName = "float64";
             }
             default -> {
-                ParseUtil.notSupport_singleLen(field, annoClass);
+                ParseUtil.notSupport_numType(field, annoClass);
                 goReadTypeName = null;
             }
         }
-        if (fieldType == float[].class) {
-            goFieldTypeName = "float32";
-        } else if (fieldType == double[].class) {
-            goFieldTypeName = "float64";
-        } else {
-            goFieldTypeName = goReadTypeName;
+
+        switch (singleValType) {
+            case uint8 -> {
+                goFieldTypeName = "uint8";
+            }
+            case int8 -> {
+                goFieldTypeName = "int8";
+            }
+            case uint16 -> {
+                goFieldTypeName = "uint16";
+            }
+            case int16 -> {
+                goFieldTypeName = "int16";
+            }
+            case uint32 -> {
+                goFieldTypeName = "uint32";
+            }
+            case int32 -> {
+                goFieldTypeName = "int32";
+            }
+            case uint64 -> {
+                goFieldTypeName = "uint64";
+            }
+            case int64 -> {
+                goFieldTypeName = "int64";
+            }
+            case float32 -> {
+                goFieldTypeName = "float32";
+            }
+            case float64 -> {
+                goFieldTypeName = "float64";
+            }
+            default -> {
+                goFieldTypeName = goReadTypeName;
+            }
         }
         goField.goFieldTypeName = goFieldTypeName;
         goField.goReadTypeName = goReadTypeName;
         if (len == 0) {
-            if ("uint8".equals(goReadTypeName)) {
-                ParseUtil.append(body, "{} parse.JsonUint8Arr {}\n", goFieldName,jsonExt);
+            if ("uint8".equals(goFieldTypeName)) {
+                ParseUtil.append(body, "{} parse.JsonUint8Arr {}\n", goFieldName, jsonExt);
             } else {
-                ParseUtil.append(body, "{} []{} {}\n", goFieldName, goFieldTypeName,jsonExt);
+                ParseUtil.append(body, "{} []{} {}\n", goFieldName, goFieldTypeName, jsonExt);
             }
         } else {
-            ParseUtil.append(body, "{} [{}]{} {}\n", goFieldName, len, goFieldTypeName,jsonExt);
+            ParseUtil.append(body, "{} [{}]{} {}\n", goFieldName, len, goFieldTypeName, jsonExt);
         }
     }
 
@@ -72,14 +121,34 @@ public class GoFieldBuilder__F_num_array extends GoFieldBuilder {
         final Class<? extends F_num_array> annoClass = anno.getClass();
         final Map<Character, String> varToGoFieldName = context.varToGoFieldName_parse;
         final StringBuilder body = context.parseBody;
-        final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.pkg_byteOrder);
-        final boolean unsigned = anno.unsigned();
-        final int singleLen = anno.singleLen();
+        final boolean bigEndian = ParseUtil.bigEndian(anno.singleOrder(), context.pkg_byteOrder);
         final int singleSkip = anno.singleSkip();
-        final String valExpr = anno.valExpr();
+        final String valExpr = anno.singleValExpr();
+        final NumType singleType = anno.singleType();
+        final NumType singleValType = anno.singleValType();
         String varNameLen = goFieldName + "_len";
         final int len = anno.len();
         final String varNameArr = goFieldName + "_arr";
+        int singleLen;
+        switch (singleType) {
+            case uint8, int8 -> {
+                singleLen = 1;
+            }
+            case uint16, int16 -> {
+                singleLen = 2;
+            }
+            case uint32, int32, float32 -> {
+                singleLen = 4;
+            }
+            case uint64, int64, float64 -> {
+                singleLen = 8;
+            }
+            default -> {
+                ParseUtil.notSupport_numType(field, annoClass);
+                singleLen = 0;
+            }
+        }
+        final boolean unsigned = goReadTypeName.charAt(0) == 'u';
         if (len > 0 && unsigned && valExpr.isEmpty() && singleSkip == 0) {
             if (singleLen == 1) {
                 ParseUtil.append(body, "{}:={}\n", varNameArr, GoParseUtil.get_unsafe_slice_to_array_1(goFieldTypeName, len));
@@ -87,14 +156,18 @@ public class GoFieldBuilder__F_num_array extends GoFieldBuilder {
                 ParseUtil.append(body, "{}:=(*{})\n", varNameArr, GoParseUtil.get_unsafe_slice_to_array_2(goFieldTypeName, len, len * singleLen));
             }
         } else {
-            ParseUtil.append(body, "{}:={}\n", varNameLen, ParseUtil.replaceLenExprToCode(anno.lenExpr(), varToGoFieldName, field));
+            if (len == 0) {
+                ParseUtil.append(body, "{}:={}\n", varNameLen, ParseUtil.replaceLenExprToCode(anno.lenExpr(), varToGoFieldName, field));
+            } else {
+                ParseUtil.append(body, "{}:={}\n", varNameLen, len);
+            }
             if (singleLen == 1 && unsigned && valExpr.isEmpty() && singleSkip == 0) {
                 ParseUtil.append(body, "{}:={}.Read_bytes({})\n", varNameArr, GoFieldBuilder.varNameByteBuf, varNameLen);
             } else {
                 if (len == 0) {
                     ParseUtil.append(body, "{}:=make([]{},{},{})\n", varNameArr, goFieldTypeName, varNameLen, varNameLen);
                 } else {
-                    ParseUtil.append(body, "{}:=[{}]{}{}\n", varNameArr, varNameLen, goFieldTypeName);
+                    ParseUtil.append(body, "{}:=[{}]{}{}\n", varNameArr, len, goFieldTypeName);
                 }
                 ParseUtil.append(body, "for i:=0;i<{};i++{\n", varNameLen);
                 ParseUtil.append(body, "e:={}.Read_{}()\n", GoFieldBuilder.varNameByteBuf, GoParseUtil.wrapTypeNameFunc(goReadTypeName, bigEndian));
@@ -105,7 +178,7 @@ public class GoFieldBuilder__F_num_array extends GoFieldBuilder {
                 if (!goReadTypeName.equals(goFieldTypeName)) {
                     valCode = ParseUtil.format("{}({})", goFieldTypeName, valCode);
                 }
-                valCode = ParseUtil.replaceValExprToCode(anno.valExpr(), valCode);
+                valCode = ParseUtil.replaceValExprToCode(anno.singleValExpr(), valCode);
                 ParseUtil.append(body, "{}[i]={}\n", varNameArr, valCode);
                 ParseUtil.append(body, "}\n");
             }
@@ -123,14 +196,34 @@ public class GoFieldBuilder__F_num_array extends GoFieldBuilder {
         final Class<? extends F_num_array> annoClass = anno.getClass();
         final Map<Character, String> varToGoFieldName = context.varToGoFieldName_deParse;
         final StringBuilder body = context.deParseBody;
-        final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.pkg_byteOrder);
-        final boolean unsigned = anno.unsigned();
-        final int singleLen = anno.singleLen();
+        final boolean bigEndian = ParseUtil.bigEndian(anno.singleOrder(), context.pkg_byteOrder);
+        final NumType singleType = anno.singleType();
+        final NumType singleValType = anno.singleValType();
         final int singleSkip = anno.singleSkip();
         final int len = anno.len();
-        final String valExpr = anno.valExpr();
+        final String valExpr = anno.singleValExpr();
         final String varNameArr = goFieldName + "_arr";
         ParseUtil.append(body, "{}:={}.{}\n", varNameArr, GoFieldBuilder.varNameInstance, goFieldName);
+        int singleLen;
+        switch (singleType) {
+            case uint8, int8 -> {
+                singleLen = 1;
+            }
+            case uint16, int16 -> {
+                singleLen = 2;
+            }
+            case uint32, int32, float32 -> {
+                singleLen = 4;
+            }
+            case uint64, int64, float64 -> {
+                singleLen = 8;
+            }
+            default -> {
+                ParseUtil.notSupport_numType(field, annoClass);
+                singleLen = 0;
+            }
+        }
+        final boolean unsigned = goReadTypeName.charAt(0) == 'u';
         if (len > 0 && unsigned && valExpr.isEmpty() && singleSkip == 0) {
             if (singleLen == 1) {
                 ParseUtil.append(body, "{}.Write_bytes({})\n", GoFieldBuilder.varNameByteBuf, GoParseUtil.get_unsafe_array_to_slice_1(varNameArr));
@@ -146,9 +239,22 @@ public class GoFieldBuilder__F_num_array extends GoFieldBuilder {
                 if (!valExpr.isEmpty()) {
                     valCode = ParseUtil.replaceValExprToCode(RpnUtil.reverseExpr(valExpr), valCode);
                 }
-                if (!goReadTypeName.equals(goFieldTypeName)) {
-                    valCode = ParseUtil.format("{}(parse.Round({}))", goReadTypeName, valCode);
+
+                //原始值不是小数、字段值是小数
+                if (!goReadTypeName.equals("float32") && !goReadTypeName.equals("float64")
+                        && (goFieldTypeName.equals("float32") || goFieldTypeName.equals("float64"))) {
+                    if (goFieldTypeName.equals("float64")) {
+                        valCode = ParseUtil.format("{}(parse.Round({}))", goReadTypeName, valCode);
+                    } else {
+                        valCode = ParseUtil.format("{}(parse.Round(float64({})))", goReadTypeName, valCode);
+                    }
+                } else {
+                    if (!goReadTypeName.equals(goFieldTypeName)) {
+                        valCode = ParseUtil.format("{}({})", goReadTypeName, valCode);
+                    }
                 }
+
+
                 ParseUtil.append(body, "{}.Write_{}({})\n", GoFieldBuilder.varNameByteBuf, GoParseUtil.wrapTypeNameFunc(goReadTypeName, bigEndian), valCode);
                 if (singleSkip > 0) {
                     ParseUtil.append(body, "{}.Write_zero({})\n", GoFieldBuilder.varNameByteBuf, singleSkip);

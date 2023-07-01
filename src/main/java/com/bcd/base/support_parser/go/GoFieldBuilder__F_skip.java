@@ -34,10 +34,10 @@ public class GoFieldBuilder__F_skip extends GoFieldBuilder {
         }
 
         switch (mode) {
-            case Skip -> {
+            case skip -> {
                 ParseUtil.append(body, "{}.Skip({})\n", GoFieldBuilder.varNameByteBuf, varNameLen);
             }
-            case ReservedFromStart -> {
+            case reservedFromStart -> {
                 final String varNameSkipLen = goFieldName+"_skipLen";
                 ParseUtil.append(body, "{}:={}+{}-{}.ReaderIndex()\n", varNameSkipLen, varNameLen, GoFieldBuilder.varNameStartIndex, GoFieldBuilder.varNameByteBuf);
                 ParseUtil.append(body, "if {}>0{\n", varNameSkipLen);
@@ -66,10 +66,10 @@ public class GoFieldBuilder__F_skip extends GoFieldBuilder {
         }
 
         switch (mode) {
-            case Skip -> {
+            case skip -> {
                 ParseUtil.append(body, "{}.Write_zero({})\n\n", GoFieldBuilder.varNameByteBuf, varNameLen);
             }
-            case ReservedFromStart -> {
+            case reservedFromStart -> {
                 final String varNameSkipLen = goFieldName+"_skipLen";
                 ParseUtil.append(body, "{}:={}+{}-{}.WriterIndex()\n", varNameSkipLen, varNameLen, GoFieldBuilder.varNameStartIndex, GoFieldBuilder.varNameByteBuf);
                 ParseUtil.append(body, "if {}>0{\n", varNameSkipLen);

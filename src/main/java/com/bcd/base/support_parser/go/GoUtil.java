@@ -21,8 +21,6 @@ public class GoUtil {
     public final static GoFieldBuilder__F_num_array fieldBuilder__f_num_array = new GoFieldBuilder__F_num_array();
     public final static GoFieldBuilder__F_bit_num fieldBuilder__f_bit_num = new GoFieldBuilder__F_bit_num();
     public final static GoFieldBuilder__F_bit_num_array fieldBuilder__f_bit_num_array = new GoFieldBuilder__F_bit_num_array();
-    public final static GoFieldBuilder__F_float_ieee754 fieldBuilder__f_float_ieee754 = new GoFieldBuilder__F_float_ieee754();
-    public final static GoFieldBuilder__F_float_ieee754_array fieldBuilder__f_float_ieee754_array = new GoFieldBuilder__F_float_ieee754_array();
     public final static GoFieldBuilder__F_string fieldBuilder__f_string = new GoFieldBuilder__F_string();
     public final static GoFieldBuilder__F_skip fieldBuilder__f_skip = new GoFieldBuilder__F_skip();
     public final static GoFieldBuilder__F_date fieldBuilder__f_date = new GoFieldBuilder__F_date();
@@ -95,10 +93,6 @@ public class GoUtil {
                     goFieldBuilder = fieldBuilder__f_bit_num;
                 } else if (field.isAnnotationPresent(F_bit_num_array.class)) {
                     goFieldBuilder = fieldBuilder__f_bit_num_array;
-                } else if (field.isAnnotationPresent(F_float_ieee754.class)) {
-                    goFieldBuilder = fieldBuilder__f_float_ieee754;
-                } else if (field.isAnnotationPresent(F_float_ieee754_array.class)) {
-                    goFieldBuilder = fieldBuilder__f_float_ieee754_array;
                 } else if (field.isAnnotationPresent(F_string.class)) {
                     goFieldBuilder = fieldBuilder__f_string;
                 } else if (field.isAnnotationPresent(F_skip.class)) {
@@ -180,10 +174,10 @@ public class GoUtil {
 
     public static void main(String[] args) {
 //        final String s = "com.bcd.base.support_parser.impl.gb32960.data";
-//        toSourceCode(s, ByteOrder.BigEndian, BitOrder.BigEndian, "/Users/baichangda/bcd/goworkspace/MyGateway_go/support_parse/gb32960/java.go");
-        final String s = "com.bcd.base.support_parser.impl.immotors.ep33.data";
-        toSourceCode(s, ByteOrder.BigEndian, BitOrder.BigEndian, "D:/work/bcd/MyGateway_go/support_parse/immotors/ep33/java.go");
-//        final String s = "com.bcd.base.support_parser.impl.icd.data";
-//        toSourceCode(s, ByteOrder.BigEndian, BitOrder.BigEndian, "/Users/baichangda/bcd/goworkspace/MyGateway_go/support_parse/icd/java.go");
+//        toSourceCode(s, ByteOrder.bigEndian, BitOrder.bigEndian, "D:/work/bcd/MyGateway_go/support_parse/gb32960/java.go");
+//        final String s = "com.bcd.base.support_parser.impl.immotors.ep33.data";
+//        toSourceCode(s, ByteOrder.bigEndian, BitOrder.bigEndian, "D:/work/bcd/MyGateway_go/support_parse/immotors/ep33/java.go");
+        final String s = "com.bcd.base.support_parser.impl.icd.data";
+        toSourceCode(s, ByteOrder.bigEndian, BitOrder.bigEndian, "D:/work/bcd/MyGateway_go/support_parse/icd/java.go");
     }
 }

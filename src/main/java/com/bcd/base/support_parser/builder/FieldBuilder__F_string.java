@@ -36,10 +36,10 @@ public class FieldBuilder__F_string extends FieldBuilder {
         final String charsetClassName = Charset.class.getName();
         final String charsetVarName = ParseUtil.defineClassVar(context, Charset.class, "{}.forName(\"{}\")", charsetClassName, charset.name());
         switch (anno.appendMode()) {
-            case NoAppend -> {
+            case noAppend -> {
                 ParseUtil.append(body, "{}.{}={}.readCharSequence({},{}).toString();\n", FieldBuilder.varNameInstance, field.getName(), FieldBuilder.varNameByteBuf, lenRes, charsetVarName);
             }
-            case LowAddressAppend -> {
+            case lowAddressAppend -> {
                 final String lenVarName = varNameField + "_len";
                 final String arrVarName = varNameField + "_arr";
                 final String discardLenVarName = varNameField + "_discardLen";
@@ -56,7 +56,7 @@ public class FieldBuilder__F_string extends FieldBuilder {
                 ParseUtil.append(body, "}\n");
                 ParseUtil.append(body, "{}.{}=new String({},{},{}-{},{});\n", FieldBuilder.varNameInstance, field.getName(), arrVarName, discardLenVarName, lenVarName, discardLenVarName, charsetVarName);
             }
-            case HighAddressAppend -> {
+            case highAddressAppend -> {
                 final String lenVarName = varNameField + "_len";
                 final String arrVarName = varNameField + "_arr";
                 final String discardLenVarName = varNameField + "_discardLen";
@@ -113,10 +113,10 @@ public class FieldBuilder__F_string extends FieldBuilder {
         final String charsetVarName = ParseUtil.defineClassVar(context, Charset.class, "{}.forName(\"{}\")", charsetClassName, charset.name());
 
         switch (anno.appendMode()) {
-            case NoAppend -> {
+            case noAppend -> {
                 ParseUtil.append(body, "{}.writeBytes({}.getBytes({}));\n", varNameByteBuf, varNameFieldVal, charsetVarName);
             }
-            case LowAddressAppend -> {
+            case lowAddressAppend -> {
                 ParseUtil.append(body, "final byte[] {}={}.getBytes({});\n", arrVarName, varNameFieldVal, charsetVarName);
                 ParseUtil.append(body, "final int {}={}-{}.length;\n", arrLeaveVarName, lenRes, arrVarName);
                 ParseUtil.append(body, "if({}>0){\n", arrLeaveVarName);
@@ -124,7 +124,7 @@ public class FieldBuilder__F_string extends FieldBuilder {
                 ParseUtil.append(body, "}\n");
                 ParseUtil.append(body, "{}.writeBytes({});\n", varNameByteBuf, arrVarName);
             }
-            case HighAddressAppend -> {
+            case highAddressAppend -> {
                 ParseUtil.append(body, "final byte[] {}={}.getBytes({});\n", arrVarName, varNameFieldVal, charsetVarName);
                 ParseUtil.append(body, "{}.writeBytes({});\n", varNameByteBuf, arrVarName);
                 ParseUtil.append(body, "final int {}={}-{}.length;\n", arrLeaveVarName, lenRes, arrVarName);

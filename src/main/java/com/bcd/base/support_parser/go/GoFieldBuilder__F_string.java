@@ -46,10 +46,10 @@ public class GoFieldBuilder__F_string extends GoFieldBuilder {
         final String varNameReadVal = goFieldName + "_v";
         ParseUtil.append(body, "{}:={}.Read_bytes({})\n", varNameReadVal, GoFieldBuilder.varNameByteBuf, varNameLen);
         switch (stringAppendMode) {
-            case NoAppend -> {
+            case noAppend -> {
                 ParseUtil.append(body, "{}.{}=string({})\n\n", GoFieldBuilder.varNameInstance, goFieldName, varNameReadVal);
             }
-            case HighAddressAppend -> {
+            case highAddressAppend -> {
                 final String varNameCount = goFieldName + "_count";
                 ParseUtil.append(body, "{}:=0\n", varNameCount);
                 ParseUtil.append(body, "for i:={}-1;i>=0;i--{\n", varNameLen);
@@ -61,7 +61,7 @@ public class GoFieldBuilder__F_string extends GoFieldBuilder {
                 ParseUtil.append(body, "}\n");
                 ParseUtil.append(body, "{}.{}=string({}[:({}-{})])\n\n", GoFieldBuilder.varNameInstance, goFieldName, varNameReadVal, varNameLen, varNameCount);
             }
-            case LowAddressAppend -> {
+            case lowAddressAppend -> {
                 final String varNameCount = goFieldName + "_count";
                 ParseUtil.append(body, "{}:=0\n", varNameCount);
                 ParseUtil.append(body, "for i:=0;i<{};i++{\n", varNameLen);
@@ -92,7 +92,7 @@ public class GoFieldBuilder__F_string extends GoFieldBuilder {
         }
 
         String valCode = GoFieldBuilder.varNameInstance + "." + goFieldName;
-        if (stringAppendMode == StringAppendMode.NoAppend) {
+        if (stringAppendMode == StringAppendMode.noAppend) {
             ParseUtil.append(body, "{}.Write_string_utf8({})\n", GoFieldBuilder.varNameByteBuf, valCode);
         } else {
             final String varNameLen = goFieldName + "_len";
@@ -103,12 +103,12 @@ public class GoFieldBuilder__F_string extends GoFieldBuilder {
             }
             final String varNameBytes = goFieldName + "_v";
             switch (stringAppendMode) {
-                case HighAddressAppend -> {
+                case highAddressAppend -> {
                     ParseUtil.append(body, "{}:=[]byte({})\n", varNameBytes, valCode);
                     ParseUtil.append(body, "{}.Write_bytes({})\n", GoFieldBuilder.varNameByteBuf, varNameBytes);
                     ParseUtil.append(body, "{}.Write_zero({}-len({}))\n", GoFieldBuilder.varNameByteBuf, varNameLen, varNameBytes);
                 }
-                case LowAddressAppend -> {
+                case lowAddressAppend -> {
                     ParseUtil.append(body, "{}:=[]byte({})\n", varNameBytes, valCode);
                     ParseUtil.append(body, "{}.Write_zero({}-len({}))\n", GoFieldBuilder.varNameByteBuf, varNameLen, varNameBytes);
                     ParseUtil.append(body, "{}.Write_bytes({})\n", GoFieldBuilder.varNameByteBuf, varNameBytes);

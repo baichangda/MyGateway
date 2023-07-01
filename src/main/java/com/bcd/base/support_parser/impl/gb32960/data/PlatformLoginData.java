@@ -1,19 +1,16 @@
 package com.bcd.base.support_parser.impl.gb32960.data;
 
-import com.bcd.base.support_parser.anno.DateMode;
-import com.bcd.base.support_parser.anno.F_date;
-import com.bcd.base.support_parser.anno.F_num;
-import com.bcd.base.support_parser.anno.F_string;
+import com.bcd.base.support_parser.anno.*;
 
 import java.util.Date;
 
 public class PlatformLoginData implements PacketData {
     //平台登入时间
-    @F_date(mode = DateMode.Bytes_yyMMddHHmmss, baseYear = 2000)
+    @F_date(mode = DateMode.bytes_yyMMddHHmmss, baseYear = 2000)
     public Date collectTime;
 
     //登入流水号
-    @F_num(len = 2)
+    @F_num(type = NumType.uint16)
     public int sn;
 
     //平台用户名
@@ -25,6 +22,6 @@ public class PlatformLoginData implements PacketData {
     public String password;
 
     //加密规则
-    @F_num(len = 1)
+    @F_num(type = NumType.uint8)
     public short encode;
 }

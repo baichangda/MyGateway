@@ -18,12 +18,12 @@ import java.lang.annotation.Target;
 public @interface F_skip {
     /**
      * 跳过字节模式
-     * {@link SkipMode#Skip}
+     * {@link SkipMode#skip}
      * 直接跳过当前指定长度的字节数
-     * {@link SkipMode#ReservedFromStart}
+     * {@link SkipMode#reservedFromStart}
      * 从当前字段所属对象开始记录索引a、当前字段索引b、跳过(规定长度-(b-a)))
      */
-    SkipMode mode() default SkipMode.Skip;
+    SkipMode mode() default SkipMode.skip;
 
     /**
      * 占用字节数

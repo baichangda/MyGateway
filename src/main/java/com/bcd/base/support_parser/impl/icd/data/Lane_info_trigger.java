@@ -2,20 +2,21 @@ package com.bcd.base.support_parser.impl.icd.data;
 
 import com.bcd.base.support_parser.anno.F_num;
 import com.bcd.base.support_parser.anno.F_skip;
+import com.bcd.base.support_parser.anno.NumType;
 import com.bcd.base.support_parser.anno.SkipMode;
 
 public class Lane_info_trigger {
-    @F_num(len = 4)
+    @F_num(type = NumType.uint32)
     public long track_id;
-    @F_num(len = 1)
+    @F_num(type = NumType.uint8)
     public short lane_id;
-    @F_num(len = 2)
+    @F_num(type = NumType.uint16)
     public int lane_dis;
-    @F_num(len = 2)
+    @F_num(type = NumType.uint16)
     public int speed;
-    @F_num(len = 1)
+    @F_num(type = NumType.uint8)
     public short status;
 
-    @F_skip(mode = SkipMode.ReservedFromStart,len = 16)
+    @F_skip(mode = SkipMode.reservedFromStart,len = 16)
     public byte[] reserved;
 }

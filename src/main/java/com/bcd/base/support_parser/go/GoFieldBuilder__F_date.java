@@ -2,14 +2,9 @@ package com.bcd.base.support_parser.go;
 
 import com.bcd.base.support_parser.anno.DateMode;
 import com.bcd.base.support_parser.anno.F_date;
-import com.bcd.base.support_parser.anno.F_string;
-import com.bcd.base.support_parser.anno.StringAppendMode;
 import com.bcd.base.support_parser.util.ParseUtil;
 
 import java.lang.reflect.Field;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.Map;
 
 public class GoFieldBuilder__F_date extends GoFieldBuilder {
     @Override
@@ -34,14 +29,16 @@ public class GoFieldBuilder__F_date extends GoFieldBuilder {
         final String zoneId = anno.zoneId();
         final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.pkg_byteOrder);
         final String varNameLocation;
-        if (mode == DateMode.Bytes_yyMMddHHmmss || mode == DateMode.Bytes_yyyyMMddHHmmss) {
+        if (mode == DateMode.bytes_yyMMddHHmmss || mode == DateMode.bytes_yyyyMMddHHmmss) {
             varNameLocation = context.getVarNameLocation(zoneId);
         } else {
             varNameLocation = null;
         }
 
+        final String bigEndianSuffix = bigEndian ? "" : "_le";
+
         switch (mode) {
-            case Bytes_yyMMddHHmmss -> {
+            case bytes_yyMMddHHmmss -> {
                 final String varNameBytes = goFieldName + "_bytes";
                 ParseUtil.append(body, "{}:={}.Read_bytes(6)\n", varNameBytes, GoFieldBuilder.varNameByteBuf);
                 ParseUtil.append(body, "{}.{}=time.Date({}+int({}[0]),time.Month(int({}[1])),int({}[2]),int({}[3]),int({}[4]),int({}[5]),0,{})\n",
@@ -49,10 +46,10 @@ public class GoFieldBuilder__F_date extends GoFieldBuilder {
                         baseYear, varNameBytes, varNameBytes, varNameBytes, varNameBytes, varNameBytes, varNameBytes,
                         varNameLocation);
             }
-            case Bytes_yyyyMMddHHmmss -> {
+            case bytes_yyyyMMddHHmmss -> {
                 final String varNameYear = goFieldName + "_year";
                 final String varNameBytes = goFieldName + "_bytes";
-                ParseUtil.append(body, "{}:={}.Read_uint16({})\n", varNameYear, GoFieldBuilder.varNameByteBuf, bigEndian);
+                ParseUtil.append(body, "{}:={}.Read_uint16{}()\n", varNameYear, GoFieldBuilder.varNameByteBuf, bigEndianSuffix);
                 ParseUtil.append(body, "{},err:={}.Read_bytes(5)\n", varNameBytes, GoFieldBuilder.varNameByteBuf);
                 ParseUtil.append(body, "if err!=nil{\n");
                 ParseUtil.append(body, "return nil,err\n");
@@ -62,29 +59,29 @@ public class GoFieldBuilder__F_date extends GoFieldBuilder {
                         varNameYear, varNameBytes, varNameBytes, varNameBytes, varNameBytes, varNameBytes,
                         varNameLocation);
             }
-            case Uint64_millisecond -> {
+            case uint64_millisecond -> {
                 final String varNameReadVal = goFieldName + "_v";
-                ParseUtil.append(body, "{}:={}.Read_int64({})\n", varNameReadVal, GoFieldBuilder.varNameByteBuf, bigEndian);
+                ParseUtil.append(body, "{}:={}.Read_int64{}()\n", varNameReadVal, GoFieldBuilder.varNameByteBuf, bigEndianSuffix);
                 ParseUtil.append(body, "{}.{}=time.UnixMilli({})\n", GoFieldBuilder.varNameInstance, goFieldName, varNameReadVal);
             }
-            case Uint64_second -> {
+            case uint64_second -> {
                 final String varNameReadVal = goFieldName + "_v";
-                ParseUtil.append(body, "{}:={}.Read_int64({})\n", varNameReadVal, GoFieldBuilder.varNameByteBuf, bigEndian);
+                ParseUtil.append(body, "{}:={}.Read_int64{}()\n", varNameReadVal, GoFieldBuilder.varNameByteBuf, bigEndianSuffix);
                 ParseUtil.append(body, "{}.{}=time.UnixMilli({}*1000)\n", GoFieldBuilder.varNameInstance, goFieldName, varNameReadVal);
             }
-            case Uint32_second -> {
+            case uint32_second -> {
                 final String varNameReadVal = goFieldName + "_v";
-                ParseUtil.append(body, "{}:={}.Read_int32({})\n", varNameReadVal, GoFieldBuilder.varNameByteBuf, bigEndian);
+                ParseUtil.append(body, "{}:={}.Read_int32{}()\n", varNameReadVal, GoFieldBuilder.varNameByteBuf, bigEndianSuffix);
                 ParseUtil.append(body, "{}.{}=time.UnixMilli(int64({})*1000)\n", GoFieldBuilder.varNameInstance, goFieldName, varNameReadVal);
             }
-            case Float64_millisecond -> {
+            case float64_millisecond -> {
                 final String varNameReadVal = goFieldName + "_v";
-                ParseUtil.append(body, "{}:={}.Read_float64({})\n", varNameReadVal, GoFieldBuilder.varNameByteBuf, bigEndian);
+                ParseUtil.append(body, "{}:={}.Read_float64{}()\n", varNameReadVal, GoFieldBuilder.varNameByteBuf, bigEndianSuffix);
                 ParseUtil.append(body, "{}.{}=time.UnixMilli(int64({}))\n", GoFieldBuilder.varNameInstance, goFieldName, varNameReadVal);
             }
-            case Float64_second -> {
+            case float64_second -> {
                 final String varNameReadVal = goFieldName + "_v";
-                ParseUtil.append(body, "{}:={}.Read_float64({})\n", varNameReadVal, GoFieldBuilder.varNameByteBuf, bigEndian);
+                ParseUtil.append(body, "{}:={}.Read_float64{}()\n", varNameReadVal, GoFieldBuilder.varNameByteBuf, bigEndianSuffix);
                 ParseUtil.append(body, "{}.{}=time.UnixMilli(int64({}*1000))\n", GoFieldBuilder.varNameInstance, goFieldName, varNameReadVal);
             }
         }
@@ -103,35 +100,36 @@ public class GoFieldBuilder__F_date extends GoFieldBuilder {
         final String zoneId = anno.zoneId();
         final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.pkg_byteOrder);
         final String varNameVal = goFieldName + "_v";
+        final String bigEndianSuffix = bigEndian ? "" : "_le";
         ParseUtil.append(body, "{}:={}.{}\n", varNameVal, GoFieldBuilder.varNameInstance, goFieldName);
         switch (mode) {
-            case Bytes_yyMMddHHmmss -> {
+            case bytes_yyMMddHHmmss -> {
                 ParseUtil.append(body, "{}.Write_bytes([]byte{byte({}.Year()-2000),byte({}.Month()),byte({}.Day()),byte({}.Hour()),byte({}.Minute()),byte({}.Second())})\n",
                         GoFieldBuilder.varNameByteBuf,
                         varNameVal, varNameVal, varNameVal, varNameVal, varNameVal, varNameVal
                 );
             }
-            case Bytes_yyyyMMddHHmmss -> {
-                ParseUtil.append(body, "{}.Write_uint16(uint16({}.Year()),{})\n", GoFieldBuilder.varNameByteBuf, varNameVal, bigEndian);
+            case bytes_yyyyMMddHHmmss -> {
+                ParseUtil.append(body, "{}.Write_uint16{}(uint16({}.Year()))\n", GoFieldBuilder.varNameByteBuf, bigEndianSuffix, varNameVal);
                 ParseUtil.append(body, "{}.Write_bytes([]byte{byte({}.Month()),byte({}.Day()),byte({}.Hour()),byte({}.Minute()),byte({}.Second())})\n",
                         GoFieldBuilder.varNameByteBuf,
                         varNameVal, varNameVal, varNameVal, varNameVal, varNameVal, varNameVal
                 );
             }
-            case Uint64_millisecond -> {
-                ParseUtil.append(body, "{}.Write_int64({}.UnixMilli(),{})\n", GoFieldBuilder.varNameByteBuf, varNameVal, bigEndian);
+            case uint64_millisecond -> {
+                ParseUtil.append(body, "{}.Write_int64{}({}.UnixMilli())\n", GoFieldBuilder.varNameByteBuf, bigEndianSuffix, varNameVal);
             }
-            case Uint64_second -> {
-                ParseUtil.append(body, "{}.Write_int64({}.UnixMilli()/1000,{})\n", GoFieldBuilder.varNameByteBuf, varNameVal, bigEndian);
+            case uint64_second -> {
+                ParseUtil.append(body, "{}.Write_int64{}({}.UnixMilli()/1000)\n", GoFieldBuilder.varNameByteBuf, bigEndianSuffix, varNameVal);
             }
-            case Uint32_second -> {
-                ParseUtil.append(body, "{}.Write_int32(int32({}.UnixMilli()/1000),{})\n", GoFieldBuilder.varNameByteBuf, varNameVal, bigEndian);
+            case uint32_second -> {
+                ParseUtil.append(body, "{}.Write_int32{}(int32({}.UnixMilli()/1000))\n", GoFieldBuilder.varNameByteBuf, bigEndianSuffix, varNameVal);
             }
-            case Float64_millisecond -> {
-                ParseUtil.append(body, "{}.Write_float64(float64({}.UnixMilli()),{})\n", GoFieldBuilder.varNameByteBuf, varNameVal, bigEndian);
+            case float64_millisecond -> {
+                ParseUtil.append(body, "{}.Write_float64{}(float64({}.UnixMilli()))\n", GoFieldBuilder.varNameByteBuf, bigEndianSuffix, varNameVal);
             }
-            case Float64_second -> {
-                ParseUtil.append(body, "{}.Write_float64(float64({}.UnixMilli())/1000,{})\n", GoFieldBuilder.varNameByteBuf, varNameVal, bigEndian);
+            case float64_second -> {
+                ParseUtil.append(body, "{}.Write_float64{}(float64({}.UnixMilli())/1000)\n", GoFieldBuilder.varNameByteBuf, bigEndianSuffix, varNameVal);
             }
         }
 

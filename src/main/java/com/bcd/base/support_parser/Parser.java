@@ -65,8 +65,6 @@ public class Parser {
     private final static FieldBuilder__F_bean fieldBuilder__f_bean = new FieldBuilder__F_bean();
     private final static FieldBuilder__F_bean_list fieldBuilder__f_bean_list = new FieldBuilder__F_bean_list();
     private final static FieldBuilder__F_date field_builder__f_date = new FieldBuilder__F_date();
-    private final static FieldBuilder__F_float_ieee754_array fieldBuilder__F_float_ieee754_array = new FieldBuilder__F_float_ieee754_array();
-    private final static FieldBuilder__F_float_ieee754 fieldbuilder__f_float_ieee754 = new FieldBuilder__F_float_ieee754();
     private final static FieldBuilder__F_num_array fieldBuilder__f_num_array = new FieldBuilder__F_num_array();
     private final static FieldBuilder__F_num fieldBuilder__f_num = new FieldBuilder__F_num();
     private final static FieldBuilder__F_skip fieldBuilder__f_skip = new FieldBuilder__F_skip();
@@ -234,19 +232,17 @@ public class Parser {
      * 配置包级别的{@link ByteOrder}定义
      * <p>
      * 用于该包下所有带如下注解的属性覆盖
-     * {@link F_float_ieee754#order()}
-     * {@link F_float_ieee754_array#order()}
      * {@link F_num#order()}
-     * {@link F_num_array#order()}
+     * {@link F_num_array#singleOrder()}
      * {@link F_date#order()}
      * <p>
      * 可以配置重复的包、优先使用前缀匹配更多的规则
      * 例如有如下目录、目录下都有class
      * com.bcd、com.bcd.test1、com.bcd.test2、com.bcd.test3、
      * 配置如下
-     * 1、{@link ByteOrder#BigEndian} -> com.bcd
-     * 2、{@link ByteOrder#SmallEndian} -> com.bcd.test1
-     * 3、{@link ByteOrder#BigEndian} -> com.bcd.test2
+     * 1、{@link ByteOrder#bigEndian} -> com.bcd
+     * 2、{@link ByteOrder#smallEndian} -> com.bcd.test1
+     * 3、{@link ByteOrder#bigEndian} -> com.bcd.test2
      * 此时
      * com.bcd、com.bcd.test3 会使用规则1
      * com.bcd.test1 会使用规则2
@@ -256,7 +252,7 @@ public class Parser {
      * 优先级说明
      * 1、字段注解{@link ByteOrder}!={@link ByteOrder#Default}、此时注解的非默认值
      * 2、{@link #append(ByteOrder, String)}!={@link ByteOrder#Default}、此时采用包级别的配置值
-     * 3、此时为{@link ByteOrder#BigEndian}、此时默认采用大端模式
+     * 3、此时为{@link ByteOrder#bigEndian}、此时默认采用大端模式
      * <p>
      * 注意:
      * 如果一个bean在多套协议中被复用、且需要在不同的协议中表现不同的{@link ByteOrder}
@@ -296,7 +292,7 @@ public class Parser {
      * <p>
      * 用于该包下所有带如下注解的属性覆盖
      * {@link F_bit_num#order()}
-     * {@link F_bit_num_array#order()}
+     * {@link F_bit_num_array#singleOrder()}
      * <p>
      * 生效规则与{@link ByteOrder}一样
      *
@@ -343,11 +339,11 @@ public class Parser {
         }
 
         switch (bitRemainingMode1) {
-            case Ignore -> {
+            case ignore -> {
                 context.bitEndWhenBitField_process = true;
                 context.bitEndWhenBitField_deProcess = true;
             }
-            case Not_ignore -> {
+            case not_ignore -> {
                 context.bitEndWhenBitField_process = false;
                 context.bitEndWhenBitField_deProcess = false;
             }
@@ -397,21 +393,9 @@ public class Parser {
                     continue;
                 }
 
-                final F_float_ieee754 f_float_ieee754 = field.getAnnotation(F_float_ieee754.class);
-                if (f_float_ieee754 != null) {
-                    fieldbuilder__f_float_ieee754.buildParse(context);
-                    continue;
-                }
-
                 final F_num_array f_num_array = field.getAnnotation(F_num_array.class);
                 if (f_num_array != null) {
                     fieldBuilder__f_num_array.buildParse(context);
-                    continue;
-                }
-
-                final F_float_ieee754_array f_float_ieee754_array = field.getAnnotation(F_float_ieee754_array.class);
-                if (f_float_ieee754_array != null) {
-                    fieldBuilder__F_float_ieee754_array.buildParse(context);
                     continue;
                 }
 
@@ -501,21 +485,9 @@ public class Parser {
                     continue;
                 }
 
-                final F_float_ieee754 f_float_ieee754 = field.getAnnotation(F_float_ieee754.class);
-                if (f_float_ieee754 != null) {
-                    fieldbuilder__f_float_ieee754.buildDeParse(context);
-                    continue;
-                }
-
                 final F_num_array f_num_array = field.getAnnotation(F_num_array.class);
                 if (f_num_array != null) {
                     fieldBuilder__f_num_array.buildDeParse(context);
-                    continue;
-                }
-
-                final F_float_ieee754_array f_float_ieee754_array = field.getAnnotation(F_float_ieee754_array.class);
-                if (f_float_ieee754_array != null) {
-                    fieldBuilder__F_float_ieee754_array.buildDeParse(context);
                     continue;
                 }
 
@@ -644,7 +616,7 @@ public class Parser {
             if (f_skip == null) {
                 return false;
             } else {
-                return f_skip.mode() == SkipMode.ReservedFromStart;
+                return f_skip.mode() == SkipMode.reservedFromStart;
             }
         });
         if (hasFieldSkipModeReserved) {

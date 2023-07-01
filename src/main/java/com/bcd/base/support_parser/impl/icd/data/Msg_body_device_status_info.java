@@ -1,14 +1,11 @@
 package com.bcd.base.support_parser.impl.icd.data;
 
-import com.bcd.base.support_parser.anno.F_bean;
-import com.bcd.base.support_parser.anno.F_num;
-import com.bcd.base.support_parser.anno.F_skip;
-import com.bcd.base.support_parser.anno.SkipMode;
+import com.bcd.base.support_parser.anno.*;
 
 public class Msg_body_device_status_info implements Msg_body {
-    @F_num(len = 4)
+    @F_num(type = NumType.uint32)
     public long dev_sn;
-    @F_num(len = 1)
+    @F_num(type = NumType.uint8)
     public SensorStatus dev_status;
     @F_bean
     public Dev_hw_list dev_hw_list;
@@ -17,6 +14,6 @@ public class Msg_body_device_status_info implements Msg_body {
     @F_bean
     public Dev_func_list dev_func_list;
 
-    @F_skip(mode = SkipMode.ReservedFromStart,len = 128)
+    @F_skip(mode = SkipMode.reservedFromStart,len = 128)
     public byte[] reserved;
 }

@@ -18,6 +18,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class ParseUtil {
+    public static void notSupport_numType(final Field field, Class<?> annoClass) {
+        throw BaseRuntimeException.getException("class[{}] field[{}] anno[{}] numType not support", field.getDeclaringClass().getName(), field.getName(), annoClass.getName());
+    }
 
     public static void notSupport_charset(final Field field, Class<?> annoClass) {
         throw BaseRuntimeException.getException("class[{}] field[{}] anno[{}] charset not support", field.getDeclaringClass().getName(), field.getName(), annoClass.getName());
@@ -56,17 +59,17 @@ public class ParseUtil {
             if (order == BitOrder.Default) {
                 return true;
             } else {
-                return order == BitOrder.BigEndian;
+                return order == BitOrder.bigEndian;
             }
         } else {
             if (order == BitOrder.Default) {
                 if (pkgOrder == BitOrder.Default) {
                     return true;
                 } else {
-                    return pkgOrder == BitOrder.BigEndian;
+                    return pkgOrder == BitOrder.bigEndian;
                 }
             } else {
-                return order == BitOrder.BigEndian;
+                return order == BitOrder.bigEndian;
             }
         }
     }
@@ -92,17 +95,17 @@ public class ParseUtil {
             if (order == ByteOrder.Default) {
                 return true;
             } else {
-                return order == ByteOrder.BigEndian;
+                return order == ByteOrder.bigEndian;
             }
         } else {
             if (order == ByteOrder.Default) {
                 if (pkgOrder == ByteOrder.Default) {
                     return true;
                 } else {
-                    return pkgOrder == ByteOrder.BigEndian;
+                    return pkgOrder == ByteOrder.bigEndian;
                 }
             } else {
-                return order == ByteOrder.BigEndian;
+                return order == ByteOrder.bigEndian;
             }
         }
     }
@@ -495,9 +498,6 @@ public class ParseUtil {
     static {
         annoSet.add(F_num.class);
         annoSet.add(F_num_array.class);
-
-        annoSet.add(F_float_ieee754.class);
-        annoSet.add(F_float_ieee754_array.class);
 
         annoSet.add(F_string.class);
 

@@ -2,9 +2,8 @@ package com.bcd.base.support_parser.builder;
 
 import com.bcd.base.support_parser.anno.F_bit_num_array;
 import com.bcd.base.support_parser.anno.F_skip;
+import com.bcd.base.support_parser.anno.NumType;
 import com.bcd.base.support_parser.exception.BaseRuntimeException;
-import com.bcd.base.support_parser.util.BitBuf_reader;
-import com.bcd.base.support_parser.util.BitBuf_writer;
 import com.bcd.base.support_parser.util.ParseUtil;
 import com.bcd.base.support_parser.util.RpnUtil;
 
@@ -19,8 +18,8 @@ public class FieldBuilder__F_bit_num_array extends FieldBuilder {
         final String arrayElementTypeName = arrayElementType.getName();
         final Class<F_bit_num_array> annoClass = F_bit_num_array.class;
         final F_bit_num_array anno = context.field.getAnnotation(annoClass);
-        final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.clazz);
-        final boolean unsigned = anno.unsigned();
+        final boolean bigEndian = ParseUtil.bigEndian(anno.singleOrder(), context.clazz);
+        final boolean unsigned = anno.singleUnsigned();
         switch (arrayElementTypeName) {
             case "byte", "short", "int", "long", "float", "double" -> {
             }
@@ -46,7 +45,7 @@ public class FieldBuilder__F_bit_num_array extends FieldBuilder {
 
         final int singleLen = anno.singleLen();
         final int singleSkip = anno.singleSkip();
-        final String valExpr = anno.valExpr();
+        final String valExpr = anno.singleValExpr();
         final StringBuilder body = context.body;
         final String varNameField = ParseUtil.getFieldVarName(context);
         String arrVarName = varNameField + "_arr";
@@ -72,8 +71,8 @@ public class FieldBuilder__F_bit_num_array extends FieldBuilder {
         final Field field = context.field;
         final Class<F_bit_num_array> annoClass = F_bit_num_array.class;
         final F_bit_num_array anno = context.field.getAnnotation(annoClass);
-        final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.clazz);
-        final boolean unsigned = anno.unsigned();
+        final boolean bigEndian = ParseUtil.bigEndian(anno.singleOrder(), context.clazz);
+        final boolean unsigned = anno.singleUnsigned();
         final Class<?> fieldTypeClass = field.getType();
         final int singleLen = anno.singleLen();
         final int singleSkip = anno.singleSkip();
@@ -90,13 +89,13 @@ public class FieldBuilder__F_bit_num_array extends FieldBuilder {
         final String varNameFieldArr = varNameField + "_arr";
         ParseUtil.append(body, "final {}[] {}={};\n", arrElementType, varNameFieldArr, valCode);
         ParseUtil.append(body, "for(int i=0;i<{}.length;i++){\n", varNameFieldArr);
-        if (anno.valExpr().isEmpty()) {
+        if (anno.singleValExpr().isEmpty()) {
             ParseUtil.append(body, "{}.write((long)({}),{},{},{});\n", varNameBitBuf, varNameFieldArr + "[i]", singleLen, bigEndian, unsigned);
         } else {
             if (isFloat) {
-                ParseUtil.append(body, "{}.write((long)({}),{},{},{});\n", varNameBitBuf, ParseUtil.replaceValExprToCode_round(RpnUtil.reverseExpr(anno.valExpr()), varNameFieldArr + "[i]"), singleLen, bigEndian, unsigned);
+                ParseUtil.append(body, "{}.write((long)({}),{},{},{});\n", varNameBitBuf, ParseUtil.replaceValExprToCode_round(RpnUtil.reverseExpr(anno.singleValExpr()), varNameFieldArr + "[i]"), singleLen, bigEndian, unsigned);
             } else {
-                ParseUtil.append(body, "{}.write((long)({}),{},{},{});\n", varNameBitBuf, ParseUtil.replaceValExprToCode(RpnUtil.reverseExpr(anno.valExpr()), varNameFieldArr + "[i]"), singleLen, bigEndian, unsigned);
+                ParseUtil.append(body, "{}.write((long)({}),{},{},{});\n", varNameBitBuf, ParseUtil.replaceValExprToCode(RpnUtil.reverseExpr(anno.singleValExpr()), varNameFieldArr + "[i]"), singleLen, bigEndian, unsigned);
             }
         }
         if (singleSkip > 0) {

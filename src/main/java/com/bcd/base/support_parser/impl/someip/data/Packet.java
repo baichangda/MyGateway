@@ -3,38 +3,39 @@ package com.bcd.base.support_parser.impl.someip.data;
 import com.bcd.base.support_parser.anno.F_bit_num;
 import com.bcd.base.support_parser.anno.F_num;
 import com.bcd.base.support_parser.anno.F_num_array;
+import com.bcd.base.support_parser.anno.NumType;
 
 public class Packet {
-    @F_num(len = 2)
+    @F_num(type = NumType.uint16)
     public int serviceId;
 
-    @F_bit_num(len = 1)
+    @F_bit_num(len = 1,valType = NumType.uint8)
     public byte flag;
 
-    @F_bit_num(len = 15)
+    @F_bit_num(len = 15,valType = NumType.uint16)
     public short methodIdOrEventId;
 
-    @F_num(len = 4,var = 'a')
+    @F_num(type = NumType.uint32,var = 'a')
     public long length;
 
-    @F_num(len = 2)
+    @F_num(type = NumType.uint16)
     public int clientId;
 
-    @F_num(len = 2)
+    @F_num(type = NumType.uint16)
     public int sessionId;
 
-    @F_num(len = 1)
+    @F_num(type = NumType.uint8)
     public short protocolVersion;
 
-    @F_num(len = 1)
+    @F_num(type = NumType.uint8)
     public short interfaceVersion;
 
-    @F_num(len = 1)
+    @F_num(type = NumType.uint8)
     public MessageType messageType;
 
-    @F_num(len = 1)
+    @F_num(type = NumType.uint8)
     public ReturnCode returnCode;
 
-    @F_num_array(lenExpr = "a-8",singleLen = 1)
+    @F_num_array(lenExpr = "a-8",singleType = NumType.int8)
     public byte[] payload;
 }

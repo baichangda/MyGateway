@@ -7,13 +7,13 @@ public enum StringAppendMode {
     /**
      * 不补0
      */
-    NoAppend,
+    noAppend,
     /**
      * 低内存地址补0
      */
-    LowAddressAppend,
+    lowAddressAppend,
     /**
      * 高内存地址补0
      */
-    HighAddressAppend
+    highAddressAppend
 }

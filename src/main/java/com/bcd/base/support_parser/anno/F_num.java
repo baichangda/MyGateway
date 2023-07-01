@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
  * byte、short、int、long、float、double、枚举类
  * <p>
  * 枚举类
- * 仅支持当{@link #len()}为1、2、4时候、因为默认类型为int、8会产生精度丢失
+ * 仅支持整型数字
  * 要求枚举类必有如下静态方法、例如
  * public enum Example{
  * public static Example fromInteger(int i){}
@@ -20,15 +20,18 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface F_num {
+
     /**
-     * 占用字节数
-     * 不同的类型对应不同的长度
-     * byte: 1
-     * short: 1、2
-     * int: 2、4
-     * long: 4、8
+     * 数据类型
      */
-    int len();
+    NumType type();
+
+
+    /**
+     * 值数据类型
+     * 默认值代表和{@link #type()}一样的类型
+     */
+    NumType valType() default NumType.Default;
 
     /**
      * 值处理表达式
@@ -51,11 +54,6 @@ public @interface F_num {
      */
     char var() default '0';
 
-
-    /**
-     * 有符号或者无符号
-     */
-    boolean unsigned() default true;
 
     /**
      * 字节序模式

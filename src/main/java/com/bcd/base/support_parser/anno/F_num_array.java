@@ -43,9 +43,15 @@ public @interface F_num_array {
     String lenExpr() default "";
 
     /**
-     * 单个元素字节长度
+     * 单个元素类型
      */
-    int singleLen();
+    NumType singleType();
+
+    /**
+     * 单个元素值数据类型
+     * 默认值代表和{@link #singleType()}一样的类型
+     */
+    NumType singleValType() default NumType.Default;
 
     /**
      * 每个数组元素在读取后、应该skip的byte长度
@@ -64,16 +70,11 @@ public @interface F_num_array {
      * (x+10)*100
      * (x+100)/100
      */
-    String valExpr() default "";
-
-    /**
-     * 有符号或者无符号
-     */
-    boolean unsigned() default true;
+    String singleValExpr() default "";
 
     /**
      * 字节序模式
      */
-    ByteOrder order() default ByteOrder.Default;
+    ByteOrder singleOrder() default ByteOrder.Default;
 
 }

@@ -26,10 +26,10 @@ public class FieldBuilder__F_skip extends FieldBuilder {
             lenValCode = anno.len() + "";
         }
         switch (anno.mode()) {
-            case Skip -> {
+            case skip -> {
                 ParseUtil.append(body, "{}.skipBytes({});\n", FieldBuilder.varNameByteBuf, lenValCode);
             }
-            case ReservedFromStart -> {
+            case reservedFromStart -> {
                 final String skipVarName = varNameField + "_skip";
                 ParseUtil.append(body, "final int {}={}-{}.readerIndex()+{};\n", skipVarName, lenValCode, FieldBuilder.varNameByteBuf, FieldBuilder.varNameStartIndex);
                 ParseUtil.append(body, "if({}>0){\n", skipVarName);
@@ -57,10 +57,10 @@ public class FieldBuilder__F_skip extends FieldBuilder {
             lenValCode = anno.len() + "";
         }
         switch (anno.mode()) {
-            case Skip -> {
+            case skip -> {
                 ParseUtil.append(body, "{}.writeBytes(new byte[{}]);\n", FieldBuilder.varNameByteBuf, lenValCode);
             }
-            case ReservedFromStart -> {
+            case reservedFromStart -> {
                 final String skipVarName = varNameField + "_skip";
                 ParseUtil.append(body, "final int {}={}-{}.writerIndex()+{};\n", skipVarName, lenValCode, FieldBuilder.varNameByteBuf, FieldBuilder.varNameStartIndex);
                 ParseUtil.append(body, "if({}>0){\n", skipVarName);

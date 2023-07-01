@@ -14,7 +14,7 @@ import io.netty.buffer.ByteBuf;
 public class Msg {
 
     static {
-        Parser.append(ByteOrder.SmallEndian,"com.bcd.base.support_parser.impl.icd");
+        Parser.append(ByteOrder.smallEndian,"com.bcd.base.support_parser.impl.icd");
     }
 
     @F_bean

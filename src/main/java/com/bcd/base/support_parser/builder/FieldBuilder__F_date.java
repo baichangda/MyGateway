@@ -25,36 +25,36 @@ public class FieldBuilder__F_date extends FieldBuilder {
         final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.clazz);
         //先转换为毫秒
         switch (anno.mode()) {
-            case Bytes_yyMMddHHmmss -> {
+            case bytes_yyMMddHHmmss -> {
                 ParseUtil.append(body, "final long {}={}.of({}+{}.readUnsignedByte(),{}.readByte(),{}.readByte(),{}.readByte(),{}.readByte(),{}.readByte(),0,{}).toInstant().toEpochMilli();\n",
                         varNameLongField, zoneDateTimeClassName, anno.baseYear()
                         , FieldBuilder.varNameByteBuf, FieldBuilder.varNameByteBuf, FieldBuilder.varNameByteBuf, FieldBuilder.varNameByteBuf
                         , FieldBuilder.varNameByteBuf, FieldBuilder.varNameByteBuf, varNameZoneId);
             }
-            case Bytes_yyyyMMddHHmmss -> {
+            case bytes_yyyyMMddHHmmss -> {
                 final String readFuncName = bigEndian ? "readUnsignedShort" : "readUnsignedShortLE";
                 ParseUtil.append(body, "final long {}={}.of({}.{}(),{}.readByte(),{}.readByte(),{}.readByte(),{}.readByte(),{}.readByte(),0,{}).toInstant().toEpochMilli();\n",
                         varNameLongField, zoneDateTimeClassName
                         , FieldBuilder.varNameByteBuf, readFuncName, FieldBuilder.varNameByteBuf, FieldBuilder.varNameByteBuf, FieldBuilder.varNameByteBuf
                         , FieldBuilder.varNameByteBuf, FieldBuilder.varNameByteBuf, varNameZoneId);
             }
-            case Uint64_millisecond -> {
+            case uint64_millisecond -> {
                 final String readFuncName = bigEndian ? "readLong" : "readLongLE";
                 ParseUtil.append(body, "final long {}={}.{}();\n", varNameLongField, FieldBuilder.varNameByteBuf, readFuncName);
             }
-            case Uint64_second -> {
+            case uint64_second -> {
                 final String readFuncName = bigEndian ? "readLong" : "readLongLE";
                 ParseUtil.append(body, "final long {}={}.{}()*1000;\n", varNameLongField, FieldBuilder.varNameByteBuf, readFuncName);
             }
-            case Uint32_second -> {
+            case uint32_second -> {
                 final String readFuncName = bigEndian ? "readUnsignedInt" : "readUnsignedIntLE";
                 ParseUtil.append(body, "final long {}={}.{}()*1000;\n", varNameLongField, FieldBuilder.varNameByteBuf, readFuncName);
             }
-            case Float64_millisecond -> {
+            case float64_millisecond -> {
                 final String readFuncName = bigEndian ? "readDouble" : "readDoubleLE";
                 ParseUtil.append(body, "final long {}=(long){}.{}();\n", varNameLongField, FieldBuilder.varNameByteBuf, readFuncName);
             }
-            case Float64_second -> {
+            case float64_second -> {
                 final String readFuncName = bigEndian ? "readDouble" : "readDoubleLE";
                 ParseUtil.append(body, "final long {}=(long)({}.{}()*1000);\n", varNameLongField, FieldBuilder.varNameByteBuf, readFuncName);
             }
@@ -112,7 +112,7 @@ public class FieldBuilder__F_date extends FieldBuilder {
 
         //先转换为毫秒
         switch (anno.mode()) {
-            case Bytes_yyMMddHHmmss -> {
+            case bytes_yyMMddHHmmss -> {
                 final String varNameZoneDateTimeField = varNameField + "zoneDateTime";
                 ParseUtil.append(body, "{} {}={}.ofInstant({}.ofEpochMilli({}),{});\n",
                         zoneDateTimeClassName,
@@ -131,7 +131,7 @@ public class FieldBuilder__F_date extends FieldBuilder {
                         varNameZoneDateTimeField,
                         varNameZoneDateTimeField);
             }
-            case Bytes_yyyyMMddHHmmss -> {
+            case bytes_yyyyMMddHHmmss -> {
                 final String writeFuncName = bigEndian ? "writeShort" : "writeShortLE";
                 final String varNameZoneDateTimeField = varNameField + "zoneDateTime";
                 ParseUtil.append(body, "{} {}={}.ofInstant({}.ofEpochMilli({}),{});\n",
@@ -150,23 +150,23 @@ public class FieldBuilder__F_date extends FieldBuilder {
                         varNameZoneDateTimeField,
                         varNameZoneDateTimeField);
             }
-            case Uint64_millisecond -> {
+            case uint64_millisecond -> {
                 final String writeFuncName = bigEndian ? "writeLong" : "writeLongLE";
                 ParseUtil.append(body, "{}.{}({});\n", FieldBuilder.varNameByteBuf, writeFuncName, varNameLongField);
             }
-            case Uint64_second -> {
+            case uint64_second -> {
                 final String writeFuncName = bigEndian ? "writeLong" : "writeLongLE";
                 ParseUtil.append(body, "{}.{}({}/1000L);\n", FieldBuilder.varNameByteBuf, writeFuncName, varNameLongField);
             }
-            case Uint32_second -> {
+            case uint32_second -> {
                 final String writeFuncName = bigEndian ? "writeInt" : "writeIntLE";
                 ParseUtil.append(body, "{}.{}((int)({}/1000L));\n", FieldBuilder.varNameByteBuf, writeFuncName, varNameLongField);
             }
-            case Float64_millisecond -> {
+            case float64_millisecond -> {
                 final String writeFuncName = bigEndian ? "writeDouble" : "writeDoubleLE";
                 ParseUtil.append(body, "{}.{}((double)({}));\n", FieldBuilder.varNameByteBuf, writeFuncName, varNameLongField);
             }
-            case Float64_second -> {
+            case float64_second -> {
                 final String writeFuncName = bigEndian ? "writeDouble" : "writeDoubleLE";
                 ParseUtil.append(body, "{}.{}((double){}/1000d);\n", FieldBuilder.varNameByteBuf, writeFuncName, varNameLongField);
             }

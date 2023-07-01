@@ -43,9 +43,16 @@ public @interface F_bit_num_array {
     String lenExpr() default "";
 
     /**
-     * 单个元素bit长度
+     * 每个元素
+     * bit长度
      */
     int singleLen();
+
+    /**
+     * 每个元素
+     * 值数据类型
+     */
+    NumType singleValType();
 
     /**
      * 每个数组元素在读取bit后、应该skip的bit长度
@@ -53,6 +60,7 @@ public @interface F_bit_num_array {
     int singleSkip() default 0;
 
     /**
+     * 每个元素
      * bit位表示的值是否为无符号类型
      * 当是有符号类型时候
      * bit最高位为符号位、0代表正数、1代表负数
@@ -60,14 +68,16 @@ public @interface F_bit_num_array {
      * 正数、正常进行求值
      * 负数、所有bit位取反+1、求值后、代表负数
      */
-    boolean unsigned() default true;
+    boolean singleUnsigned() default true;
 
     /**
+     * 每个元素
      * bit位序模式
      */
-    BitOrder order() default BitOrder.Default;
+    BitOrder singleOrder() default BitOrder.Default;
 
     /**
+     * 每个元素
      * 值处理表达式
      * 在解析出的原始值得基础上,进行运算
      * 公式中的x变量代表字段原始的值
@@ -79,7 +89,7 @@ public @interface F_bit_num_array {
      * (x+10)*100
      * (x+100)/100
      */
-    String valExpr() default "";
+    String singleValExpr() default "";
 
     /**
      * 表示当前字段bit解析结束时候、剩余多余的bit(不满1字节的)的处理模式

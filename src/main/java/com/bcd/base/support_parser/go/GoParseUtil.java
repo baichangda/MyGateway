@@ -3,7 +3,6 @@ package com.bcd.base.support_parser.go;
 import com.bcd.base.support_parser.anno.*;
 import com.bcd.base.support_parser.util.ParseUtil;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.util.*;
@@ -43,8 +42,8 @@ public class GoParseUtil {
             final F_num f_num = field.getAnnotation(F_num.class);
             if (f_num != null) {
                 final boolean bigEndian = ParseUtil.bigEndian(f_num.order(), pkg_byteOrder);
-                if (bigEndian && f_num.len() > 0 && f_num.valExpr().isEmpty()) {
-                    byteLen += f_num.len();
+                if (bigEndian && f_num.valExpr().isEmpty()) {
+                    byteLen += getByteLength(f_num.type());
                     continue;
                 } else {
                     return;
@@ -53,9 +52,9 @@ public class GoParseUtil {
 
             final F_num_array f_num_array = field.getAnnotation(F_num_array.class);
             if (f_num_array != null) {
-                final boolean bigEndian = ParseUtil.bigEndian(f_num_array.order(), pkg_byteOrder);
-                if (bigEndian && f_num_array.len() > 0 && f_num_array.valExpr().isEmpty() && f_num_array.singleSkip() == 0) {
-                    byteLen += f_num_array.len() * f_num_array.singleLen();
+                final boolean bigEndian = ParseUtil.bigEndian(f_num_array.singleOrder(), pkg_byteOrder);
+                if (bigEndian && f_num_array.len() > 0 && f_num_array.singleValExpr().isEmpty() && f_num_array.singleSkip() == 0) {
+                    byteLen += f_num_array.len() * getByteLength(f_num_array.singleType());
                     continue;
                 } else {
                     return;
@@ -102,42 +101,6 @@ public class GoParseUtil {
                     return;
                 }
             }
-
-            final F_float_ieee754 f_float_ieee754 = field.getAnnotation(F_float_ieee754.class);
-            if (f_float_ieee754 != null) {
-                final boolean bigEndian = ParseUtil.bigEndian(f_float_ieee754.order(), pkg_byteOrder);
-                if (bigEndian && f_float_ieee754.valExpr().isEmpty()) {
-                    switch (f_float_ieee754.type()) {
-                        case Float32 -> {
-                            byteLen += 4;
-                        }
-                        case Float64 -> {
-                            byteLen += 8;
-                        }
-                    }
-                    continue;
-                } else {
-                    return;
-                }
-            }
-
-            final F_float_ieee754_array f_float_ieee754_array = field.getAnnotation(F_float_ieee754_array.class);
-            if (f_float_ieee754_array != null) {
-                final boolean bigEndian = ParseUtil.bigEndian(f_float_ieee754_array.order(), pkg_byteOrder);
-                if (bigEndian && f_float_ieee754_array.len() > 0 && f_float_ieee754_array.valExpr().isEmpty()) {
-                    switch (f_float_ieee754.type()) {
-                        case Float32 -> {
-                            byteLen += 4 * f_float_ieee754_array.len();
-                        }
-                        case Float64 -> {
-                            byteLen += 8 * f_float_ieee754_array.len();
-                        }
-                    }
-                    continue;
-                } else {
-                    return;
-                }
-            }
             return;
         }
         unsafePointerStruct_byteLen.put(goStructName, byteLen);
@@ -149,7 +112,7 @@ public class GoParseUtil {
             if (f_skip == null) {
                 return false;
             } else {
-                return f_skip.mode() == SkipMode.ReservedFromStart;
+                return f_skip.mode() == SkipMode.reservedFromStart;
             }
         });
     }
@@ -175,11 +138,11 @@ public class GoParseUtil {
         }
 
         switch (bitRemainingMode1) {
-            case Ignore -> {
+            case ignore -> {
                 context.bitEndWhenBitField_process = true;
                 context.bitEndWhenBitField_deProcess = true;
             }
-            case Not_ignore -> {
+            case not_ignore -> {
                 context.bitEndWhenBitField_process = false;
                 context.bitEndWhenBitField_deProcess = false;
             }
@@ -201,109 +164,6 @@ public class GoParseUtil {
                     }
                 }
             }
-        }
-    }
-
-    private static String toFieldType(Field field) {
-        Annotation anno;
-        if ((anno = field.getAnnotation(F_num.class)) != null) {
-            F_num f_num = (F_num) anno;
-            switch (f_num.len()) {
-                case 1 -> {
-                    return f_num.unsigned() ? "uint8" : "int8";
-                }
-                case 2 -> {
-                    return f_num.unsigned() ? "uint16" : "int16";
-                }
-                case 4 -> {
-                    return f_num.unsigned() ? "uint32" : "int32";
-                }
-                case 8 -> {
-                    return f_num.unsigned() ? "uint64" : "int64";
-                }
-                default -> {
-                    ParseUtil.notSupport_len(field, f_num.getClass());
-                    return "";
-                }
-            }
-        } else if ((anno = field.getAnnotation(F_bit_num.class)) != null) {
-            F_bit_num f_bit_num = (F_bit_num) anno;
-            final int len = f_bit_num.len();
-            if (len >= 1 && len <= 8) {
-                return f_bit_num.unsigned() ? "uint8" : "int8";
-            } else if (len >= 9 && len <= 16) {
-                return f_bit_num.unsigned() ? "uint16" : "int16";
-            } else if (len >= 17 && len <= 32) {
-                return f_bit_num.unsigned() ? "uint32" : "int32";
-            } else if (len >= 33 && len <= 64) {
-                return f_bit_num.unsigned() ? "uint64" : "int64";
-            } else {
-                ParseUtil.notSupport_len(field, f_bit_num.getClass());
-                return "";
-            }
-        } else if ((anno = field.getAnnotation(F_num_array.class)) != null) {
-            F_num_array f_num_array = (F_num_array) anno;
-            switch (f_num_array.singleLen()) {
-                case 1 -> {
-                    return f_num_array.unsigned() ? "[]uint8" : "[]int8";
-                }
-                case 2 -> {
-                    return f_num_array.unsigned() ? "[]uint16" : "[]int16";
-                }
-                case 4 -> {
-                    return f_num_array.unsigned() ? "[]uint32" : "[]int32";
-                }
-                case 8 -> {
-                    return f_num_array.unsigned() ? "[]uint64" : "[]int64";
-                }
-                default -> {
-                    ParseUtil.notSupport_singleLen(field, f_num_array.getClass());
-                    return "";
-                }
-            }
-        } else if ((anno = field.getAnnotation(F_bit_num_array.class)) != null) {
-            F_bit_num_array f_bit_num_array = (F_bit_num_array) anno;
-            final int singleLen = f_bit_num_array.singleLen();
-            if (singleLen >= 1 && singleLen <= 8) {
-                return f_bit_num_array.unsigned() ? "[]uint8" : "[]int8";
-            } else if (singleLen >= 9 && singleLen <= 16) {
-                return f_bit_num_array.unsigned() ? "[]uint16" : "[]int16";
-            } else if (singleLen >= 17 && singleLen <= 32) {
-                return f_bit_num_array.unsigned() ? "[]uint32" : "[]int32";
-            } else if (singleLen >= 33 && singleLen <= 64) {
-                return f_bit_num_array.unsigned() ? "[]uint64" : "[]int64";
-            } else {
-                ParseUtil.notSupport_len(field, f_bit_num_array.getClass());
-                return "";
-            }
-        } else if ((anno = field.getAnnotation(F_string.class)) != null) {
-            return "string";
-        } else if ((anno = field.getAnnotation(F_date.class)) != null) {
-            return "time.Time";
-        } else if ((anno = field.getAnnotation(F_float_ieee754.class)) != null) {
-            F_float_ieee754 f_float_ieee754 = (F_float_ieee754) anno;
-            if (f_float_ieee754.type() == FloatType_ieee754.Float32) {
-                return "float32";
-            } else {
-                return "float64";
-            }
-        } else if ((anno = field.getAnnotation(F_float_ieee754_array.class)) != null) {
-            F_float_ieee754_array f_float_ieee754_array = (F_float_ieee754_array) anno;
-            if (f_float_ieee754_array.type() == FloatType_ieee754.Float32) {
-                return "[]float32";
-            } else {
-                return "[]float64";
-            }
-        } else if ((anno = field.getAnnotation(F_bean.class)) != null) {
-            final String simpleName = field.getType().getSimpleName();
-            return toFirstUpperCase(simpleName);
-        } else if ((anno = field.getAnnotation(F_bean_list.class)) != null) {
-            final String simpleName = field.getType().getComponentType().getSimpleName();
-            return "[]" + toFirstUpperCase(simpleName);
-        } else if ((anno = field.getAnnotation(F_customize.class)) != null) {
-            return "interface{}";
-        } else {
-            return null;
         }
     }
 
@@ -365,6 +225,26 @@ public class GoParseUtil {
                 	Len:  {},
                 	Cap:  {},
                 }))""", structValCode, sliceLen, sliceLen);
+    }
+
+    public static int getByteLength(NumType type) {
+        switch (type) {
+            case uint8, int8 -> {
+                return 1;
+            }
+            case uint16, int16 -> {
+                return 2;
+            }
+            case uint32, int32, float32 -> {
+                return 4;
+            }
+            case uint64, int64, float64 -> {
+                return 8;
+            }
+            default -> {
+                return 0;
+            }
+        }
     }
 
     public static void appendUnsafeStructFunc(StringBuilder body, String goStructName, int structByteLen) {
