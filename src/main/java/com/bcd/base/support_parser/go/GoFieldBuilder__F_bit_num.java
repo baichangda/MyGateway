@@ -88,13 +88,10 @@ public class GoFieldBuilder__F_bit_num extends GoFieldBuilder {
             ParseUtil.append(body, "{}.Finish();\n", varNameBitBufReader);
         }
         String valCode = varNameReadVal;
-        if (goFieldTypeName.equals("float32") || goFieldTypeName.equals("float64")) {
-            valCode = ParseUtil.format("{}({})", goFieldTypeName, valCode);
-            valCode = ParseUtil.replaceValExprToCode(valExpr, valCode);
-        } else {
-            valCode = ParseUtil.replaceValExprToCode(valExpr, valCode);
-            valCode = ParseUtil.format("{}({})", goFieldTypeName, valCode);
-        }
+
+        valCode = ParseUtil.format("{}({})", goFieldTypeName, valCode);
+        valCode = ParseUtil.replaceValExprToCode(valExpr, valCode);
+
         ParseUtil.append(body, "{}.{}={}\n\n", GoFieldBuilder.varNameInstance, goFieldName, valCode);
         if (anno.var() != '0') {
             if (valExpr.isEmpty()) {
@@ -122,16 +119,11 @@ public class GoFieldBuilder__F_bit_num extends GoFieldBuilder {
         String valCode = GoFieldBuilder.varNameInstance + "." + goFieldName;
 
 
-        //原始值不是小数、字段值是小数
-        if ((goFieldTypeName.equals("float32"))) {
-            valCode = ParseUtil.replaceValExprToCode(RpnUtil.reverseExpr(valExpr), valCode);
-            valCode = ParseUtil.format("int64(parse.Round(float64({})))", valCode);
-        } else if (goFieldTypeName.equals("float64")) {
-            valCode = ParseUtil.replaceValExprToCode(RpnUtil.reverseExpr(valExpr), valCode);
+        valCode = ParseUtil.replaceValExprToCode(RpnUtil.reverseExpr(valExpr), valCode);
+        if (goFieldTypeName.equals("float32") || goFieldTypeName.equals("float64")) {
             valCode = ParseUtil.format("int64(parse.Round({}))", valCode);
         } else {
             valCode = ParseUtil.format("int64({})", valCode);
-            valCode = ParseUtil.replaceValExprToCode(RpnUtil.reverseExpr(valExpr), valCode);
         }
 
         ParseUtil.append(body, "{}.Write({},{},{},{})\n", varNameBitBufWriter, valCode, len, bigEndian, unsigned);

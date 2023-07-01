@@ -78,17 +78,17 @@ public class Evt_D006 extends Evt_4_x {
     public short ISGInvtrTem;
     @F_bit_num(len = 8, valType = NumType.int16, valExpr = "x-40")
     public short SAMInvtrTem;
-    @F_bit_num(len = 16, valType = NumType.int16, valExpr = "x-32768")
+    @F_bit_num(len = 16, valType = NumType.int32, valExpr = "x-32768")
     public short TMSpd;
     @F_bit_num(len = 1, valType = NumType.int8)
     public byte TMSpdV;
-    @F_bit_num(len = 16, valType = NumType.int16, valExpr = "x-32768")
+    @F_bit_num(len = 16, valType = NumType.int32, valExpr = "x-32768")
     public short ISGSpd;
     @F_bit_num(len = 1, valType = NumType.int8)
     public byte ISGSpdV;
     @F_bit_num(len = 1, valType = NumType.int8)
     public byte SAMSpdV;
-    @F_bit_num(len = 16, valType = NumType.int16, valExpr = "x-32768")
+    @F_bit_num(len = 16, valType = NumType.int32, valExpr = "x-32768")
     public short SAMSpd;
     @F_bit_num(len = 11, valType = NumType.float32, valExpr = "x*0.5-512")
     public float TMActuToq;

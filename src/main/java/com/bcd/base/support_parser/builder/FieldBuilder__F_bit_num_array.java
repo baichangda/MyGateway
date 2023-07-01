@@ -2,7 +2,6 @@ package com.bcd.base.support_parser.builder;
 
 import com.bcd.base.support_parser.anno.F_bit_num_array;
 import com.bcd.base.support_parser.anno.F_skip;
-import com.bcd.base.support_parser.anno.NumType;
 import com.bcd.base.support_parser.exception.BaseRuntimeException;
 import com.bcd.base.support_parser.util.ParseUtil;
 import com.bcd.base.support_parser.util.RpnUtil;
@@ -58,7 +57,8 @@ public class FieldBuilder__F_bit_num_array extends FieldBuilder {
         if (singleSkip > 0) {
             ParseUtil.append(body, "{}.skip({});\n", varNameBitBuf, singleSkip);
         }
-        ParseUtil.append(body, "{}[i]=({})({});\n", arrVarName, arrayElementTypeName, ParseUtil.replaceValExprToCode(valExpr, varNameArrayElement));
+        String valCode = ParseUtil.replaceValExprToCode(valExpr, varNameArrayElement);
+        ParseUtil.append(body, "{}[i]=({})({});\n", arrVarName, arrayElementTypeName, valCode);
         ParseUtil.append(body, "}\n");
         if (context.bitEndWhenBitField_process) {
             ParseUtil.append(body, "{}.finish();\n", context.varNameBitBuf);

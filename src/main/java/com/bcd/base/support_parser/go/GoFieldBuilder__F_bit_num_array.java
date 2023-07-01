@@ -102,13 +102,10 @@ public class GoFieldBuilder__F_bit_num_array extends GoFieldBuilder {
         ParseUtil.append(body, "for i:=0;i<{};i++{\n", varNameLen);
         ParseUtil.append(body, "e:={}.Read({},{},{})\n", varNameBitBufReader, singleLen, bigEndian, unsigned);
         String valCode = "e";
-        if (goFieldTypeName.equals("float32") || goFieldTypeName.equals("float64")) {
-            valCode = ParseUtil.format("{}({})", goFieldTypeName, valCode);
-            valCode = ParseUtil.replaceValExprToCode(valExpr, valCode);
-        } else {
-            valCode = ParseUtil.replaceValExprToCode(valExpr, valCode);
-            valCode = ParseUtil.format("{}({})", goFieldTypeName, valCode);
-        }
+
+        valCode = ParseUtil.format("{}({})", goFieldTypeName, valCode);
+        valCode = ParseUtil.replaceValExprToCode(valExpr, valCode);
+
         ParseUtil.append(body, "{}[i]={}\n", varNameArr, valCode);
         ParseUtil.append(body, "}\n");
         ParseUtil.append(body, "{}.{}={}\n", GoFieldBuilder.varNameInstance, goFieldName, varNameArr);
@@ -132,16 +129,12 @@ public class GoFieldBuilder__F_bit_num_array extends GoFieldBuilder {
         ParseUtil.append(body, "{}:={}.{}\n", varNameArr, GoFieldBuilder.varNameInstance, goFieldName);
         ParseUtil.append(body, "for i:=0;i<len({});i++{\n", varNameArr);
         String valCode = ParseUtil.format("{}[i]", varNameArr);
-        //原始值不是小数、字段值是小数
-        if ((goFieldTypeName.equals("float32"))) {
-            valCode = ParseUtil.replaceValExprToCode(RpnUtil.reverseExpr(valExpr), valCode);
-            valCode = ParseUtil.format("int64(parse.Round(float64({})))", valCode);
-        } else if (goFieldTypeName.equals("float64")) {
-            valCode = ParseUtil.replaceValExprToCode(RpnUtil.reverseExpr(valExpr), valCode);
+
+        valCode = ParseUtil.replaceValExprToCode(RpnUtil.reverseExpr(valExpr), valCode);
+        if (goFieldTypeName.equals("float32") || goFieldTypeName.equals("float64")) {
             valCode = ParseUtil.format("int64(parse.Round({}))", valCode);
         } else {
             valCode = ParseUtil.format("int64({})", valCode);
-            valCode = ParseUtil.replaceValExprToCode(RpnUtil.reverseExpr(valExpr), valCode);
         }
 
         ParseUtil.append(body, "{}.Write({},{},{},{})\n", varNameBitBufWriter, valCode, singleLen, bigEndian, unsigned);

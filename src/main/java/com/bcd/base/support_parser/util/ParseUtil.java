@@ -359,11 +359,7 @@ public class ParseUtil {
     }
 
     public static String replaceValExprToCode_round(final String expr, final String valExpr) {
-        final StringBuilder sb = new StringBuilder();
-        sb.append(format("{}.round(", ParseUtil.class.getName()));
-        sb.append(replaceValExprToCode(expr, valExpr));
-        sb.append(")");
-        return sb.toString();
+        return format("{}.round(", ParseUtil.class.getName()) + replaceValExprToCode(expr, valExpr) + ")";
     }
 
 

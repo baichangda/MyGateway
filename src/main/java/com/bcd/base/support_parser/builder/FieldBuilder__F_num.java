@@ -82,7 +82,7 @@ public class FieldBuilder__F_num extends FieldBuilder {
         if (fieldTypeClass.isEnum()) {
             ParseUtil.append(body, "{}.{}={}.fromInteger((int)({}));\n", varNameInstance, field.getName(), fieldTypeName, valCode);
         } else {
-            ParseUtil.append(body, "{}.{}={};\n", varNameInstance, field.getName(), valCode);
+            ParseUtil.append(body, "{}.{}=({}){};\n", varNameInstance, field.getName(), sourceValTypeName, valCode);
         }
 
         final char var = anno.var();

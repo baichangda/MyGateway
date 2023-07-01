@@ -243,11 +243,7 @@ public class GoFieldBuilder__F_num_array extends GoFieldBuilder {
                 //原始值不是小数、字段值是小数
                 if (!goReadTypeName.equals("float32") && !goReadTypeName.equals("float64")
                         && (goFieldTypeName.equals("float32") || goFieldTypeName.equals("float64"))) {
-                    if (goFieldTypeName.equals("float64")) {
-                        valCode = ParseUtil.format("{}(parse.Round({}))", goReadTypeName, valCode);
-                    } else {
-                        valCode = ParseUtil.format("{}(parse.Round(float64({})))", goReadTypeName, valCode);
-                    }
+                    valCode = ParseUtil.format("{}(parse.Round({}))", goReadTypeName, valCode);
                 } else {
                     if (!goReadTypeName.equals(goFieldTypeName)) {
                         valCode = ParseUtil.format("{}({})", goReadTypeName, valCode);

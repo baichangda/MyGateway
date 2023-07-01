@@ -1,10 +1,7 @@
 package com.bcd.base.support_parser.builder;
 
-import com.bcd.base.support_parser.Parser;
 import com.bcd.base.support_parser.anno.F_bit_num;
 import com.bcd.base.support_parser.exception.BaseRuntimeException;
-import com.bcd.base.support_parser.util.BitBuf_reader;
-import com.bcd.base.support_parser.util.BitBuf_writer;
 import com.bcd.base.support_parser.util.ParseUtil;
 import com.bcd.base.support_parser.util.RpnUtil;
 
@@ -20,14 +17,17 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
         final F_bit_num anno = field.getAnnotation(annoClass);
         final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.clazz);
         final boolean unsigned = anno.unsigned();
-
+        final String sourceValTypeName;
         switch (fieldTypeName) {
             case "byte", "short", "int", "long", "float", "double" -> {
+                sourceValTypeName = fieldTypeName;
             }
             default -> {
                 if (fieldTypeClass.isEnum()) {
+                    sourceValTypeName = "int";
                 } else {
                     ParseUtil.notSupport_fieldType(field, annoClass);
+                    sourceValTypeName = null;
                 }
             }
         }
@@ -43,15 +43,17 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
 
         final String varNameBitBuf = context.getVarNameBitBuf_reader();
 
-        ParseUtil.append(body, "final long {}={}.read({},{},{});\n", varNameField, varNameBitBuf, len, bigEndian, unsigned);
+        ParseUtil.append(body, "final {} {}=({}){}.read({},{},{});\n", sourceValTypeName, varNameField, sourceValTypeName, varNameBitBuf, len, bigEndian, unsigned);
         if (context.bitEndWhenBitField_process) {
             ParseUtil.append(body, "{}.finish();\n", varNameBitBuf);
         }
 
+        String valCode = ParseUtil.replaceValExprToCode(anno.valExpr(), varNameField);
+
         if (fieldTypeClass.isEnum()) {
-            ParseUtil.append(body, "{}.{}={}.fromInteger((int){});\n", varNameInstance, field.getName(), fieldTypeName, ParseUtil.replaceValExprToCode(anno.valExpr(), varNameField));
+            ParseUtil.append(body, "{}.{}={}.fromInteger((int){});\n", varNameInstance, field.getName(), fieldTypeName, valCode);
         } else {
-            ParseUtil.append(body, "{}.{}=({})({});\n", varNameInstance, field.getName(), fieldTypeName, ParseUtil.replaceValExprToCode(anno.valExpr(), varNameField));
+            ParseUtil.append(body, "{}.{}=({})({});\n", varNameInstance, field.getName(), fieldTypeName, valCode);
         }
 
         final char var = anno.var();
