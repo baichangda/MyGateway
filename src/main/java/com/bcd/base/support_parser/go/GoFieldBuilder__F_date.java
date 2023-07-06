@@ -40,7 +40,7 @@ public class GoFieldBuilder__F_date extends GoFieldBuilder {
         switch (mode) {
             case bytes_yyMMddHHmmss -> {
                 final String varNameBytes = goFieldName + "_bytes";
-                ParseUtil.append(body, "{}:={}.Read_bytes(6)\n", varNameBytes, GoFieldBuilder.varNameByteBuf);
+                ParseUtil.append(body, "{}:={}.Read_slice_uint8(6)\n", varNameBytes, GoFieldBuilder.varNameByteBuf);
                 ParseUtil.append(body, "{}.{}=time.Date({}+int({}[0]),time.Month(int({}[1])),int({}[2]),int({}[3]),int({}[4]),int({}[5]),0,{})\n",
                         GoFieldBuilder.varNameInstance, goFieldName,
                         baseYear, varNameBytes, varNameBytes, varNameBytes, varNameBytes, varNameBytes, varNameBytes,
@@ -50,7 +50,7 @@ public class GoFieldBuilder__F_date extends GoFieldBuilder {
                 final String varNameYear = goFieldName + "_year";
                 final String varNameBytes = goFieldName + "_bytes";
                 ParseUtil.append(body, "{}:={}.Read_uint16{}()\n", varNameYear, GoFieldBuilder.varNameByteBuf, bigEndianSuffix);
-                ParseUtil.append(body, "{},err:={}.Read_bytes(5)\n", varNameBytes, GoFieldBuilder.varNameByteBuf);
+                ParseUtil.append(body, "{},err:={}.Read_slice_uint8(5)\n", varNameBytes, GoFieldBuilder.varNameByteBuf);
                 ParseUtil.append(body, "if err!=nil{\n");
                 ParseUtil.append(body, "return nil,err\n");
                 ParseUtil.append(body, "}\n");
@@ -104,14 +104,14 @@ public class GoFieldBuilder__F_date extends GoFieldBuilder {
         ParseUtil.append(body, "{}:={}.{}\n", varNameVal, GoFieldBuilder.varNameInstance, goFieldName);
         switch (mode) {
             case bytes_yyMMddHHmmss -> {
-                ParseUtil.append(body, "{}.Write_bytes([]byte{byte({}.Year()-2000),byte({}.Month()),byte({}.Day()),byte({}.Hour()),byte({}.Minute()),byte({}.Second())})\n",
+                ParseUtil.append(body, "{}.Write_slice_uint8([]byte{byte({}.Year()-2000),byte({}.Month()),byte({}.Day()),byte({}.Hour()),byte({}.Minute()),byte({}.Second())})\n",
                         GoFieldBuilder.varNameByteBuf,
                         varNameVal, varNameVal, varNameVal, varNameVal, varNameVal, varNameVal
                 );
             }
             case bytes_yyyyMMddHHmmss -> {
                 ParseUtil.append(body, "{}.Write_uint16{}(uint16({}.Year()))\n", GoFieldBuilder.varNameByteBuf, bigEndianSuffix, varNameVal);
-                ParseUtil.append(body, "{}.Write_bytes([]byte{byte({}.Month()),byte({}.Day()),byte({}.Hour()),byte({}.Minute()),byte({}.Second())})\n",
+                ParseUtil.append(body, "{}.Write_slice_uint8([]byte{byte({}.Month()),byte({}.Day()),byte({}.Hour()),byte({}.Minute()),byte({}.Second())})\n",
                         GoFieldBuilder.varNameByteBuf,
                         varNameVal, varNameVal, varNameVal, varNameVal, varNameVal, varNameVal
                 );

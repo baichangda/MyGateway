@@ -181,33 +181,33 @@ public class GoParseUtil {
     }
 
     public static String get_unsafe_slice_to_array_1(String structType, int arrLen) {
-        return ParseUtil.format("[{}]{}({}.Read_bytes({}))", arrLen, structType, GoFieldBuilder.varNameByteBuf, arrLen);
+        return ParseUtil.format("[{}]{}({}.Read_slice_{}({}))", arrLen, structType, GoFieldBuilder.varNameByteBuf, structType, arrLen);
     }
 
     public static String get_unsafe_slice_to_array_2(String structType, int arrLen, int sliceLen) {
-        return ParseUtil.format("(*[{}]{})(unsafe.Pointer(unsafe.SliceData({}.Read_bytes({}))))", arrLen, structType, GoFieldBuilder.varNameByteBuf, sliceLen);
+        return ParseUtil.format("(*[{}]{})(unsafe.Pointer(unsafe.SliceData({}.Read_slice_{}({}))))", arrLen, structType, GoFieldBuilder.varNameByteBuf, structType, sliceLen);
     }
 
     public static String get_unsafe_array_to_slice_1(String arrValCode) {
         return ParseUtil.format("{}[:]", arrValCode);
     }
 
-    public static String get_unsafe_array_to_slice_2(String arrValCode, int sliceLen) {
+    public static String get_unsafe_array_to_slice_2(String structType, String arrValCode, int sliceLen) {
         return ParseUtil.format("""
-                (*[]byte)(unsafe.Pointer(&reflect.SliceHeader{
+                (*[]{})(unsafe.Pointer(&reflect.SliceHeader{
                     Data: uintptr(unsafe.Pointer(&{})),
                     Len:  {},
                     Cap:  {},
-                }))""", arrValCode, sliceLen, sliceLen);
+                }))""", structType, arrValCode, sliceLen, sliceLen);
     }
 
     public static String get_unsafe_slice_to_struct(String structType, int sliceLen) {
-        return ParseUtil.format("(*{})(unsafe.Pointer(unsafe.SliceData({}.Read_bytes({}))))", structType, GoFieldBuilder.varNameByteBuf, sliceLen);
+        return ParseUtil.format("(*{})(unsafe.Pointer(unsafe.SliceData({}.Read_slice_uint8({}))))", structType, GoFieldBuilder.varNameByteBuf, sliceLen);
     }
 
     public static String get_unsafe_struct_to_slice(String structValCode, int sliceLen) {
         return ParseUtil.format("""
-                (*[]byte)(unsafe.Pointer(&reflect.SliceHeader{
+                (*[]uint8)(unsafe.Pointer(&reflect.SliceHeader{
                 	Data: uintptr(unsafe.Pointer({})),
                 	Len:  {},
                 	Cap:  {},
@@ -215,12 +215,12 @@ public class GoParseUtil {
     }
 
     public static String get_unsafe_slice_to_structArr(String structType, int arrLen, int sliceLen) {
-        return ParseUtil.format("(*[{}]{})(unsafe.Pointer(unsafe.SliceData({}.Read_bytes({}))))", arrLen, structType, GoFieldBuilder.varNameByteBuf, sliceLen);
+        return ParseUtil.format("(*[{}]{})(unsafe.Pointer(unsafe.SliceData({}.Read_slice_uint8({}))))", arrLen, structType, GoFieldBuilder.varNameByteBuf, sliceLen);
     }
 
     public static String get_unsafe_structArr_to_slice(String structValCode, int sliceLen) {
         return ParseUtil.format("""
-                (*[]byte)(unsafe.Pointer(&reflect.SliceHeader{
+                (*[]uint8)(unsafe.Pointer(&reflect.SliceHeader{
                 	Data: uintptr(unsafe.Pointer({})),
                 	Len:  {},
                 	Cap:  {},
@@ -251,10 +251,10 @@ public class GoParseUtil {
         if (GoParseUtil.noPointerStructSet.contains(goStructName)) {
             ParseUtil.append(body, """
                             func To_{}({} *parse.ByteBuf, {} *parse.ParseContext) {} {
-                                 return *(*{})(unsafe.Pointer(unsafe.SliceData({}.Read_bytes({}))))
+                                 return *(*{})(unsafe.Pointer(unsafe.SliceData({}.Read_slice_uint8({}))))
                             }
                             func({} {})Write({} *parse.ByteBuf,{} *parse.ParseContext){
-                                {}.Write_bytes(*(*[]byte)(unsafe.Pointer(&reflect.SliceHeader{
+                                {}.Write_slice_uint8(*(*[]byte)(unsafe.Pointer(&reflect.SliceHeader{
                                     Data: uintptr(unsafe.Pointer(&{})),
                                     Len:  {},
                                     Cap:  {},
@@ -266,10 +266,10 @@ public class GoParseUtil {
         } else {
             ParseUtil.append(body, """
                             func To_{}({} *parse.ByteBuf, {} *parse.ParseContext) *{} {
-                                 return (*{})(unsafe.Pointer(unsafe.SliceData({}.Read_bytes({}))))
+                                 return (*{})(unsafe.Pointer(unsafe.SliceData({}.Read_slice_uint8({}))))
                             }
                             func(_{} *{})Write({} *parse.ByteBuf,{} *parse.ParseContext){
-                                {}.Write_bytes(*(*[]byte)(unsafe.Pointer(&reflect.SliceHeader{
+                                {}.Write_slice_uint8(*(*[]byte)(unsafe.Pointer(&reflect.SliceHeader{
                                     Data: uintptr(unsafe.Pointer(_{})),
                                     Len:  {},
                                     Cap:  {},
