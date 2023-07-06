@@ -33,15 +33,16 @@ public @interface F_num {
      * 对原始值进行{@link #valExpr()}运算后、存储最终值的类型
      * 默认值代表和{@link #type()}一样的类型
      *
+     * 此属性对java解析程序没有影响、因为java程序在定义bean的field时候已经考虑进去了
+     * 主要用于生成其他语言的解析程序时候用到、例如go
+     *
      * {@link #valExpr()} 为空时
      * 设置为和{@link #type()}一样即可
      *
      * {@link #valExpr()} 不为空时
      * 此时定义的类型需要考虑存储如下值都不会出现溢出或错误
      * 原始值、运算过程中的值、结果值
-     *
-     * 此属性对java解析程序没有影响、因为java程序在定义bean的field时候已经考虑进去了
-     * 主要用于生成其他语言的解析程序时候用到、例如go
+     * 因为在解析时候、会先将读取出的原始值{@link #type()}转换为{@link #valType()}然后再进行{@link #valExpr()}运算
      */
     NumType valType() default NumType.Default;
 

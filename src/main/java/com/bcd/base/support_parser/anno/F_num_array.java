@@ -12,7 +12,6 @@ import java.lang.annotation.Target;
  * {@link #len()}和{@link #lenExpr()} 二选一、代表字段数组长度
  * <p>
  * 枚举类
- * 仅支持当{@link #singleLen()}为1、2、4时候、因为默认类型为int、8会产生精度丢失
  * 要求枚举类必有如下静态方法、例如
  * public enum Example{
  * public static Example fromInteger(int i){}
@@ -43,36 +42,40 @@ public @interface F_num_array {
     String lenExpr() default "";
 
     /**
-     * 单个元素类型
+     * 每个数组元素
      * 读取原始值的数据类型
      * 数据类型
      */
     NumType singleType();
 
     /**
-     * 单个元素值数据类型
-     * 对原始值进行{@link #singleValExpr()}运算后、存储最终值的类型
+     * 每个数组元素
+     * 值数据类型
+     * 对原始值进行{@link #singleValType()}运算后、存储最终值的类型
      * 默认值代表和{@link #singleType()}一样的类型
-     * <p>
+     *
+     * 此属性对java解析程序没有影响、因为java程序在定义bean的field时候已经考虑进去了
+     * 主要用于生成其他语言的解析程序时候用到、例如go
+     *
      * {@link #singleValExpr()} 为空时
      * 设置为和{@link #singleType()}一样即可
-     * <p>
+     *
      * {@link #singleValExpr()} 不为空时
      * 此时定义的类型需要考虑存储如下值都不会出现溢出或错误
      * 原始值、运算过程中的值、结果值
-     * <p>
-     * 此属性对java解析程序没有影响、因为java程序在定义bean的field时候已经考虑进去了
-     * 主要用于生成其他语言的解析程序时候用到、例如go
+     * 因为在解析时候、会先将读取出的原始值{@link #singleType()}转换为{@link #singleValType()}然后再进行{@link #singleValExpr()}运算
      */
     NumType singleValType() default NumType.Default;
 
     /**
-     * 每个数组元素在读取后、应该skip的byte长度
+     * 每个数组元素
+     * 在读取后、应该skip的byte长度
      */
     int singleSkip() default 0;
 
     /**
-     * 值处理表达式、针对于数组中每个值
+     * 每个数组元素
+     * 值处理表达式
      * 在解析出的原始值得基础上,进行运算
      * 公式中的x变量代表字段原始的值
      * 注意:
@@ -86,22 +89,8 @@ public @interface F_num_array {
     String singleValExpr() default "";
 
     /**
+     * 每个数组元素
      * 字节序模式
      */
     ByteOrder singleOrder() default ByteOrder.Default;
-
-    /**
-     * 组模式
-     * 开启后
-     * 多个连续的{@link #group()}==true 的字段
-     * 会在一个for循环中解析、且for循环的len会以第一个为准
-     *
-     * 此模式下只有第一个字段需要设置{@link #len()}或者{@link #lenExpr()}
-     * 剩下的字段只不需要设置长度属性
-     *
-     * 注意在此模式下
-     * 只有第一个字段会有解析日志、后面的字段都是空的
-     */
-    boolean group() default false;
-
 }

@@ -12,7 +12,6 @@ import java.lang.annotation.Target;
  * {@link #len()}和{@link #lenExpr()} 二选一、代表字段数组长度
  *
  * 枚举类
- * 仅支持当{@link #singleLen()}为1、2、4时候、因为默认类型为int、8会产生精度丢失
  * 要求枚举类必有如下静态方法、例如
  * public enum Example{
  * public static Example fromInteger(int i){}

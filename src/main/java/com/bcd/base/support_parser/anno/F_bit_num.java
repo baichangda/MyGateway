@@ -10,7 +10,6 @@ import java.lang.annotation.Target;
  * byte、short、int、long、float、double、枚举类
  * <p>
  * 枚举类
- * 仅支持当{@link #len()}为1、2、4时候、因为默认类型为int、8会产生精度丢失
  * 要求枚举类必有如下静态方法、例如
  * public enum Example{
  * public static Example fromInteger(int i){}
