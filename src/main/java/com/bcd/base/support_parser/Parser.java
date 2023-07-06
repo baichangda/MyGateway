@@ -315,6 +315,27 @@ public class Parser {
         Collections.sort(bitOrderConfigs);
     }
 
+    private static Map<String, List<String>> getGroupMap_f_num_array(List<Field> fieldList) {
+        final Map<String, List<String>> map = new HashMap<>();
+        boolean hasGroup = false;
+        final List<String> list = new ArrayList<>();
+        for (Field field : fieldList) {
+            final F_num_array f_num_array = field.getAnnotation(F_num_array.class);
+            if (f_num_array != null && f_num_array.group()) {
+                if (!hasGroup) {
+                    list.add(field.getName());
+                    hasGroup = true;
+                }
+            } else {
+                hasGroup = false;
+                if (list.size() > 1) {
+                    map.put(list.get(0), list);
+                }
+            }
+        }
+        return map;
+    }
+
     private static void bitEndWhenBitField(List<Field> fieldList, int i, BuilderContext context) {
         final Field cur = fieldList.get(i);
         final F_bit_num f_bit_num1 = cur.getAnnotation(F_bit_num.class);
@@ -376,11 +397,11 @@ public class Parser {
         if (ParseUtil.needBitBuf(fieldList)) {
             ParseUtil.newBitBuf_parse(context);
         }
+        final Map<String, List<String>> groupMap_f_num_array = getGroupMap_f_num_array(fieldList);
         for (int i = 0; i < fieldList.size(); i++) {
             Field field = fieldList.get(i);
             context.field = field;
             bitEndWhenBitField(fieldList, i, context);
-
             if (logCollector_parse != null) {
                 if (!context.logBit) {
                     ParseUtil.prependLogCode_parse(context);
@@ -395,7 +416,13 @@ public class Parser {
 
                 final F_num_array f_num_array = field.getAnnotation(F_num_array.class);
                 if (f_num_array != null) {
-                    fieldBuilder__f_num_array.buildParse(context);
+                    final List<String> groupFieldNameList = groupMap_f_num_array.get(field.getName());
+                    if (groupFieldNameList == null) {
+                        context.groupFieldNameList = null;
+                    } else {
+                        context.groupFieldNameList = groupFieldNameList;
+                        fieldBuilder__f_num_array.buildParse(context);
+                    }
                     continue;
                 }
 

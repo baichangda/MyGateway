@@ -46,65 +46,70 @@ public class FieldBuilder__F_num_array extends FieldBuilder {
 
 
         final NumType singleType = anno.singleType();
-        final String valExpr = anno.singleValExpr();
+        final String singleValExpr = anno.singleValExpr();
         final StringBuilder body = context.body;
         final String varNameField = ParseUtil.getFieldVarName(context);
         String arrVarName = varNameField + "_arr";
         final boolean bigEndian = ParseUtil.bigEndian(anno.singleOrder(), context.clazz);
         final int singleSkip = anno.singleSkip();
         ParseUtil.append(body, "final {}[] {}=new {}[{}];\n", arrayElementTypeName, arrVarName, arrayElementTypeName, arrLenRes);
-        String funcName;
-        switch (singleType) {
-            case uint8 -> {
-                funcName = "readUnsignedByte";
-            }
-            case int8 -> {
-                funcName = "readByte";
-            }
-            case uint16 -> {
-                funcName = "readUnsignedShort";
-            }
-            case int16 -> {
-                funcName = "readShort";
-            }
-            case uint32 -> {
-                funcName = "readUnsignedInt";
-            }
-            case int32 -> {
-                funcName = "readInt";
-            }
-            case uint64, int64 -> {
-                funcName = "readLong";
-            }
-            case float32 -> {
-                funcName = "readFloat";
-            }
-            case float64 -> {
-                funcName = "readDouble";
-            }
-            default -> {
-                ParseUtil.notSupport_numType(field, annoClass);
-                funcName = null;
-            }
-        }
-        if (!bigEndian && singleType != NumType.uint8 && singleType != NumType.int8) {
-            funcName += "LE";
-        }
-
-        ParseUtil.append(body, "for(int i=0;i<{}.length;i++){\n", arrVarName);
-        final String varNameArrayElement = varNameField + "_arrEle";
-        ParseUtil.append(body, "final {} {}=({}){}.{}();\n", sourceValTypeName, varNameArrayElement, sourceValTypeName, FieldBuilder.varNameByteBuf, funcName);
-        if (singleSkip > 0) {
-            ParseUtil.append(body, "{}.skipBytes({});\n", varNameByteBuf, singleSkip);
-        }
-        //表达式运算
-        final String valCode = ParseUtil.replaceValExprToCode(valExpr, varNameArrayElement);
-        if (arrayElementType.isEnum()) {
-            ParseUtil.append(body, "{}[i]={}.fromInteger((int)({}));\n", arrVarName, arrayElementTypeName, valCode);
+        //优化处理 byte[]数组解析
+        if (byte[].class.isAssignableFrom(fieldTypeClass) && singleType == NumType.int8 && singleValExpr.isEmpty() && singleSkip == 0) {
+            ParseUtil.append(body, "{}.readBytes({});\n", FieldBuilder.varNameByteBuf, arrVarName);
         } else {
-            ParseUtil.append(body, "{}[i]=({})({});\n", arrVarName, arrayElementTypeName, valCode);
+            String funcName;
+            switch (singleType) {
+                case uint8 -> {
+                    funcName = "readUnsignedByte";
+                }
+                case int8 -> {
+                    funcName = "readByte";
+                }
+                case uint16 -> {
+                    funcName = "readUnsignedShort";
+                }
+                case int16 -> {
+                    funcName = "readShort";
+                }
+                case uint32 -> {
+                    funcName = "readUnsignedInt";
+                }
+                case int32 -> {
+                    funcName = "readInt";
+                }
+                case uint64, int64 -> {
+                    funcName = "readLong";
+                }
+                case float32 -> {
+                    funcName = "readFloat";
+                }
+                case float64 -> {
+                    funcName = "readDouble";
+                }
+                default -> {
+                    ParseUtil.notSupport_numType(field, annoClass);
+                    funcName = null;
+                }
+            }
+            if (!bigEndian && singleType != NumType.uint8 && singleType != NumType.int8) {
+                funcName += "LE";
+            }
+
+            ParseUtil.append(body, "for(int i=0;i<{}.length;i++){\n", arrVarName);
+            final String varNameArrayElement = varNameField + "_arrEle";
+            ParseUtil.append(body, "final {} {}=({}){}.{}();\n", sourceValTypeName, varNameArrayElement, sourceValTypeName, FieldBuilder.varNameByteBuf, funcName);
+            if (singleSkip > 0) {
+                ParseUtil.append(body, "{}.skipBytes({});\n", varNameByteBuf, singleSkip);
+            }
+            //表达式运算
+            final String valCode = ParseUtil.replaceValExprToCode(singleValExpr, varNameArrayElement);
+            if (arrayElementType.isEnum()) {
+                ParseUtil.append(body, "{}[i]={}.fromInteger((int)({}));\n", arrVarName, arrayElementTypeName, valCode);
+            } else {
+                ParseUtil.append(body, "{}[i]=({})({});\n", arrVarName, arrayElementTypeName, valCode);
+            }
+            ParseUtil.append(body, "}\n");
         }
-        ParseUtil.append(body, "}\n");
 
         ParseUtil.append(body, "{}.{}={};\n", FieldBuilder.varNameInstance, field.getName(), arrVarName);
     }
@@ -120,12 +125,13 @@ public class FieldBuilder__F_num_array extends FieldBuilder {
         final StringBuilder body = context.body;
         final String varNameInstance = FieldBuilder.varNameInstance;
         final String fieldName = field.getName();
+        final String singleValExpr = anno.singleValExpr();
         String valCode = varNameInstance + "." + fieldName;
         final String varNameField = ParseUtil.getFieldVarName(context);
 
         ParseUtil.append(body, "if({}!=null){\n", valCode);
 
-        if (byte[].class.isAssignableFrom(fieldTypeClass) && singleType == NumType.int8 && anno.singleValExpr().isEmpty()) {
+        if (byte[].class.isAssignableFrom(fieldTypeClass) && singleType == NumType.int8 && singleValExpr.isEmpty() && singleSkip == 0) {
             ParseUtil.append(body, "{}.writeBytes({});\n", FieldBuilder.varNameByteBuf, valCode);
         } else {
             final Class<?> arrayElementType = fieldTypeClass.componentType();
@@ -141,11 +147,11 @@ public class FieldBuilder__F_num_array extends FieldBuilder {
             if (arrayElementType.isEnum()) {
                 arrEleValCode = ParseUtil.format("({}).toInteger()", arrEleValCode);
             }
-            if (!anno.singleValExpr().isEmpty()) {
+            if (!singleValExpr.isEmpty()) {
                 if (isFloat) {
-                    arrEleValCode = ParseUtil.replaceValExprToCode_round(RpnUtil.reverseExpr(anno.singleValExpr()), arrEleValCode);
+                    arrEleValCode = ParseUtil.replaceValExprToCode_round(RpnUtil.reverseExpr(singleValExpr), arrEleValCode);
                 } else {
-                    arrEleValCode = ParseUtil.replaceValExprToCode(RpnUtil.reverseExpr(anno.singleValExpr()), arrEleValCode);
+                    arrEleValCode = ParseUtil.replaceValExprToCode(RpnUtil.reverseExpr(singleValExpr), arrEleValCode);
                 }
             }
 

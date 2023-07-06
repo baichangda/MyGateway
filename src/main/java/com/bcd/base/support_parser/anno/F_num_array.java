@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
  * byte[]、short[]、int[]、long[]、float[]、double[]、enum[]
  * 数组长度=总字节数/singleLen
  * {@link #len()}和{@link #lenExpr()} 二选一、代表字段数组长度
- *
+ * <p>
  * 枚举类
  * 仅支持当{@link #singleLen()}为1、2、4时候、因为默认类型为int、8会产生精度丢失
  * 要求枚举类必有如下静态方法、例如
@@ -18,7 +18,7 @@ import java.lang.annotation.Target;
  * public static Example fromInteger(int i){}
  * public int toInteger(){}
  * }
- *
+ * <p>
  * 反解析中
  * 值可以为null、代表空数组
  */
@@ -53,14 +53,14 @@ public @interface F_num_array {
      * 单个元素值数据类型
      * 对原始值进行{@link #singleValExpr()}运算后、存储最终值的类型
      * 默认值代表和{@link #singleType()}一样的类型
-     *
+     * <p>
      * {@link #singleValExpr()} 为空时
      * 设置为和{@link #singleType()}一样即可
-     *
+     * <p>
      * {@link #singleValExpr()} 不为空时
      * 此时定义的类型需要考虑存储如下值都不会出现溢出或错误
      * 原始值、运算过程中的值、结果值
-     *
+     * <p>
      * 此属性对java解析程序没有影响、因为java程序在定义bean的field时候已经考虑进去了
      * 主要用于生成其他语言的解析程序时候用到、例如go
      */
@@ -89,5 +89,19 @@ public @interface F_num_array {
      * 字节序模式
      */
     ByteOrder singleOrder() default ByteOrder.Default;
+
+    /**
+     * 组模式
+     * 开启后
+     * 多个连续的{@link #group()}==true 的字段
+     * 会在一个for循环中解析、且for循环的len会以第一个为准
+     *
+     * 此模式下只有第一个字段需要设置{@link #len()}或者{@link #lenExpr()}
+     * 剩下的字段只不需要设置长度属性
+     *
+     * 注意在此模式下
+     * 只有第一个字段会有解析日志、后面的字段都是空的
+     */
+    boolean group() default false;
 
 }

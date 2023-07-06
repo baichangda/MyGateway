@@ -1,18 +1,17 @@
 package com.bcd.base.support_parser.builder;
 
-import com.bcd.base.support_parser.Parser;
-import com.bcd.base.support_parser.anno.*;
+import com.bcd.base.support_parser.anno.F_customize;
 import com.bcd.base.support_parser.processor.ProcessContext;
 import com.bcd.base.support_parser.processor.Processor;
-import com.bcd.base.support_parser.util.*;
+import com.bcd.base.support_parser.util.ParseUtil;
 import io.netty.buffer.ByteBuf;
 import javassist.CtClass;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class BuilderContext {
     /**
@@ -61,7 +60,12 @@ public class BuilderContext {
      */
     public final Map<String, String> classVarDefineToVarName;
 
-    public final Set<String> indexFieldNameSet = new HashSet<>();
+
+    /**
+     * 此属性不为null
+     * 只会出现在group中第一个字段的解析中
+     */
+    public List<String> groupFieldNameList;
 
 
     public BuilderContext(StringBuilder body, Class clazz, CtClass implCc, Map<String, String> classVarDefineToVarName) {
