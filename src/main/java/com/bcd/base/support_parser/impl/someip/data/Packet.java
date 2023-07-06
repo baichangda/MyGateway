@@ -36,6 +36,6 @@ public class Packet {
     @F_num(type = NumType.uint8)
     public ReturnCode returnCode;
 
-    @F_num_array(lenExpr = "a-8",singleType = NumType.int8)
+    @F_num_array(lenExpr = "a-8",singleType = NumType.uint8)
     public byte[] payload;
 }

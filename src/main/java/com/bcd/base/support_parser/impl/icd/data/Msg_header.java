@@ -5,7 +5,7 @@ import com.bcd.base.support_parser.anno.*;
 import java.util.Date;
 
 public class Msg_header {
-    @F_num_array(len = 4, singleType = NumType.int8)
+    @F_num_array(len = 4, singleType = NumType.uint8)
     public byte[] header;
     @F_num(type = NumType.uint16)
     public int header_len;
