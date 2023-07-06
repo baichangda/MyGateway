@@ -10,6 +10,7 @@ import java.lang.annotation.Target;
  * byte、short、int、long、float、double、枚举类
  * <p>
  * 枚举类
+ * 仅支持整型数字
  * 要求枚举类必有如下静态方法、例如
  * public enum Example{
  * public static Example fromInteger(int i){}
