@@ -78,9 +78,12 @@ public @interface F_date {
      * {@link DateMode#bytes_yyMMddHHmmss}
      * {@link DateMode#bytes_yyyyMMddHHmmss}
      * 用于表示原始值的时区
-     * 注意时区可以为offset、例如+8、但是此时需要考虑夏令时问题
+     * 可以为时区偏移量、或者时区id、例如中国时区
+     * 时区偏移量为 +8
+     * 时区id为 Asia/Shanghai
+     * 区别是时区id是考虑了夏令时的、优先使用时区偏移量、效率较高
      */
-    String zoneId() default "Asia/Shanghai";
+    String zoneId() default "+8";
 
     /**
      * 如下模式时候
@@ -104,9 +107,14 @@ public @interface F_date {
     /**
      * 当字段为string类型时候
      * 需要指定翻译成string的时区、格式
-     * 注意时区可以为offset、例如+8、但是此时需要考虑夏令时问题
+     *
+     * 时区
+     * 可以为时区偏移量、或者时区id、例如中国时区
+     * 时区偏移量为 +8
+     * 时区id为 Asia/Shanghai
+     * 区别是时区id是考虑了夏令时的、优先使用时区偏移量、效率较高
      */
     String stringFormat() default "yyyyMMddHHmmss";
-    String stringZoneId() default "Asia/Shanghai";
+    String stringZoneId() default "+8";
 
 }
