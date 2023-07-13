@@ -6,6 +6,7 @@ import com.bcd.base.support_parser.util.ParseUtil;
 
 import java.lang.reflect.Field;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -98,15 +99,18 @@ public class GoBuildContext {
 
 
     public final String getVarNameLocation(String zoneId) {
-        final ZoneId of = ZoneId.of(zoneId);
         String varName = GoUtil.zoneId_varNameLocation.get(zoneId);
         if (varName == null) {
+            final ZoneId of = ZoneId.of(zoneId);
             final int size = GoUtil.zoneId_varNameLocation.size();
             varName = "_Location" + size;
-            ParseUtil.append(globalBody, "var {},_=time.LoadLocation(\"{}\")\n", varName, of.getId());
+            if (of instanceof ZoneOffset) {
+                ParseUtil.append(globalBody, "var {}=time.FixedZone(\"{}\",{})\n", varName, varName, ((ZoneOffset) of).getTotalSeconds());
+            } else {
+                ParseUtil.append(globalBody, "var {},_=time.LoadLocation(\"{}\")\n", varName, of.getId());
+            }
             GoUtil.zoneId_varNameLocation.put(zoneId, varName);
         }
         return varName;
     }
-
 }

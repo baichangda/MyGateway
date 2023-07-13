@@ -13,7 +13,7 @@ public class GoFieldBuilder__F_date extends GoFieldBuilder {
         final GoField goField = context.goField;
         final String goFieldName = goField.goFieldName;
         final String jsonExt = goField.jsonExt;
-        ParseUtil.append(body, "{} time.Time {}\n", goFieldName,jsonExt);
+        ParseUtil.append(body, "{} time.Time {}\n", goFieldName, jsonExt);
     }
 
     @Override
