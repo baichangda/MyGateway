@@ -7,6 +7,7 @@ import com.bcd.base.support_parser.util.ParseUtil;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class FieldBuilder__F_bean_list extends FieldBuilder {
@@ -44,24 +45,21 @@ public class FieldBuilder__F_bean_list extends FieldBuilder {
             final String varNameBitBuf = context.getVarNameBitBuf_reader();
             ParseUtil.append(body, "{}.bitBuf_reader={};\n", processContextVarName, varNameBitBuf);
         }
+
+        ParseUtil.append(body, "final {}[] {}=new {}[{}];\n", typeClassName, varNameField, typeClassName, fieldVarNameListLen);
+        //在for循环外构造复用对象
+        ParseUtil.append(body, "for(int i=0;i<{};i++){\n", fieldVarNameListLen);
+        ParseUtil.append(body, "{}[i]={}.parse({}.class,{},{});\n", varNameField, parserClassName, typeClassName, FieldBuilder.varNameByteBuf, processContextVarName);
+        ParseUtil.append(body, "}\n");
+
         switch (fieldTypeFlag) {
             case 1 -> {
-                ParseUtil.append(body, "final {}[] {}=new {}[{}];\n", typeClassName, varNameField, typeClassName, fieldVarNameListLen);
-                //在for循环外构造复用对象
-                ParseUtil.append(body, "for(int i=0;i<{};i++){\n", fieldVarNameListLen);
-                ParseUtil.append(body, "{}[i]={}.parse({}.class,{},{});\n", varNameField, parserClassName, typeClassName, FieldBuilder.varNameByteBuf, processContextVarName);
-                ParseUtil.append(body, "}\n");
+                ParseUtil.append(body, "{}.{}={};\n", FieldBuilder.varNameInstance, field.getName(), varNameField);
             }
             case 2 -> {
-                final String arrayListClassName = ArrayList.class.getName();
-                ParseUtil.append(body, "final {} {}=new {}({});\n", arrayListClassName, varNameField, arrayListClassName, fieldVarNameListLen);
-                //在for循环外构造复用对象
-                ParseUtil.append(body, "for(int i=0;i<{};i++){\n", fieldVarNameListLen);
-                ParseUtil.append(body, "{}.add({}.parse({}.class,{},{}));\n", varNameField, parserClassName, typeClassName, FieldBuilder.varNameByteBuf, processContextVarName);
-                ParseUtil.append(body, "}\n");
+                ParseUtil.append(body, "{}.{}={}.asList({});\n", FieldBuilder.varNameInstance, field.getName(), Arrays.class.getName(), varNameField);
             }
         }
-        ParseUtil.append(body, "{}.{}={};\n", FieldBuilder.varNameInstance, field.getName(), varNameField);
     }
 
     @Override
