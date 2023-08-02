@@ -2,8 +2,6 @@ package com.bcd.base.support_parser.builder;
 
 import com.bcd.base.support_parser.Parser;
 import com.bcd.base.support_parser.anno.F_bean_list;
-import com.bcd.base.support_parser.util.BitBuf_reader;
-import com.bcd.base.support_parser.util.BitBuf_writer;
 import com.bcd.base.support_parser.util.ParseUtil;
 
 import java.lang.reflect.Field;
@@ -36,9 +34,9 @@ public class FieldBuilder__F_bean_list extends FieldBuilder {
         final String fieldVarNameListLen = varNameField + "_listLen";
         if (anno.listLen() == 0) {
             String listLenRes = ParseUtil.replaceLenExprToCode(anno.listLenExpr(), context.varToFieldName, field);
-            ParseUtil.append(body, "final int {}=(int)({});\n", fieldVarNameListLen, listLenRes);
+            ParseUtil.append(body, "final int {}={};\n", fieldVarNameListLen, listLenRes);
         } else {
-            ParseUtil.append(body, "final int {}=(int)({});\n", fieldVarNameListLen, anno.listLen());
+            ParseUtil.append(body, "final int {}={};\n", fieldVarNameListLen, anno.listLen());
         }
         final String typeClassName = typeClass.getName();
         final String processContextVarName = context.getProcessContextVarName();
@@ -56,8 +54,7 @@ public class FieldBuilder__F_bean_list extends FieldBuilder {
             }
             case 2 -> {
                 final String arrayListClassName = ArrayList.class.getName();
-                final String listClassName = List.class.getName();
-                ParseUtil.append(body, "final {} {}=new {}({});\n", listClassName, varNameField, arrayListClassName, fieldVarNameListLen);
+                ParseUtil.append(body, "final {} {}=new {}({});\n", arrayListClassName, varNameField, arrayListClassName, fieldVarNameListLen);
                 //在for循环外构造复用对象
                 ParseUtil.append(body, "for(int i=0;i<{};i++){\n", fieldVarNameListLen);
                 ParseUtil.append(body, "{}.add({}.parse({}.class,{},{}));\n", varNameField, parserClassName, typeClassName, FieldBuilder.varNameByteBuf, processContextVarName);
