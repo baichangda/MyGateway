@@ -20,7 +20,7 @@ public class GoFieldBuilder__F_num extends GoFieldBuilder {
         final NumType type = anno.type();
         final NumType valType = anno.valType();
         final StringBuilder body = context.structBody;
-        final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.pkg_byteOrder);
+        final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.byteOrder);
         final Class<?> fieldType = field.getType();
         final String goFieldTypeName;
         final String goReadTypeName;
@@ -113,7 +113,7 @@ public class GoFieldBuilder__F_num extends GoFieldBuilder {
         final Class<? extends F_num> annoClass = anno.getClass();
         final Map<Character, String> varToGoFieldName = context.varToGoFieldName_parse;
         final StringBuilder body = context.parseBody;
-        final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.pkg_byteOrder);
+        final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.byteOrder);
         final Class<?> fieldType = field.getType();
         final String varNameReadVal = goFieldName + "_v";
         final String valExpr = anno.valExpr();
@@ -144,7 +144,7 @@ public class GoFieldBuilder__F_num extends GoFieldBuilder {
         final Class<? extends F_num> annoClass = anno.getClass();
         final Map<Character, String> varToGoFieldName = context.varToGoFieldName_deParse;
         final StringBuilder body = context.deParseBody;
-        final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.pkg_byteOrder);
+        final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.byteOrder);
         final String valExpr = anno.valExpr();
         String valCode = GoFieldBuilder.varNameInstance + "." + goFieldName;
         if (!valExpr.isEmpty()) {

@@ -2,6 +2,7 @@ package com.bcd.tcp.icd;
 
 import com.bcd.base.support_parser.Parser;
 import com.bcd.base.support_parser.impl.icd.data.Msg;
+import com.bcd.base.support_parser.processor.Processor;
 import com.bcd.tcp.SessionClusterManager;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
@@ -22,6 +23,8 @@ public class Handler_icd extends ChannelInboundHandlerAdapter {
 
     public final SessionClusterManager sessionClusterManager;
 
+    final static Processor<Msg> processor = Parser.getProcessor(Msg.class);
+
     public Handler_icd(Save_icd save_icd, SessionClusterManager sessionClusterManager) {
         this.queue = save_icd.queue;
         this.sessionClusterManager = sessionClusterManager;
@@ -37,7 +40,7 @@ public class Handler_icd extends ChannelInboundHandlerAdapter {
         }
         //解析
         try {
-            final Msg msg = Parser.parse(Msg.class, byteBuf, null);
+            final Msg msg = processor.process(byteBuf, null);
             if (session == null) {
                 //构造会话
                 session = new Session_icd(String.valueOf(msg.msg_header.device_sn), ctx.channel());

@@ -1,12 +1,10 @@
 package com.bcd.base.support_parser.builder;
 
-import com.bcd.base.support_parser.Parser;
 import com.bcd.base.support_parser.anno.F_bean_list;
 import com.bcd.base.support_parser.util.ParseUtil;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -30,8 +28,8 @@ public class FieldBuilder__F_bean_list extends FieldBuilder {
             fieldTypeFlag = 0;
             typeClass = null;
         }
+
         final String varNameField = ParseUtil.getFieldVarName(context);
-        final String parserClassName = Parser.class.getName();
         final String fieldVarNameListLen = varNameField + "_listLen";
         if (anno.listLen() == 0) {
             String listLenRes = ParseUtil.replaceLenExprToCode(anno.listLenExpr(), context.varToFieldName, field);
@@ -40,6 +38,7 @@ public class FieldBuilder__F_bean_list extends FieldBuilder {
             ParseUtil.append(body, "final int {}={};\n", fieldVarNameListLen, anno.listLen());
         }
         final String typeClassName = typeClass.getName();
+        final String processorVarName = context.getProcessorVarName(typeClass);
         final String processContextVarName = context.getProcessContextVarName();
         if (anno.passBitBuf()) {
             final String varNameBitBuf = context.getVarNameBitBuf_reader();
@@ -49,7 +48,7 @@ public class FieldBuilder__F_bean_list extends FieldBuilder {
         ParseUtil.append(body, "final {}[] {}=new {}[{}];\n", typeClassName, varNameField, typeClassName, fieldVarNameListLen);
         //在for循环外构造复用对象
         ParseUtil.append(body, "for(int i=0;i<{};i++){\n", fieldVarNameListLen);
-        ParseUtil.append(body, "{}[i]={}.parse({}.class,{},{});\n", varNameField, parserClassName, typeClassName, FieldBuilder.varNameByteBuf, processContextVarName);
+        ParseUtil.append(body, "{}[i]={}.process({},{});\n", varNameField, processorVarName, FieldBuilder.varNameByteBuf, processContextVarName);
         ParseUtil.append(body, "}\n");
 
         switch (fieldTypeFlag) {
@@ -89,7 +88,7 @@ public class FieldBuilder__F_bean_list extends FieldBuilder {
         }
 
         final String typeClassName = typeClass.getName();
-        final String parserClassName = Parser.class.getName();
+        final String processorVarName = context.getProcessorVarName(typeClass);
         final String processContextVarName = context.getProcessContextVarName();
         if (anno.passBitBuf()) {
             final String varNameBitBuf = context.getVarNameBitBuf_writer();
@@ -111,7 +110,7 @@ public class FieldBuilder__F_bean_list extends FieldBuilder {
                 ParseUtil.append(body, "final {} {}=({}){}.get(i);\n", typeClassName, fieldVarNameTemp, typeClassName, varNameField);
             }
         }
-        ParseUtil.append(body, "{}.deParse({},{},{});\n", parserClassName, fieldVarNameTemp, FieldBuilder.varNameByteBuf, processContextVarName);
+        ParseUtil.append(body, "{}.deProcess({},{},{});\n", processorVarName, FieldBuilder.varNameByteBuf, processContextVarName, fieldVarNameTemp);
         ParseUtil.append(body, "}\n");
 
         ParseUtil.append(body, "}\n");

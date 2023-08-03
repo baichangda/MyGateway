@@ -22,7 +22,7 @@ public class FieldBuilder__F_date extends FieldBuilder {
         final String varNameLongField = varNameField + "_long";
         final String zoneDateTimeClassName = ZonedDateTime.class.getName();
         final String varNameZoneId = ParseUtil.defineClassVar(context, ZoneId.class, "{}.of(\"{}\")", ZoneId.class.getName(), anno.zoneId());
-        final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.clazz);
+        final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.byteOrder);
         //先转换为毫秒
         switch (anno.mode()) {
             case bytes_yyMMddHHmmss -> {
@@ -94,7 +94,7 @@ public class FieldBuilder__F_date extends FieldBuilder {
         final String varNameZoneId = ParseUtil.defineClassVar(context, ZoneId.class, "{}.of(\"{}\")", ZoneId.class.getName(), anno.zoneId());
         final String varNameLongField = varNameField + "_long";
         final String zoneDateTimeClassName = ZonedDateTime.class.getName();
-        final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.clazz);
+        final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.byteOrder);
         //根据字段类型获取long
         if (Date.class.isAssignableFrom(fieldTypeClass)) {
             ParseUtil.append(body, "final long {}={}.getTime();\n", varNameLongField, valCode);

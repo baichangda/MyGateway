@@ -15,7 +15,7 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
         final Class<?> fieldTypeClass = field.getType();
         final String fieldTypeName = fieldTypeClass.getName();
         final F_bit_num anno = field.getAnnotation(annoClass);
-        final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.clazz);
+        final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.bitOrder);
         final boolean unsigned = anno.unsigned();
         final String sourceValTypeName;
         switch (fieldTypeName) {
@@ -67,7 +67,7 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
         final Class<F_bit_num> annoClass = F_bit_num.class;
         final Field field = context.field;
         final F_bit_num anno = field.getAnnotation(annoClass);
-        final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.clazz);
+        final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.bitOrder);
         final boolean unsigned = anno.unsigned();
         final String varNameInstance = FieldBuilder.varNameInstance;
         final StringBuilder body = context.body;

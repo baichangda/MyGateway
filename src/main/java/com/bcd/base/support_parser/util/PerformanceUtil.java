@@ -1,8 +1,8 @@
 package com.bcd.base.support_parser.util;
 
 import com.bcd.base.support_parser.Parser;
+import com.bcd.base.support_parser.processor.Processor;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,8 +39,9 @@ public class PerformanceUtil {
                 });
             }
         } else {
+            Processor<T> processor = Parser.getProcessor(clazz);
             final ByteBuf buf = Unpooled.wrappedBuffer(bytes);
-            final T t = Parser.parse(clazz, buf, null);
+            final T t = processor.process(buf, null);
             for (int i = 0; i < pools.length; i++) {
                 pools[i].execute(() -> {
                     testDeParse(t, num, count);
@@ -71,22 +72,24 @@ public class PerformanceUtil {
         ByteBuf byteBuf = Unpooled.wrappedBuffer(bytes);
         byteBuf.markReaderIndex();
         byteBuf.markWriterIndex();
+        Processor<T> processor = Parser.getProcessor(clazz);
         for (int i = 1; i <= num; i++) {
             byteBuf.resetReaderIndex();
             byteBuf.resetWriterIndex();
-            final T t = Parser.parse(clazz, byteBuf, null);
+            final T t = processor.process(byteBuf, null);
             count.increment();
         }
     }
 
-    public static <T> void testDeParse(Object obj, int num, LongAdder count) {
+    public static <T> void testDeParse(T obj, int num, LongAdder count) {
         ByteBuf byteBuf = Unpooled.buffer();
         byteBuf.markReaderIndex();
         byteBuf.markWriterIndex();
+        Processor<T> processor = Parser.getProcessor((Class<T>) obj.getClass());
         for (int i = 1; i <= num; i++) {
             byteBuf.resetReaderIndex();
             byteBuf.resetWriterIndex();
-            Parser.deParse(obj, byteBuf, null);
+            processor.deProcess(byteBuf, null,obj);
             count.increment();
         }
     }

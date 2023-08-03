@@ -23,8 +23,8 @@ public class GoBuildContext {
     public final Map<Character, String> varToGoFieldName_parse = new HashMap<>();
     public final Map<Character, String> varToGoFieldName_deParse = new HashMap<>();
 
-    public final ByteOrder pkg_byteOrder;
-    public final BitOrder pkg_bitOrder;
+    public final ByteOrder byteOrder;
+    public final BitOrder bitOrder;
 
     public final StringBuilder globalBody;
     public final StringBuilder structBody;
@@ -40,12 +40,12 @@ public class GoBuildContext {
     public boolean bitEndWhenBitField_process;
     public boolean bitEndWhenBitField_deProcess;
 
-    public GoBuildContext(Class<?> clazz, ByteOrder pkg_byteOrder, BitOrder pkg_bitOrder, StringBuilder globalBody, StringBuilder structBody
+    public GoBuildContext(Class<?> clazz, ByteOrder byteOrder, BitOrder bitOrder, StringBuilder globalBody, StringBuilder structBody
             , StringBuilder parseBody, StringBuilder deParseBody, StringBuilder customizeBody) {
         this.clazz = clazz;
         this.goStructName = GoParseUtil.toFirstUpperCase(clazz.getSimpleName());
-        this.pkg_byteOrder = pkg_byteOrder;
-        this.pkg_bitOrder = pkg_bitOrder;
+        this.byteOrder = byteOrder;
+        this.bitOrder = bitOrder;
         this.globalBody = globalBody;
         this.structBody = structBody;
         this.parseBody = parseBody;

@@ -1,16 +1,20 @@
 package com.bcd.base.support_parser.builder;
 
+import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.support_parser.Parser;
+import com.bcd.base.support_parser.anno.BitOrder;
+import com.bcd.base.support_parser.anno.ByteOrder;
 import com.bcd.base.support_parser.anno.F_customize;
 import com.bcd.base.support_parser.processor.ProcessContext;
 import com.bcd.base.support_parser.processor.Processor;
 import com.bcd.base.support_parser.util.ParseUtil;
 import io.netty.buffer.ByteBuf;
+import javassist.CannotCompileException;
 import javassist.CtClass;
+import javassist.CtField;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class BuilderContext {
@@ -42,6 +46,11 @@ public class BuilderContext {
     public boolean logBit;
 
     /**
+     * 同一个类中共享processor变量
+     */
+    public final Map<String, String> beanClassAndOrder_processorVarName;
+
+    /**
      * 用于给
      * {@link Processor#process(ByteBuf, ProcessContext)}
      * {@link Processor#deProcess(ByteBuf, ProcessContext, Object)}
@@ -60,33 +69,56 @@ public class BuilderContext {
      */
     public final Map<String, String> classVarDefineToVarName;
 
+    public final BuilderContext parentContext;
 
-    /**
-     * 此属性不为null
-     * 只会出现在group中第一个字段的解析中
-     */
-    public List<String> groupFieldNameList;
+    public final ByteOrder byteOrder;
+    public final BitOrder bitOrder;
 
-
-    public BuilderContext(StringBuilder body, Class clazz, CtClass implCc, Map<String, String> classVarDefineToVarName) {
+    public BuilderContext(StringBuilder body, Class clazz, CtClass implCc, Map<String, String> classVarDefineToVarName, Map<String, String> beanClassAndOrder_processorVarName, ByteOrder byteOrder, BitOrder bitOrder, BuilderContext parentContext) {
         this.body = body;
         this.clazz = clazz;
         this.implCc = implCc;
         this.classVarDefineToVarName = classVarDefineToVarName;
+        this.beanClassAndOrder_processorVarName = beanClassAndOrder_processorVarName;
+        this.parentContext = parentContext;
+        this.byteOrder = byteOrder;
+        this.bitOrder = bitOrder;
     }
+
 
     public final String getProcessContextVarName() {
         if (processContextVarName == null) {
             processContextVarName = "processContext";
-            final String proocessContextClassName = ProcessContext.class.getName();
+            final String processContextClassName = ProcessContext.class.getName();
             ParseUtil.append(body, "final {} {}=new {}({},{});\n",
-                    proocessContextClassName,
+                    processContextClassName,
                     processContextVarName,
-                    proocessContextClassName,
+                    processContextClassName,
                     FieldBuilder.varNameInstance,
                     FieldBuilder.varNameParentProcessContext);
         }
         return processContextVarName;
+    }
+
+
+    public final String getProcessorVarName(Class<?> beanClazz) {
+        final String key = beanClazz.getName() + "," + byteOrder + "," + bitOrder;
+        return beanClassAndOrder_processorVarName.computeIfAbsent(key, k -> {
+            final String varName = "_processor_" + beanClazz.getSimpleName();
+            //在build时候预先生成、并在相应的class中生成类变量
+            Parser.getProcessor(beanClazz, byteOrder, bitOrder, this);
+            String format = ParseUtil.format("public final {} {}={}.beanClassNameAndOrder_processor.get(\"{}\");\n",
+                    Processor.class.getName(),
+                    varName,
+                    Parser.class.getName(),
+                    k);
+            try {
+                implCc.addField(CtField.make(format, implCc));
+            } catch (CannotCompileException e) {
+                throw BaseRuntimeException.getException(e);
+            }
+            return varName;
+        });
     }
 
     public final String getVarNameBitBuf_reader() {

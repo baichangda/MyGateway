@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -35,12 +36,17 @@ import java.util.stream.Collectors;
  * <p>
  * 工作原理:
  * 使用javassist框架配合自定义注解、生成一套解析代码
+ * 使用方法:
+ * 1、首先获取类处理器
+ * {@link #getProcessor(Class)}
+ * {@link #getProcessor(Class, ByteOrder, BitOrder)}
+ * 2、调用解析或者反解析
  * <p>
  * 解析调用入口:
- * {@link #parse(Class, ByteBuf, ProcessContext)}
+ * {@link Processor#process(ByteBuf, ProcessContext)}
  * <p>
  * 反解析调用入口:
- * {@link #deParse(Object, ByteBuf, ProcessContext)}
+ * {@link Processor#deProcess(ByteBuf, ProcessContext, Object)}
  * <p>
  * 性能表现:
  * 由于是字节码增强技术、和手动编写代码解析效率一样
@@ -50,8 +56,6 @@ import java.util.stream.Collectors;
  * {@link #enablePrintBuildLog()}
  * {@link #withDefaultLogCollector_parse()}
  * {@link #withDefaultLogCollector_deParse()}
- * {@link #append(ByteOrder, String)}
- * {@link #append(BitOrder, String)}
  * <p>
  * 注意:
  * 如果启动了解析和反解析日志、并不是所有字段都会打印、逻辑参考
@@ -73,13 +77,7 @@ public class Parser {
     private final static FieldBuilder__F_bit_num fieldbuilder__f_bit_num = new FieldBuilder__F_bit_num();
     private final static FieldBuilder__F_bit_num_array fieldbuilder__f_bit_num_array = new FieldBuilder__F_bit_num_array();
     private final static FieldBuilder__F_bit_skip fieldbuilder__f_bit_skip = new FieldBuilder__F_bit_skip();
-    /**
-     * javassist生成类序号
-     */
-    private static int processorIndex = 0;
 
-
-    private final static Map<Class<?>, Processor<?>> beanClass_to_processor = new HashMap<>();
 
     /**
      * 是否在src/main/java下面生成class文件
@@ -217,104 +215,6 @@ public class Parser {
         generateClassFile = true;
     }
 
-
-    public static final ArrayList<ByteOrderConfig> byteOrderConfigs = new ArrayList<>();
-
-
-    public record ByteOrderConfig(ByteOrder order, String classPrefix) implements Comparable<ByteOrderConfig> {
-        @Override
-        public int compareTo(ByteOrderConfig o) {
-            return Integer.compare(classPrefix.length(), o.classPrefix.length());
-        }
-    }
-
-    /**
-     * 配置包级别的{@link ByteOrder}定义
-     * <p>
-     * 用于该包下所有带如下注解的属性覆盖
-     * {@link F_num#order()}
-     * {@link F_num_array#singleOrder()}
-     * {@link F_date#order()}
-     * <p>
-     * 可以配置重复的包、优先使用前缀匹配更多的规则
-     * 例如有如下目录、目录下都有class
-     * com.bcd、com.bcd.test1、com.bcd.test2、com.bcd.test3、
-     * 配置如下
-     * 1、{@link ByteOrder#bigEndian} -> com.bcd
-     * 2、{@link ByteOrder#smallEndian} -> com.bcd.test1
-     * 3、{@link ByteOrder#bigEndian} -> com.bcd.test2
-     * 此时
-     * com.bcd、com.bcd.test3 会使用规则1
-     * com.bcd.test1 会使用规则2
-     * com.bcd.test2 会使用规则3
-     * <p>
-     * 注意:
-     * 优先级说明
-     * 1、字段注解{@link ByteOrder}!={@link ByteOrder#Default}、此时注解的非默认值
-     * 2、{@link #append(ByteOrder, String)}!={@link ByteOrder#Default}、此时采用包级别的配置值
-     * 3、此时为{@link ByteOrder#bigEndian}、此时默认采用大端模式
-     * <p>
-     * 注意:
-     * 如果一个bean在多套协议中被复用、且需要在不同的协议中表现不同的{@link ByteOrder}
-     * 则此bean不能复用、需要重新定义一个、因为针对一个bean只会生成一个processor、且存储在{@link #beanClass_to_processor}
-     *
-     * @param order
-     * @param classPrefix
-     */
-    public synchronized static void append(ByteOrder order, String classPrefix) {
-        for (int i = 0; i < byteOrderConfigs.size(); i++) {
-            final ByteOrderConfig config = byteOrderConfigs.get(i);
-            if (config.classPrefix.equals(classPrefix)) {
-                if (config.order != order) {
-                    byteOrderConfigs.set(i, new ByteOrderConfig(order, classPrefix));
-                    logger.warn("ByteOrder,append[{},{}] rewrite[{},{}]", order, classPrefix, config.order, config.classPrefix);
-                    break;
-                }
-                return;
-            }
-        }
-        byteOrderConfigs.add(new ByteOrderConfig(order, classPrefix));
-        Collections.sort(byteOrderConfigs);
-    }
-
-
-    public static final ArrayList<BitOrderConfig> bitOrderConfigs = new ArrayList<>();
-
-    public record BitOrderConfig(BitOrder order, String classPrefix) implements Comparable<BitOrderConfig> {
-        @Override
-        public int compareTo(BitOrderConfig o) {
-            return Integer.compare(classPrefix.length(), o.classPrefix.length());
-        }
-    }
-
-    /**
-     * 配置包级别的{@link ByteOrder}定义
-     * <p>
-     * 用于该包下所有带如下注解的属性覆盖
-     * {@link F_bit_num#order()}
-     * {@link F_bit_num_array#singleOrder()}
-     * <p>
-     * 生效规则与{@link ByteOrder}一样
-     *
-     * @param order
-     * @param classPrefix
-     */
-    public synchronized static void append(BitOrder order, String classPrefix) {
-        for (int i = 0; i < byteOrderConfigs.size(); i++) {
-            final BitOrderConfig config = bitOrderConfigs.get(i);
-            if (config.classPrefix.equals(classPrefix)) {
-                if (config.order != order) {
-                    bitOrderConfigs.set(i, new BitOrderConfig(order, classPrefix));
-                    logger.warn("BitOrder,append[{},{}] rewrite[{},{}]", order, classPrefix, config.order, config.classPrefix);
-                    break;
-                }
-                return;
-            }
-        }
-        bitOrderConfigs.add(new BitOrderConfig(order, classPrefix));
-        Collections.sort(bitOrderConfigs);
-    }
-
     private static void bitEndWhenBitField(List<Field> fieldList, int i, BuilderContext context) {
         final Field cur = fieldList.get(i);
         final F_bit_num f_bit_num1 = cur.getAnnotation(F_bit_num.class);
@@ -368,7 +268,7 @@ public class Parser {
         }
     }
 
-    private static void buildMethodBody_parse(Class<?> clazz, BuilderContext context) {
+    private static void buildMethodBody_process(Class<?> clazz, BuilderContext context) {
         final List<Field> fieldList = ParseUtil.getParseFields(clazz);
         if (fieldList.isEmpty()) {
             return;
@@ -459,7 +359,7 @@ public class Parser {
 
     }
 
-    private static void buildMethodBody_deParse(Class<?> clazz, BuilderContext context) {
+    private static void buildMethodBody_deProcess(Class<?> clazz, BuilderContext context) {
         final List<Field> fieldList = ParseUtil.getParseFields(clazz);
         if (fieldList.isEmpty()) {
             return;
@@ -550,14 +450,18 @@ public class Parser {
         }
     }
 
+    /**
+     * 生成类的序号
+     */
+    private static int processorIndex = 0;
 
-    private static Class<?> buildClass(Class<?> clazz) throws CannotCompileException, NotFoundException, IOException {
+    public static <T> Class<T> buildClass(Class<T> clazz, BuilderContext parentContext, ByteOrder byteOrder, BitOrder bitOrder) throws CannotCompileException, NotFoundException, IOException {
         final String processor_class_name = Processor.class.getName();
         final String byteBufClassName = ByteBuf.class.getName();
         final String clazzName = clazz.getName();
 
         final int lastIndexOf = processor_class_name.lastIndexOf(".");
-        String implProcessor_class_name = processor_class_name.substring(0, lastIndexOf) + "." + processor_class_name.substring(lastIndexOf + 1) + "_" + processorIndex++ + "_" + clazz.getSimpleName();
+        String implProcessor_class_name = processor_class_name.substring(0, lastIndexOf) + "." + processor_class_name.substring(lastIndexOf + 1) + "_" + processorIndex++ + "_" + clazz.getSimpleName() + "_" + byteOrder + "_" + bitOrder;
         final CtClass cc = ClassPool.getDefault().makeClass(implProcessor_class_name);
 
         //添加泛型
@@ -589,6 +493,7 @@ public class Parser {
         cc.addConstructor(constructor);
 
         final Map<String, String> classVarDefineToVarName = new HashMap<>();
+        final Map<String, String> beanClassAndOrder_processorVarName = new HashMap<>();
 
         //添加实现、定义process方法
         final CtClass interface_cc = ClassPool.getDefault().get(processor_class_name);
@@ -621,8 +526,8 @@ public class Parser {
         if (hasFieldSkipModeReserved) {
             ParseUtil.append(processBody, "final int {}={}.readerIndex();\n", FieldBuilder.varNameStartIndex, FieldBuilder.varNameByteBuf);
         }
-        BuilderContext parseContext = new BuilderContext(processBody, clazz, cc, classVarDefineToVarName);
-        buildMethodBody_parse(clazz, parseContext);
+        BuilderContext parseBuilderContext = new BuilderContext(processBody, clazz, cc, classVarDefineToVarName, beanClassAndOrder_processorVarName, byteOrder, bitOrder, parentContext);
+        buildMethodBody_process(clazz, parseBuilderContext);
         ParseUtil.append(processBody, "return {};\n", FieldBuilder.varNameInstance);
         processBody.append("}");
         if (printBuildLog) {
@@ -648,8 +553,8 @@ public class Parser {
         if (hasFieldSkipModeReserved) {
             ParseUtil.append(deProcessBody, "final int {}={}.writerIndex();\n", FieldBuilder.varNameStartIndex, FieldBuilder.varNameByteBuf);
         }
-        BuilderContext deParseContext = new BuilderContext(deProcessBody, clazz, cc, classVarDefineToVarName);
-        buildMethodBody_deParse(clazz, deParseContext);
+        BuilderContext deParseBuilderContext = new BuilderContext(deProcessBody, clazz, cc, classVarDefineToVarName, beanClassAndOrder_processorVarName, byteOrder, bitOrder, parentContext);
+        buildMethodBody_deProcess(clazz, deParseBuilderContext);
         deProcessBody.append("}");
         if (printBuildLog) {
             logger.info("\n-----------class[{}] deProcess-----------{}\n", clazz.getName(), deProcessBody.toString());
@@ -659,48 +564,41 @@ public class Parser {
         if (generateClassFile) {
             cc.writeFile("src/main/java");
         }
-        return cc.toClass(Processor.class);
+        return (Class<T>) cc.toClass(Processor.class);
 //        return cc.toClass();
     }
 
-    @SuppressWarnings("unchecked")
-    public static <T> T parse(Class<T> clazz, ByteBuf data, ProcessContext<?> parentContext) {
-        Processor<T> processor = (Processor<T>) beanClass_to_processor.get(clazz);
-        if (processor == null) {
-            synchronized (beanClass_to_processor) {
-                processor = (Processor<T>) beanClass_to_processor.get(clazz);
-                if (processor == null) {
-                    try {
-                        final Class<?> impl = buildClass(clazz);
-                        processor = (Processor<T>) impl.getConstructor().newInstance();
-                        beanClass_to_processor.put(clazz, processor);
-                    } catch (Exception e) {
-                        throw BaseRuntimeException.getException(e);
-                    }
-                }
-            }
-        }
-        return processor.process(data, parentContext);
+    public static <T> Processor<T> getProcessor(Class<T> clazz) {
+        return getProcessor(clazz, ByteOrder.Default, BitOrder.Default, null);
     }
 
-    @SuppressWarnings("unchecked")
-    public static <T> void deParse(T instance, ByteBuf data, ProcessContext<?> parentContext) {
-        final Class<?> clazz = instance.getClass();
-        Processor<T> processor = (Processor<T>) beanClass_to_processor.get(clazz);
+    public static <T> Processor<T> getProcessor(Class<T> clazz, ByteOrder byteOrder, BitOrder bitOrder) {
+        return getProcessor(clazz, byteOrder, bitOrder, null);
+    }
+
+    public static <T> Processor<T> getProcessor(Class<T> clazz, ByteOrder byteOrder, BitOrder bitOrder, BuilderContext parentContext) {
+        final String clazzName = clazz.getName();
+        final String key = clazzName + "," + byteOrder + "," + bitOrder;
+        Processor<T> processor = (Processor<T>) beanClassNameAndOrder_processor.get(key);
         if (processor == null) {
-            synchronized (beanClass_to_processor) {
-                processor = (Processor<T>) beanClass_to_processor.get(clazz);
+            synchronized (beanClassNameAndOrder_processor) {
+                processor = (Processor<T>) beanClassNameAndOrder_processor.get(key);
                 if (processor == null) {
                     try {
-                        final Class<?> impl = buildClass(clazz);
-                        processor = (Processor<T>) (impl.getConstructor().newInstance());
-                        beanClass_to_processor.put(clazz, processor);
-                    } catch (Exception e) {
+                        final Class<T> processClass = Parser.buildClass(clazz, parentContext, byteOrder, bitOrder);
+                        processor = (Processor<T>) processClass.getConstructor().newInstance();
+                        beanClassNameAndOrder_processor.put(key, processor);
+                        return processor;
+                    } catch (CannotCompileException | NotFoundException | IOException | NoSuchMethodException |
+                             InstantiationException | IllegalAccessException | InvocationTargetException e) {
                         throw BaseRuntimeException.getException(e);
                     }
                 }
             }
         }
-        processor.deProcess(data, parentContext, instance);
+        return processor;
     }
+
+
+    public final static Map<String, Processor<?>> beanClassNameAndOrder_processor = new HashMap<>();
 }

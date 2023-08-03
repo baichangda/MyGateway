@@ -1,8 +1,6 @@
 package com.bcd.base.support_parser.impl.icd.data;
 
 
-import com.bcd.base.support_parser.Parser;
-import com.bcd.base.support_parser.anno.ByteOrder;
 import com.bcd.base.support_parser.anno.F_bean;
 import com.bcd.base.support_parser.anno.F_customize;
 import com.bcd.base.support_parser.impl.icd.processor.Msg_body_processor;
@@ -12,11 +10,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.netty.buffer.ByteBuf;
 
 public class Msg {
-
-    static {
-        Parser.append(ByteOrder.smallEndian,"com.bcd.base.support_parser.impl.icd");
-    }
-
     @F_bean
     public Msg_header msg_header;
     @F_customize(processorClass = Msg_body_processor.class)

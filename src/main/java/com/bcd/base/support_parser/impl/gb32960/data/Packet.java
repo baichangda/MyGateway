@@ -41,33 +41,4 @@ public class Packet {
     //异或校验位
     @F_num(type = NumType.int8)
     public byte code;
-
-
-    public static void main(String[] args) {
-        Packet packet = new Packet();
-        packet.vin = "abcd";
-        packet.flag = PacketFlag.vehicle_login_data;
-        packet.header = new byte[]{0x23, 0x23};
-        final VehicleLoginData vehicleLoginData = new VehicleLoginData();
-        vehicleLoginData.collectTime = new Date();
-//        vehicleLoginData.iccid="8888";
-        vehicleLoginData.subSystemNum = 2;
-        vehicleLoginData.systemCodeLen = 0;
-//        vehicleLoginData.systemCode="";
-        packet.data = vehicleLoginData;
-        Parser.withDefaultLogCollector_deParse();
-        Parser.withDefaultLogCollector_parse();
-        Parser.enableGenerateClassFile();
-        ByteBuf byteBuf = Unpooled.buffer();
-        Parser.deParse(packet, byteBuf, null);
-        final ByteBuf byteBuf1 = byteBuf.copy();
-        final Packet parse = Parser.parse(Packet.class, byteBuf, null);
-        ByteBuf byteBuf2 = Unpooled.buffer();
-        Parser.deParse(parse, byteBuf2, null);
-        final String s1 = ByteBufUtil.hexDump(byteBuf1).toUpperCase();
-        final String s2 = ByteBufUtil.hexDump(byteBuf2).toUpperCase();
-        System.out.println(s1);
-        System.out.println(s2);
-        assert s1.equals(s2);
-    }
 }

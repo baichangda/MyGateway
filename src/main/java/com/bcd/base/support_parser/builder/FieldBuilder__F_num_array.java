@@ -50,7 +50,7 @@ public class FieldBuilder__F_num_array extends FieldBuilder {
         final StringBuilder body = context.body;
         final String varNameField = ParseUtil.getFieldVarName(context);
         String arrVarName = varNameField + "_arr";
-        final boolean bigEndian = ParseUtil.bigEndian(anno.singleOrder(), context.clazz);
+        final boolean bigEndian = ParseUtil.bigEndian(anno.singleOrder(), context.byteOrder);
         final int singleSkip = anno.singleSkip();
         ParseUtil.append(body, "final {}[] {}=new {}[{}];\n", arrayElementTypeName, arrVarName, arrayElementTypeName, arrLenRes);
         //优化处理 byte[]数组解析
@@ -155,7 +155,7 @@ public class FieldBuilder__F_num_array extends FieldBuilder {
                 }
             }
 
-            final boolean bigEndian = ParseUtil.bigEndian(anno.singleOrder(), context.clazz);
+            final boolean bigEndian = ParseUtil.bigEndian(anno.singleOrder(), context.byteOrder);
             final String writeCastTypeName;
             String funcName;
             if (!bigEndian && singleType != NumType.uint8 && singleType != NumType.int8) {

@@ -11,6 +11,16 @@ import org.slf4j.LoggerFactory;
 public class VehicleCommonDataFieldProcessor implements Processor<VehicleCommonData> {
     Logger logger = LoggerFactory.getLogger(VehicleCommonDataFieldProcessor.class);
 
+    final Processor<VehicleBaseData> processor_vehicleBaseData = Parser.getProcessor(VehicleBaseData.class);
+    final Processor<VehicleMotorData> processor_vehicleMotorData = Parser.getProcessor(VehicleMotorData.class);
+    final Processor<VehicleFuelBatteryData> processor_vehicleFuelBatteryData = Parser.getProcessor(VehicleFuelBatteryData.class);
+    final Processor<VehicleEngineData> processor_vehicleEngineData = Parser.getProcessor(VehicleEngineData.class);
+    final Processor<VehiclePositionData> processor_vehiclePositionData = Parser.getProcessor(VehiclePositionData.class);
+    final Processor<VehicleLimitValueData> processor_vehicleLimitValueData = Parser.getProcessor(VehicleLimitValueData.class);
+    final Processor<VehicleAlarmData> processor_vehicleAlarmData = Parser.getProcessor(VehicleAlarmData.class);
+    final Processor<VehicleStorageVoltageData> processor_vehicleStorageVoltageData = Parser.getProcessor(VehicleStorageVoltageData.class);
+    final Processor<VehicleStorageTemperatureData> processor_vehicleStorageTemperatureData = Parser.getProcessor(VehicleStorageTemperatureData.class);
+
     @Override
     public VehicleCommonData process(final ByteBuf byteBuf, final ProcessContext parentContext) {
         final VehicleCommonData vehicleCommonData = new VehicleCommonData();
@@ -27,47 +37,47 @@ public class VehicleCommonDataFieldProcessor implements Processor<VehicleCommonD
             switch (flag) {
                 case 1: {
                     //2.1、整车数据
-                    vehicleCommonData.vehicleBaseData = Parser.parse(VehicleBaseData.class, byteBuf, processContext);
+                    vehicleCommonData.vehicleBaseData = processor_vehicleBaseData.process(byteBuf, processContext);
                     break;
                 }
                 case 2: {
                     //2.2、驱动电机数据
-                    vehicleCommonData.vehicleMotorData = Parser.parse(VehicleMotorData.class, byteBuf, processContext);
+                    vehicleCommonData.vehicleMotorData = processor_vehicleMotorData.process(byteBuf, processContext);
                     break;
                 }
                 case 3: {
                     //2.3、燃料电池数据
-                    vehicleCommonData.vehicleFuelBatteryData = Parser.parse(VehicleFuelBatteryData.class, byteBuf, processContext);
+                    vehicleCommonData.vehicleFuelBatteryData = processor_vehicleFuelBatteryData.process(byteBuf, processContext);
                     break;
                 }
                 case 4: {
                     //2.4、发动机数据
-                    vehicleCommonData.vehicleEngineData = Parser.parse(VehicleEngineData.class, byteBuf, processContext);
+                    vehicleCommonData.vehicleEngineData = processor_vehicleEngineData.process(byteBuf, processContext);
                     break;
                 }
                 case 5: {
                     //2.5、车辆位置数据
-                    vehicleCommonData.vehiclePositionData = Parser.parse(VehiclePositionData.class, byteBuf, processContext);
+                    vehicleCommonData.vehiclePositionData = processor_vehiclePositionData.process(byteBuf, processContext);
                     break;
                 }
                 case 6: {
                     //2.6、极值数据
-                    vehicleCommonData.vehicleLimitValueData = Parser.parse(VehicleLimitValueData.class, byteBuf, processContext);
+                    vehicleCommonData.vehicleLimitValueData = processor_vehicleLimitValueData.process(byteBuf, processContext);
                     break;
                 }
                 case 7: {
                     //2.7、报警数据
-                    vehicleCommonData.vehicleAlarmData = Parser.parse(VehicleAlarmData.class, byteBuf, processContext);
+                    vehicleCommonData.vehicleAlarmData = processor_vehicleAlarmData.process(byteBuf, processContext);
                     break;
                 }
                 case 8: {
                     //2.8、可充电储能装置电压数据
-                    vehicleCommonData.vehicleStorageVoltageData = Parser.parse(VehicleStorageVoltageData.class, byteBuf, processContext);
+                    vehicleCommonData.vehicleStorageVoltageData = processor_vehicleStorageVoltageData.process(byteBuf, processContext);
                     break;
                 }
                 case 9: {
                     //2.9、可充电储能装置温度数据
-                    vehicleCommonData.vehicleStorageTemperatureData = Parser.parse(VehicleStorageTemperatureData.class, byteBuf, processContext);
+                    vehicleCommonData.vehicleStorageTemperatureData = processor_vehicleStorageTemperatureData.process(byteBuf, processContext);
                     break;
                 }
                 default: {
@@ -89,41 +99,41 @@ public class VehicleCommonDataFieldProcessor implements Processor<VehicleCommonD
     @Override
     public void deProcess(ByteBuf data, ProcessContext parentContext, VehicleCommonData instance) {
         ProcessContext<VehicleCommonData> processContext = new ProcessContext<>(instance, parentContext);
-        if (instance.vehicleBaseData!=null) {
+        if (instance.vehicleBaseData != null) {
             data.writeByte(1);
-            Parser.deParse(instance.vehicleBaseData,data,processContext);
+            processor_vehicleBaseData.deProcess(data,parentContext,instance.vehicleBaseData);
         }
-        if (instance.vehicleMotorData!=null) {
+        if (instance.vehicleMotorData != null) {
             data.writeByte(2);
-            Parser.deParse(instance.vehicleMotorData,data,processContext);
+            processor_vehicleMotorData.deProcess(data,parentContext,instance.vehicleMotorData);
         }
-        if (instance.vehicleFuelBatteryData!=null) {
+        if (instance.vehicleFuelBatteryData != null) {
             data.writeByte(3);
-            Parser.deParse(instance.vehicleFuelBatteryData,data,processContext);
+            processor_vehicleFuelBatteryData.deProcess(data,parentContext,instance.vehicleFuelBatteryData);
         }
-        if (instance.vehicleEngineData!=null) {
+        if (instance.vehicleEngineData != null) {
             data.writeByte(4);
-            Parser.deParse(instance.vehicleEngineData,data,processContext);
+            processor_vehicleEngineData.deProcess(data,parentContext,instance.vehicleEngineData);
         }
-        if (instance.vehiclePositionData!=null) {
+        if (instance.vehiclePositionData != null) {
             data.writeByte(5);
-            Parser.deParse(instance.vehiclePositionData,data,processContext);
+            processor_vehiclePositionData.deProcess(data,parentContext,instance.vehiclePositionData);
         }
-        if (instance.vehicleLimitValueData!=null) {
+        if (instance.vehicleLimitValueData != null) {
             data.writeByte(6);
-            Parser.deParse(instance.vehicleLimitValueData,data,processContext);
+            processor_vehicleLimitValueData.deProcess(data,parentContext,instance.vehicleLimitValueData);
         }
-        if (instance.vehicleAlarmData!=null) {
+        if (instance.vehicleAlarmData != null) {
             data.writeByte(7);
-            Parser.deParse(instance.vehicleAlarmData,data,processContext);
+            processor_vehicleAlarmData.deProcess(data,parentContext,instance.vehicleAlarmData);
         }
-        if (instance.vehicleStorageVoltageData!=null) {
+        if (instance.vehicleStorageVoltageData != null) {
             data.writeByte(8);
-            Parser.deParse(instance.vehicleStorageVoltageData,data,processContext);
+            processor_vehicleStorageVoltageData.deProcess(data,parentContext,instance.vehicleStorageVoltageData);
         }
-        if (instance.vehicleStorageTemperatureData!=null) {
+        if (instance.vehicleStorageTemperatureData != null) {
             data.writeByte(9);
-            Parser.deParse(instance.vehicleStorageTemperatureData,data,processContext);
+            processor_vehicleStorageTemperatureData.deProcess(data,parentContext,instance.vehicleStorageTemperatureData);
         }
     }
 }

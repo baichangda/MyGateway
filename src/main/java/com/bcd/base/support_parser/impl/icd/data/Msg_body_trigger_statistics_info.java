@@ -2,6 +2,7 @@ package com.bcd.base.support_parser.impl.icd.data;
 
 import com.bcd.base.support_parser.Parser;
 import com.bcd.base.support_parser.anno.*;
+import com.bcd.base.support_parser.processor.Processor;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
@@ -29,9 +30,10 @@ public class Msg_body_trigger_statistics_info implements Msg_body {
 //        Parser.enableGenerateClassFile();
         Parser.withDefaultLogCollector_parse();
         Parser.withDefaultLogCollector_deParse();
-        final Msg msg = Parser.parse(Msg.class, byteBuf, null);
+        Processor<Msg> processor = Parser.getProcessor(Msg.class);
+        final Msg msg = processor.process(byteBuf, null);
         ByteBuf dest = Unpooled.buffer();
-        Parser.deParse(msg, dest, null);
+        processor.deProcess(dest, null,msg);
         System.out.println(hex.toUpperCase());
         System.out.println(ByteBufUtil.hexDump(dest).toUpperCase());
         assert hex.equalsIgnoreCase(ByteBufUtil.hexDump(dest));

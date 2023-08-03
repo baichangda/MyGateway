@@ -17,7 +17,7 @@ public class FieldBuilder__F_bit_num_array extends FieldBuilder {
         final String arrayElementTypeName = arrayElementType.getName();
         final Class<F_bit_num_array> annoClass = F_bit_num_array.class;
         final F_bit_num_array anno = context.field.getAnnotation(annoClass);
-        final boolean bigEndian = ParseUtil.bigEndian(anno.singleOrder(), context.clazz);
+        final boolean bigEndian = ParseUtil.bigEndian(anno.singleOrder(), context.bitOrder);
         final boolean unsigned = anno.singleUnsigned();
         switch (arrayElementTypeName) {
             case "byte", "short", "int", "long", "float", "double" -> {
@@ -71,7 +71,7 @@ public class FieldBuilder__F_bit_num_array extends FieldBuilder {
         final Field field = context.field;
         final Class<F_bit_num_array> annoClass = F_bit_num_array.class;
         final F_bit_num_array anno = context.field.getAnnotation(annoClass);
-        final boolean bigEndian = ParseUtil.bigEndian(anno.singleOrder(), context.clazz);
+        final boolean bigEndian = ParseUtil.bigEndian(anno.singleOrder(), context.bitOrder);
         final boolean unsigned = anno.singleUnsigned();
         final Class<?> fieldTypeClass = field.getType();
         final int singleLen = anno.singleLen();

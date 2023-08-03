@@ -6,12 +6,14 @@ import com.bcd.base.support_parser.anno.*;
 import com.bcd.base.support_parser.builder.BuilderContext;
 import com.bcd.base.support_parser.builder.FieldBuilder;
 import com.bcd.base.support_parser.exception.BaseRuntimeException;
+import com.bcd.base.support_parser.processor.Processor;
 import com.google.common.collect.Sets;
-import javassist.CannotCompileException;
-import javassist.CtClass;
-import javassist.CtField;
+import com.sun.jdi.connect.IllegalConnectorArgumentsException;
+import javassist.*;
+import javassist.util.HotSwapper;
 import org.slf4j.helpers.MessageFormatter;
 
+import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.*;
@@ -54,8 +56,8 @@ public class ParseUtil {
         return "_" + toFirstLowerCase(processorClass.getSimpleName());
     }
 
-    public static boolean bigEndian(BitOrder order, BitOrder pkgOrder) {
-        if (pkgOrder == null) {
+    public static boolean bigEndian(BitOrder order, BitOrder parentOrder) {
+        if (parentOrder == null) {
             if (order == BitOrder.Default) {
                 return true;
             } else {
@@ -63,10 +65,10 @@ public class ParseUtil {
             }
         } else {
             if (order == BitOrder.Default) {
-                if (pkgOrder == BitOrder.Default) {
+                if (parentOrder == BitOrder.Default) {
                     return true;
                 } else {
-                    return pkgOrder == BitOrder.bigEndian;
+                    return parentOrder == BitOrder.bigEndian;
                 }
             } else {
                 return order == BitOrder.bigEndian;
@@ -74,24 +76,8 @@ public class ParseUtil {
         }
     }
 
-    /**
-     * @param order
-     * @param clazz
-     * @return
-     */
-    public static boolean bigEndian(BitOrder order, Class<?> clazz) {
-        BitOrder configOrder = null;
-        final String className = clazz.getName();
-        for (Parser.BitOrderConfig config : Parser.bitOrderConfigs) {
-            if (className.startsWith(config.classPrefix())) {
-                configOrder = config.order();
-            }
-        }
-        return bigEndian(order, configOrder);
-    }
-
-    public static boolean bigEndian(ByteOrder order, ByteOrder pkgOrder) {
-        if (pkgOrder == null) {
+    public static boolean bigEndian(ByteOrder order, ByteOrder parentOrder) {
+        if (parentOrder == null) {
             if (order == ByteOrder.Default) {
                 return true;
             } else {
@@ -99,33 +85,15 @@ public class ParseUtil {
             }
         } else {
             if (order == ByteOrder.Default) {
-                if (pkgOrder == ByteOrder.Default) {
+                if (parentOrder == ByteOrder.Default) {
                     return true;
                 } else {
-                    return pkgOrder == ByteOrder.bigEndian;
+                    return parentOrder == ByteOrder.bigEndian;
                 }
             } else {
                 return order == ByteOrder.bigEndian;
             }
         }
-    }
-
-    /**
-     * @param order
-     * @param clazz
-     * @return
-     */
-    public static boolean bigEndian(ByteOrder order, Class<?> clazz) {
-        ByteOrder configOrder = null;
-        final String className = clazz.getName();
-        for (Parser.ByteOrderConfig config : Parser.byteOrderConfigs) {
-            if (className.startsWith(config.classPrefix())) {
-                configOrder = config.order();
-            }
-        }
-        return bigEndian(order, configOrder);
-
-
     }
 
     /**
@@ -525,5 +493,6 @@ public class ParseUtil {
     public static List<Field> getParseFields(Class<?> clazz) {
         return ClassUtil.getAllFields(clazz).stream().filter(ParseUtil::needParse).collect(Collectors.toList());
     }
+
 
 }

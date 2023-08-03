@@ -8,46 +8,53 @@ import io.netty.buffer.ByteBuf;
 
 
 public class PacketDataFieldProcessor implements Processor<PacketData> {
+    final Processor<VehicleLoginData> processor_vehicleLoginData = Parser.getProcessor(VehicleLoginData.class);
+    final Processor<VehicleRunData> processor_vehicleRunData = Parser.getProcessor(VehicleRunData.class);
+    final Processor<VehicleSupplementData> processor_vehicleSupplementData = Parser.getProcessor(VehicleSupplementData.class);
+    final Processor<VehicleLogoutData> processor_vehicleLogoutData = Parser.getProcessor(VehicleLogoutData.class);
+    final Processor<PlatformLoginData> processor_platformLoginData = Parser.getProcessor(PlatformLoginData.class);
+    final Processor<PlatformLogoutData> processor_platformLogoutData = Parser.getProcessor(PlatformLogoutData.class);
 
     @Override
     public PacketData process(final ByteBuf data, final ProcessContext parentContext) {
+
         final Packet packet = (Packet) parentContext.instance;
         if (packet.replyFlag == 0xfe) {
             PacketData packetData = null;
             switch (packet.flag) {
                 //车辆登入
                 case vehicle_login_data: {
-                    packetData = Parser.parse(VehicleLoginData.class, data, parentContext);
+                    packetData = processor_vehicleLoginData.process(data, parentContext);
                     break;
                 }
 
                 //车辆实时信息
                 case vehicle_run_data: {
-                    packetData = Parser.parse(VehicleRunData.class, data, parentContext);
+                    packetData = processor_vehicleRunData.process(data, parentContext);
                     break;
                 }
 
                 //补发信息上报
                 case vehicle_supplement_data: {
-                    packetData = Parser.parse(VehicleSupplementData.class, data, parentContext);
+                    packetData = processor_vehicleSupplementData.process(data, parentContext);
                     break;
                 }
 
                 //车辆登出
                 case vehicle_logout_data: {
-                    packetData = Parser.parse(VehicleLogoutData.class, data, parentContext);
+                    packetData = processor_vehicleLogoutData.process(data, parentContext);
                     break;
                 }
 
                 //平台登入
                 case platform_login_data: {
-                    packetData = Parser.parse(PlatformLoginData.class, data, parentContext);
+                    packetData = processor_platformLoginData.process(data, parentContext);
                     break;
                 }
 
                 //平台登出
                 case platform_logout_data: {
-                    packetData = Parser.parse(PlatformLogoutData.class, data, parentContext);
+                    packetData = processor_platformLogoutData.process(data, parentContext);
                     break;
                 }
 
@@ -74,7 +81,52 @@ public class PacketDataFieldProcessor implements Processor<PacketData> {
     public void deProcess(ByteBuf data, ProcessContext parentContext, PacketData instance) {
         final Packet packet = (Packet) parentContext.instance;
         if (packet.replyFlag == 0xfe) {
-            Parser.deParse(instance, data, parentContext);
+            switch (packet.flag) {
+                //车辆登入
+                case vehicle_login_data: {
+                    processor_vehicleLoginData.deProcess(data, parentContext, (VehicleLoginData) instance);
+                    break;
+                }
+                //车辆实时信息
+                case vehicle_run_data: {
+                    processor_vehicleRunData.deProcess(data, parentContext, (VehicleRunData) instance);
+                    break;
+                }
+
+                //补发信息上报
+                case vehicle_supplement_data: {
+                    processor_vehicleSupplementData.deProcess(data, parentContext, (VehicleSupplementData) instance);
+                    break;
+                }
+
+                //车辆登出
+                case vehicle_logout_data: {
+                    processor_vehicleLogoutData.deProcess(data, parentContext, (VehicleLogoutData) instance);
+                    break;
+                }
+
+                //平台登入
+                case platform_login_data: {
+                    processor_platformLoginData.deProcess(data, parentContext, (PlatformLoginData) instance);
+                    break;
+                }
+
+                //平台登出
+                case platform_logout_data: {
+                    processor_platformLogoutData.deProcess(data, parentContext, (PlatformLogoutData) instance);
+                    break;
+                }
+
+                //心跳
+                case heartbeat: {
+                    break;
+                }
+
+                //终端校时
+                case terminal_timing: {
+                    break;
+                }
+            }
         } else {
             data.writeBytes(((ResponseData) instance).content);
         }

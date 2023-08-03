@@ -1,8 +1,8 @@
 package com.bcd.base.support_parser.impl.someip;
 
 import com.bcd.base.support_parser.Parser;
-import com.bcd.base.support_parser.impl.immotors.ep33.Parser_immotors_ep33_test;
 import com.bcd.base.support_parser.impl.someip.data.Packet;
+import com.bcd.base.support_parser.processor.Processor;
 import com.bcd.base.support_parser.util.PerformanceUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
@@ -25,9 +25,10 @@ public class Parser_someip_test {
         String data = "000100e4000000ac0009000a0304000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a1";
         byte[] bytes = ByteBufUtil.decodeHexDump(data);
         ByteBuf byteBuf = Unpooled.wrappedBuffer(bytes);
-        final Packet packet = Parser.parse(Packet.class, byteBuf, null);
+        final Processor<Packet> processor = Parser.getProcessor(Packet.class);
+        final Packet packet = processor.process(byteBuf, null);
         ByteBuf dest = Unpooled.buffer();
-        Parser.deParse(packet, dest, null);
+        processor.deProcess(dest, null, packet);
         logger.info(data.toUpperCase());
         logger.info(ByteBufUtil.hexDump(dest).toLowerCase());
         assert data.equalsIgnoreCase(ByteBufUtil.hexDump(dest));

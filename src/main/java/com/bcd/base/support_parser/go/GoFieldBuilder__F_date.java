@@ -27,7 +27,7 @@ public class GoFieldBuilder__F_date extends GoFieldBuilder {
         final int baseYear = anno.baseYear();
         final DateMode mode = anno.mode();
         final String zoneId = anno.zoneId();
-        final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.pkg_byteOrder);
+        final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.byteOrder);
         final String varNameLocation;
         if (mode == DateMode.bytes_yyMMddHHmmss || mode == DateMode.bytes_yyyyMMddHHmmss) {
             varNameLocation = context.getVarNameLocation(zoneId);
@@ -98,7 +98,7 @@ public class GoFieldBuilder__F_date extends GoFieldBuilder {
         final int baseYear = anno.baseYear();
         final DateMode mode = anno.mode();
         final String zoneId = anno.zoneId();
-        final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.pkg_byteOrder);
+        final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.byteOrder);
         final String varNameVal = goFieldName + "_v";
         final String bigEndianSuffix = bigEndian ? "" : "_le";
         ParseUtil.append(body, "{}:={}.{}\n", varNameVal, GoFieldBuilder.varNameInstance, goFieldName);

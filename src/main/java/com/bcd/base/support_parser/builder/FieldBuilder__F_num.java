@@ -36,7 +36,7 @@ public class FieldBuilder__F_num extends FieldBuilder {
         final String varNameInstance = FieldBuilder.varNameInstance;
         final String varNameField = ParseUtil.getFieldVarName(context);
 
-        final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.clazz);
+        final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.byteOrder);
         final NumType type = anno.type();
         String funcName;
         switch (type) {
@@ -96,7 +96,7 @@ public class FieldBuilder__F_num extends FieldBuilder {
         final Class<F_num> annoClass = F_num.class;
         final Field field = context.field;
         final F_num anno = context.field.getAnnotation(annoClass);
-        final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.clazz);
+        final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.byteOrder);
         final String varNameInstance = FieldBuilder.varNameInstance;
         final StringBuilder body = context.body;
         final String fieldName = field.getName();

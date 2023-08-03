@@ -19,7 +19,7 @@ public class GoFieldBuilder__F_num_array extends GoFieldBuilder {
         final StringBuilder body = context.structBody;
         final String jsonExt = goField.jsonExt;
         final int len = anno.len();
-        final boolean bigEndian = ParseUtil.bigEndian(anno.singleOrder(), context.pkg_byteOrder);
+        final boolean bigEndian = ParseUtil.bigEndian(anno.singleOrder(), context.byteOrder);
         final Class<?> fieldType = field.getType();
         final NumType singleType = anno.singleType();
         final NumType singleValType = anno.singleValType();
@@ -121,7 +121,7 @@ public class GoFieldBuilder__F_num_array extends GoFieldBuilder {
         final Class<? extends F_num_array> annoClass = anno.getClass();
         final Map<Character, String> varToGoFieldName = context.varToGoFieldName_parse;
         final StringBuilder body = context.parseBody;
-        final boolean bigEndian = ParseUtil.bigEndian(anno.singleOrder(), context.pkg_byteOrder);
+        final boolean bigEndian = ParseUtil.bigEndian(anno.singleOrder(), context.byteOrder);
         final int singleSkip = anno.singleSkip();
         final String valExpr = anno.singleValExpr();
         final NumType singleType = anno.singleType();
@@ -195,7 +195,7 @@ public class GoFieldBuilder__F_num_array extends GoFieldBuilder {
         final Class<? extends F_num_array> annoClass = anno.getClass();
         final Map<Character, String> varToGoFieldName = context.varToGoFieldName_deParse;
         final StringBuilder body = context.deParseBody;
-        final boolean bigEndian = ParseUtil.bigEndian(anno.singleOrder(), context.pkg_byteOrder);
+        final boolean bigEndian = ParseUtil.bigEndian(anno.singleOrder(), context.byteOrder);
         final NumType singleType = anno.singleType();
         final NumType singleValType = anno.singleValType();
         final int singleSkip = anno.singleSkip();

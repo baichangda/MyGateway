@@ -2,6 +2,7 @@ package com.bcd.tcp.gb32960;
 
 import com.bcd.base.support_parser.Parser;
 import com.bcd.base.support_parser.impl.gb32960.data.Packet;
+import com.bcd.base.support_parser.processor.Processor;
 import com.bcd.tcp.SessionClusterManager;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -26,10 +27,12 @@ public class Handler_gb32960 extends ChannelInboundHandlerAdapter {
         this.sessionClusterManager = sessionClusterManager;
     }
 
+    final static Processor<Packet> processor = Parser.getProcessor(Packet.class);
+
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         //解析
-        final Packet packet = Parser.parse(Packet.class, (ByteBuf) msg, null);
+        final Packet packet = processor.process((ByteBuf) msg, null);
         if (session == null) {
             //构造会话
             session = new Session_gb32960(packet.vin, ctx.channel());

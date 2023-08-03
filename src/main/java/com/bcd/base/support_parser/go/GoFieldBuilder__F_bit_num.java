@@ -17,7 +17,7 @@ public class GoFieldBuilder__F_bit_num extends GoFieldBuilder {
         final String goFieldName = goField.goFieldName;
         final Class<? extends F_bit_num> annoClass = anno.getClass();
         final StringBuilder body = context.structBody;
-        final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.pkg_bitOrder);
+        final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.bitOrder);
         final boolean unsigned = anno.unsigned();
         final String jsonExt = goField.jsonExt;
         final Class<?> fieldType = field.getType();
@@ -75,7 +75,7 @@ public class GoFieldBuilder__F_bit_num extends GoFieldBuilder {
         final Class<? extends F_bit_num> annoClass = anno.getClass();
         final Map<Character, String> varToGoFieldName = context.varToGoFieldName_parse;
         final StringBuilder body = context.parseBody;
-        final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.pkg_bitOrder);
+        final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.bitOrder);
         final boolean unsigned = anno.unsigned();
         final Class<?> fieldType = field.getType();
         final String varNameBitBufReader = context.getVarNameBitBuf_reader();
@@ -111,7 +111,7 @@ public class GoFieldBuilder__F_bit_num extends GoFieldBuilder {
         final Map<Character, String> varToGoFieldName = context.varToGoFieldName_deParse;
         final Class<? extends F_bit_num> annoClass = anno.getClass();
         final StringBuilder body = context.deParseBody;
-        final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.pkg_bitOrder);
+        final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.bitOrder);
         final boolean unsigned = anno.unsigned();
         final String valExpr = anno.valExpr();
         final int len = anno.len();
