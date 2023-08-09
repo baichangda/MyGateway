@@ -568,14 +568,38 @@ public class Parser {
 //        return cc.toClass();
     }
 
+    /**
+     * 获取类解析器
+     * 使用默认字节序模式和位模式
+     * @param clazz 实体类类型
+     * @return
+     * @param <T>
+     */
     public static <T> Processor<T> getProcessor(Class<T> clazz) {
         return getProcessor(clazz, ByteOrder.Default, BitOrder.Default, null);
     }
 
+    /**
+     * 获取类解析器
+     * @param clazz 实体类类型
+     * @param byteOrder 实体类字节码实现 字节序模式
+     * @param bitOrder 实体类字节码实现 位模式
+     * @return
+     * @param <T>
+     */
     public static <T> Processor<T> getProcessor(Class<T> clazz, ByteOrder byteOrder, BitOrder bitOrder) {
         return getProcessor(clazz, byteOrder, bitOrder, null);
     }
 
+    /**
+     * 获取类解析器
+     * @param clazz 实体类类型
+     * @param byteOrder 实体类字节码实现 字节序模式
+     * @param bitOrder 实体类字节码实现 位模式
+     * @param parentContext 上层bean的build上下文
+     * @return
+     * @param <T>
+     */
     public static <T> Processor<T> getProcessor(Class<T> clazz, ByteOrder byteOrder, BitOrder bitOrder, BuilderContext parentContext) {
         final String clazzName = clazz.getName();
         final String key = clazzName + "," + byteOrder + "," + bitOrder;
