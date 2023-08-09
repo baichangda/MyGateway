@@ -166,7 +166,7 @@ public final class BitBuf_reader_log extends BitBuf_reader {
         }
     }
 
-    public final long read(int bit, boolean bigEndian, boolean unsigned) {
+    public long read(int bit, boolean bigEndian, boolean unsigned) {
         final ByteBuf byteBuf = this.byteBuf;
         final int bitOffset = this.bitOffset;
         byte b;
@@ -223,7 +223,7 @@ public final class BitBuf_reader_log extends BitBuf_reader {
     }
 
 
-    public final void skip(int bit) {
+    public void skip(int bit) {
         final ByteBuf byteBuf = this.byteBuf;
         final int bitOffset = this.bitOffset;
         byte b = this.b;
@@ -264,7 +264,7 @@ public final class BitBuf_reader_log extends BitBuf_reader {
         logs.add(log);
     }
 
-    public final void finish() {
+    public void finish() {
         final FinishLog log;
         if (bitOffset == 0) {
             log = new FinishLog();

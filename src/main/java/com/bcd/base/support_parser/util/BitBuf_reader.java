@@ -5,10 +5,6 @@ import io.netty.buffer.Unpooled;
 
 public class BitBuf_reader {
 
-    public final static boolean default_bigEndian = true;
-    public final static boolean default_unsigned = true;
-
-
     public final ByteBuf byteBuf;
     public byte b;
     //当前readIndex的bit偏移量

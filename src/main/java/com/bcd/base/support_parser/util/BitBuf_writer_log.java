@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BitBuf_writer_log extends BitBuf_writer {
+public final class BitBuf_writer_log extends BitBuf_writer {
 
     static Logger logger = LoggerFactory.getLogger(BitBuf_reader_log.class);
     public List<Log> logs = new ArrayList<>();
@@ -142,7 +142,7 @@ public class BitBuf_writer_log extends BitBuf_writer {
         }
     }
 
-    public final void write(long l, int bit, boolean bigEndian, boolean unsigned) {
+    public void write(long l, int bit, boolean bigEndian, boolean unsigned) {
         final ByteBuf byteBuf = this.byteBuf;
         int bitOffset = this.bitOffset;
         byte b = this.b;
@@ -202,7 +202,7 @@ public class BitBuf_writer_log extends BitBuf_writer {
     }
 
 
-    public final void skip(int bit) {
+    public void skip(int bit) {
         final ByteBuf byteBuf = this.byteBuf;
         final int bitOffset = this.bitOffset;
         byte b = this.b;
@@ -240,7 +240,7 @@ public class BitBuf_writer_log extends BitBuf_writer {
         logs.add(log);
     }
 
-    public final void finish() {
+    public void finish() {
         final FinishLog log;
         if (bitOffset == 0) {
             log = new FinishLog();
