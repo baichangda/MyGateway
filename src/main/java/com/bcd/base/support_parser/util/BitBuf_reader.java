@@ -61,29 +61,16 @@ public class BitBuf_reader {
             };
             ByteBuf bb2 = Unpooled.wrappedBuffer(source2);
             BitBuf_reader bitBuf2 = new BitBuf_reader(bb2);
-//            final long l1 = bitBuf2.read_log(3);
-//            final long l2 = bitBuf2.read_log(3);
-//            final long l3 = bitBuf2.read_log(9);
             final long res1 = bitBuf2.read(3, true, true);
-            final long res2 = bitBuf2.read(3, true, true);
+            final long res2 = bitBuf2.read(8, true, true);
             bitBuf2.skip(3);
             final long res3 = bitBuf2.read(9, false, false);
-//            res1.print(null);
-//            res2.print(null);
-//            skip1.print(null);
-//            res3.print(null);
             System.out.println(res1);
             System.out.println(res2);
             System.out.println(res3);
         }
         System.out.println(System.currentTimeMillis() - t1);
 
-    }
-
-
-
-    public long read(int bit) {
-        return read(bit, default_bigEndian, default_unsigned);
     }
 
     public long read(int bit, boolean bigEndian, boolean unsigned) {
@@ -107,6 +94,7 @@ public class BitBuf_reader {
             byteLen = (temp >> 3) + 1;
             l = (b & 0xffL) << (temp - finalBitOffset);
         }
+
         for (int i = 1; i < byteLen; i++) {
             b = byteBuf.readByte();
             l |= ((b & 0xffL) << ((byteLen - 1 - i) << 3));

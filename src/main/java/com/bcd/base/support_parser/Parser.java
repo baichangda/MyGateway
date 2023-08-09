@@ -61,7 +61,7 @@ import java.util.stream.Collectors;
  * 如果启动了解析和反解析日志、并不是所有字段都会打印、逻辑参考
  * {@link ParseUtil#needLog(BuilderContext)}
  */
-
+@SuppressWarnings("unchecked")
 public class Parser {
 
     public final static Logger logger = LoggerFactory.getLogger(Parser.class);

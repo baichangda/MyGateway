@@ -68,12 +68,6 @@ public class BitBuf_writer {
 
 
 
-    public void write(long l, int bit) {
-        write(l, bit, default_bigEndian, default_unsigned);
-    }
-
-
-
     public void write(long l, int bit, boolean bigEndian, boolean unsigned) {
         final ByteBuf byteBuf = this.byteBuf;
         int bitOffset = this.bitOffset;

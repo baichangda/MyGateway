@@ -166,10 +166,6 @@ public final class BitBuf_reader_log extends BitBuf_reader {
         }
     }
 
-    public final long read(int bit) {
-        return read(bit, default_bigEndian, default_unsigned);
-    }
-
     public final long read(int bit, boolean bigEndian, boolean unsigned) {
         final ByteBuf byteBuf = this.byteBuf;
         final int bitOffset = this.bitOffset;

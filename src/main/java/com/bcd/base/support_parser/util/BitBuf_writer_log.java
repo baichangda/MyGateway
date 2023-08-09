@@ -142,11 +142,6 @@ public class BitBuf_writer_log extends BitBuf_writer {
         }
     }
 
-    public final void write(long l, int bit) {
-        write(l, bit, default_bigEndian, default_unsigned);
-    }
-
-
     public final void write(long l, int bit, boolean bigEndian, boolean unsigned) {
         final ByteBuf byteBuf = this.byteBuf;
         int bitOffset = this.bitOffset;
