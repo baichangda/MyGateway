@@ -2,6 +2,7 @@ package com.bcd.base.support_parser.util;
 
 import com.bcd.base.support_parser.Parser;
 import com.bcd.base.support_parser.processor.Processor;
+import com.bcd.base.util.ExecutorUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.slf4j.Logger;
@@ -12,7 +13,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.LongAdder;
-
+@SuppressWarnings("unchecked")
 public class PerformanceUtil {
 
     private final static Logger logger = LoggerFactory.getLogger(PerformanceUtil.class);
@@ -59,10 +60,14 @@ public class PerformanceUtil {
                 pool.shutdown();
             }
             for (ExecutorService pool : pools) {
-                pool.awaitTermination(1, TimeUnit.HOURS);
+                while(!pool.awaitTermination(1, TimeUnit.HOURS)){
+
+                }
             }
             monitor.shutdown();
-            monitor.awaitTermination(1, TimeUnit.MINUTES);
+            while(!monitor.awaitTermination(1, TimeUnit.HOURS)){
+
+            }
         } catch (InterruptedException e) {
             logger.error("interrupted", e);
         }
