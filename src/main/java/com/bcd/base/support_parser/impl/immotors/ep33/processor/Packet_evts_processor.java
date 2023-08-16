@@ -40,6 +40,8 @@ public class Packet_evts_processor implements Processor<List<Evt>> {
     final Processor<Evt_D00D> processor_Evt_D00D = Parser.getProcessor(Evt_D00D.class);
     final Processor<Evt_D00E> processor_Evt_D00E = Parser.getProcessor(Evt_D00E.class);
     final Processor<Evt_D00F> processor_Evt_D00F = Parser.getProcessor(Evt_D00F.class);
+    final Processor<Evt_D01D> processor_Evt_D01D = Parser.getProcessor(Evt_D01D.class);
+    final Processor<Evt_FFFF> processor_Evt_FFFF = Parser.getProcessor(Evt_FFFF.class);
     final Processor<Evt_2_6_unknown> processor_Evt_2_6_unknown = Parser.getProcessor(Evt_2_6_unknown.class);
     final Processor<Evt_4_x_unknown> processor_Evt_4_x_unknown = Parser.getProcessor(Evt_4_x_unknown.class);
 
@@ -113,6 +115,12 @@ public class Packet_evts_processor implements Processor<List<Evt>> {
                 case 0xD00F -> {
                     evt = processor_Evt_D00F.process(data, parentContext);
                 }
+                case 0xD01D -> {
+                    evt = processor_Evt_D01D.process(data, parentContext);
+                }
+                case 0xFFFF -> {
+                    evt = processor_Evt_FFFF.process(data, parentContext);
+                }
                 default -> {
                     if ((evtId >= 0x0001 && evtId <= 0x07FF)
                             || (evtId >= 0x0800 && evtId <= 0x0FFF)
@@ -122,7 +130,6 @@ public class Packet_evts_processor implements Processor<List<Evt>> {
                             || (evtId >= 0x6000 && evtId <= 0x6FFF)
                             || (evtId >= 0x7000 && evtId <= 0x8FFF)
                             || (evtId >= 0x9000 && evtId <= 0xAFFF)
-                            || evtId == 0XFFFF
                     ) {
                         evt = processor_Evt_2_6_unknown.process(data, parentContext);
 //                        final String evtIdHex = ByteBufUtil.hexDump(new byte[]{(byte) (evtId>>8), (byte) evtId});
@@ -211,6 +218,12 @@ public class Packet_evts_processor implements Processor<List<Evt>> {
                 case 0xD00F -> {
                     processor_Evt_D00F.deProcess(data, parentContext, (Evt_D00F) evt);
                 }
+                case 0xD01D -> {
+                    processor_Evt_D01D.deProcess(data, parentContext, (Evt_D01D) evt);
+                }
+                case 0xFFFF -> {
+                    processor_Evt_FFFF.deProcess(data, parentContext, (Evt_FFFF) evt);
+                }
                 default -> {
                     if ((evtId >= 0x0001 && evtId <= 0x07FF)
                             || (evtId >= 0x0800 && evtId <= 0x0FFF)
@@ -220,7 +233,6 @@ public class Packet_evts_processor implements Processor<List<Evt>> {
                             || (evtId >= 0x6000 && evtId <= 0x6FFF)
                             || (evtId >= 0x7000 && evtId <= 0x8FFF)
                             || (evtId >= 0x9000 && evtId <= 0xAFFF)
-                            || evtId == 0XFFFF
                     ) {
                         processor_Evt_2_6_unknown.deProcess(data, parentContext, (Evt_2_6_unknown) evt);
 //                        final String evtIdHex = ByteBufUtil.hexDump(new byte[]{(byte) (evtId>>8), (byte) evtId});
