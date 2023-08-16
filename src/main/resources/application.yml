@@ -16,7 +16,6 @@ spring:
       repositories:
         enabled: false
       #公用配置
-      ssl: false
       database: 0
       timeout: 60000
       password: incar@2023
@@ -46,6 +45,8 @@ spring:
       #单机配置
       host: ${server_host:127.0.0.1}
       port: 6379
+      ssl:
+        enabled: false
 
   #  kafka配置
   kafka:

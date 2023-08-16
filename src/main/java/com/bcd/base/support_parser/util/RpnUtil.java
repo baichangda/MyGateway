@@ -1,7 +1,7 @@
 package com.bcd.base.support_parser.util;
 
 
-import com.bcd.base.support_parser.exception.BaseRuntimeException;
+import com.bcd.base.exception.BaseRuntimeException;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;

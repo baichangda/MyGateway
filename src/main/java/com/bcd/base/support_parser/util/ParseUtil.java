@@ -5,7 +5,7 @@ import com.bcd.base.support_parser.Parser;
 import com.bcd.base.support_parser.anno.*;
 import com.bcd.base.support_parser.builder.BuilderContext;
 import com.bcd.base.support_parser.builder.FieldBuilder;
-import com.bcd.base.support_parser.exception.BaseRuntimeException;
+import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.support_parser.processor.Processor;
 import com.google.common.collect.Sets;
 import com.sun.jdi.connect.IllegalConnectorArgumentsException;

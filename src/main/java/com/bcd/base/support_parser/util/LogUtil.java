@@ -1,6 +1,6 @@
 package com.bcd.base.support_parser.util;
 
-import com.bcd.base.support_parser.exception.BaseRuntimeException;
+import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.support_parser.impl.immotors.ep33.data.Evt_0006;
 import com.bcd.base.support_parser.impl.immotors.ep33.data.Evt_D00B;
 

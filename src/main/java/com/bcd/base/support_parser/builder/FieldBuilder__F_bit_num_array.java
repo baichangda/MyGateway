@@ -2,7 +2,7 @@ package com.bcd.base.support_parser.builder;
 
 import com.bcd.base.support_parser.anno.F_bit_num_array;
 import com.bcd.base.support_parser.anno.F_skip;
-import com.bcd.base.support_parser.exception.BaseRuntimeException;
+import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.support_parser.util.ParseUtil;
 import com.bcd.base.support_parser.util.RpnUtil;
 

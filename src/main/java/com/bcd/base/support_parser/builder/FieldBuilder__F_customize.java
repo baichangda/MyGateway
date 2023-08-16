@@ -2,7 +2,7 @@ package com.bcd.base.support_parser.builder;
 
 
 import com.bcd.base.support_parser.anno.F_customize;
-import com.bcd.base.support_parser.exception.BaseRuntimeException;
+import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.support_parser.util.BitBuf_reader;
 import com.bcd.base.support_parser.util.BitBuf_writer;
 import com.bcd.base.support_parser.util.ParseUtil;

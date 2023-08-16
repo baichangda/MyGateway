@@ -1,7 +1,7 @@
 package com.bcd.base.support_parser.go;
 
 import com.bcd.base.support_parser.anno.*;
-import com.bcd.base.support_parser.exception.BaseRuntimeException;
+import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.support_parser.util.ClassUtil;
 import com.bcd.base.support_parser.util.ParseUtil;
 

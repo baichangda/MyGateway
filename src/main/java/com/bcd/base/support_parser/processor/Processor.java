@@ -1,6 +1,6 @@
 package com.bcd.base.support_parser.processor;
 
-import com.bcd.base.support_parser.exception.BaseRuntimeException;
+import com.bcd.base.exception.BaseRuntimeException;
 import io.netty.buffer.ByteBuf;
 
 public interface Processor<T> {

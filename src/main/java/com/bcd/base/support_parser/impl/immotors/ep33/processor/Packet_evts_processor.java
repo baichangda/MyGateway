@@ -1,7 +1,7 @@
 package com.bcd.base.support_parser.impl.immotors.ep33.processor;
 
 import com.bcd.base.support_parser.Parser;
-import com.bcd.base.support_parser.exception.BaseRuntimeException;
+import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.support_parser.impl.immotors.Evt;
 import com.bcd.base.support_parser.impl.immotors.ep33.data.*;
 import com.bcd.base.support_parser.processor.ProcessContext;

@@ -3,7 +3,7 @@ package com.bcd.base.support_parser.builder;
 
 import com.bcd.base.support_parser.anno.F_skip;
 import com.bcd.base.support_parser.anno.F_string;
-import com.bcd.base.support_parser.exception.BaseRuntimeException;
+import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.support_parser.util.ParseUtil;
 
 import java.lang.reflect.Field;
