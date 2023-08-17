@@ -26,8 +26,7 @@ public class Lane_info_cycle {
     public short ave_car_head_dis;
     @F_num(type = NumType.uint8)
     public short ave_car_body_dis;
-
     @F_skip(mode = SkipMode.reservedFromStart,len = 32)
-    public byte[] reserved;
+    public byte reserved;
 
 }

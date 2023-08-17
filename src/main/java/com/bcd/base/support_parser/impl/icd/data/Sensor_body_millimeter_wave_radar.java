@@ -10,5 +10,5 @@ public class Sensor_body_millimeter_wave_radar implements Sensor_body {
     public int distance;
 
     @F_skip(mode = SkipMode.reservedFromStart,len = 32)
-    public byte[] reserved;
+    public byte reserved;
 }

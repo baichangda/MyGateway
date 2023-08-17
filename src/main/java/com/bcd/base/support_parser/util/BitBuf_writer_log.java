@@ -211,8 +211,10 @@ public final class BitBuf_writer_log extends BitBuf_writer {
         final int byteLen = (temp >> 3) + (newBitOffsetZero ? 0 : 1);
         final SkipLog log = new SkipLog(byteLen, bitOffset, bit);
 
+        log.bytes[0] = b;
         if (byteLen == 1) {
             if (newBitOffsetZero) {
+                byteBuf.writeByte(b);
                 b = 0;
             }
         } else {
@@ -222,9 +224,7 @@ public final class BitBuf_writer_log extends BitBuf_writer {
                 } else {
                     byteBuf.writeZero(byteLen - 1);
                 }
-
             } else {
-                log.bytes[0] = b;
                 byteBuf.writeByte(b);
                 if (newBitOffsetZero) {
                     byteBuf.writeZero(byteLen - 1);

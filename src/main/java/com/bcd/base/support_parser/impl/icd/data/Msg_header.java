@@ -33,5 +33,5 @@ public class Msg_header {
     public float dev_azimuth;
 
     @F_skip(mode = SkipMode.reservedFromStart, len = 128)
-    public byte[] reserved;
+    public byte reserved;
 }

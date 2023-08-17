@@ -19,7 +19,7 @@ public class Dev_hw_list {
     public int bandwidth;
 
     @F_skip(mode = SkipMode.reservedFromStart, len = 32)
-    public byte[] reserved;
+    public byte reserved;
 
 
 }

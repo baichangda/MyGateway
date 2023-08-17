@@ -12,5 +12,5 @@ public class Evt_0008 extends Evt_2_6 {
     @F_bit_num(len = 16, valType = NumType.uint16)
     public int cellMNC;
     @F_skip(len = 2)
-    public int skip;
+    public byte skip;
 }

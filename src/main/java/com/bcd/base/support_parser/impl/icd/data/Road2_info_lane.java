@@ -15,7 +15,7 @@ public class Road2_info_lane {
     public int area_point_count;
 
     @F_skip(len = 32, mode = SkipMode.reservedFromStart)
-    public byte[] reserved;
+    public byte reserved;
     @F_bean_list(listLenExpr = "a")
     public List<Road2_info_lane_area_point> area_point_array;
 }

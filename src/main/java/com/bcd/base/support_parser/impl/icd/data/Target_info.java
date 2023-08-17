@@ -66,6 +66,6 @@ public class Target_info {
     public Target_info_extras extras;
 
     @F_skip(mode = SkipMode.reservedFromStart, len = 128)
-    public byte[] reserved;
+    public byte reserved;
 
 }

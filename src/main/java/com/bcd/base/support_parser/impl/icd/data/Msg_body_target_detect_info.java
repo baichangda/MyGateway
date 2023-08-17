@@ -19,7 +19,7 @@ public class Msg_body_target_detect_info implements Msg_body {
     public int target_count;
 
     @F_skip(len = 64, mode = SkipMode.reservedFromStart)
-    public byte[] reserved;
+    public byte reserved;
     @F_num_array(lenExpr = "a", singleType = NumType.uint32)
     public long[] src_array;
     @F_bean_list(listLenExpr = "b")

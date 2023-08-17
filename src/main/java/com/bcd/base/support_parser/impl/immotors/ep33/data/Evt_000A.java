@@ -18,5 +18,5 @@ public class Evt_000A extends Evt_2_6 {
     public short GNSSSATS;
 
     @F_skip(len = 2)
-    public int skip;
+    public byte skip;
 }

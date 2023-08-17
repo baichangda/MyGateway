@@ -15,7 +15,7 @@ public class Msg_body_queue_statistics_info implements Msg_body{
     @F_num(type = NumType.uint8,var = 'b')
     public short lane_count;
     @F_skip(len = 32,mode = SkipMode.reservedFromStart)
-    public byte[] reserved;
+    public byte reserved;
     @F_num_array(lenExpr = "a", singleType = NumType.uint32)
     public long[] src_array;
     @F_bean_list(listLenExpr = "b")

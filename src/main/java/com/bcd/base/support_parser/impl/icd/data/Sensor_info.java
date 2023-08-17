@@ -30,5 +30,5 @@ public class Sensor_info {
     public Sensor_body sensor_body;
 
     @F_skip(mode = SkipMode.reservedFromStart, len = 128)
-    public byte[] reserved;
+    public byte reserved;
 }

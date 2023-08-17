@@ -17,7 +17,7 @@ public class Msg_body_area_statistics_info implements Msg_body{
     public short lane_count;
 
     @F_skip(len = 32,mode = SkipMode.reservedFromStart)
-    public byte[] reserved;
+    public byte reserved;
     @F_num_array(lenExpr = "a", singleType = NumType.uint32)
     public long[] src_array;
     @F_bean_list(listLenExpr = "b")

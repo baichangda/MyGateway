@@ -17,7 +17,7 @@ public class Evt_0800 extends Evt_2_6 {
     @F_bit_num(len = 8, valExpr = "x*0.1+3", valType = NumType.float32)
     public float SysVol;
     @F_skip(len = 3)
-    public int skip;
+    public byte skip;
     @F_bit_num(len = 1, valType = NumType.uint8)
     public byte TrShftLvrPosV;
 }

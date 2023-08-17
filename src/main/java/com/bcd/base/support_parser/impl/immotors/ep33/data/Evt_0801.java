@@ -7,7 +7,7 @@ import com.bcd.base.support_parser.impl.immotors.Evt_2_6;
 
 public class Evt_0801 extends Evt_2_6 {
     @F_skip(len = 5)
-    public int skip;
+    public byte skip;
     @F_bit_num(len = 8, valType = NumType.float32, valExpr = "x*0.392157")
     public float BrkPdlPos;
 }

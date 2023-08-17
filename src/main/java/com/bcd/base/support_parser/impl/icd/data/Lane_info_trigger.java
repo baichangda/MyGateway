@@ -16,7 +16,6 @@ public class Lane_info_trigger {
     public int speed;
     @F_num(type = NumType.uint8)
     public short status;
-
     @F_skip(mode = SkipMode.reservedFromStart,len = 16)
-    public byte[] reserved;
+    public byte reserved;
 }

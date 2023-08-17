@@ -24,7 +24,6 @@ public class Dev_func_list {
     public byte status_monitor;
     @F_num(type = NumType.uint8)
     public byte environment_monitor;
-
     @F_skip(mode = SkipMode.reservedFromStart,len = 32)
-    public byte[] reserved;
+    public byte reserved;
 }

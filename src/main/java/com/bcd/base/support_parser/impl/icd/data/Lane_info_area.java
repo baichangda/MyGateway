@@ -24,8 +24,7 @@ public class Lane_info_area {
     public int tail_car_pos;
     @F_num(type = NumType.uint16)
     public int tail_car_speed;
-
     @F_skip(mode = SkipMode.reservedFromStart,len = 32)
-    public byte[] reserved;
+    public byte reserved;
 
 }

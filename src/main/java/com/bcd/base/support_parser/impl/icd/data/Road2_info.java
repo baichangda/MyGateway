@@ -19,7 +19,7 @@ public class Road2_info {
     public long lane_count;
 
     @F_skip(len = 64,mode = SkipMode.reservedFromStart)
-    public byte[] reserved;
+    public byte reserved;
     @F_bean_list(listLenExpr = "a")
     public List<Road2_info_lane> lane_info_array;
 

@@ -112,6 +112,7 @@ public class BitBuf_writer {
         final int byteLen = (temp >> 3) + (newBitOffsetZero ? 0 : 1);
         if (byteLen == 1) {
             if (newBitOffsetZero) {
+                byteBuf.writeByte(b);
                 b = 0;
             }
         } else {

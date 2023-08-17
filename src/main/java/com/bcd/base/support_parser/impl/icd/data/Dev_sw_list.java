@@ -10,5 +10,5 @@ public class Dev_sw_list {
     public byte data_transfer;
 
     @F_skip(mode = SkipMode.reservedFromStart, len = 32)
-    public byte[] reserved;
+    public byte reserved;
 }

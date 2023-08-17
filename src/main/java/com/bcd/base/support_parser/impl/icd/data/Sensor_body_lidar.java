@@ -16,5 +16,5 @@ public class Sensor_body_lidar implements Sensor_body{
     public float vert_view_angle;
 
     @F_skip(mode = SkipMode.reservedFromStart,len = 32)
-    public byte[] reserved;
+    public byte reserved;
 }

@@ -12,5 +12,5 @@ public class Evt_0802 extends Evt_2_6 {
     @F_bit_num(len = 1, valType = NumType.uint8)
     public byte VehSpdAvgDrvnV;
     @F_skip(len = 4)
-    public int skip;
+    public byte skip;
 }

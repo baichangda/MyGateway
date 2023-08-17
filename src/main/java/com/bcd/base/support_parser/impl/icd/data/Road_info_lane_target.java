@@ -14,5 +14,5 @@ public class Road_info_lane_target {
     public long lane_v;
 
     @F_skip(mode = SkipMode.reservedFromStart,len = 32)
-    public byte[] reserved;
+    public byte reserved;
 }

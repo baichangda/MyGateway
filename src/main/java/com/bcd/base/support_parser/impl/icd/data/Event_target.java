@@ -18,6 +18,6 @@ public class Event_target {
     public Target_info_extras extras;
 
     @F_skip(mode = SkipMode.reservedFromStart,len = 64)
-    public byte[] reserved;
+    public byte reserved;
 
 }
