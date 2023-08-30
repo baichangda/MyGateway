@@ -1,7 +1,7 @@
 package com.bcd.base.support_parser.go;
 
-import com.bcd.base.support_parser.anno.*;
 import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.support_parser.anno.*;
 import com.bcd.base.support_parser.util.ClassUtil;
 import com.bcd.base.support_parser.util.ParseUtil;
 
@@ -12,7 +12,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class GoUtil {
     public final static Map<String, String> zoneId_varNameLocation = new HashMap<>();
@@ -41,7 +43,6 @@ public class GoUtil {
         }
         for (Class<?> clazz : classes) {
             GoParseUtil.initUnsafePointerStructSet(clazz, byteOrder);
-            GoParseUtil.initNoPointerStructSet(clazz);
         }
 
         final StringBuilder globalBody = new StringBuilder();
@@ -57,20 +58,12 @@ public class GoUtil {
             final GoBuildContext context = new GoBuildContext(clazz, byteOrder, bitOrder, globalBody, structBody, parseBody, deParseBody, customizeBody);
             final String goStructName = context.goStructName;
             ParseUtil.append(structBody, "type {} struct{\n", goStructName);
-            if (GoParseUtil.noPointerStructSet.contains(goStructName)) {
-                ParseUtil.append(parseBody, "func To_{}({} *parse.ByteBuf,{} *parse.ParseContext) {}{\n",
-                        goStructName, GoFieldBuilder.varNameByteBuf, GoFieldBuilder.varNameParentParseContext, goStructName);
-                ParseUtil.append(deParseBody, "func({} {})Write({} *parse.ByteBuf,{} *parse.ParseContext){\n",
-                        GoFieldBuilder.varNameInstance, goStructName,
-                        GoFieldBuilder.varNameByteBuf, GoFieldBuilder.varNameParentParseContext);
-            } else {
-                ParseUtil.append(parseBody, "func To_{}({} *parse.ByteBuf,{} *parse.ParseContext) *{}{\n",
-                        goStructName, GoFieldBuilder.varNameByteBuf, GoFieldBuilder.varNameParentParseContext, goStructName);
-                ParseUtil.append(deParseBody, "func(_{} *{})Write({} *parse.ByteBuf,{} *parse.ParseContext){\n",
-                        GoFieldBuilder.varNameInstance, goStructName,
-                        GoFieldBuilder.varNameByteBuf, GoFieldBuilder.varNameParentParseContext);
-                ParseUtil.append(deParseBody, "{}:= *_{}\n", GoFieldBuilder.varNameInstance, GoFieldBuilder.varNameInstance);
-            }
+            ParseUtil.append(parseBody, "func To_{}({} *parse.ByteBuf,{} *parse.ParseContext) *{}{\n",
+                    goStructName, GoFieldBuilder.varNameByteBuf, GoFieldBuilder.varNameParentParseContext, goStructName);
+            ParseUtil.append(deParseBody, "func(_{} *{})Write({} *parse.ByteBuf,{} *parse.ParseContext){\n",
+                    GoFieldBuilder.varNameInstance, goStructName,
+                    GoFieldBuilder.varNameByteBuf, GoFieldBuilder.varNameParentParseContext);
+            ParseUtil.append(deParseBody, "{}:= *_{}\n", GoFieldBuilder.varNameInstance, GoFieldBuilder.varNameInstance);
 
 
             ParseUtil.append(parseBody, "{}:={}{}\n", GoFieldBuilder.varNameInstance, goStructName);
@@ -118,11 +111,7 @@ public class GoUtil {
 
 
             ParseUtil.append(structBody, "}\n");
-            if (GoParseUtil.noPointerStructSet.contains(goStructName)) {
-                ParseUtil.append(parseBody, "return {}\n", GoFieldBuilder.varNameInstance);
-            } else {
-                ParseUtil.append(parseBody, "return &{}\n", GoFieldBuilder.varNameInstance);
-            }
+            ParseUtil.append(parseBody, "return &{}\n", GoFieldBuilder.varNameInstance);
             ParseUtil.append(parseBody, "}\n");
             ParseUtil.append(deParseBody, "}\n");
 
@@ -137,7 +126,7 @@ public class GoUtil {
                 body.append(deParseBody);
                 body.append("\n");
             } else {
-                GoParseUtil.appendUnsafeStructFunc(body,goStructName,structByteLen);
+                GoParseUtil.appendUnsafeStructFunc(body, goStructName, structByteLen);
             }
         }
 

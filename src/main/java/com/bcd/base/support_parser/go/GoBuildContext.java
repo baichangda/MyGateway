@@ -87,11 +87,7 @@ public class GoBuildContext {
 
     public final String getVarNameDeParseContext() {
         if (varNameDeParseContext == null) {
-            if (GoParseUtil.noPointerStructSet.contains(goStructName)) {
-                ParseUtil.append(deParseBody, "{}:=parse.ToParseContext({},{})\n", GoFieldBuilder.varNameParseContext, GoFieldBuilder.varNameInstance, GoFieldBuilder.varNameParentParseContext);
-            } else {
-                ParseUtil.append(deParseBody, "{}:=parse.ToParseContext(_{},{})\n", GoFieldBuilder.varNameParseContext, GoFieldBuilder.varNameInstance, GoFieldBuilder.varNameParentParseContext);
-            }
+            ParseUtil.append(deParseBody, "{}:=parse.ToParseContext(_{},{})\n", GoFieldBuilder.varNameParseContext, GoFieldBuilder.varNameInstance, GoFieldBuilder.varNameParentParseContext);
             varNameDeParseContext = GoFieldBuilder.varNameParseContext;
         }
         return varNameDeParseContext;

@@ -5,28 +5,13 @@ import com.bcd.base.support_parser.util.ParseUtil;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class GoParseUtil {
-    //非指针结构体、parse和deParse 对象都为结构体
-    public final static Set<String> noPointerStructSet = new HashSet<>();
-
     //可以直接使用unsafe指针转换的结构体
     public final static Map<String, Integer> unsafePointerStruct_byteLen = new HashMap<>();
-
-    static void initNoPointerStructSet(Class<?> clazz) {
-        noPointerStructSet.addAll(ParseUtil.getParseFields(clazz).stream().filter(e -> e.isAnnotationPresent(F_bean_list.class)).map(field -> {
-            final Class<?> fieldType = field.getType();
-            final Class<?> c;
-            if (fieldType.isArray()) {
-                c = fieldType.getComponentType();
-            } else {
-                c = ((Class<?>) (((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0]));
-            }
-            return toFirstUpperCase(c.getSimpleName());
-        }).collect(Collectors.toSet()));
-    }
 
     static void initUnsafePointerStructSet(Class<?> clazz, ByteOrder pkg_byteOrder) {
         final String goStructName = toFirstUpperCase(clazz.getSimpleName());
@@ -248,37 +233,20 @@ public class GoParseUtil {
     }
 
     public static void appendUnsafeStructFunc(StringBuilder body, String goStructName, int structByteLen) {
-        if (GoParseUtil.noPointerStructSet.contains(goStructName)) {
-            ParseUtil.append(body, """
-                            func To_{}({} *parse.ByteBuf, {} *parse.ParseContext) {} {
-                                 return *(*{})(unsafe.Pointer(unsafe.SliceData({}.Read_slice_uint8({}))))
-                            }
-                            func({} {})Write({} *parse.ByteBuf,{} *parse.ParseContext){
-                                {}.Write_slice_uint8(*(*[]byte)(unsafe.Pointer(&reflect.SliceHeader{
-                                    Data: uintptr(unsafe.Pointer(&{})),
-                                    Len:  {},
-                                    Cap:  {},
-                                })))
-                            }
-                            """,
-                    goStructName, GoFieldBuilder.varNameByteBuf, GoFieldBuilder.varNameParentParseContext, goStructName, goStructName, GoFieldBuilder.varNameByteBuf, structByteLen,
-                    GoFieldBuilder.varNameInstance, goStructName, GoFieldBuilder.varNameByteBuf, GoFieldBuilder.varNameParentParseContext, GoFieldBuilder.varNameByteBuf, GoFieldBuilder.varNameInstance, structByteLen, structByteLen);
-        } else {
-            ParseUtil.append(body, """
-                            func To_{}({} *parse.ByteBuf, {} *parse.ParseContext) *{} {
-                                 return (*{})(unsafe.Pointer(unsafe.SliceData({}.Read_slice_uint8({}))))
-                            }
-                            func(_{} *{})Write({} *parse.ByteBuf,{} *parse.ParseContext){
-                                {}.Write_slice_uint8(*(*[]byte)(unsafe.Pointer(&reflect.SliceHeader{
-                                    Data: uintptr(unsafe.Pointer(_{})),
-                                    Len:  {},
-                                    Cap:  {},
-                                })))
-                            }
-                            """,
-                    goStructName, GoFieldBuilder.varNameByteBuf, GoFieldBuilder.varNameParentParseContext, goStructName, goStructName, GoFieldBuilder.varNameByteBuf, structByteLen,
-                    GoFieldBuilder.varNameInstance, goStructName, GoFieldBuilder.varNameByteBuf, GoFieldBuilder.varNameParentParseContext, GoFieldBuilder.varNameByteBuf, GoFieldBuilder.varNameInstance, structByteLen, structByteLen);
-        }
+        ParseUtil.append(body, """
+                        func To_{}({} *parse.ByteBuf, {} *parse.ParseContext) *{} {
+                             return (*{})(unsafe.Pointer(unsafe.SliceData({}.Read_slice_uint8({}))))
+                        }
+                        func(_{} *{})Write({} *parse.ByteBuf,{} *parse.ParseContext){
+                            {}.Write_slice_uint8(*(*[]byte)(unsafe.Pointer(&reflect.SliceHeader{
+                                Data: uintptr(unsafe.Pointer(_{})),
+                                Len:  {},
+                                Cap:  {},
+                            })))
+                        }
+                        """,
+                goStructName, GoFieldBuilder.varNameByteBuf, GoFieldBuilder.varNameParentParseContext, goStructName, goStructName, GoFieldBuilder.varNameByteBuf, structByteLen,
+                GoFieldBuilder.varNameInstance, goStructName, GoFieldBuilder.varNameByteBuf, GoFieldBuilder.varNameParentParseContext, GoFieldBuilder.varNameByteBuf, GoFieldBuilder.varNameInstance, structByteLen, structByteLen);
     }
 
 

@@ -18,11 +18,7 @@ public class GoFieldBuilder__F_bean extends GoFieldBuilder {
         final String goFieldTypeName = field.getType().getSimpleName();
         final String jsonExt = goField.jsonExt;
         goField.goFieldTypeName = goFieldTypeName;
-        if (GoParseUtil.noPointerStructSet.contains(goFieldTypeName)) {
-            ParseUtil.append(body, "{} {} {}\n", goFieldName, goFieldTypeName, jsonExt);
-        } else {
-            ParseUtil.append(body, "{} *{} {}\n", goFieldName, goFieldTypeName, jsonExt);
-        }
+        ParseUtil.append(body, "{} *{} {}\n", goFieldName, goFieldTypeName, jsonExt);
     }
 
     @Override
