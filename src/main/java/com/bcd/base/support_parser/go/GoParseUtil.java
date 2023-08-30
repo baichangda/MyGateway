@@ -23,7 +23,6 @@ public class GoParseUtil {
         final List<Field> parseFields = ParseUtil.getParseFields(clazz);
         int byteLen = 0;
         for (Field field : parseFields) {
-            final Class<?> fieldType = field.getType();
             final F_num f_num = field.getAnnotation(F_num.class);
             if (f_num != null) {
                 final boolean bigEndian = ParseUtil.bigEndian(f_num.order(), pkg_byteOrder);
@@ -41,47 +40,6 @@ public class GoParseUtil {
                 if (bigEndian && f_num_array.len() > 0 && f_num_array.singleValExpr().isEmpty() && f_num_array.singleSkip() == 0) {
                     byteLen += f_num_array.len() * getByteLength(f_num_array.singleType());
                     continue;
-                } else {
-                    return;
-                }
-            }
-            final F_bean f_bean = field.getAnnotation(F_bean.class);
-            if (f_bean != null) {
-                final String goFieldTypeStructName = toFirstUpperCase(fieldType.getSimpleName());
-                Integer fieldByteLen = unsafePointerStruct_byteLen.get(goFieldTypeStructName);
-                if (fieldByteLen == null) {
-                    initUnsafePointerStructSet(fieldType, pkg_byteOrder);
-                    fieldByteLen = unsafePointerStruct_byteLen.get(goFieldTypeStructName);
-                }
-                if (fieldByteLen >= 0) {
-                    byteLen += fieldByteLen;
-                    continue;
-                } else {
-                    return;
-                }
-            }
-
-            final F_bean_list f_bean_list = field.getAnnotation(F_bean_list.class);
-            if (f_bean_list != null) {
-                if (f_bean_list.listLen() > 0) {
-                    Class<?> goFieldType;
-                    if (fieldType.isArray()) {
-                        goFieldType = fieldType.getComponentType();
-                    } else {
-                        goFieldType = ((Class<?>) (((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0]));
-                    }
-                    final String goFieldTypeStructName = toFirstUpperCase(goFieldType.getSimpleName());
-                    Integer fieldByteLen = unsafePointerStruct_byteLen.get(goFieldTypeStructName);
-                    if (fieldByteLen == null) {
-                        initUnsafePointerStructSet(fieldType, pkg_byteOrder);
-                        fieldByteLen = unsafePointerStruct_byteLen.get(goFieldTypeStructName);
-                    }
-                    if (fieldByteLen >= 0) {
-                        byteLen += fieldByteLen * f_bean_list.listLen();
-                        continue;
-                    } else {
-                        return;
-                    }
                 } else {
                     return;
                 }
