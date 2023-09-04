@@ -57,7 +57,7 @@ public class GoFieldBuilder__F_num_array extends GoFieldBuilder {
                 goReadTypeName = "float64";
             }
             default -> {
-                ParseUtil.notSupport_numType(field, annoClass);
+                ParseUtil.notSupport_numType(context.clazz, field, annoClass);
                 goReadTypeName = null;
             }
         }
@@ -144,7 +144,7 @@ public class GoFieldBuilder__F_num_array extends GoFieldBuilder {
                 singleLen = 8;
             }
             default -> {
-                ParseUtil.notSupport_numType(field, annoClass);
+                ParseUtil.notSupport_numType(context.clazz, field, annoClass);
                 singleLen = 0;
             }
         }
@@ -218,7 +218,7 @@ public class GoFieldBuilder__F_num_array extends GoFieldBuilder {
                 singleLen = 8;
             }
             default -> {
-                ParseUtil.notSupport_numType(field, annoClass);
+                ParseUtil.notSupport_numType(context.clazz, field, annoClass);
                 singleLen = 0;
             }
         }

@@ -57,7 +57,7 @@ public class GoFieldBuilder__F_num extends GoFieldBuilder {
                 goReadTypeName = "float64";
             }
             default -> {
-                ParseUtil.notSupport_numType(field, annoClass);
+                ParseUtil.notSupport_numType(context.clazz, field, annoClass);
                 goReadTypeName = null;
             }
         }

@@ -17,8 +17,8 @@ import java.util.stream.Collectors;
 public class LogUtil {
     public final static ConcurrentHashMap<Class<?>, HashMap<String, Integer>> class_fieldName_lineNo = new ConcurrentHashMap<>();
 
-    public static String getDeclaredFieldStackTrace(Class<?> fieldDeclaringClass, String fieldName) {
-        final Class<?>[] nestMembers = fieldDeclaringClass.getNestMembers();
+    public static String getFieldStackTrace(Class<?> clazz, String fieldName) {
+        final Class<?>[] nestMembers = clazz.getNestMembers();
         final Class<?> topClass = nestMembers[0];
         HashMap<String, Integer> fieldName_lineNo = null;
         for (Class<?> nestMember : nestMembers) {
@@ -50,7 +50,7 @@ public class LogUtil {
                 }
                 return resMap;
             });
-            if (fieldDeclaringClass == nestMember) {
+            if (clazz == nestMember) {
                 fieldName_lineNo = temp;
             }
         }
@@ -64,9 +64,9 @@ public class LogUtil {
     }
 
     public static void main(String[] args) throws NoSuchFieldException {
-        System.out.println("." + getDeclaredFieldStackTrace(Evt_0006.class, "HDop"));
-        System.out.println("." + getDeclaredFieldStackTrace(Evt_0006.class, "VDop"));
-        System.out.println("." + getDeclaredFieldStackTrace(Evt_D00B.class, "BMSCellVols"));
-        System.out.println("." + getDeclaredFieldStackTrace(Evt_D00B.Evt_D00B_BMSCellVol.class, "BMSCellVolV"));
+        System.out.println("." + getFieldStackTrace(Evt_0006.class, "HDop"));
+        System.out.println("." + getFieldStackTrace(Evt_0006.class, "VDop"));
+        System.out.println("." + getFieldStackTrace(Evt_D00B.class, "BMSCellVols"));
+        System.out.println("." + getFieldStackTrace(Evt_D00B.Evt_D00B_BMSCellVol.class, "BMSCellVolV"));
     }
 }

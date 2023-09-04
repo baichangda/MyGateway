@@ -12,7 +12,7 @@ import java.util.Date;
 
 public class Packet {
     //头 0-2
-    @F_num_array(len = 2, singleType = NumType.uint8)
+    @F_num_array(len = 2, singleType = NumType.int8)
     public byte[] header;
     //命令标识 2-3
     @F_num(type = NumType.uint8)

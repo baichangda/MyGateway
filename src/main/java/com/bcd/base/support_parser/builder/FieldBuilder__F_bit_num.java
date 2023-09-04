@@ -26,7 +26,7 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
                 if (fieldTypeClass.isEnum()) {
                     sourceValTypeName = "int";
                 } else {
-                    ParseUtil.notSupport_fieldType(field, annoClass);
+                    ParseUtil.notSupport_fieldType(context.clazz, field, annoClass);
                     sourceValTypeName = null;
                 }
             }

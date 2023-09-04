@@ -22,7 +22,7 @@ public class VehicleFuelBatteryData {
 
     //燃料电池温度探针总数
     @F_num(type = NumType.uint32, var = 'a')
-    public int num;
+    public long num;
 
     //探针温度值
     @F_num_array(lenExpr = "a", singleValExpr = "x-40", singleType = NumType.uint8, singleValType = NumType.int16)

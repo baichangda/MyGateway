@@ -1,51 +1,129 @@
 package com.bcd.base.support_parser.util;
 
 
+import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.support_parser.Parser;
 import com.bcd.base.support_parser.anno.*;
 import com.bcd.base.support_parser.builder.BuilderContext;
 import com.bcd.base.support_parser.builder.FieldBuilder;
-import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.base.support_parser.processor.Processor;
 import com.google.common.collect.Sets;
-import com.sun.jdi.connect.IllegalConnectorArgumentsException;
-import javassist.*;
-import javassist.util.HotSwapper;
+import javassist.CannotCompileException;
+import javassist.CtClass;
+import javassist.CtField;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.slf4j.helpers.MessageFormatter;
 
-import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class ParseUtil {
-    public static void notSupport_numType(final Field field, Class<?> annoClass) {
-        throw BaseRuntimeException.getException("class[{}] field[{}] anno[{}] numType not support", field.getDeclaringClass().getName(), field.getName(), annoClass.getName());
+
+    static Logger logger = LoggerFactory.getLogger(ParseUtil.class);
+
+    public static void check_numType(Class<?> clazz, Field field, F_num anno) {
+        Class<?> suggestType = check_numType(anno.type(), anno.valType());
+        if (suggestType == null) {
+            notSupport_numType(clazz, field, anno.getClass());
+            return;
+        }
+        Class<?> actualType = field.getType();
+        String fieldStackTrace = LogUtil.getFieldStackTrace(clazz, field.getName());
+        if (!actualType.isEnum()) {
+            if (suggestType != actualType) {
+                logger.warn("{} @F_num[type={},valType={}] type suggest[{}] actual[{}]",
+                        fieldStackTrace,
+                        anno.type(),
+                        anno.valType(),
+                        suggestType.getName(),
+                        actualType.getName());
+            }
+        }
     }
 
-    public static void notSupport_charset(final Field field, Class<?> annoClass) {
-        throw BaseRuntimeException.getException("class[{}] field[{}] anno[{}] charset not support", field.getDeclaringClass().getName(), field.getName(), annoClass.getName());
+    public static void check_numType(Class<?> clazz, Field field, F_num_array anno) {
+        Class<?> suggestType = check_numType(anno.singleType(), anno.singleValType());
+        if (suggestType == null) {
+            notSupport_numType(clazz, field, anno.getClass());
+            return;
+        }
+        Class<?> actualType = field.getType().getComponentType();
+        String fieldStackTrace = LogUtil.getFieldStackTrace(clazz, field.getName());
+        if (!actualType.isEnum()) {
+            if (suggestType != actualType) {
+                logger.warn("{} @F_num_array[singleType={},singleValType={}] type suggest[{}] actual[{}]",
+                        fieldStackTrace,
+                        anno.singleType(),
+                        anno.singleValType(),
+                        suggestType.getName(),
+                        actualType.getName());
+            }
+        }
     }
 
-    public static void notSupport_type(final Field field, Class<?> annoClass) {
-        throw BaseRuntimeException.getException("class[{}] field[{}] anno[{}] type not support", field.getDeclaringClass().getName(), field.getName(), annoClass.getName());
+    private static Class<?> check_numType(NumType type, NumType valType) {
+        final NumType tempType;
+        if (valType == NumType.Default) {
+            tempType = type;
+        } else {
+            tempType = valType;
+        }
+        final Class<?> suggestType;
+        switch (tempType) {
+            case uint8 -> {
+                suggestType = short.class;
+            }
+            case int8 -> {
+                suggestType = byte.class;
+            }
+            case uint16 -> {
+                suggestType = int.class;
+            }
+            case int16 -> {
+                suggestType = short.class;
+            }
+            case uint32 -> {
+                suggestType = long.class;
+            }
+            case int32 -> {
+                suggestType = int.class;
+            }
+            case uint64 -> {
+                suggestType = long.class;
+            }
+            case int64 -> {
+                suggestType = long.class;
+            }
+            case float32 -> {
+                suggestType = float.class;
+            }
+            case float64 -> {
+                suggestType = double.class;
+            }
+            default -> {
+                suggestType = null;
+            }
+        }
+        return suggestType;
+
     }
 
-    public static void notSupport_order(final Field field, Class<?> annoClass) {
-        throw BaseRuntimeException.getException("class[{}] field[{}] anno[{}] order not support", field.getDeclaringClass().getName(), field.getName(), annoClass.getName());
+    public static void notSupport_numType(Class<?> clazz, Field field, Class<?> annoClass) {
+        throw BaseRuntimeException.getException("class[{}] field[{}] anno[{}] numType not support", clazz.getName(), field.getName(), annoClass.getName());
     }
 
-    public static void notSupport_fieldType(final Field field, Class<?> annoClass) {
-        throw BaseRuntimeException.getException("class[{}] field[{}] anno[{}] not support", field.getDeclaringClass().getName(), field.getName(), annoClass.getName());
+    public static void notSupport_charset(Class<?> clazz, Field field, Class<?> annoClass) {
+        throw BaseRuntimeException.getException("class[{}] field[{}] anno[{}] charset not support", clazz.getName(), field.getName(), annoClass.getName());
     }
 
-    public static void notSupport_len(final Field field, Class<?> annoClass) {
-        throw BaseRuntimeException.getException("class[{}] field[{}] anno[{}] len not support", field.getDeclaringClass().getName(), field.getName(), annoClass.getName());
+    public static void notSupport_type(Class<?> clazz, Field field, Class<?> annoClass) {
+        throw BaseRuntimeException.getException("class[{}] field[{}] anno[{}] type not support", clazz.getName(), field.getName(), annoClass.getName());
     }
 
-    public static void notSupport_singleLen(final Field field, Class<?> annoClass) {
-        throw BaseRuntimeException.getException("class[{}] field[{}] anno[{}] singleLen not support", field.getDeclaringClass().getName(), field.getName(), annoClass.getName());
+    public static void notSupport_fieldType(Class<?> clazz, Field field, Class<?> annoClass) {
+        throw BaseRuntimeException.getException("class[{}] field[{}] anno[{}] not support", clazz.getName(), field.getName(), annoClass.getName());
     }
 
     private static String toFirstLowerCase(final String str) {

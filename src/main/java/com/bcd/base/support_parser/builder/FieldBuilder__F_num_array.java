@@ -1,9 +1,9 @@
 package com.bcd.base.support_parser.builder;
 
+import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.support_parser.anno.F_num_array;
 import com.bcd.base.support_parser.anno.F_skip;
 import com.bcd.base.support_parser.anno.NumType;
-import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.support_parser.util.ParseUtil;
 import com.bcd.base.support_parser.util.RpnUtil;
 
@@ -19,6 +19,9 @@ public class FieldBuilder__F_num_array extends FieldBuilder {
         final String sourceValTypeName;
         final Class<F_num_array> annoClass = F_num_array.class;
         final F_num_array anno = context.field.getAnnotation(annoClass);
+
+        ParseUtil.check_numType(context.clazz, field, anno);
+
         switch (arrayElementTypeName) {
             case "byte", "short", "int", "long", "float", "double" -> {
                 sourceValTypeName = arrayElementTypeName;
@@ -27,7 +30,7 @@ public class FieldBuilder__F_num_array extends FieldBuilder {
                 if (arrayElementType.isEnum()) {
                     sourceValTypeName = "int";
                 } else {
-                    ParseUtil.notSupport_fieldType(field, annoClass);
+                    ParseUtil.notSupport_fieldType(context.clazz, field, annoClass);
                     sourceValTypeName = null;
                 }
             }
@@ -87,7 +90,7 @@ public class FieldBuilder__F_num_array extends FieldBuilder {
                     funcName = "readDouble";
                 }
                 default -> {
-                    ParseUtil.notSupport_numType(field, annoClass);
+                    ParseUtil.notSupport_numType(context.clazz, field, annoClass);
                     funcName = null;
                 }
             }
@@ -189,7 +192,7 @@ public class FieldBuilder__F_num_array extends FieldBuilder {
                     funcName = "writeDouble" + funcName;
                 }
                 default -> {
-                    ParseUtil.notSupport_numType(field, annoClass);
+                    ParseUtil.notSupport_numType(context.clazz, field, annoClass);
                     writeCastTypeName = null;
                 }
             }

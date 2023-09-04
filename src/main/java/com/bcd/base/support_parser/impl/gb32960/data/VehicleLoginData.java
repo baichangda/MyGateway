@@ -23,7 +23,7 @@ public class VehicleLoginData implements PacketData {
 
     //可充电储能系统编码长度
     @F_num(type = NumType.uint8, var = 'm')
-    public byte systemCodeLen;
+    public short systemCodeLen;
 
     //可充电储能系统编码
     @F_string(lenExpr = "n*m")

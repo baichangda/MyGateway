@@ -32,7 +32,7 @@ public class GoFieldBuilder__F_string extends GoFieldBuilder {
         final String charset = anno.charset();
 
         if (Charset.forName(charset) != StandardCharsets.UTF_8) {
-            ParseUtil.notSupport_charset(field, annoClass);
+            ParseUtil.notSupport_charset(context.clazz, field, annoClass);
         }
 
         final String varNameLen = goFieldName + "_len";
@@ -88,7 +88,7 @@ public class GoFieldBuilder__F_string extends GoFieldBuilder {
         final String charset = anno.charset();
         final StringAppendMode stringAppendMode = anno.appendMode();
         if (Charset.forName(charset) != StandardCharsets.UTF_8) {
-            ParseUtil.notSupport_charset(field, annoClass);
+            ParseUtil.notSupport_charset(context.clazz, field, annoClass);
         }
 
         String valCode = GoFieldBuilder.varNameInstance + "." + goFieldName;

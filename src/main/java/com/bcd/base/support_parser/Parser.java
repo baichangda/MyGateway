@@ -158,7 +158,7 @@ public class Parser {
             @Override
             public void collect_field(Class<?> clazz, Class<?> fieldDeclaringClass, String fieldName, byte[] content, Object val, String processorClassName) {
                 logger.info("--parse field{}--[{}].[{}] [{}]->[{}]"
-                        , LogUtil.getDeclaredFieldStackTrace(fieldDeclaringClass, fieldName)
+                        , LogUtil.getFieldStackTrace(fieldDeclaringClass, fieldName)
                         , clazz.getSimpleName()
                         , fieldName
                         , ByteBufUtil.hexDump(content).toUpperCase()
@@ -170,7 +170,7 @@ public class Parser {
             public void collect_field_bit(Class<?> clazz, Class<?> fieldDeclaringClass, String fieldName, BitBuf_reader_log.Log[] logs, Object val, String processorClassName) {
                 for (BitBuf_reader_log.Log log : logs) {
                     logger.info("--parse field{}--[{}].[{}] val[{}] {}"
-                            , LogUtil.getDeclaredFieldStackTrace(fieldDeclaringClass, fieldName)
+                            , LogUtil.getFieldStackTrace(fieldDeclaringClass, fieldName)
                             , clazz.getSimpleName()
                             , fieldName
                             , val
@@ -186,7 +186,7 @@ public class Parser {
             @Override
             public void collect_field(Class<?> clazz, Class<?> fieldDeclaringClass, String fieldName, Object val, byte[] content, String processorClassName) {
                 logger.info("--deParse field{}--[{}].[{}] [{}]->[{}]"
-                        , LogUtil.getDeclaredFieldStackTrace(fieldDeclaringClass, fieldName)
+                        , LogUtil.getFieldStackTrace(fieldDeclaringClass, fieldName)
                         , clazz.getSimpleName()
                         , fieldName
                         , val
@@ -197,7 +197,7 @@ public class Parser {
             public void collect_field_bit(Class<?> clazz, Class<?> fieldDeclaringClass, String fieldName, Object val, BitBuf_writer_log.Log[] logs, String processorClassName) {
                 for (BitBuf_writer_log.Log log : logs) {
                     logger.info("--deParse field{}--[{}].[{}] val[{}] {}"
-                            , LogUtil.getDeclaredFieldStackTrace(fieldDeclaringClass, fieldName)
+                            , LogUtil.getFieldStackTrace(fieldDeclaringClass, fieldName)
                             , clazz.getSimpleName()
                             , fieldName
                             , val

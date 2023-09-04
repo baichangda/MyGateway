@@ -56,7 +56,7 @@ public class GoFieldBuilder__F_bit_num extends GoFieldBuilder {
                 goFieldTypeName = "float64";
             }
             default -> {
-                ParseUtil.notSupport_numType(field, annoClass);
+                ParseUtil.notSupport_numType(context.clazz, field, annoClass);
                 goFieldTypeName = null;
             }
         }

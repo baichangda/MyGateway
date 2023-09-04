@@ -30,7 +30,7 @@ public class VehicleAlarmData {
 
     //驱动电机故障代码列表
     @F_num_array(lenExpr = "b", singleType = NumType.uint32)
-    public int[] driverBadCodes;
+    public long[] driverBadCodes;
 
     //发动机故障总数
     @F_num(type = NumType.uint8, var = 'c')
@@ -38,7 +38,7 @@ public class VehicleAlarmData {
 
     //发动机故障代码列表
     @F_num_array(lenExpr = "c", singleType = NumType.uint32)
-    public short[] engineBadCodes;
+    public long[] engineBadCodes;
 
     //其他故障总数
     @F_num(type = NumType.uint8, var = 'd')
