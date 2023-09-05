@@ -1,7 +1,7 @@
 package com.bcd.base.support_parser.builder;
 
-import com.bcd.base.support_parser.anno.F_bit_num;
 import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.support_parser.anno.F_bit_num;
 import com.bcd.base.support_parser.util.ParseUtil;
 import com.bcd.base.support_parser.util.RpnUtil;
 
@@ -17,6 +17,9 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
         final F_bit_num anno = field.getAnnotation(annoClass);
         final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.bitOrder);
         final boolean unsigned = anno.unsigned();
+
+        ParseUtil.check_numType(context.clazz, field, anno);
+
         final String sourceValTypeName;
         switch (fieldTypeName) {
             case "byte", "short", "int", "long", "float", "double" -> {

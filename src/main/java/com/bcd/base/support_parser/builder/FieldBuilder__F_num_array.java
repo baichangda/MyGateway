@@ -63,19 +63,31 @@ public class FieldBuilder__F_num_array extends FieldBuilder {
             String funcName;
             switch (singleType) {
                 case uint8 -> {
-                    funcName = "readUnsignedByte";
+                    if (sourceValTypeName.equals("byte")) {
+                        funcName = "readByte";
+                    } else {
+                        funcName = "readUnsignedByte";
+                    }
                 }
                 case int8 -> {
                     funcName = "readByte";
                 }
                 case uint16 -> {
-                    funcName = "readUnsignedShort";
+                    if (sourceValTypeName.equals("short")) {
+                        funcName = "readShort";
+                    } else {
+                        funcName = "readUnsignedShort";
+                    }
                 }
                 case int16 -> {
                     funcName = "readShort";
                 }
                 case uint32 -> {
-                    funcName = "readUnsignedInt";
+                    if (sourceValTypeName.equals("int")) {
+                        funcName = "readInt";
+                    } else {
+                        funcName = "readUnsignedInt";
+                    }
                 }
                 case int32 -> {
                     funcName = "readInt";

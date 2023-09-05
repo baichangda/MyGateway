@@ -1,8 +1,8 @@
 package com.bcd.base.support_parser;
 
+import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.support_parser.anno.*;
 import com.bcd.base.support_parser.builder.*;
-import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.support_parser.processor.ProcessContext;
 import com.bcd.base.support_parser.processor.Processor;
 import com.bcd.base.support_parser.util.BitBuf_reader_log;
@@ -89,6 +89,15 @@ public class Parser {
      * 是否打印javassist生成class的过程日志
      */
     private static boolean printBuildLog = false;
+
+    /**
+     * 是否进行bean的数字字段类型检查、针对数字字段包含如下注解
+     * {@link F_num}
+     * {@link F_num_array}
+     * {@link F_bit_num}
+     * {@link F_bit_num_array}
+     */
+    public static boolean printNumFieldSuggestTypeWarn = false;
 
 
     public interface LogCollector_parse {
@@ -209,6 +218,10 @@ public class Parser {
 
     public static void enablePrintBuildLog() {
         printBuildLog = true;
+    }
+
+    public static void enablePrintNumFieldSuggestTypeWarn() {
+        printNumFieldSuggestTypeWarn = true;
     }
 
     public static void enableGenerateClassFile() {
@@ -571,9 +584,10 @@ public class Parser {
     /**
      * 获取类解析器
      * 使用默认字节序模式和位模式
+     *
      * @param clazz 实体类类型
-     * @return
      * @param <T>
+     * @return
      */
     public static <T> Processor<T> getProcessor(Class<T> clazz) {
         return getProcessor(clazz, ByteOrder.Default, BitOrder.Default, null);
@@ -581,11 +595,12 @@ public class Parser {
 
     /**
      * 获取类解析器
-     * @param clazz 实体类类型
+     *
+     * @param clazz     实体类类型
      * @param byteOrder 实体类字节码实现 字节序模式
-     * @param bitOrder 实体类字节码实现 位模式
-     * @return
+     * @param bitOrder  实体类字节码实现 位模式
      * @param <T>
+     * @return
      */
     public static <T> Processor<T> getProcessor(Class<T> clazz, ByteOrder byteOrder, BitOrder bitOrder) {
         return getProcessor(clazz, byteOrder, bitOrder, null);
@@ -593,12 +608,13 @@ public class Parser {
 
     /**
      * 获取类解析器
-     * @param clazz 实体类类型
-     * @param byteOrder 实体类字节码实现 字节序模式
-     * @param bitOrder 实体类字节码实现 位模式
+     *
+     * @param clazz         实体类类型
+     * @param byteOrder     实体类字节码实现 字节序模式
+     * @param bitOrder      实体类字节码实现 位模式
      * @param parentContext 上层bean的build上下文
-     * @return
      * @param <T>
+     * @return
      */
     public static <T> Processor<T> getProcessor(Class<T> clazz, ByteOrder byteOrder, BitOrder bitOrder, BuilderContext parentContext) {
         final String clazzName = clazz.getName();

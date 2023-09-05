@@ -23,7 +23,99 @@ public class ParseUtil {
 
     static Logger logger = LoggerFactory.getLogger(ParseUtil.class);
 
+    public static void check_numType(Class<?> clazz, Field field, F_bit_num anno) {
+        if(!Parser.printNumFieldSuggestTypeWarn){
+            return;
+        }
+        Class<?> suggestType = check_numType(anno.valType());
+        if (suggestType == null) {
+            notSupport_numType(clazz, field, anno.getClass());
+            return;
+        }
+        Class<?> actualType = field.getType();
+        String fieldStackTrace = LogUtil.getFieldStackTrace(clazz, field.getName());
+        if (!actualType.isEnum()) {
+            if (suggestType != actualType) {
+                logger.warn("{} class[{}] field[{}] @F_bit_num[valType={}] type suggest[{}] actual[{}]",
+                        fieldStackTrace,
+                        clazz.getName(),
+                        field.getName(),
+                        anno.valType(),
+                        suggestType.getName(),
+                        actualType.getName());
+            }
+        }
+    }
+
+    public static void check_numType(Class<?> clazz, Field field, F_bit_num_array anno) {
+        if(!Parser.printNumFieldSuggestTypeWarn){
+            return;
+        }
+        Class<?> suggestType = check_numType(anno.singleValType());
+        if (suggestType == null) {
+            notSupport_numType(clazz, field, anno.getClass());
+            return;
+        }
+        Class<?> actualType = field.getType();
+        String fieldStackTrace = LogUtil.getFieldStackTrace(clazz, field.getName());
+        if (!actualType.isEnum()) {
+            if (suggestType != actualType) {
+                logger.warn("{} class[{}] field[{}] @F_num[singleValType={}] type suggest[{}] actual[{}]",
+                        fieldStackTrace,
+                        clazz.getName(),
+                        field.getName(),
+                        anno.singleValType(),
+                        suggestType.getName(),
+                        actualType.getName());
+            }
+        }
+    }
+
+    private static Class<?> check_numType(NumType valType) {
+        final Class<?> suggestType;
+        switch (valType) {
+            case uint8 -> {
+                suggestType = short.class;
+            }
+            case int8 -> {
+                suggestType = byte.class;
+            }
+            case uint16 -> {
+                suggestType = int.class;
+            }
+            case int16 -> {
+                suggestType = short.class;
+            }
+            case uint32 -> {
+                suggestType = long.class;
+            }
+            case int32 -> {
+                suggestType = int.class;
+            }
+            case uint64 -> {
+                suggestType = long.class;
+            }
+            case int64 -> {
+                suggestType = long.class;
+            }
+            case float32 -> {
+                suggestType = float.class;
+            }
+            case float64 -> {
+                suggestType = double.class;
+            }
+            default -> {
+                suggestType = null;
+            }
+        }
+        return suggestType;
+
+    }
+
     public static void check_numType(Class<?> clazz, Field field, F_num anno) {
+        if(!Parser.printNumFieldSuggestTypeWarn){
+            return;
+        }
         Class<?> suggestType = check_numType(anno.type(), anno.valType());
         if (suggestType == null) {
             notSupport_numType(clazz, field, anno.getClass());
@@ -33,8 +125,10 @@ public class ParseUtil {
         String fieldStackTrace = LogUtil.getFieldStackTrace(clazz, field.getName());
         if (!actualType.isEnum()) {
             if (suggestType != actualType) {
-                logger.warn("{} @F_num[type={},valType={}] type suggest[{}] actual[{}]",
+                logger.warn("{} class[{}] field[{}] @F_num[type={},valType={}] type suggest[{}] actual[{}]",
                         fieldStackTrace,
+                        clazz.getName(),
+                        field.getName(),
                         anno.type(),
                         anno.valType(),
                         suggestType.getName(),
@@ -44,6 +138,9 @@ public class ParseUtil {
     }
 
     public static void check_numType(Class<?> clazz, Field field, F_num_array anno) {
+        if(!Parser.printNumFieldSuggestTypeWarn){
+            return;
+        }
         Class<?> suggestType = check_numType(anno.singleType(), anno.singleValType());
         if (suggestType == null) {
             notSupport_numType(clazz, field, anno.getClass());
@@ -53,8 +150,10 @@ public class ParseUtil {
         String fieldStackTrace = LogUtil.getFieldStackTrace(clazz, field.getName());
         if (!actualType.isEnum()) {
             if (suggestType != actualType) {
-                logger.warn("{} @F_num_array[singleType={},singleValType={}] type suggest[{}] actual[{}]",
+                logger.warn("{} class[{}] field[{}] @F_num_array[singleType={},singleValType={}] type suggest[{}] actual[{}]",
                         fieldStackTrace,
+                        clazz.getName(),
+                        field.getName(),
                         anno.singleType(),
                         anno.singleValType(),
                         suggestType.getName(),
