@@ -30,7 +30,7 @@ public class FieldBuilder__F_num extends FieldBuilder {
             }
         }
 
-        final F_num anno = context.field.getAnnotation(annoClass);
+        final F_num anno = field.getAnnotation(annoClass);
         final StringBuilder body = context.body;
         final String varNameInstance = FieldBuilder.varNameInstance;
         final String varNameField = ParseUtil.getFieldVarName(context);

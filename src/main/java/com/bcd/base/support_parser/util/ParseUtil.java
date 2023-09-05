@@ -29,7 +29,7 @@ public class ParseUtil {
         }
         Class<?> suggestType = check_numType(anno.valType());
         if (suggestType == null) {
-            notSupport_numType(clazz, field, anno.getClass());
+            notSupport_numType(clazz, field, anno.annotationType());
             return;
         }
         Class<?> actualType = field.getType();
@@ -53,7 +53,7 @@ public class ParseUtil {
         }
         Class<?> suggestType = check_numType(anno.singleValType());
         if (suggestType == null) {
-            notSupport_numType(clazz, field, anno.getClass());
+            notSupport_numType(clazz, field, anno.annotationType());
             return;
         }
         Class<?> actualType = field.getType().getComponentType();
@@ -118,7 +118,7 @@ public class ParseUtil {
         }
         Class<?> suggestType = check_numType(anno.type(), anno.valType());
         if (suggestType == null) {
-            notSupport_numType(clazz, field, anno.getClass());
+            notSupport_numType(clazz, field, anno.annotationType());
             return;
         }
         Class<?> actualType = field.getType();
@@ -143,7 +143,7 @@ public class ParseUtil {
         }
         Class<?> suggestType = check_numType(anno.singleType(), anno.singleValType());
         if (suggestType == null) {
-            notSupport_numType(clazz, field, anno.getClass());
+            notSupport_numType(clazz, field, anno.annotationType());
             return;
         }
         Class<?> actualType = field.getType().getComponentType();
