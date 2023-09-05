@@ -56,7 +56,7 @@ public class ParseUtil {
             notSupport_numType(clazz, field, anno.getClass());
             return;
         }
-        Class<?> actualType = field.getType();
+        Class<?> actualType = field.getType().getComponentType();
         String fieldStackTrace = LogUtil.getFieldStackTrace(clazz, field.getName());
         if (!actualType.isEnum()) {
             if (suggestType != actualType) {
