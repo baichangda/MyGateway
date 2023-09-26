@@ -29,7 +29,7 @@ public class Evt_D00F extends Evt_4_x {
     @F_bit_num(len = 1, valType = NumType.uint8)
     public byte BMSBatPrsSnsrVBkup;
     @F_bit_num(len = 15, valType = NumType.float32, valExpr = "x*0.05")
-    public double BMSBatPrsSnsrVal;
+    public float BMSBatPrsSnsrVal;
     @F_bit_num(len = 8, valType = NumType.float32, valExpr = "x*0.4")
     public float BMSClntPumpPWMReq;
     @F_bit_num(len = 1, valType = NumType.uint8)
