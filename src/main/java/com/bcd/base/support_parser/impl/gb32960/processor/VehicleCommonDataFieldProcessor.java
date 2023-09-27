@@ -22,7 +22,7 @@ public class VehicleCommonDataFieldProcessor implements Processor<VehicleCommonD
     final Processor<VehicleStorageTemperatureData> processor_vehicleStorageTemperatureData = Parser.getProcessor(VehicleStorageTemperatureData.class);
 
     @Override
-    public VehicleCommonData process(final ByteBuf byteBuf, final ProcessContext parentContext) {
+    public VehicleCommonData process(final ByteBuf byteBuf, final ProcessContext<?> parentContext) {
         final VehicleCommonData vehicleCommonData = new VehicleCommonData();
         int allLen = ((Packet) parentContext.parentContext.instance).contentLength - 6;
         ProcessContext<VehicleCommonData> processContext = new ProcessContext<>(vehicleCommonData, parentContext);
@@ -97,8 +97,7 @@ public class VehicleCommonDataFieldProcessor implements Processor<VehicleCommonD
     }
 
     @Override
-    public void deProcess(ByteBuf data, ProcessContext parentContext, VehicleCommonData instance) {
-        ProcessContext<VehicleCommonData> processContext = new ProcessContext<>(instance, parentContext);
+    public void deProcess(ByteBuf data, ProcessContext<?> parentContext, VehicleCommonData instance) {
         if (instance.vehicleBaseData != null) {
             data.writeByte(1);
             processor_vehicleBaseData.deProcess(data,parentContext,instance.vehicleBaseData);

@@ -21,7 +21,7 @@ public class BuilderContext {
     /**
      * 主要用于{@link F_customize#builderClass()}缓存、避免在生成解析类的过程中生成多个实例
      */
-    public final static Map<Class, FieldBuilder> fieldBuilderCache = new HashMap<>();
+    public final static Map<Class<?>, FieldBuilder> fieldBuilderCache = new HashMap<>();
     /**
      * parse方法体
      */
@@ -69,18 +69,15 @@ public class BuilderContext {
      */
     public final Map<String, String> classVarDefineToVarName;
 
-    public final BuilderContext parentContext;
-
     public final ByteOrder byteOrder;
     public final BitOrder bitOrder;
 
-    public BuilderContext(StringBuilder body, Class clazz, CtClass implCc, Map<String, String> classVarDefineToVarName, Map<String, String> beanClassAndOrder_processorVarName, ByteOrder byteOrder, BitOrder bitOrder, BuilderContext parentContext) {
+    public BuilderContext(StringBuilder body, Class<?> clazz, CtClass implCc, Map<String, String> classVarDefineToVarName, Map<String, String> beanClassAndOrder_processorVarName, ByteOrder byteOrder, BitOrder bitOrder) {
         this.body = body;
         this.clazz = clazz;
         this.implCc = implCc;
         this.classVarDefineToVarName = classVarDefineToVarName;
         this.beanClassAndOrder_processorVarName = beanClassAndOrder_processorVarName;
-        this.parentContext = parentContext;
         this.byteOrder = byteOrder;
         this.bitOrder = bitOrder;
     }
@@ -95,18 +92,19 @@ public class BuilderContext {
                     processContextVarName,
                     processContextClassName,
                     FieldBuilder.varNameInstance,
-                    FieldBuilder.varNameParentProcessContext);
+                    FieldBuilder.varNameParentProcessContext
+            );
         }
         return processContextVarName;
     }
 
 
     public final String getProcessorVarName(Class<?> beanClazz) {
-        final String key = beanClazz.getName() + "," + byteOrder + "," + bitOrder;
+        final String key = ParseUtil.getProcessKey(beanClazz, byteOrder, bitOrder);
         return beanClassAndOrder_processorVarName.computeIfAbsent(key, k -> {
             final String varName = "_processor_" + beanClazz.getSimpleName();
             //在build时候预先生成、并在相应的class中生成类变量
-            Parser.getProcessor(beanClazz, byteOrder, bitOrder, this);
+            Parser.getProcessor(beanClazz, byteOrder, bitOrder);
             String format = ParseUtil.format("public final {} {}={}.beanClassNameAndOrder_processor.get(\"{}\");\n",
                     Processor.class.getName(),
                     varName,

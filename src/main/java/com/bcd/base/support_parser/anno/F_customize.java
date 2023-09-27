@@ -50,8 +50,8 @@ public @interface F_customize {
      * {@link com.bcd.base.support_parser.processor.ProcessContext#bitBuf_reader}
      * {@link com.bcd.base.support_parser.processor.ProcessContext#bitBuf_writer}
      * 集合中的子类获取bitBuf逻辑参考
-     * {@link BuilderContext#getVarNameBitBuf_reader()}
-     * {@link BuilderContext#getVarNameBitBuf_writer()}
+     * {@link com.bcd.base.support_parser.util.ParseUtil#newBitBuf_parse(BuilderContext)}
+     * {@link com.bcd.base.support_parser.util.ParseUtil#newBitBuf_deParse(BuilderContext)}
      */
     boolean passBitBuf() default false;
 }

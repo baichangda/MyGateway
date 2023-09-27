@@ -8,6 +8,7 @@ import io.netty.buffer.ByteBuf;
 
 
 public class PacketDataFieldProcessor implements Processor<PacketData> {
+
     final Processor<VehicleLoginData> processor_vehicleLoginData = Parser.getProcessor(VehicleLoginData.class);
     final Processor<VehicleRunData> processor_vehicleRunData = Parser.getProcessor(VehicleRunData.class);
     final Processor<VehicleSupplementData> processor_vehicleSupplementData = Parser.getProcessor(VehicleSupplementData.class);

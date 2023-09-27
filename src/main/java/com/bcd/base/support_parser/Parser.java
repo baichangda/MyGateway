@@ -463,18 +463,13 @@ public class Parser {
         }
     }
 
-    /**
-     * 生成类的序号
-     */
-    private static int processorIndex = 0;
 
-    public static <T> Class<T> buildClass(Class<T> clazz, BuilderContext parentContext, ByteOrder byteOrder, BitOrder bitOrder) throws CannotCompileException, NotFoundException, IOException {
+    public static <T> Class<T> buildClass(Class<T> clazz, ByteOrder byteOrder, BitOrder bitOrder) throws CannotCompileException, NotFoundException, IOException {
         final String processor_class_name = Processor.class.getName();
         final String byteBufClassName = ByteBuf.class.getName();
         final String clazzName = clazz.getName();
 
-        final int lastIndexOf = processor_class_name.lastIndexOf(".");
-        String implProcessor_class_name = processor_class_name.substring(0, lastIndexOf) + "." + processor_class_name.substring(lastIndexOf + 1) + "_" + processorIndex++ + "_" + clazz.getSimpleName() + "_" + byteOrder + "_" + bitOrder;
+        String implProcessor_class_name = ParseUtil.getProcessClassName(clazz, byteOrder, bitOrder);
         final CtClass cc = ClassPool.getDefault().makeClass(implProcessor_class_name);
 
         //添加泛型
@@ -539,7 +534,7 @@ public class Parser {
         if (hasFieldSkipModeReserved) {
             ParseUtil.append(processBody, "final int {}={}.readerIndex();\n", FieldBuilder.varNameStartIndex, FieldBuilder.varNameByteBuf);
         }
-        BuilderContext parseBuilderContext = new BuilderContext(processBody, clazz, cc, classVarDefineToVarName, beanClassAndOrder_processorVarName, byteOrder, bitOrder, parentContext);
+        BuilderContext parseBuilderContext = new BuilderContext(processBody, clazz, cc, classVarDefineToVarName, beanClassAndOrder_processorVarName, byteOrder, bitOrder);
         buildMethodBody_process(clazz, parseBuilderContext);
         ParseUtil.append(processBody, "return {};\n", FieldBuilder.varNameInstance);
         processBody.append("}");
@@ -566,7 +561,7 @@ public class Parser {
         if (hasFieldSkipModeReserved) {
             ParseUtil.append(deProcessBody, "final int {}={}.writerIndex();\n", FieldBuilder.varNameStartIndex, FieldBuilder.varNameByteBuf);
         }
-        BuilderContext deParseBuilderContext = new BuilderContext(deProcessBody, clazz, cc, classVarDefineToVarName, beanClassAndOrder_processorVarName, byteOrder, bitOrder, parentContext);
+        BuilderContext deParseBuilderContext = new BuilderContext(deProcessBody, clazz, cc, classVarDefineToVarName, beanClassAndOrder_processorVarName, byteOrder, bitOrder);
         buildMethodBody_deProcess(clazz, deParseBuilderContext);
         deProcessBody.append("}");
         if (printBuildLog) {
@@ -590,42 +585,27 @@ public class Parser {
      * @return
      */
     public static <T> Processor<T> getProcessor(Class<T> clazz) {
-        return getProcessor(clazz, ByteOrder.Default, BitOrder.Default, null);
+        return getProcessor(clazz, ByteOrder.Default, BitOrder.Default);
     }
 
     /**
      * 获取类解析器
      *
-     * @param clazz     实体类类型
-     * @param byteOrder 实体类字节码实现 字节序模式
-     * @param bitOrder  实体类字节码实现 位模式
+     * @param clazz       实体类类型
+     * @param byteOrder   实体类字节码实现 字节序模式
+     * @param bitOrder    实体类字节码实现 位模式
      * @param <T>
      * @return
      */
     public static <T> Processor<T> getProcessor(Class<T> clazz, ByteOrder byteOrder, BitOrder bitOrder) {
-        return getProcessor(clazz, byteOrder, bitOrder, null);
-    }
-
-    /**
-     * 获取类解析器
-     *
-     * @param clazz         实体类类型
-     * @param byteOrder     实体类字节码实现 字节序模式
-     * @param bitOrder      实体类字节码实现 位模式
-     * @param parentContext 上层bean的build上下文
-     * @param <T>
-     * @return
-     */
-    public static <T> Processor<T> getProcessor(Class<T> clazz, ByteOrder byteOrder, BitOrder bitOrder, BuilderContext parentContext) {
-        final String clazzName = clazz.getName();
-        final String key = clazzName + "," + byteOrder + "," + bitOrder;
+        final String key = ParseUtil.getProcessKey(clazz, byteOrder, bitOrder);
         Processor<T> processor = (Processor<T>) beanClassNameAndOrder_processor.get(key);
         if (processor == null) {
             synchronized (beanClassNameAndOrder_processor) {
                 processor = (Processor<T>) beanClassNameAndOrder_processor.get(key);
                 if (processor == null) {
                     try {
-                        final Class<T> processClass = Parser.buildClass(clazz, parentContext, byteOrder, bitOrder);
+                        final Class<T> processClass = Parser.buildClass(clazz, byteOrder, bitOrder);
                         processor = (Processor<T>) processClass.getConstructor().newInstance();
                         beanClassNameAndOrder_processor.put(key, processor);
                         return processor;

@@ -46,7 +46,7 @@ public class Packet_evts_processor implements Processor<List<Evt>> {
     final Processor<Evt_4_x_unknown> processor_Evt_4_x_unknown = Parser.getProcessor(Evt_4_x_unknown.class);
 
     @Override
-    public List<Evt> process(ByteBuf data, ProcessContext parentContext) {
+    public List<Evt> process(ByteBuf data, ProcessContext<?> parentContext) {
         final List<Evt> evts = new ArrayList<>();
         while (data.isReadable()) {
             final int evtId = data.getUnsignedShort(data.readerIndex());
@@ -151,7 +151,7 @@ public class Packet_evts_processor implements Processor<List<Evt>> {
     }
 
     @Override
-    public void deProcess(ByteBuf data, ProcessContext parentContext, List<Evt> instance) {
+    public void deProcess(ByteBuf data, ProcessContext<?> parentContext, List<Evt> instance) {
         for (Evt evt : instance) {
             final int evtId = evt.evtId;
             switch (evtId) {

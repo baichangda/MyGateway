@@ -6,6 +6,7 @@ import com.bcd.base.support_parser.Parser;
 import com.bcd.base.support_parser.anno.*;
 import com.bcd.base.support_parser.builder.BuilderContext;
 import com.bcd.base.support_parser.builder.FieldBuilder;
+import com.bcd.base.support_parser.processor.Processor;
 import com.google.common.collect.Sets;
 import javassist.CannotCompileException;
 import javassist.CtClass;
@@ -24,7 +25,7 @@ public class ParseUtil {
     static Logger logger = LoggerFactory.getLogger(ParseUtil.class);
 
     public static void check_numType(Class<?> clazz, Field field, F_bit_num anno) {
-        if(!Parser.printNumFieldSuggestTypeWarn){
+        if (!Parser.printNumFieldSuggestTypeWarn) {
             return;
         }
         Class<?> suggestType = check_numType(anno.valType());
@@ -48,7 +49,7 @@ public class ParseUtil {
     }
 
     public static void check_numType(Class<?> clazz, Field field, F_bit_num_array anno) {
-        if(!Parser.printNumFieldSuggestTypeWarn){
+        if (!Parser.printNumFieldSuggestTypeWarn) {
             return;
         }
         Class<?> suggestType = check_numType(anno.singleValType());
@@ -113,7 +114,7 @@ public class ParseUtil {
     }
 
     public static void check_numType(Class<?> clazz, Field field, F_num anno) {
-        if(!Parser.printNumFieldSuggestTypeWarn){
+        if (!Parser.printNumFieldSuggestTypeWarn) {
             return;
         }
         Class<?> suggestType = check_numType(anno.type(), anno.valType());
@@ -138,7 +139,7 @@ public class ParseUtil {
     }
 
     public static void check_numType(Class<?> clazz, Field field, F_num_array anno) {
-        if(!Parser.printNumFieldSuggestTypeWarn){
+        if (!Parser.printNumFieldSuggestTypeWarn) {
             return;
         }
         Class<?> suggestType = check_numType(anno.singleType(), anno.singleValType());
@@ -508,7 +509,7 @@ public class ParseUtil {
     }
 
 
-    public static String unBoxing(final String num, final Class clazz) {
+    public static String unBoxing(final String num, final Class<?> clazz) {
         if (clazz == byte.class) {
             return num + ".byteValue()";
         } else if (clazz == short.class) {
@@ -526,7 +527,7 @@ public class ParseUtil {
         }
     }
 
-    public static String boxing(final String num, final Class clazz) {
+    public static String boxing(final String num, final Class<?> clazz) {
         if (clazz == byte.class) {
             return "Byte.valueOf(" + num + ")";
         } else if (clazz == short.class) {
@@ -671,5 +672,21 @@ public class ParseUtil {
         return ClassUtil.getAllFields(clazz).stream().filter(ParseUtil::needParse).collect(Collectors.toList());
     }
 
+    public static String getProcessKey(Class<?> clazz, ByteOrder byteOrder, BitOrder bitOrder) {
+        return clazz.getName()
+                + "_" + (byteOrder == ByteOrder.smallEndian ? 0 : 1)
+                + "_" + (bitOrder == BitOrder.smallEndian ? 0 : 1);
+    }
 
+    /**
+     * 生成类的序号
+     */
+    private static int processorIndex = 0;
+
+    public static String getProcessClassName(Class<?> clazz, ByteOrder byteOrder, BitOrder bitOrder) {
+        String clazzName = Processor.class.getName();
+        return clazzName.substring(0, clazzName.lastIndexOf(".")) + ".P_" + (processorIndex++) + "_" + clazz.getSimpleName()
+                + "_" + (byteOrder == ByteOrder.smallEndian ? 0 : 1)
+                + "_" + (bitOrder == BitOrder.smallEndian ? 0 : 1);
+    }
 }

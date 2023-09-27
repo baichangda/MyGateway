@@ -3,8 +3,6 @@ package com.bcd.base.support_parser.builder;
 
 import com.bcd.base.support_parser.anno.F_customize;
 import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.base.support_parser.util.BitBuf_reader;
-import com.bcd.base.support_parser.util.BitBuf_writer;
 import com.bcd.base.support_parser.util.ParseUtil;
 
 import java.lang.reflect.Field;
@@ -25,13 +23,14 @@ public class FieldBuilder__F_customize extends FieldBuilder {
                 final String varNameField = ParseUtil.getFieldVarName(context);
                 final String processorClassVarName = ParseUtil.getProcessorVarName(processorClass);
                 final String varNameInstance = FieldBuilder.varNameInstance;
-                final String fieldTypeClassName = field.getType().getName();
+                final Class<?> fieldType = field.getType();
+                final String fieldTypeClassName = fieldType.getName();
                 final String processContextVarName = context.getProcessContextVarName();
                 if (anno.passBitBuf()) {
                     final String varNameBitBuf = context.getVarNameBitBuf_reader();
                     ParseUtil.append(body, "{}.bitBuf_reader={};\n", processContextVarName, varNameBitBuf);
                 }
-                final String unBoxing = ParseUtil.unBoxing(ParseUtil.format("{}.process({},{})", processorClassVarName, FieldBuilder.varNameByteBuf, processContextVarName), field.getType());
+                final String unBoxing = ParseUtil.unBoxing(ParseUtil.format("{}.process({},{})", processorClassVarName, FieldBuilder.varNameByteBuf, processContextVarName), fieldType);
                 if (anno.var() == '0') {
                     ParseUtil.append(body, "{}.{}={};\n", varNameInstance, field.getName(), unBoxing);
                 } else {
