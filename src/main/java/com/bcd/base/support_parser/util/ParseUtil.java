@@ -6,6 +6,8 @@ import com.bcd.base.support_parser.Parser;
 import com.bcd.base.support_parser.anno.*;
 import com.bcd.base.support_parser.builder.BuilderContext;
 import com.bcd.base.support_parser.builder.FieldBuilder;
+import com.bcd.base.support_parser.impl.gb32960.data.Packet;
+import com.bcd.base.support_parser.impl.gb32960.data.VehicleBaseData;
 import com.bcd.base.support_parser.processor.Processor;
 import com.google.common.collect.Sets;
 import javassist.CannotCompileException;
@@ -17,6 +19,7 @@ import org.slf4j.helpers.MessageFormatter;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -330,25 +333,7 @@ public class ParseUtil {
     }
 
     public static boolean needBitBuf(List<Field> fieldList) {
-        return fieldList.stream().anyMatch(e -> {
-            if (e.isAnnotationPresent(F_bit_num.class) || e.isAnnotationPresent(F_bit_num_array.class) || e.isAnnotationPresent(F_bit_skip.class)) {
-                return true;
-            } else {
-                final F_bean f_bean = e.getAnnotation(F_bean.class);
-                if (f_bean != null && f_bean.passBitBuf()) {
-                    return true;
-                }
-                final F_bean_list f_bean_list = e.getAnnotation(F_bean_list.class);
-                if (f_bean_list != null && f_bean_list.passBitBuf()) {
-                    return true;
-                }
-                final F_customize f_customize = e.getAnnotation(F_customize.class);
-                if (f_customize != null && f_customize.passBitBuf()) {
-                    return true;
-                }
-            }
-            return false;
-        });
+        return fieldList.stream().anyMatch(e -> e.isAnnotationPresent(F_bit_num.class) || e.isAnnotationPresent(F_bit_num_array.class) || e.isAnnotationPresent(F_bit_skip.class));
     }
 
     public static void newBitBuf_parse(BuilderContext context) {
@@ -357,19 +342,9 @@ public class ParseUtil {
         final String bitBuf_reader_log_className = BitBuf_reader_log.class.getName();
 
         if (Parser.logCollector_parse == null) {
-            ParseUtil.append(body, "final {} {};\n", bitBuf_reader_className, FieldBuilder.varNameBitBuf);
-            ParseUtil.append(body, "if ({} == null || {}.bitBuf_reader == null) {\n", FieldBuilder.varNameParentProcessContext, FieldBuilder.varNameParentProcessContext);
-            ParseUtil.append(body, "{}=new {}({});\n", FieldBuilder.varNameBitBuf, bitBuf_reader_className, FieldBuilder.varNameByteBuf);
-            ParseUtil.append(body, "}else{\n");
-            ParseUtil.append(body, "{}={}.bitBuf_reader;\n", FieldBuilder.varNameBitBuf, FieldBuilder.varNameParentProcessContext);
-            ParseUtil.append(body, "}\n");
+            ParseUtil.append(body, "final {} {}=new {}({});\n", bitBuf_reader_className, FieldBuilder.varNameBitBuf,bitBuf_reader_className, FieldBuilder.varNameByteBuf);
         } else {
-            ParseUtil.append(body, "final {} {};\n", bitBuf_reader_log_className, FieldBuilder.varNameBitBuf);
-            ParseUtil.append(body, "if ({} == null || {}.bitBuf_reader == null) {\n", FieldBuilder.varNameParentProcessContext, FieldBuilder.varNameParentProcessContext);
-            ParseUtil.append(body, "{}=new {}({});\n", FieldBuilder.varNameBitBuf, bitBuf_reader_log_className, FieldBuilder.varNameByteBuf);
-            ParseUtil.append(body, "}else{\n");
-            ParseUtil.append(body, "{}=({}){}.bitBuf_reader;\n", FieldBuilder.varNameBitBuf, bitBuf_reader_log_className, FieldBuilder.varNameParentProcessContext);
-            ParseUtil.append(body, "}\n");
+            ParseUtil.append(body, "final {} {}=new {}({});\n", bitBuf_reader_log_className, FieldBuilder.varNameBitBuf,bitBuf_reader_log_className, FieldBuilder.varNameByteBuf);
         }
         context.varNameBitBuf = FieldBuilder.varNameBitBuf;
     }
@@ -379,19 +354,9 @@ public class ParseUtil {
         final String bitBuf_writer_className = BitBuf_writer.class.getName();
         final String bitBuf_writer_log_className = BitBuf_writer_log.class.getName();
         if (Parser.logCollector_parse == null) {
-            ParseUtil.append(body, "final {} {};\n", bitBuf_writer_className, FieldBuilder.varNameBitBuf);
-            ParseUtil.append(body, "if ({} == null || {}.bitBuf_writer == null) {\n", FieldBuilder.varNameParentProcessContext, FieldBuilder.varNameParentProcessContext);
-            ParseUtil.append(body, "{}=new {}({});\n", FieldBuilder.varNameBitBuf, bitBuf_writer_className, FieldBuilder.varNameByteBuf);
-            ParseUtil.append(body, "}else{\n");
-            ParseUtil.append(body, "{}={}.bitBuf_writer;\n", FieldBuilder.varNameBitBuf, FieldBuilder.varNameParentProcessContext);
-            ParseUtil.append(body, "}\n");
+            ParseUtil.append(body, "final {} {}=new {}({});\n", bitBuf_writer_className, FieldBuilder.varNameBitBuf,bitBuf_writer_className, FieldBuilder.varNameByteBuf);
         } else {
-            ParseUtil.append(body, "final {} {};\n", bitBuf_writer_log_className, FieldBuilder.varNameBitBuf);
-            ParseUtil.append(body, "if ({} == null || {}.bitBuf_writer == null) {\n", FieldBuilder.varNameParentProcessContext, FieldBuilder.varNameParentProcessContext);
-            ParseUtil.append(body, "{}=new {}({});\n", FieldBuilder.varNameBitBuf, bitBuf_writer_log_className, FieldBuilder.varNameByteBuf);
-            ParseUtil.append(body, "}else{\n");
-            ParseUtil.append(body, "{}=({}){}.bitBuf_writer;\n", FieldBuilder.varNameBitBuf, bitBuf_writer_log_className, FieldBuilder.varNameParentProcessContext);
-            ParseUtil.append(body, "}\n");
+            ParseUtil.append(body, "final {} {}=new {}({});\n", bitBuf_writer_log_className, FieldBuilder.varNameBitBuf,bitBuf_writer_log_className, FieldBuilder.varNameByteBuf);
         }
         context.varNameBitBuf = FieldBuilder.varNameBitBuf;
     }
@@ -688,5 +653,37 @@ public class ParseUtil {
         return clazzName.substring(0, clazzName.lastIndexOf(".")) + ".P_" + (processorIndex++) + "_" + clazz.getSimpleName()
                 + "_" + (byteOrder == ByteOrder.smallEndian ? 0 : 1)
                 + "_" + (bitOrder == BitOrder.smallEndian ? 0 : 1);
+    }
+
+    public static boolean checkChildrenHasAnno_F_customize(Class<?> clazz) {
+        List<Field> parseFields = getParseFields(clazz);
+        for (int i = 0; i < parseFields.size(); i++) {
+            Field field = parseFields.get(i);
+            F_customize f_customize = field.getAnnotation(F_customize.class);
+            if (f_customize != null) {
+                return true;
+            }
+            F_bean f_bean = field.getAnnotation(F_bean.class);
+            if (f_bean != null) {
+                Class<?> fieldType = field.getType();
+                parseFields.addAll(getParseFields(fieldType));
+            }
+            F_bean_list f_bean_list = field.getAnnotation(F_bean_list.class);
+            if (f_bean_list != null) {
+                Class<?> fieldType = field.getType();
+                if (fieldType.isArray()) {
+                    parseFields.addAll(getParseFields(fieldType.getComponentType()));
+                } else {
+                    Class<?> actualTypeArgument = (Class<?>) (((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0]);
+                    parseFields.addAll(getParseFields(actualTypeArgument));
+                }
+            }
+        }
+        return false;
+    }
+
+    public static void main(String[] args) {
+        boolean b = checkChildrenHasAnno_F_customize(Packet.class);
+        System.out.println(b);
     }
 }

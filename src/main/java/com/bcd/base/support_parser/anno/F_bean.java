@@ -18,14 +18,5 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface F_bean {
-    /**
-     * 是否传递bitBuf对象到bean的解析中
-     * 会在父类中构造bitBuf对象并设置
-     * {@link com.bcd.base.support_parser.processor.ProcessContext#bitBuf_reader}
-     * {@link com.bcd.base.support_parser.processor.ProcessContext#bitBuf_writer}
-     * 集合中的子类获取bitBuf逻辑参考
-     * {@link BuilderContext#getVarNameBitBuf_reader()}
-     * {@link BuilderContext#getVarNameBitBuf_writer()}
-     */
-    boolean passBitBuf() default false;
+
 }

@@ -39,12 +39,12 @@ public class FieldBuilder__F_bean_list extends FieldBuilder {
         }
         final String typeClassName = typeClass.getName();
         final String processorVarName = context.getProcessorVarName(typeClass);
-        final String processContextVarName = context.getProcessContextVarName();
-        if (anno.passBitBuf()) {
-            final String varNameBitBuf = context.getVarNameBitBuf_reader();
-            ParseUtil.append(body, "{}.bitBuf_reader={};\n", processContextVarName, varNameBitBuf);
+        final String processContextVarName;
+        if (ParseUtil.checkChildrenHasAnno_F_customize(typeClass)) {
+            processContextVarName = context.getProcessContextVarName();
+        } else {
+            processContextVarName = "null";
         }
-
         ParseUtil.append(body, "final {}[] {}=new {}[{}];\n", typeClassName, varNameField, typeClassName, fieldVarNameListLen);
         //在for循环外构造复用对象
         ParseUtil.append(body, "for(int i=0;i<{};i++){\n", fieldVarNameListLen);
@@ -89,10 +89,11 @@ public class FieldBuilder__F_bean_list extends FieldBuilder {
 
         final String typeClassName = typeClass.getName();
         final String processorVarName = context.getProcessorVarName(typeClass);
-        final String processContextVarName = context.getProcessContextVarName();
-        if (anno.passBitBuf()) {
-            final String varNameBitBuf = context.getVarNameBitBuf_writer();
-            ParseUtil.append(body, "{}.bitBuf_writer={};\n", processContextVarName, varNameBitBuf);
+        final String processContextVarName;
+        if (ParseUtil.checkChildrenHasAnno_F_customize(typeClass)) {
+            processContextVarName = context.getProcessContextVarName();
+        } else {
+            processContextVarName = "null";
         }
         final String fieldVarNameTemp = varNameField + "_temp";
         switch (fieldTypeFlag) {

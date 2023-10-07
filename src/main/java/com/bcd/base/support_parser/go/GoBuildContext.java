@@ -61,8 +61,8 @@ public class GoBuildContext {
 
     public final String getVarNameBitBuf_reader() {
         if (varNameBitBuf_reader == null) {
-            ParseUtil.append(parseBody, "{}:=parse.GetBitBuf_reader({},{})\n"
-                    , GoFieldBuilder.varNameBitBuf, GoFieldBuilder.varNameByteBuf, GoFieldBuilder.varNameParentParseContext);
+            ParseUtil.append(parseBody, "{}:=parse.ToBitBuf_reader({})\n"
+                    , GoFieldBuilder.varNameBitBuf, GoFieldBuilder.varNameByteBuf);
             varNameBitBuf_reader = GoFieldBuilder.varNameBitBuf;
         }
         return varNameBitBuf_reader;
@@ -70,8 +70,8 @@ public class GoBuildContext {
 
     public final String getVarNameBitBuf_writer() {
         if (varNameBitBuf_writer == null) {
-            ParseUtil.append(deParseBody, "{}:=parse.GetBitBuf_writer({},{})\n"
-                    , GoFieldBuilder.varNameBitBuf, GoFieldBuilder.varNameByteBuf, GoFieldBuilder.varNameParentParseContext);
+            ParseUtil.append(deParseBody, "{}:=parse.ToBitBuf_writer({})\n"
+                    , GoFieldBuilder.varNameBitBuf, GoFieldBuilder.varNameByteBuf);
             varNameBitBuf_writer = GoFieldBuilder.varNameBitBuf;
         }
         return varNameBitBuf_writer;

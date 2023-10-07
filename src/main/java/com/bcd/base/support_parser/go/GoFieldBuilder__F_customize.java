@@ -114,24 +114,15 @@ public class GoFieldBuilder__F_customize extends GoFieldBuilder {
         final GoField goField = context.goField;
         final String goFieldName = goField.goFieldName;
         final F_customize f_customize = field.getAnnotation(F_customize.class);
-        final boolean passBitBuf = f_customize.passBitBuf();
         final String toFunName = "To_" + goFieldName;
         if (!customizeClassSet.contains(fieldType)) {
             ParseUtil.append(customizeBody, "func {}({} *parse.ByteBuf,{} *parse.ParseContext)any{\n", toFunName, GoFieldBuilder.varNameByteBuf, GoFieldBuilder.varNameParentParseContext);
-            if (passBitBuf) {
-                ParseUtil.append(customizeBody, "{}:=parse.GetBitBuf_reader({},{})\n"
-                        , GoFieldBuilder.varNameBitBuf, GoFieldBuilder.varNameByteBuf, GoFieldBuilder.varNameParentParseContext);
-            }
             ParseUtil.append(customizeBody, "//todo Read Implement F_customize[{}#{}]\n\n", clazz.getName(), field.getName());
             ParseUtil.append(customizeBody, "return nil\n");
             ParseUtil.append(customizeBody, "}\n\n");
         }
 
         final String varNameParseContext = context.getVarNameParseContext();
-        if (passBitBuf) {
-            final String varNameBitBuf = context.getVarNameBitBuf_reader();
-            ParseUtil.append(body, "{}.BitBuf_reader={}\n", varNameParseContext, varNameBitBuf);
-        }
         ParseUtil.append(body, "{}.{}={}({},{})\n", GoFieldBuilder.varNameInstance, goFieldName,
                 toFunName, GoFieldBuilder.varNameByteBuf, varNameParseContext);
     }
@@ -145,26 +136,17 @@ public class GoFieldBuilder__F_customize extends GoFieldBuilder {
         final GoField goField = context.goField;
         final String goFieldName = goField.goFieldName;
         final F_customize f_customize = field.getAnnotation(F_customize.class);
-        final boolean passBitBuf = f_customize.passBitBuf();
         final String writeFunName = "Write_" + goFieldName;
         if (!customizeClassSet.contains(fieldType)) {
             ParseUtil.append(customizeBody, "func {}({} *parse.ByteBuf,_{} any,{} *parse.ParseContext){\n",
                     writeFunName, GoFieldBuilder.varNameByteBuf,
                     GoFieldBuilder.varNameInstance,
                     GoFieldBuilder.varNameParentParseContext);
-            if (passBitBuf) {
-                ParseUtil.append(customizeBody, "{}:=parse.GetBitBuf_writer({},{})\n"
-                        , GoFieldBuilder.varNameBitBuf, GoFieldBuilder.varNameByteBuf, GoFieldBuilder.varNameParentParseContext);
-            }
             ParseUtil.append(customizeBody, "//todo Write Implement F_customize[{}#{}]\n\n", clazz.getName(), field.getName());
             ParseUtil.append(customizeBody, "}\n\n");
         }
 
         final String varNameParseContext = context.getVarNameDeParseContext();
-        if (passBitBuf) {
-            final String varNameBitBuf = context.getVarNameBitBuf_writer();
-            ParseUtil.append(body, "{}.BitBuf_writer={}\n", varNameParseContext, varNameBitBuf);
-        }
         ParseUtil.append(body, "{}({},{}.{},{})\n",
                 writeFunName, GoFieldBuilder.varNameByteBuf,GoFieldBuilder.varNameInstance, goFieldName, varNameParseContext);
 

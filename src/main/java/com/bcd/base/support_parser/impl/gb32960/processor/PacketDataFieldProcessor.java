@@ -25,7 +25,7 @@ public class PacketDataFieldProcessor implements Processor<PacketData> {
             switch (packet.flag) {
                 //车辆登入
                 case vehicle_login_data: {
-                    packetData = processor_vehicleLoginData.process(data, parentContext);
+                    packetData = processor_vehicleLoginData.process(data, null);
                     break;
                 }
 
@@ -43,19 +43,19 @@ public class PacketDataFieldProcessor implements Processor<PacketData> {
 
                 //车辆登出
                 case vehicle_logout_data: {
-                    packetData = processor_vehicleLogoutData.process(data, parentContext);
+                    packetData = processor_vehicleLogoutData.process(data, null);
                     break;
                 }
 
                 //平台登入
                 case platform_login_data: {
-                    packetData = processor_platformLoginData.process(data, parentContext);
+                    packetData = processor_platformLoginData.process(data, null);
                     break;
                 }
 
                 //平台登出
                 case platform_logout_data: {
-                    packetData = processor_platformLogoutData.process(data, parentContext);
+                    packetData = processor_platformLogoutData.process(data, null);
                     break;
                 }
 
@@ -85,7 +85,7 @@ public class PacketDataFieldProcessor implements Processor<PacketData> {
             switch (packet.flag) {
                 //车辆登入
                 case vehicle_login_data: {
-                    processor_vehicleLoginData.deProcess(data, parentContext, (VehicleLoginData) instance);
+                    processor_vehicleLoginData.deProcess(data, null, (VehicleLoginData) instance);
                     break;
                 }
                 //车辆实时信息
@@ -102,19 +102,19 @@ public class PacketDataFieldProcessor implements Processor<PacketData> {
 
                 //车辆登出
                 case vehicle_logout_data: {
-                    processor_vehicleLogoutData.deProcess(data, parentContext, (VehicleLogoutData) instance);
+                    processor_vehicleLogoutData.deProcess(data, null, (VehicleLogoutData) instance);
                     break;
                 }
 
                 //平台登入
                 case platform_login_data: {
-                    processor_platformLoginData.deProcess(data, parentContext, (PlatformLoginData) instance);
+                    processor_platformLoginData.deProcess(data, null, (PlatformLoginData) instance);
                     break;
                 }
 
                 //平台登出
                 case platform_logout_data: {
-                    processor_platformLogoutData.deProcess(data, parentContext, (PlatformLogoutData) instance);
+                    processor_platformLogoutData.deProcess(data, null, (PlatformLogoutData) instance);
                     break;
                 }
 

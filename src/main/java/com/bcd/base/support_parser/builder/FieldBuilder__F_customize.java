@@ -26,10 +26,6 @@ public class FieldBuilder__F_customize extends FieldBuilder {
                 final Class<?> fieldType = field.getType();
                 final String fieldTypeClassName = fieldType.getName();
                 final String processContextVarName = context.getProcessContextVarName();
-                if (anno.passBitBuf()) {
-                    final String varNameBitBuf = context.getVarNameBitBuf_reader();
-                    ParseUtil.append(body, "{}.bitBuf_reader={};\n", processContextVarName, varNameBitBuf);
-                }
                 final String unBoxing = ParseUtil.unBoxing(ParseUtil.format("{}.process({},{})", processorClassVarName, FieldBuilder.varNameByteBuf, processContextVarName), fieldType);
                 if (anno.var() == '0') {
                     ParseUtil.append(body, "{}.{}={};\n", varNameInstance, field.getName(), unBoxing);
@@ -72,10 +68,6 @@ public class FieldBuilder__F_customize extends FieldBuilder {
                 throw BaseRuntimeException.getException("class[{}] field[{}] anno[] must have builderClass or processorClass", field.getDeclaringClass().getName(), field.getName(), F_customize.class.getName());
             } else {
                 final String processContextVarName = context.getProcessContextVarName();
-                if (anno.passBitBuf()) {
-                    final String varNameBitBuf = context.getVarNameBitBuf_writer();
-                    ParseUtil.append(body, "{}.bitBuf_writer={};\n", processContextVarName, varNameBitBuf);
-                }
                 final String processorClassVarName = ParseUtil.getProcessorVarName(processorClass);
                 ParseUtil.append(body, "{}.deProcess({},{},{});\n", processorClassVarName, FieldBuilder.varNameByteBuf, processContextVarName, valCode);
             }

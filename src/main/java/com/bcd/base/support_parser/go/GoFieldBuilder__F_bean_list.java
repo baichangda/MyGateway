@@ -14,7 +14,6 @@ public class GoFieldBuilder__F_bean_list extends GoFieldBuilder {
         final F_bean_list anno = field.getAnnotation(F_bean_list.class);
         final Class<? extends F_bean_list> annoClass = anno.getClass();
         final StringBuilder body = context.structBody;
-        final boolean passBitBuf = anno.passBitBuf();
         final GoField goField = context.goField;
         final String goFieldName = goField.goFieldName;
         final Class<?> fieldType = field.getType();
@@ -39,10 +38,15 @@ public class GoFieldBuilder__F_bean_list extends GoFieldBuilder {
     public void buildParse(GoBuildContext context) {
         final Field field = context.field;
         final Class<?> fieldType = field.getType();
+        final Class<?> goFieldType;
+        if (fieldType.isArray()) {
+            goFieldType = fieldType.getComponentType();
+        } else {
+            goFieldType = ((Class<?>) (((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0]));
+        }
         final F_bean_list anno = field.getAnnotation(F_bean_list.class);
         final Class<? extends F_bean_list> annoClass = anno.getClass();
         final StringBuilder body = context.parseBody;
-        final boolean passBitBuf = anno.passBitBuf();
         final GoField goField = context.goField;
         final String goFieldName = goField.goFieldName;
         final String goFieldTypeName = goField.goFieldTypeName;
@@ -60,10 +64,11 @@ public class GoFieldBuilder__F_bean_list extends GoFieldBuilder {
         } else {
             ParseUtil.append(body, "{}:=[{}]*{}\n", varNameArr, varNameLen, goFieldTypeName);
         }
-        final String varNameParseContext = context.getVarNameParseContext();
-        if (passBitBuf) {
-            final String varNameBitBuf = context.getVarNameBitBuf_reader();
-            ParseUtil.append(body, "{}.BitBuf_reader={}\n", varNameParseContext, varNameBitBuf);
+        final String varNameParseContext;
+        if (ParseUtil.checkChildrenHasAnno_F_customize(goFieldType)) {
+            varNameParseContext = context.getVarNameParseContext();
+        } else {
+            varNameParseContext = "nil";
         }
         ParseUtil.append(body, "for i:=0;i<{};i++{\n", varNameLen);
         final String valCode;
@@ -76,24 +81,31 @@ public class GoFieldBuilder__F_bean_list extends GoFieldBuilder {
 
     public void buildDeParse(GoBuildContext context) {
         final Field field = context.field;
+        final Class<?> fieldType = field.getType();
+        final Class<?> goFieldType;
+        if (fieldType.isArray()) {
+            goFieldType = fieldType.getComponentType();
+        } else {
+            goFieldType = ((Class<?>) (((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0]));
+        }
         final F_bean_list anno = field.getAnnotation(F_bean_list.class);
         final Class<? extends F_bean_list> annoClass = anno.getClass();
         final StringBuilder body = context.deParseBody;
-        final boolean passBitBuf = anno.passBitBuf();
         final GoField goField = context.goField;
         final String goFieldName = goField.goFieldName;
         final String goFieldTypeName = goField.goFieldTypeName;
-        final String varNameParseContext = context.getVarNameDeParseContext();
+        final String varNameDeParseContext;
+        if (ParseUtil.checkChildrenHasAnno_F_customize(goFieldType)) {
+            varNameDeParseContext = context.getVarNameDeParseContext();
+        } else {
+            varNameDeParseContext = "nil";
+        }
         final int listLen = anno.listLen();
         final String varNameArr = goFieldName + "_arr";
         ParseUtil.append(body, "{}:={}.{}\n", varNameArr, GoFieldBuilder.varNameInstance, goFieldName);
         final Integer byteLen = GoParseUtil.unsafePointerStruct_byteLen.get(goFieldTypeName);
-        if (passBitBuf) {
-            final String varNameBitBuf = context.getVarNameBitBuf_writer();
-            ParseUtil.append(body, "{}.BitBuf_writer={}\n", varNameParseContext, varNameBitBuf);
-        }
         ParseUtil.append(body, "for i:=0;i<len({});i++{\n", varNameArr);
-        ParseUtil.append(body, "{}[i].Write({},{})\n", varNameArr, GoFieldBuilder.varNameByteBuf, varNameParseContext);
+        ParseUtil.append(body, "{}[i].Write({},{})\n", varNameArr, GoFieldBuilder.varNameByteBuf, varNameDeParseContext);
         ParseUtil.append(body, "}\n");
     }
 
