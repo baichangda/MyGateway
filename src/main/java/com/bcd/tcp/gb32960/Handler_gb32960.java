@@ -10,20 +10,18 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.ConcurrentLinkedQueue;
-
 public class Handler_gb32960 extends ChannelInboundHandlerAdapter {
 
-    static Logger logger= LoggerFactory.getLogger(Handler_gb32960.class);
+    static Logger logger = LoggerFactory.getLogger(Handler_gb32960.class);
 
     Session_gb32960 session;
 
-    public final ConcurrentLinkedQueue<Packet> queue;
+    public final Save_gb32960 save_gb32960;
 
     public final SessionClusterManager sessionClusterManager;
 
     public Handler_gb32960(Save_gb32960 save_gb32960, SessionClusterManager sessionClusterManager) {
-        this.queue = save_gb32960.queue;
+        this.save_gb32960 = save_gb32960;
         this.sessionClusterManager = sessionClusterManager;
     }
 
@@ -40,14 +38,14 @@ public class Handler_gb32960 extends ChannelInboundHandlerAdapter {
             sessionClusterManager.send(session);
         }
         //添加到保存队列
-        queue.add(packet);
+        save_gb32960.put(packet);
         super.channelRead(ctx, msg);
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         //关闭
-        if(session!=null){
+        if (session != null) {
             session.close();
         }
         super.channelInactive(ctx);
@@ -55,7 +53,7 @@ public class Handler_gb32960 extends ChannelInboundHandlerAdapter {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        logger.error("exceptionCaught",cause);
+        logger.error("exceptionCaught", cause);
         //关闭
         ctx.close();
     }

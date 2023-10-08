@@ -18,6 +18,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class Helper_gb32960 {
+
+    public static int getDbIndex(String vin, int dbNum) {
+        return Math.floorMod(vin.hashCode(), dbNum);
+    }
+
     public static void saveBatch(MongoTemplate mongoTemplate, List<SaveData_gb32960> list) {
         if (list.isEmpty()) {
             return;

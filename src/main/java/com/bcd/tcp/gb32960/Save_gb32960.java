@@ -23,19 +23,24 @@ public class Save_gb32960 implements ApplicationListener<ContextRefreshedEvent> 
     public final ArrayBlockingQueue<Packet>[] queues;
     public final ExecutorService[] pools;
     public final ArrayList<SaveData_gb32960>[] caches;
+    public final int dbNum;
 
     public Save_gb32960(@Value("${mongodbs}") String[] mongodbs) {
-        int dbNum = mongodbs.length;
+        dbNum = mongodbs.length;
         mongoTemplates = new MongoTemplate[dbNum];
         queues = new ArrayBlockingQueue[dbNum];
         pools = new ExecutorService[dbNum];
         caches = new ArrayList[dbNum];
         for (int i = 0; i < dbNum; i++) {
             mongoTemplates[i] = new MongoTemplate(new SimpleMongoClientDatabaseFactory(mongodbs[i]));
-            queues[i] = new ArrayBlockingQueue<>(10000);
+            queues[i] = new ArrayBlockingQueue<>(50000);
             pools[i] = Executors.newSingleThreadExecutor();
             caches[i] = new ArrayList<>();
         }
+    }
+
+    public void put(Packet p) throws InterruptedException {
+        queues[Helper_gb32960.getDbIndex(p.vin, dbNum)].put(p);
     }
 
     public void start() {
