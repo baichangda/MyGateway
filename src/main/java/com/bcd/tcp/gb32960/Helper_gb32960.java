@@ -4,8 +4,6 @@ import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.support_parser.impl.gb32960.data.Packet;
 import com.bcd.base.support_parser.impl.gb32960.data.PacketFlag;
 import com.bcd.base.util.JsonUtil;
-import com.bcd.tcp.icd.SaveData_icd;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.BulkOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -13,34 +11,25 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.data.util.Pair;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Component
 public class Helper_gb32960 {
-    @Autowired
-    public void setMongoTemplate(MongoTemplate mongoTemplate) {
-        Helper_gb32960.mongoTemplate = mongoTemplate;
-    }
-
-    public static MongoTemplate mongoTemplate;
-
-    public static void saveBatch(List<SaveData_gb32960> list) {
+    public static void saveBatch(MongoTemplate mongoTemplate, List<SaveData_gb32960> list) {
         if (list.isEmpty()) {
             return;
         }
         final List<Pair<Query, Update>> collect = list.stream()
                 .map(e -> Pair.of(Query.query(Criteria.where("id").is(e.id)), e.toUpdate()))
                 .collect(Collectors.toList());
-        mongoTemplate.bulkOps(BulkOperations.BulkMode.UNORDERED, SaveData_icd.class)
+        mongoTemplate.bulkOps(BulkOperations.BulkMode.UNORDERED, Save_gb32960.class)
                 .upsert(collect).execute();
     }
 
-    public static List<SaveData_gb32960> list(String vin, PacketFlag flag, Date beginTime, Date endTime, int skip, int limit, boolean desc) {
+    public static List<SaveData_gb32960> list(MongoTemplate mongoTemplate, String vin, PacketFlag flag, Date beginTime, Date endTime, int skip, int limit, boolean desc) {
         Query query = new Query();
         query.skip(skip);
         query.limit(limit);
