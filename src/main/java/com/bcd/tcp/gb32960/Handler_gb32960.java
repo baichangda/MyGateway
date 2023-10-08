@@ -5,6 +5,7 @@ import com.bcd.base.support_parser.impl.gb32960.data.Packet;
 import com.bcd.base.support_parser.processor.Processor;
 import com.bcd.tcp.SessionClusterManager;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.slf4j.Logger;
@@ -29,8 +30,12 @@ public class Handler_gb32960 extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        //获取原始数据
+        ByteBuf byteBuf = (ByteBuf) msg;
+        byte[] src = new byte[byteBuf.readableBytes()];
+        byteBuf.getBytes(0, src);
         //解析
-        final Packet packet = processor.process((ByteBuf) msg, null);
+        final Packet packet = processor.process(byteBuf, null);
         if (session == null) {
             //构造会话
             session = new Session_gb32960(packet.vin, ctx.channel());
@@ -39,6 +44,8 @@ public class Handler_gb32960 extends ChannelInboundHandlerAdapter {
         }
         //添加到保存队列
         save_gb32960.put(packet);
+        //相应数据
+        ctx.writeAndFlush(Unpooled.wrappedBuffer(Packet.response(src)));
         super.channelRead(ctx, msg);
     }
 
