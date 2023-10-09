@@ -57,9 +57,14 @@ public class Save_gb32960 implements ApplicationListener<ContextRefreshedEvent> 
                             cache.add(SaveData_gb32960.from(p));
                             if (cache.size() == 1000) {
                                 Helper_gb32960.saveBatch(mongoTemplate, cache);
+                                cache.clear();
                             }
                             p = queue.poll();
                         } while (p != null);
+                        if (!cache.isEmpty()) {
+                            Helper_gb32960.saveBatch(mongoTemplate, cache);
+                            cache.clear();
+                        }
                     }
                 } catch (InterruptedException ex) {
                     throw BaseRuntimeException.getException(ex);
