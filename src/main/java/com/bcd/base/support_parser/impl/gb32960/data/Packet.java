@@ -41,17 +41,4 @@ public class Packet {
     //异或校验位
     @F_num(type = NumType.int8)
     public byte code;
-
-    public static byte[] response(byte[] src) {
-        byte[] dest = new byte[25];
-        System.arraycopy(src,0,dest,0,3);
-        dest[3] = 0x01;
-        System.arraycopy(src,4,dest,4,18);
-        byte xor = 0;
-        for (int i = 0; i < 24; i++) {
-            xor ^= src[i];
-        }
-        dest[24] = xor;
-        return dest;
-    }
 }

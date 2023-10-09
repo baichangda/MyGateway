@@ -45,7 +45,7 @@ public class Handler_gb32960 extends ChannelInboundHandlerAdapter {
         //添加到保存队列
         save_gb32960.put(packet);
         //相应数据
-        ctx.writeAndFlush(Unpooled.wrappedBuffer(Packet.response(src)));
+        ctx.writeAndFlush(Unpooled.wrappedBuffer(response_succeed(src)));
         super.channelRead(ctx, msg);
     }
 
@@ -63,5 +63,18 @@ public class Handler_gb32960 extends ChannelInboundHandlerAdapter {
         logger.error("exceptionCaught", cause);
         //关闭
         ctx.close();
+    }
+
+    private byte[] response_succeed(byte[] src) {
+        byte[] dest = new byte[25];
+        System.arraycopy(src, 0, dest, 0, 3);
+        dest[3] = 0x01;
+        System.arraycopy(src, 4, dest, 4, 18);
+        byte xor = 0;
+        for (int i = 0; i < 24; i++) {
+            xor ^= src[i];
+        }
+        dest[24] = xor;
+        return dest;
     }
 }
