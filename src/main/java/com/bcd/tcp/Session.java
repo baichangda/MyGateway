@@ -39,7 +39,7 @@ public class Session {
 
     public enum Type {
         gb32960(0),
-        icd(1),
+        jt808(1),
         ;
         public final int type;
 
