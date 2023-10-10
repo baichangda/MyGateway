@@ -1,14 +1,14 @@
 package com.bcd.tcp.gb32960;
 
-import com.bcd.base.exception.BaseRuntimeException;
-import com.bcd.base.support_parser.impl.gb32960.data.Packet;
+import com.bcd.root.data.gb32960.Helper;
+import com.bcd.root.data.gb32960.SaveData;
+import com.bcd.root.exception.BaseRuntimeException;
+import com.bcd.root.support_mongo.MongoHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -20,49 +20,51 @@ import java.util.concurrent.Executors;
 public class Save_gb32960 implements ApplicationListener<ContextRefreshedEvent> {
     static Logger logger = LoggerFactory.getLogger(Save_gb32960.class);
     public final MongoTemplate[] mongoTemplates;
-    public final ArrayBlockingQueue<Packet>[] queues;
+    public final ArrayBlockingQueue<SaveData>[] queues;
     public final ExecutorService[] pools;
-    public final ArrayList<SaveData_gb32960>[] caches;
+    public final ArrayList<SaveData>[] caches;
     public final int dbNum;
 
-    public Save_gb32960(@Value("${mongodbs}") String[] mongodbs) {
-        dbNum = mongodbs.length;
-        mongoTemplates = new MongoTemplate[dbNum];
+    public Save_gb32960(MongoHandler mongoHandler) {
+        dbNum = mongoHandler.dbNum;
+        mongoTemplates = mongoHandler.mongoTemplates;
         queues = new ArrayBlockingQueue[dbNum];
         pools = new ExecutorService[dbNum];
         caches = new ArrayList[dbNum];
         for (int i = 0; i < dbNum; i++) {
-            mongoTemplates[i] = new MongoTemplate(new SimpleMongoClientDatabaseFactory(mongodbs[i]));
             queues[i] = new ArrayBlockingQueue<>(50000);
             pools[i] = Executors.newSingleThreadExecutor();
             caches[i] = new ArrayList<>();
         }
     }
 
-    public void put(Packet p) throws InterruptedException {
-        queues[Helper_gb32960.getDbIndex(p.vin, dbNum)].put(p);
+    public void put(SaveData d) throws InterruptedException {
+        queues[Helper.getDbIndex(d.jsonData.vin, dbNum)].put(d);
     }
 
     public void start() {
         for (int i = 0; i < pools.length; i++) {
             final MongoTemplate mongoTemplate = mongoTemplates[i];
             final ExecutorService pool = pools[i];
-            final ArrayBlockingQueue<Packet> queue = queues[i];
-            final ArrayList<SaveData_gb32960> cache = caches[i];
+            final ArrayBlockingQueue<SaveData> queue = queues[i];
+            final ArrayList<SaveData> cache = caches[i];
             pool.execute(() -> {
                 try {
                     while (true) {
-                        Packet p = queue.take();
+                        SaveData d = queue.take();
                         do {
-                            cache.add(SaveData_gb32960.from(p));
+                            Monitor_gb32960.queueNum.decrement();
+                            cache.add(d);
                             if (cache.size() == 1000) {
-                                Helper_gb32960.saveBatch(mongoTemplate, cache);
+                                Helper.saveBatch(mongoTemplate, cache);
+                                Monitor_gb32960.saveNum.add(cache.size());
                                 cache.clear();
                             }
-                            p = queue.poll();
-                        } while (p != null);
+                            d = queue.poll();
+                        } while (d != null);
                         if (!cache.isEmpty()) {
-                            Helper_gb32960.saveBatch(mongoTemplate, cache);
+                            Helper.saveBatch(mongoTemplate, cache);
+                            Monitor_gb32960.saveNum.add(cache.size());
                             cache.clear();
                         }
                     }

@@ -1,9 +1,9 @@
 package com.bcd.base.support_parser.impl.gb32960;
 
-import com.bcd.base.support_parser.Parser;
-import com.bcd.base.support_parser.impl.gb32960.data.Packet;
-import com.bcd.base.support_parser.processor.Processor;
-import com.bcd.base.support_parser.util.PerformanceUtil;
+import com.bcd.root.support_parser.Parser;
+import com.bcd.root.support_parser.impl.gb32960.data.Packet;
+import com.bcd.root.support_parser.processor.Processor;
+import com.bcd.root.support_parser.util.PerformanceUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
@@ -28,7 +28,7 @@ public class Parser_gb32960_test {
 //        String data = "232303FE4C534A413234303330485331393239363901013507E403190F0507010203010000000469B00EE5271055020F1FFF000002010103424E1E4E2045FFFF2710050006BE437001CF306A060160FFFF0101FFFF0118FF01010E070000000000000000000801010EE527100060000160FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF09010100180EFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFED";
 //        String data = "232305013230303030304c534a535130303030303001000617060a09262042";
         String data = "23 23 03 01 4C 53 4A 41 32 34 30 33 30 48 53 31 39 32 39 36 39 01 00 00 FE";
-        data=data.replaceAll(" ","");
+        data = data.replaceAll(" ", "");
         byte[] bytes = ByteBufUtil.decodeHexDump(data);
         ByteBuf byteBuf = Unpooled.wrappedBuffer(bytes);
         final Processor<Packet> processor = Parser.getProcessor(Packet.class);

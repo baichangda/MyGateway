@@ -6,31 +6,30 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @SuppressWarnings("unchecked")
 public class Session {
+    public final static ConcurrentHashMap<String, Session>[] sessionMaps = new ConcurrentHashMap[2];
     public final int type;
     public final String id;
     public final long createTs;
     public final Channel channel;
     public boolean closed;
 
-    public final static ConcurrentHashMap<String, Session>[] sessions = new ConcurrentHashMap[2];
-
     public Session(int type, String id, Channel channel) {
         this.type = type;
         this.id = id;
         this.channel = channel;
         this.createTs = System.currentTimeMillis();
-        sessions[type].put(id, this);
+        sessionMaps[type].put(id, this);
     }
 
     public static Session getSession(int type, String id) {
-        return sessions[type].get(id);
+        return sessionMaps[type].get(id);
     }
 
     public void close() {
         channel.eventLoop().execute(() -> {
             if (!closed) {
                 //移除会话
-                sessions[type].remove(id);
+                sessionMaps[type].remove(id);
                 //关闭会话
                 channel.close();
                 closed = true;

@@ -1,9 +1,9 @@
 package com.bcd.base.support_redis;
 
-import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.support_redis.serializer.RedisSerializer_key_string;
 import com.bcd.base.support_redis.serializer.RedisSerializer_value_integer;
-import com.bcd.base.util.JsonUtil;
+import com.bcd.root.exception.BaseRuntimeException;
+import com.bcd.root.util.JsonUtil;
 import com.fasterxml.jackson.databind.JavaType;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -17,12 +17,12 @@ import java.nio.charset.StandardCharsets;
 @SuppressWarnings("unchecked")
 public class RedisUtil {
 
-    public final static RedisSerializer<String> SERIALIZER_KEY_STRING = new RedisSerializer_key_string(StandardCharsets.UTF_8, RedisUtil.SYSTEM_REDIS_KEY_PRE);
     public final static RedisSerializer<Object> SERIALIZER_VALUE_JDK = RedisSerializer.java();
     public final static RedisSerializer<String> SERIALIZER_VALUE_STRING = RedisSerializer.string();
     public final static RedisSerializer<Integer> SERIALIZER_VALUE_INTEGER = new RedisSerializer_value_integer();
     public final static RedisSerializer<byte[]> SERIALIZER_VALUE_BYTEARRAY = RedisSerializer.byteArray();
     public final static String SYSTEM_REDIS_KEY_PRE = "bcd_gw:";
+    public final static RedisSerializer<String> SERIALIZER_KEY_STRING = new RedisSerializer_key_string(StandardCharsets.UTF_8, RedisUtil.SYSTEM_REDIS_KEY_PRE);
 
     /**
      * 在redis key前面加上系统标识、避免和其他服务公用redis时候因为相同的key导致异常

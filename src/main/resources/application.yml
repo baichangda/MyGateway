@@ -69,7 +69,4 @@ gateway:
     maxBeforeOffline: 15s
     #kafka topic、多网关之间同一设备session上下线通知
     sessionTopic: bcd-gw-session
-mongodbs:
-  - mongodb://10.0.11.50:27017/rvm2_1
-  - mongodb://10.0.11.50:27017/rvm2_2
-  - mongodb://10.0.11.50:27017/rvm2_3
+mongodbs: mongodb://10.0.11.50:27017/rvm2_1,mongodb://10.0.11.50:27017/rvm2_2,mongodb://10.0.11.50:27017/rvm2_3

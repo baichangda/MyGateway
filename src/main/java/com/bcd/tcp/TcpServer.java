@@ -13,21 +13,27 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
 import java.net.InetSocketAddress;
+import java.time.Duration;
+import java.util.List;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 @Component
-public class TcpServer implements CommandLineRunner {
-
-    @Autowired
-    GatewayProp gatewayProp;
+public class TcpServer implements CommandLineRunner, ApplicationListener<ContextRefreshedEvent> {
 
     final Logger logger = LoggerFactory.getLogger(TcpServer.class);
-
+    @Autowired
+    GatewayProp gatewayProp;
     @Autowired
     Handler_dispatch handler_dispatch;
+
+    @Autowired
+    List<Monitor> monitorList;
 
     public void run(String... args) throws Exception {
         final EventLoopGroup boosGroup = new NioEventLoopGroup();
@@ -52,6 +58,23 @@ public class TcpServer implements CommandLineRunner {
             boosGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
         }
+    }
+
+    public void startMonitor() {
+        Duration period = Duration.ofSeconds(3);
+        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
+            StringBuilder sb = new StringBuilder();
+            for (Monitor monitor : monitorList) {
+                sb.append("\n");
+                sb.append(monitor.log(period));
+            }
+            logger.info("{}", sb);
+        }, period.toSeconds(), period.toSeconds(), TimeUnit.SECONDS);
+    }
+
+    @Override
+    public void onApplicationEvent(ContextRefreshedEvent event) {
+        startMonitor();
     }
 
 }

@@ -16,13 +16,12 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class GatewayHeartBeat implements ApplicationListener<ContextRefreshedEvent> {
 
+    //保持网关在redis状态
+    static ScheduledExecutorService pool_saveRedis_heartBeat = Executors.newSingleThreadScheduledExecutor();
+    final GatewayProp gatewayProp;
     @Autowired
     @Qualifier("string_string_redisTemplate")
     RedisTemplate<String, String> redisTemplate;
-    //保持网关在redis状态
-    static ScheduledExecutorService pool_saveRedis_heartBeat = Executors.newSingleThreadScheduledExecutor();
-
-    final GatewayProp gatewayProp;
 
     public GatewayHeartBeat(GatewayProp gatewayProp) {
         this.gatewayProp = gatewayProp;

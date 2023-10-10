@@ -1,8 +1,6 @@
 package com.bcd.tcp.gb32960;
 
-import com.bcd.base.support_parser.Parser;
-import com.bcd.base.support_parser.impl.gb32960.data.Packet;
-import com.bcd.base.support_parser.processor.Processor;
+import com.bcd.root.data.gb32960.SaveData;
 import com.bcd.tcp.SessionClusterManager;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -14,36 +12,36 @@ import org.slf4j.LoggerFactory;
 public class Handler_gb32960 extends ChannelInboundHandlerAdapter {
 
     static Logger logger = LoggerFactory.getLogger(Handler_gb32960.class);
-
+    public final Save_gb32960 save;
+    public final SessionClusterManager sessionClusterManager;
     Session_gb32960 session;
 
-    public final Save_gb32960 save_gb32960;
-
-    public final SessionClusterManager sessionClusterManager;
-
-    public Handler_gb32960(Save_gb32960 save_gb32960, SessionClusterManager sessionClusterManager) {
-        this.save_gb32960 = save_gb32960;
+    public Handler_gb32960(Save_gb32960 save, SessionClusterManager sessionClusterManager) {
+        this.save = save;
         this.sessionClusterManager = sessionClusterManager;
     }
 
-    final static Processor<Packet> processor = Parser.getProcessor(Packet.class);
-
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        Monitor_gb32960.receiveNum.increment();
         //获取原始数据
         ByteBuf byteBuf = (ByteBuf) msg;
         byte[] src = new byte[byteBuf.readableBytes()];
         byteBuf.getBytes(0, src);
-        //解析
-        final Packet packet = processor.process(byteBuf, null);
+
+        //轻量解析
+        SaveData saveData = SaveData.readSaveData(byteBuf);
+
         if (session == null) {
             //构造会话
-            session = new Session_gb32960(packet.vin, ctx.channel());
+            session = new Session_gb32960(saveData.jsonData.vin, ctx.channel());
             //发送会话通知到其他集群、踢掉无用的session
             sessionClusterManager.send(session);
         }
+
         //添加到保存队列
-        save_gb32960.put(packet);
+        save.put(saveData);
+        Monitor_gb32960.queueNum.increment();
         //相应数据
         ctx.writeAndFlush(Unpooled.wrappedBuffer(response_succeed(src)));
         super.channelRead(ctx, msg);
