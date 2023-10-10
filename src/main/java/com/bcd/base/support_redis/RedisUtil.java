@@ -2,8 +2,8 @@ package com.bcd.base.support_redis;
 
 import com.bcd.base.support_redis.serializer.RedisSerializer_key_string;
 import com.bcd.base.support_redis.serializer.RedisSerializer_value_integer;
-import com.bcd.root.exception.BaseRuntimeException;
-import com.bcd.root.util.JsonUtil;
+import com.bcd.share.exception.BaseRuntimeException;
+import com.bcd.share.util.JsonUtil;
 import com.fasterxml.jackson.databind.JavaType;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;

@@ -1,6 +1,6 @@
 package com.bcd.tcp.gb32960;
 
-import com.bcd.root.data.gb32960.SaveData;
+import com.bcd.share.data.gb32960.SaveData;
 import com.bcd.tcp.SessionClusterManager;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;

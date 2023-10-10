@@ -1,6 +1,6 @@
 package com.bcd.tcp.gb32960;
 
-import com.bcd.root.util.StringUtil;
+import com.bcd.share.util.StringUtil;
 import com.bcd.tcp.Monitor;
 import org.springframework.stereotype.Component;
 
