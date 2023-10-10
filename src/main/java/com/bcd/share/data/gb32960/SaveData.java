@@ -25,9 +25,9 @@ public class SaveData {
     @JsonIgnore
     public String json;
 
-    public static SaveData readSaveData(ByteBuf byteBuf) {
+    public static SaveData readSaveData(byte[] bytes) {
         SaveData saveData = new SaveData();
-        JsonData temp = JsonData.readJsonData(byteBuf);
+        JsonData temp = JsonData.readJsonData(bytes);
         saveData.jsonData = temp;
         saveData.id = Helper.toId(temp.vin, temp.type, temp.collectTime);
         saveData.json = JsonUtil.toJson(temp);

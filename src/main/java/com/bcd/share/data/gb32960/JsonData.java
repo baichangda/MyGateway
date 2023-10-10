@@ -15,9 +15,7 @@ public class JsonData {
     public Date receiveTime;
     public String hex;
 
-    public static JsonData readJsonData(ByteBuf byteBuf) {
-        byte[] bytes = new byte[byteBuf.readableBytes()];
-        byteBuf.readBytes(bytes);
+    public static JsonData readJsonData(byte[] bytes) {
         JsonData jsonData = new JsonData();
         jsonData.type = bytes[2];
         jsonData.vin = new String(bytes, 4, 17);

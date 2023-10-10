@@ -24,13 +24,13 @@ public class Handler_gb32960 extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         Monitor_gb32960.receiveNum.increment();
-        //获取原始数据
+        //读取数据
         ByteBuf byteBuf = (ByteBuf) msg;
-        byte[] src = new byte[byteBuf.readableBytes()];
-        byteBuf.getBytes(0, src);
+        byte[] bytes = new byte[byteBuf.readableBytes()];
+        byteBuf.readBytes(bytes);
 
         //轻量解析
-        SaveData saveData = SaveData.readSaveData(byteBuf);
+        SaveData saveData = SaveData.readSaveData(bytes);
 
         if (session == null) {
             //构造会话
@@ -42,8 +42,8 @@ public class Handler_gb32960 extends ChannelInboundHandlerAdapter {
         //添加到保存队列
         save.put(saveData);
         Monitor_gb32960.queueNum.increment();
-        //相应数据
-        ctx.writeAndFlush(Unpooled.wrappedBuffer(response_succeed(src)));
+        //响应数据
+        ctx.writeAndFlush(Unpooled.wrappedBuffer(response_succeed(bytes)));
         super.channelRead(ctx, msg);
     }
 
