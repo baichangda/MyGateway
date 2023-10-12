@@ -14,14 +14,15 @@ plugins {
     id 'java-library'
     id 'java'
     id 'idea'
-    id "io.spring.dependency-management" version "1.1.0"
-    id 'org.springframework.boot' version "+"
+    id "io.spring.dependency-management" version "1.1.2"
+    id 'org.springframework.boot' version "3.+"
 }
 
 group 'com.bcd'
 version '6.0-SNAPSHOT'
 
-sourceCompatibility = 17
+sourceCompatibility = 21
+targetCompatibility = 21
 
 repositories {
     mavenLocal()
