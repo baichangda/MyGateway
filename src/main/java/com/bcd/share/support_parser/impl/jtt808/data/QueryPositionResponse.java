@@ -1,15 +1,18 @@
 package com.bcd.share.support_parser.impl.jtt808.data;
 
-import com.bcd.share.support_parser.anno.F_bean;
-import com.bcd.share.support_parser.anno.F_num;
-import com.bcd.share.support_parser.anno.NumType;
+import io.netty.buffer.ByteBuf;
 
 public class QueryPositionResponse implements PacketBody {
     //应答流水号
-    @F_num(type = NumType.uint16)
     public int sn;
 
     //位置信息
-    @F_bean
     public Position position;
+
+    public static QueryPositionResponse read(ByteBuf data, int len) {
+        QueryPositionResponse queryPositionResponse = new QueryPositionResponse();
+        queryPositionResponse.sn = data.readUnsignedShort();
+        queryPositionResponse.position = Position.read(data, len - 2);
+        return queryPositionResponse;
+    }
 }

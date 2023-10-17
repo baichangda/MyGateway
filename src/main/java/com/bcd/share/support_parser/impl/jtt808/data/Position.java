@@ -1,7 +1,6 @@
 package com.bcd.share.support_parser.impl.jtt808.data;
 
 
-import com.bcd.share.support_parser.anno.*;
 import com.bcd.share.util.DateZoneUtil;
 import io.netty.buffer.ByteBuf;
 
