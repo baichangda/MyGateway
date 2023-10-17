@@ -116,15 +116,15 @@ public class GoFieldBuilder__F_customize extends GoFieldBuilder {
         final F_customize f_customize = field.getAnnotation(F_customize.class);
         final String toFunName = "To_" + goFieldName;
         if (!customizeClassSet.contains(fieldType)) {
-            ParseUtil.append(customizeBody, "func {}({} *parse.ByteBuf,{} *parse.ParseContext)any{\n", toFunName, varNameByteBuf, varNameParentParseContext);
+            ParseUtil.append(customizeBody, "func {}({} *parse.ByteBuf,{} *parse.ParseContext,args ...any)any{\n", toFunName, varNameByteBuf, varNameParentParseContext);
             ParseUtil.append(customizeBody, "//todo Read Implement F_customize[{}#{}]\n\n", clazz.getName(), field.getName());
             ParseUtil.append(customizeBody, "return nil\n");
             ParseUtil.append(customizeBody, "}\n\n");
         }
-
         final String varNameParseContext = context.getVarNameParseContext();
-        ParseUtil.append(body, "{}.{}={}({},{})\n", varNameInstance, goFieldName,
-                toFunName, varNameByteBuf, varNameParseContext);
+        String processorArgs = f_customize.processorArgs();
+        ParseUtil.append(body, "{}.{}={}({},{},{})\n", varNameInstance, goFieldName,
+                toFunName, varNameByteBuf, varNameParseContext, processorArgs.isEmpty() ? "" : ("," + processorArgs));
     }
 
     public void buildDeParse(GoBuildContext context) {
@@ -138,7 +138,7 @@ public class GoFieldBuilder__F_customize extends GoFieldBuilder {
         final F_customize f_customize = field.getAnnotation(F_customize.class);
         final String writeFunName = "Write_" + goFieldName;
         if (!customizeClassSet.contains(fieldType)) {
-            ParseUtil.append(customizeBody, "func {}({} *parse.ByteBuf,_{} any,{} *parse.ParseContext){\n",
+            ParseUtil.append(customizeBody, "func {}({} *parse.ByteBuf,_{} any,{} *parse.ParseContext,args ...any){\n",
                     writeFunName, varNameByteBuf,
                     varNameInstance,
                     varNameParentParseContext);
@@ -147,8 +147,9 @@ public class GoFieldBuilder__F_customize extends GoFieldBuilder {
         }
 
         final String varNameParseContext = context.getVarNameDeParseContext();
-        ParseUtil.append(body, "{}({},{}.{},{})\n",
-                writeFunName, varNameByteBuf, varNameInstance, goFieldName, varNameParseContext);
+        String processorArgs = f_customize.processorArgs();
+        ParseUtil.append(body, "{}({},{}.{},{},{})\n",
+                writeFunName, varNameByteBuf, varNameInstance, goFieldName, varNameParseContext, processorArgs.isEmpty() ? "" : ("," + processorArgs));
 
         customizeClassSet.add(fieldType);
     }

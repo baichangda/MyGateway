@@ -425,12 +425,21 @@ public class Parser {
         final CtConstructor constructor = CtNewConstructor.make(new CtClass[]{}, null, cc);
         initBody.append("{\n");
         //加processorClass字段并初始化
-        final List<Class<?>> processorClassList = Arrays.stream(clazz.getDeclaredFields()).map(f -> f.getAnnotation(F_customize.class)).filter(Objects::nonNull).map(F_customize::processorClass).filter(e -> e != void.class).collect(Collectors.toList());
-        for (Class<?> processorClass : processorClassList) {
+        Map<String, String> customize_processorId_processorVarName = new HashMap<>();
+        int processVarIndex = 0;
+        final List<F_customize> f_customize_list = Arrays.stream(clazz.getDeclaredFields()).map(f -> f.getAnnotation(F_customize.class)).filter(Objects::nonNull).filter(e -> e.processorClass() != void.class).collect(Collectors.toList());
+        for (F_customize f_customize : f_customize_list) {
+            Class<?> processorClass = f_customize.processorClass();
+            String processorArgs = f_customize.processorArgs();
             final String processorClassName = processorClass.getName();
-            final String processorVarName = ParseUtil.getProcessorVarName(processorClass);
-            cc.addField(CtField.make("private final " + processorClassName + " " + processorVarName + ";", cc));
-            initBody.append(ParseUtil.format("this.{}=new {}();\n", processorVarName, processorClassName));
+            final String processorId = processorClassName + "," + processorArgs;
+            String processorVarName = customize_processorId_processorVarName.get(processorId);
+            if (processorVarName == null) {
+                processorVarName = "_processor_" + processVarIndex++;
+                cc.addField(CtField.make("private final " + processorClassName + " " + processorVarName + ";", cc));
+                initBody.append(ParseUtil.format("this.{}=new {}({});\n", processorVarName, processorClassName, processorArgs));
+                customize_processorId_processorVarName.put(processorId, processorVarName);
+            }
         }
         initBody.append("}\n");
         if (printBuildLog) {
@@ -473,7 +482,7 @@ public class Parser {
         if (hasFieldSkipModeReserved) {
             ParseUtil.append(processBody, "final int {}={}.readerIndex();\n", FieldBuilder.varNameStartIndex, FieldBuilder.varNameByteBuf);
         }
-        BuilderContext parseBuilderContext = new BuilderContext(processBody, clazz, cc, classVarDefineToVarName, beanClassAndOrder_processorVarName, byteOrder, bitOrder);
+        BuilderContext parseBuilderContext = new BuilderContext(processBody, clazz, cc, classVarDefineToVarName, beanClassAndOrder_processorVarName, byteOrder, bitOrder, customize_processorId_processorVarName);
         buildMethodBody_process(clazz, parseBuilderContext);
         ParseUtil.append(processBody, "return {};\n", FieldBuilder.varNameInstance);
         processBody.append("}");
@@ -500,7 +509,7 @@ public class Parser {
         if (hasFieldSkipModeReserved) {
             ParseUtil.append(deProcessBody, "final int {}={}.writerIndex();\n", FieldBuilder.varNameStartIndex, FieldBuilder.varNameByteBuf);
         }
-        BuilderContext deParseBuilderContext = new BuilderContext(deProcessBody, clazz, cc, classVarDefineToVarName, beanClassAndOrder_processorVarName, byteOrder, bitOrder);
+        BuilderContext deParseBuilderContext = new BuilderContext(deProcessBody, clazz, cc, classVarDefineToVarName, beanClassAndOrder_processorVarName, byteOrder, bitOrder, customize_processorId_processorVarName);
         buildMethodBody_deProcess(clazz, deParseBuilderContext);
         deProcessBody.append("}");
         if (printBuildLog) {

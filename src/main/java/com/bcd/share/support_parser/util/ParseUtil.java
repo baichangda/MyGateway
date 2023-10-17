@@ -271,10 +271,6 @@ public class ParseUtil {
         return str.substring(0, 1).toLowerCase() + str.substring(1);
     }
 
-    public static String getProcessorVarName(final Class<?> processorClass) {
-        return "_" + toFirstLowerCase(processorClass.getSimpleName());
-    }
-
     public static boolean bigEndian(BitOrder order, BitOrder parentOrder) {
         if (parentOrder == null) {
             if (order == BitOrder.Default) {
@@ -668,10 +664,5 @@ public class ParseUtil {
             }
         }
         return false;
-    }
-
-    public static void main(String[] args) {
-        boolean b = checkChildrenHasAnno_F_customize(Packet.class);
-        System.out.println(b);
     }
 }

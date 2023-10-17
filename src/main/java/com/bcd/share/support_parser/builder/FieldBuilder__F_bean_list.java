@@ -30,27 +30,21 @@ public class FieldBuilder__F_bean_list extends FieldBuilder {
         }
 
         final String varNameField = ParseUtil.getFieldVarName(context);
-        final String fieldVarNameListLen = varNameField + "_listLen";
-        if (anno.listLen() == 0) {
-            String listLenRes = ParseUtil.replaceLenExprToCode(anno.listLenExpr(), context.varToFieldName, field);
-            ParseUtil.append(body, "final int {}={};\n", fieldVarNameListLen, listLenRes);
-        } else {
-            ParseUtil.append(body, "final int {}={};\n", fieldVarNameListLen, anno.listLen());
-        }
         final String typeClassName = typeClass.getName();
         final String processorVarName = context.getProcessorVarName(typeClass);
-        final String processContextVarName;
-        if (ParseUtil.checkChildrenHasAnno_F_customize(typeClass)) {
-            processContextVarName = context.getProcessContextVarName();
+        final String processContextVarName = context.getProcessContextVarName();
+        final String varNameListLen = varNameField + "_listLen";
+        if (anno.listLen() == 0) {
+            String listLenRes = ParseUtil.replaceLenExprToCode(anno.listLenExpr(), context.varToFieldName, field);
+            ParseUtil.append(body, "final int {}={};\n", varNameListLen, listLenRes);
         } else {
-            processContextVarName = "null";
+            ParseUtil.append(body, "final int {}={};\n", varNameListLen, anno.listLen());
         }
-        ParseUtil.append(body, "final {}[] {}=new {}[{}];\n", typeClassName, varNameField, typeClassName, fieldVarNameListLen);
         //在for循环外构造复用对象
-        ParseUtil.append(body, "for(int i=0;i<{};i++){\n", fieldVarNameListLen);
+        ParseUtil.append(body, "final {}[] {}=new {}[{}];\n", typeClassName, varNameField, typeClassName, varNameListLen);
+        ParseUtil.append(body, "for(int i=0;i<{};i++){\n", varNameListLen);
         ParseUtil.append(body, "{}[i]={}.process({},{});\n", varNameField, processorVarName, FieldBuilder.varNameByteBuf, processContextVarName);
         ParseUtil.append(body, "}\n");
-
         switch (fieldTypeFlag) {
             case 1 -> {
                 ParseUtil.append(body, "{}.{}={};\n", FieldBuilder.varNameInstance, field.getName(), varNameField);
@@ -89,12 +83,7 @@ public class FieldBuilder__F_bean_list extends FieldBuilder {
 
         final String typeClassName = typeClass.getName();
         final String processorVarName = context.getProcessorVarName(typeClass);
-        final String processContextVarName;
-        if (ParseUtil.checkChildrenHasAnno_F_customize(typeClass)) {
-            processContextVarName = context.getProcessContextVarName();
-        } else {
-            processContextVarName = "null";
-        }
+        final String processContextVarName = context.getProcessContextVarName();
         final String fieldVarNameTemp = varNameField + "_temp";
         switch (fieldTypeFlag) {
             case 1 -> {

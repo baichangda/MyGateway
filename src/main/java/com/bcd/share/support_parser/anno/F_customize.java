@@ -29,6 +29,18 @@ public @interface F_customize {
     Class<?> processorClass() default void.class;
 
     /**
+     * 处理类参数
+     * 在new {@link #processorClass()}时候、会传入指定参数
+     * 空字符串、则不传入参数
+     * 参数类型支持java基础类型和string
+     * 例如有3个参数
+     * int,String,double
+     * 则值可以是
+     * "100,\"test\",100.123"
+     */
+    String processorArgs() default "";
+
+    /**
      * asm构建类
      * 与{@link #processorClass()}互斥
      * 必须是{@link FieldBuilder}子类

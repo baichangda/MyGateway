@@ -64,12 +64,7 @@ public class GoFieldBuilder__F_bean_list extends GoFieldBuilder {
         } else {
             ParseUtil.append(body, "{}:=[{}]*{}\n", varNameArr, varNameLen, goFieldTypeName);
         }
-        final String varNameParseContext;
-        if (ParseUtil.checkChildrenHasAnno_F_customize(goFieldType)) {
-            varNameParseContext = context.getVarNameParseContext();
-        } else {
-            varNameParseContext = "nil";
-        }
+        final String varNameParseContext = context.getVarNameParseContext();
         ParseUtil.append(body, "for i:=0;i<{};i++{\n", varNameLen);
         final String valCode;
         valCode = ParseUtil.format("To_{}({},{})", goFieldTypeName, varNameByteBuf, varNameParseContext);
@@ -94,12 +89,7 @@ public class GoFieldBuilder__F_bean_list extends GoFieldBuilder {
         final GoField goField = context.goField;
         final String goFieldName = goField.goFieldName;
         final String goFieldTypeName = goField.goFieldTypeName;
-        final String varNameDeParseContext;
-        if (ParseUtil.checkChildrenHasAnno_F_customize(goFieldType)) {
-            varNameDeParseContext = context.getVarNameDeParseContext();
-        } else {
-            varNameDeParseContext = "nil";
-        }
+        final String varNameDeParseContext = context.getVarNameDeParseContext();
         final int listLen = anno.listLen();
         final String varNameArr = goFieldName + "_arr";
         ParseUtil.append(body, "{}:={}.{}\n", varNameArr, varNameInstance, goFieldName);

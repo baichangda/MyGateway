@@ -1,6 +1,10 @@
 package com.bcd.share.support_parser.impl.jtt808.data;
 
 
+import io.netty.buffer.ByteBuf;
+
+import java.nio.charset.Charset;
+
 public class TextInfoIssued implements PacketBody {
     //标志
     public byte flag;
@@ -8,4 +12,13 @@ public class TextInfoIssued implements PacketBody {
     public byte type;
     //文本信息
     public String info;
+
+    static final Charset gbk = Charset.forName("GBK");
+    public static TextInfoIssued read(ByteBuf data, int len){
+        TextInfoIssued textInfoIssued = new TextInfoIssued();
+        textInfoIssued.flag = data.readByte();
+        textInfoIssued.type = data.readByte();
+        textInfoIssued.info = data.readCharSequence(len - 2, gbk).toString();
+        return textInfoIssued;
+    }
 }

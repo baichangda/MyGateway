@@ -65,7 +65,12 @@ public class BuilderContext {
      */
     public String processContextVarName;
 
-    public BuilderContext(StringBuilder body, Class<?> clazz, CtClass implCc, Map<String, String> classVarDefineToVarName, Map<String, String> beanClassAndOrder_processorVarName, ByteOrder byteOrder, BitOrder bitOrder) {
+    /**
+     * 用于获取{@link F_customize#processorClass()}获取变量
+     */
+    public Map<String, String> customize_processorId_processorVarName;
+
+    public BuilderContext(StringBuilder body, Class<?> clazz, CtClass implCc, Map<String, String> classVarDefineToVarName, Map<String, String> beanClassAndOrder_processorVarName, ByteOrder byteOrder, BitOrder bitOrder, Map<String, String> customize_processorId_processorVarName) {
         this.body = body;
         this.clazz = clazz;
         this.implCc = implCc;
@@ -73,6 +78,11 @@ public class BuilderContext {
         this.beanClassAndOrder_processorVarName = beanClassAndOrder_processorVarName;
         this.byteOrder = byteOrder;
         this.bitOrder = bitOrder;
+        this.customize_processorId_processorVarName=customize_processorId_processorVarName;
+    }
+
+    public final String getCustomizeProcessorVarName(Class<?> processorClass, String processorArgs) {
+        return customize_processorId_processorVarName.get(processorClass.getName() + "," + processorArgs);
     }
 
 

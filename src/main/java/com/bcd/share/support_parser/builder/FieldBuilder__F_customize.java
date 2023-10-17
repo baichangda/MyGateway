@@ -21,7 +21,7 @@ public class FieldBuilder__F_customize extends FieldBuilder {
             } else {
                 final StringBuilder body = context.body;
                 final String varNameField = ParseUtil.getFieldVarName(context);
-                final String processorClassVarName = ParseUtil.getProcessorVarName(processorClass);
+                final String processorClassVarName = context.getCustomizeProcessorVarName(processorClass,anno.processorArgs());
                 final String varNameInstance = FieldBuilder.varNameInstance;
                 final Class<?> fieldType = field.getType();
                 final String fieldTypeClassName = fieldType.getName();
@@ -68,7 +68,7 @@ public class FieldBuilder__F_customize extends FieldBuilder {
                 throw BaseRuntimeException.getException("class[{}] field[{}] anno[] must have builderClass or processorClass", field.getDeclaringClass().getName(), field.getName(), F_customize.class.getName());
             } else {
                 final String processContextVarName = context.getProcessContextVarName();
-                final String processorClassVarName = ParseUtil.getProcessorVarName(processorClass);
+                final String processorClassVarName = context.getCustomizeProcessorVarName(processorClass,anno.processorArgs());
                 ParseUtil.append(body, "{}.deProcess({},{},{});\n", processorClassVarName, FieldBuilder.varNameByteBuf, processContextVarName, valCode);
             }
         } else {

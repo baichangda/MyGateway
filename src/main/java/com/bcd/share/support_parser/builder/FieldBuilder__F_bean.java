@@ -14,12 +14,7 @@ public class FieldBuilder__F_bean extends FieldBuilder {
         final String varNameField = ParseUtil.getFieldVarName(context);
         final Class<?> fieldType = field.getType();
         final String fieldTypeClassName = fieldType.getName();
-        final String processContextVarName;
-        if (ParseUtil.checkChildrenHasAnno_F_customize(fieldType)) {
-            processContextVarName = context.getProcessContextVarName();
-        } else {
-            processContextVarName = "null";
-        }
+        final String processContextVarName = context.getProcessContextVarName();
         final String processorVarName = context.getProcessorVarName(fieldType);
         ParseUtil.append(body, "{}.{}=({}){}.process({},{});\n",
                 varNameInstance,
@@ -37,12 +32,7 @@ public class FieldBuilder__F_bean extends FieldBuilder {
         final F_bean anno = field.getAnnotation(F_bean.class);
         final Class<?> fieldType = field.getType();
         final String fieldName = field.getName();
-        final String processContextVarName;
-        if (ParseUtil.checkChildrenHasAnno_F_customize(fieldType)) {
-            processContextVarName = context.getProcessContextVarName();
-        } else {
-            processContextVarName = "null";
-        }
+        final String processContextVarName= context.getProcessContextVarName();
         final String processorVarName = context.getProcessorVarName(fieldType);
         ParseUtil.append(body, "{}.deProcess({},{},{});\n",
                 processorVarName,
