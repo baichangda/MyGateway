@@ -3,6 +3,7 @@ package com.bcd.share.support_parser.impl.jtt808.data;
 import com.bcd.share.util.DateZoneUtil;
 import io.netty.buffer.ByteBuf;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -40,6 +41,8 @@ public class SetPath implements PacketBody{
         for (int i = 0; i < num; i++) {
             items[i] = CornerItem.read(data);
         }
+        setPath.nameLen = data.readUnsignedShort();
+        setPath.name = data.readCharSequence(setPath.nameLen, StandardCharsets.UTF_8).toString();
         return setPath;
     }
 }
