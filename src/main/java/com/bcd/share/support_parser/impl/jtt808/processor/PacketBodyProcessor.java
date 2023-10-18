@@ -43,6 +43,16 @@ public class PacketBodyProcessor implements Processor<PacketBody> {
     Processor<WaybillReport> processor_WaybillReport = Parser.getProcessor(WaybillReport.class);
     Processor<DriverIdentityReport> processor_DriverIdentityReport = Parser.getProcessor(DriverIdentityReport.class);
     Processor<CanDataUpload> processor_CanDataUpload = Parser.getProcessor(CanDataUpload.class);
+    Processor<MultiMediaEventUpload> processor_MultiMediaEventUpload = Parser.getProcessor(MultiMediaEventUpload.class);
+    Processor<CameraTakePhotoCmdRequest> processor_CameraTakePhotoCmdRequest = Parser.getProcessor(CameraTakePhotoCmdRequest.class);
+    Processor<CameraTakePhotoCmdResponse> processor_CameraTakePhotoCmdResponse = Parser.getProcessor(CameraTakePhotoCmdResponse.class);
+    Processor<StorageMultiMediaDataFetchRequest> processor_StorageMultiMediaDataFetchRequest = Parser.getProcessor(StorageMultiMediaDataFetchRequest.class);
+    Processor<StorageMultiMediaDataUploadCmd> processor_StorageMultiMediaDataUploadCmd = Parser.getProcessor(StorageMultiMediaDataUploadCmd.class);
+    Processor<RecordingStartCmd> processor_RecordingStartCmd = Parser.getProcessor(RecordingStartCmd.class);
+
+    Processor<SingleMultiMediaDataFetchUploadCmd> processor_SingleMultiMediaDataFetchUploadCmd = Parser.getProcessor(SingleMultiMediaDataFetchUploadCmd.class);
+    Processor<PlatformRsa> processor_PlatformRsa = Parser.getProcessor(PlatformRsa.class);
+    Processor<TerminalRsa> processor_TerminalRsa = Parser.getProcessor(TerminalRsa.class);
 
 
     @Override
@@ -169,6 +179,51 @@ public class PacketBodyProcessor implements Processor<PacketBody> {
             }
             case 0x0705 -> {
                 packetBody = processor_CanDataUpload.process(data, parentContext);
+            }
+            case 0x0800 -> {
+                packetBody = processor_MultiMediaEventUpload.process(data, parentContext);
+            }
+            case 0x0801 -> {
+                packetBody = MultiMediaDataUploadRequest.read(data, packet.header.msgLen);
+            }
+            case 0x8800 -> {
+                packetBody = MultiMediaDataUploadResponse.read(data, packet.header.msgLen);
+            }
+            case 0x8801 -> {
+                packetBody = processor_CameraTakePhotoCmdRequest.process(data, parentContext);
+            }
+            case 0x0805 -> {
+                packetBody = processor_CameraTakePhotoCmdResponse.process(data, parentContext);
+            }
+            case 0x8802 -> {
+                packetBody = processor_StorageMultiMediaDataFetchRequest.process(data, parentContext);
+            }
+            case 0x0802 -> {
+                packetBody = StorageMultiMediaDataFetchResponse.read(data, packet.header.msgLen);
+            }
+            case 0x8803 -> {
+                packetBody = processor_StorageMultiMediaDataUploadCmd.process(data, parentContext);
+            }
+            case 0x8804 -> {
+                packetBody = processor_RecordingStartCmd.process(data, parentContext);
+            }
+            case 0x8805 -> {
+                packetBody = processor_SingleMultiMediaDataFetchUploadCmd.process(data, parentContext);
+            }
+            case 0x8900 -> {
+                packetBody = DataDownStream.read(data, packet.header.msgLen);
+            }
+            case 0x0900 -> {
+                packetBody = DataUpStream.read(data, packet.header.msgLen);
+            }
+            case 0x0901 -> {
+                packetBody = DataCompressReport.read(data, packet.header.msgLen);
+            }
+            case 0x8A00 -> {
+                packetBody = processor_PlatformRsa.process(data, parentContext);
+            }
+            case 0x0A00 -> {
+                packetBody = processor_TerminalRsa.process(data, parentContext);
             }
             default -> throw BaseRuntimeException.getException("msgId[{}] not support", packet.header.msgId);
         }
