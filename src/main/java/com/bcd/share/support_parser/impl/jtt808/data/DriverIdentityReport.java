@@ -9,7 +9,7 @@ public class DriverIdentityReport implements PacketBody {
     @F_num(type = NumType.uint8)
     public byte status;
     //时间
-    @F_date(mode = DateMode.bytes_yyMMddHHmmss)
+    @F_date_bytes_6
     public Date time;
     //ic卡读取结果
     @F_num(type = NumType.uint8)
@@ -25,7 +25,7 @@ public class DriverIdentityReport implements PacketBody {
     public String code;
     //发证机构名称长度
     @F_num(type = NumType.uint8, var = 'm')
-    public String orgLen;
+    public short orgLen;
     //发证机构
     @F_string(lenExpr = "m", appendMode = StringAppendMode.noAppend)
     public String org;

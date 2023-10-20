@@ -22,7 +22,7 @@ public class PositionBase {
     //方向
     public int direction;
     //时间
-    public Date time;
+    public String time;
 
     public static PositionBase read(ByteBuf data) {
         PositionBase positionBase = new PositionBase();
@@ -33,7 +33,13 @@ public class PositionBase {
         positionBase.alt = data.readUnsignedShort();
         positionBase.speed = data.readUnsignedShort() / 10f;
         positionBase.direction = data.readUnsignedShort();
-        positionBase.time = Date.from(LocalDateTime.of(data.readUnsignedByte() + 2000, data.readByte(), data.readByte(), data.readByte(), data.readByte(), data.readByte()).toInstant(DateZoneUtil.ZONE_OFFSET));
+        byte b1 = data.readByte();
+        byte b2 = data.readByte();
+        byte b3 = data.readByte();
+        byte b4 = data.readByte();
+        byte b5 = data.readByte();
+        byte b6 = data.readByte();
+        positionBase.time = "" + b1 + b2 + b3 + b4 + b5 + b6;
         return positionBase;
     }
 }

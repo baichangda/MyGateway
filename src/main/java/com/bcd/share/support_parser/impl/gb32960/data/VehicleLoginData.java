@@ -7,7 +7,7 @@ import java.util.Date;
 
 public class VehicleLoginData implements PacketData {
     //数据采集时间
-    @F_date(mode = DateMode.bytes_yyMMddHHmmss)
+    @F_date_bytes_6
     public Date collectTime;
 
     //登入流水号

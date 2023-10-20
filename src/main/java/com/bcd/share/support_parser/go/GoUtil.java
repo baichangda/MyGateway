@@ -25,7 +25,10 @@ public class GoUtil {
     public final static GoFieldBuilder__F_bit_num_array fieldBuilder__f_bit_num_array = new GoFieldBuilder__F_bit_num_array();
     public final static GoFieldBuilder__F_string fieldBuilder__f_string = new GoFieldBuilder__F_string();
     public final static GoFieldBuilder__F_skip fieldBuilder__f_skip = new GoFieldBuilder__F_skip();
-    public final static GoFieldBuilder__F_date fieldBuilder__f_date = new GoFieldBuilder__F_date();
+    public final static GoFieldBuilder__F_date_bytes_6 fieldBuilder__f_date_bytes_6 = new GoFieldBuilder__F_date_bytes_6();
+    public final static GoFieldBuilder__F_date_bytes_7 fieldBuilder__f_date_bytes_7 = new GoFieldBuilder__F_date_bytes_7();
+    public final static GoFieldBuilder__F_date_ts fieldBuilder__f_date_ts = new GoFieldBuilder__F_date_ts();
+    public final static GoFieldBuilder__F_date_bcd fieldBuilder__f_date_bcd = new GoFieldBuilder__F_date_bcd();
     public final static GoFieldBuilder__F_bit_skip fieldBuilder__f_bit_skip = new GoFieldBuilder__F_bit_skip();
     public final static GoFieldBuilder__F_bean fieldBuilder__f_bean = new GoFieldBuilder__F_bean();
     public final static GoFieldBuilder__F_bean_list fieldBuilder__f_bean_list = new GoFieldBuilder__F_bean_list();
@@ -90,9 +93,15 @@ public class GoUtil {
                     goFieldBuilder = fieldBuilder__f_string;
                 } else if (field.isAnnotationPresent(F_skip.class)) {
                     goFieldBuilder = fieldBuilder__f_skip;
-                } else if (field.isAnnotationPresent(F_date.class)) {
-                    goFieldBuilder = fieldBuilder__f_date;
-                } else if (field.isAnnotationPresent(F_bit_skip.class)) {
+                } else if (field.isAnnotationPresent(F_date_bytes_6.class)) {
+                    goFieldBuilder = fieldBuilder__f_date_bytes_6;
+                } else if (field.isAnnotationPresent(F_date_bytes_7.class)) {
+                    goFieldBuilder = fieldBuilder__f_date_bytes_7;
+                }else if (field.isAnnotationPresent(F_date_ts.class)) {
+                    goFieldBuilder = fieldBuilder__f_date_ts;
+                }else if (field.isAnnotationPresent(F_date_bcd.class)) {
+                    goFieldBuilder = fieldBuilder__f_date_bcd;
+                }else if (field.isAnnotationPresent(F_bit_skip.class)) {
                     goFieldBuilder = fieldBuilder__f_bit_skip;
                 } else if (field.isAnnotationPresent(F_bean.class)) {
                     goFieldBuilder = fieldBuilder__f_bean;

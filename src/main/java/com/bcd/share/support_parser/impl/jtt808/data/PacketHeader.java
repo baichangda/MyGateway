@@ -27,11 +27,11 @@ public class PacketHeader {
     @F_num(type = NumType.uint8)
     public short version;
     //终端手机号
-    @F_string(len = 10, appendMode = StringAppendMode.lowAddressAppend)
+    @F_bcd(len = 10, appendMode = StringAppendMode.lowAddressAppend)
     public String phoneNumber;
     //消息流水号
     @F_num(type = NumType.uint16)
-    public int msgSn;
+    public int sn;
     @F_customize(processorClass = SubPacketProcessor.class)
     public SubPacket subPacket;
 }

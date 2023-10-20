@@ -7,7 +7,7 @@ import java.util.Date;
 
 public class PlatformLoginData implements PacketData {
     //平台登入时间
-    @F_date(mode = DateMode.bytes_yyMMddHHmmss, baseYear = 2000)
+    @F_date_bytes_6
     public Date collectTime;
 
     //登入流水号

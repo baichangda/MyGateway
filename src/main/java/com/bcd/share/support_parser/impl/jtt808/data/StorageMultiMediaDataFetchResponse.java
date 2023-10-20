@@ -1,12 +1,6 @@
 package com.bcd.share.support_parser.impl.jtt808.data;
 
-import com.bcd.share.support_parser.anno.DateMode;
-import com.bcd.share.support_parser.anno.F_date;
-import com.bcd.share.support_parser.anno.F_num;
-import com.bcd.share.support_parser.anno.NumType;
 import io.netty.buffer.ByteBuf;
-
-import java.util.Date;
 
 public class StorageMultiMediaDataFetchResponse implements PacketBody{
     //应答流水号

@@ -6,9 +6,9 @@ import com.bcd.share.support_parser.Parser;
 import com.bcd.share.support_parser.anno.*;
 import com.bcd.share.support_parser.builder.BuilderContext;
 import com.bcd.share.support_parser.builder.FieldBuilder;
-import com.bcd.share.support_parser.impl.gb32960.data.Packet;
 import com.bcd.share.support_parser.processor.Processor;
 import com.google.common.collect.Sets;
+import io.netty.buffer.ByteBuf;
 import javassist.CannotCompileException;
 import javassist.CtClass;
 import javassist.CtField;
@@ -50,8 +50,12 @@ public class ParseUtil {
         annoSet.add(F_num_array.class);
 
         annoSet.add(F_string.class);
+        annoSet.add(F_string_bcd.class);
 
-        annoSet.add(F_date.class);
+        annoSet.add(F_date_bytes_6.class);
+        annoSet.add(F_date_bytes_7.class);
+        annoSet.add(F_date_ts.class);
+        annoSet.add(F_date_bcd.class);
 
         annoSet.add(F_bean.class);
         annoSet.add(F_bean_list.class);
@@ -63,6 +67,8 @@ public class ParseUtil {
         annoSet.add(F_bit_num.class);
         annoSet.add(F_bit_num_array.class);
         annoSet.add(F_bit_skip.class);
+
+        annoSet.add(F_bcd.class);
     }
 
     public static void check_numType(Class<?> clazz, Field field, F_bit_num anno) {
@@ -665,4 +671,6 @@ public class ParseUtil {
         }
         return false;
     }
+
+
 }

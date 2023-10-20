@@ -53,7 +53,7 @@ public class TerminalRegisterRequest implements PacketBody {
         PacketHeader packetHeader = new PacketHeader();
         packetHeader.msgId = 0x0100;
         packetHeader.msgLen = 76 + terminalRegisterRequest.plateNo.getBytes(Charset.forName("GBK")).length;
-        packetHeader.msgSn = 1;
+        packetHeader.sn = 1;
 
         Packet packet = new Packet();
         packet.startFlag = 0x7e;

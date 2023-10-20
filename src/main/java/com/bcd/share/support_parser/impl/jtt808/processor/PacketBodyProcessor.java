@@ -34,7 +34,6 @@ public class PacketBodyProcessor implements Processor<PacketBody> {
     Processor<TempPositionFollow> processor_TempPositionFollow = Parser.getProcessor(TempPositionFollow.class);
     Processor<ConfirmAlarmMsg> processor_ConfirmAlarmMsg = Parser.getProcessor(ConfirmAlarmMsg.class);
     Processor<SetPhoneText> processor_SetPhoneText = Parser.getProcessor(SetPhoneText.class);
-    Processor<VehicleControlRequest> processor_VehicleControlRequest = Parser.getProcessor(VehicleControlRequest.class);
     Processor<DeleteCircleArea> processor_DeleteCircleArea = Parser.getProcessor(DeleteCircleArea.class);
     Processor<DeleteRectangleArea> processor_DeleteRectangleArea = Parser.getProcessor(DeleteRectangleArea.class);
     Processor<DeletePolygonArea> processor_DeletePolygonArea = Parser.getProcessor(DeletePolygonArea.class);
@@ -127,7 +126,7 @@ public class PacketBodyProcessor implements Processor<PacketBody> {
                 packetBody = processor_SetPhoneText.process(data, parentContext);
             }
             case 0x8500 -> {
-                packetBody = processor_VehicleControlRequest.process(data, parentContext);
+                packetBody = VehicleControlRequest.read(data);
             }
             case 0x0500 -> {
                 packetBody = VehicleControlResponse.read(data, packet.header.msgLen);

@@ -1,15 +1,44 @@
 package com.bcd.share.support_parser.impl.jtt808.data;
 
-import com.bcd.share.support_parser.anno.F_customize;
-import com.bcd.share.support_parser.anno.F_num;
-import com.bcd.share.support_parser.anno.NumType;
-import com.bcd.share.support_parser.impl.jtt808.processor.VehicleControlTypeArrProcessor;
+import com.bcd.share.exception.BaseRuntimeException;
+import io.netty.buffer.ByteBuf;
 
 public class VehicleControlRequest implements PacketBody {
     //控制类型数量
-    @F_num(type = NumType.uint16, var = 'n')
     public int num;
     //控制类型
-    @F_customize(processorClass = VehicleControlTypeArrProcessor.class)
     public VehicleControlType[] types;
+
+    public static VehicleControlRequest read(ByteBuf data) {
+        VehicleControlRequest vehicleControlRequest = new VehicleControlRequest();
+        int num = data.readUnsignedShort();
+        vehicleControlRequest.num = num;
+        VehicleControlType[] types = new VehicleControlType[num];
+        vehicleControlRequest.types = types;
+        for (int i = 0; i < num; i++) {
+            int id = data.readUnsignedShort();
+            switch (id) {
+                case 0x0001 -> {
+                    VehicleControlType vehicleControlType = new VehicleControlType();
+                    vehicleControlType.id = id;
+                    vehicleControlType.param = new byte[]{data.readByte()};
+                    types[i] = vehicleControlType;
+                }
+                default -> {
+                    throw BaseRuntimeException.getException("VehicleControlType id[{}] not support", id);
+                }
+            }
+        }
+        return vehicleControlRequest;
+    }
+
+    public void write(ByteBuf data) {
+        data.writeShort(num);
+        if (types != null) {
+            for (VehicleControlType vehicleControlType : types) {
+                data.writeShort(vehicleControlType.id);
+                data.writeBytes(vehicleControlType.param);
+            }
+        }
+    }
 }

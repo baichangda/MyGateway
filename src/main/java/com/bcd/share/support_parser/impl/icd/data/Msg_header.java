@@ -20,7 +20,7 @@ public class Msg_header {
     public long device_sn;
     @F_num(type = NumType.uint32)
     public long count;
-    @F_date(mode = DateMode.float64_second)
+    @F_date_ts(mode = 5)
     public Date timestamp;
     @F_num(type = NumType.uint16, valType = NumType.float32, valExpr = "x/10")
     public float fps;

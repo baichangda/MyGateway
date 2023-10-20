@@ -68,15 +68,20 @@ public class Parser {
     public final static Map<String, Processor<?>> beanClassNameAndOrder_processor = new HashMap<>();
     private final static FieldBuilder__F_bean fieldBuilder__f_bean = new FieldBuilder__F_bean();
     private final static FieldBuilder__F_bean_list fieldBuilder__f_bean_list = new FieldBuilder__F_bean_list();
-    private final static FieldBuilder__F_date field_builder__f_date = new FieldBuilder__F_date();
+    private final static FieldBuilder__F_date_bytes_6 field_builder__f_date_bytes_6 = new FieldBuilder__F_date_bytes_6();
+    private final static FieldBuilder__F_date_bytes_7 field_builder__f_date_bytes_7 = new FieldBuilder__F_date_bytes_7();
+    private final static FieldBuilder__F_date_ts field_builder__f_date_ts = new FieldBuilder__F_date_ts();
+    private final static FieldBuilder__F_date_bcd field_builder__f_date_bcd = new FieldBuilder__F_date_bcd();
     private final static FieldBuilder__F_num_array fieldBuilder__f_num_array = new FieldBuilder__F_num_array();
     private final static FieldBuilder__F_num fieldBuilder__f_num = new FieldBuilder__F_num();
     private final static FieldBuilder__F_skip fieldBuilder__f_skip = new FieldBuilder__F_skip();
     private final static FieldBuilder__F_string fieldBuilder__f_string = new FieldBuilder__F_string();
+    private final static FieldBuilder__F_string_bcd fieldBuilder__f_string_bcd = new FieldBuilder__F_string_bcd();
     private final static FieldBuilder__F_customize fieldBuilder__f_customize = new FieldBuilder__F_customize();
     private final static FieldBuilder__F_bit_num fieldbuilder__f_bit_num = new FieldBuilder__F_bit_num();
     private final static FieldBuilder__F_bit_num_array fieldbuilder__f_bit_num_array = new FieldBuilder__F_bit_num_array();
     private final static FieldBuilder__F_bit_skip fieldbuilder__f_bit_skip = new FieldBuilder__F_bit_skip();
+    private final static FieldBuilder__F_bcd fieldbuilder__f_bcd = new FieldBuilder__F_bcd();
     /**
      * 是否进行bean的数字字段类型检查、针对数字字段包含如下注解
      * {@link F_num}
@@ -175,6 +180,8 @@ public class Parser {
         final F_bit_skip f_bit_skip1 = cur.getAnnotation(F_bit_skip.class);
         if (f_bit_num1 != null || f_bit_skip1 != null) {
             context.logBit = true;
+        } else {
+            context.logBit = false;
         }
         BitRemainingMode bitRemainingMode1 = null;
         if (f_bit_num1 != null) {
@@ -257,9 +264,33 @@ public class Parser {
                     continue;
                 }
 
-                final F_date f_date = field.getAnnotation(F_date.class);
-                if (f_date != null) {
-                    field_builder__f_date.buildParse(context);
+                final F_string_bcd f_string_bcd = field.getAnnotation(F_string_bcd.class);
+                if (f_string_bcd != null) {
+                    fieldBuilder__f_string_bcd.buildParse(context);
+                    continue;
+                }
+
+                final F_date_bytes_6 f_date_bytes_6 = field.getAnnotation(F_date_bytes_6.class);
+                if (f_date_bytes_6 != null) {
+                    field_builder__f_date_bytes_6.buildParse(context);
+                    continue;
+                }
+
+                final F_date_bytes_7 f_date_bytes_7 = field.getAnnotation(F_date_bytes_7.class);
+                if (f_date_bytes_7 != null) {
+                    field_builder__f_date_bytes_7.buildParse(context);
+                    continue;
+                }
+
+                final F_date_ts f_date_ts = field.getAnnotation(F_date_ts.class);
+                if (f_date_ts != null) {
+                    field_builder__f_date_ts.buildParse(context);
+                    continue;
+                }
+
+                final F_date_bcd f_date_bcd = field.getAnnotation(F_date_bcd.class);
+                if (f_date_bcd != null) {
+                    field_builder__f_date_bcd.buildParse(context);
                     continue;
                 }
 
@@ -299,6 +330,7 @@ public class Parser {
                 if (f_bit_skip != null) {
                     fieldbuilder__f_bit_skip.buildParse(context);
                 }
+
             } finally {
                 if (logCollector_parse != null) {
                     if (context.logBit) {
@@ -349,9 +381,33 @@ public class Parser {
                     continue;
                 }
 
-                final F_date f_date = field.getAnnotation(F_date.class);
-                if (f_date != null) {
-                    field_builder__f_date.buildDeParse(context);
+                final F_string_bcd f_string_bcd = field.getAnnotation(F_string_bcd.class);
+                if (f_string_bcd != null) {
+                    fieldBuilder__f_string_bcd.buildDeParse(context);
+                    continue;
+                }
+
+                final F_date_bytes_6 f_date_bytes_6 = field.getAnnotation(F_date_bytes_6.class);
+                if (f_date_bytes_6 != null) {
+                    field_builder__f_date_bytes_6.buildDeParse(context);
+                    continue;
+                }
+
+                final F_date_bytes_7 f_date_bytes_7 = field.getAnnotation(F_date_bytes_7.class);
+                if (f_date_bytes_7 != null) {
+                    field_builder__f_date_bytes_7.buildDeParse(context);
+                    continue;
+                }
+
+                final F_date_ts f_date_ts = field.getAnnotation(F_date_ts.class);
+                if (f_date_ts != null) {
+                    field_builder__f_date_ts.buildDeParse(context);
+                    continue;
+                }
+
+                final F_date_bcd f_date_bcd = field.getAnnotation(F_date_bcd.class);
+                if (f_date_bcd != null) {
+                    field_builder__f_date_bcd.buildDeParse(context);
                     continue;
                 }
 
@@ -390,6 +446,10 @@ public class Parser {
                 final F_bit_skip f_bit_skip = field.getAnnotation(F_bit_skip.class);
                 if (f_bit_skip != null) {
                     fieldbuilder__f_bit_skip.buildDeParse(context);
+                }
+                final F_bcd f_bcd = field.getAnnotation(F_bcd.class);
+                if (f_bcd != null) {
+                    fieldbuilder__f_bcd.buildParse(context);
                 }
             } finally {
                 if (logCollector_deParse != null) {

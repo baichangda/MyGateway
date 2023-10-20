@@ -1,7 +1,6 @@
 package com.bcd.share.support_parser.impl.jtt808.data;
 
-import com.bcd.share.support_parser.anno.DateMode;
-import com.bcd.share.support_parser.anno.F_date;
+import com.bcd.share.support_parser.anno.F_date_bytes_6;
 import com.bcd.share.support_parser.anno.F_num;
 import com.bcd.share.support_parser.anno.NumType;
 
@@ -18,9 +17,9 @@ public class StorageMultiMediaDataFetchRequest implements PacketBody{
     @F_num(type = NumType.uint8)
     public byte code;
     //起始时间
-    @F_date(mode = DateMode.bytes_yyMMddHHmmss)
+    @F_date_bytes_6
     public Date startTime;
     //结束时间
-    @F_date(mode = DateMode.bytes_yyMMddHHmmss)
+    @F_date_bytes_6
     public Date endTime;
 }
