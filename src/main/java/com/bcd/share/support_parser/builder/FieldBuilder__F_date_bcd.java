@@ -23,7 +23,7 @@ public class FieldBuilder__F_date_bcd extends FieldBuilder {
         final String varNameLongField = varNameField + "_long";
         final String zoneDateTimeClassName = ZonedDateTime.class.getName();
         final String varNameZoneId = ParseUtil.defineClassVar(context, ZoneId.class, "{}.of(\"{}\")", ZoneId.class.getName(), anno.zoneId());
-        ParseUtil.append(body, "final long {}={}.read({},{},{});\n", varNameLongField, FieldBuilder__F_bcd.class.getName()
+        ParseUtil.append(body, "final long {}={}.read({},{},{});\n", varNameLongField, FieldBuilder__F_date_bcd.class.getName()
                 , varNameByteBuf, varNameZoneId, anno.baseYear());
 
         //根据字段类型格式化

@@ -81,7 +81,6 @@ public class Parser {
     private final static FieldBuilder__F_bit_num fieldbuilder__f_bit_num = new FieldBuilder__F_bit_num();
     private final static FieldBuilder__F_bit_num_array fieldbuilder__f_bit_num_array = new FieldBuilder__F_bit_num_array();
     private final static FieldBuilder__F_bit_skip fieldbuilder__f_bit_skip = new FieldBuilder__F_bit_skip();
-    private final static FieldBuilder__F_bcd fieldbuilder__f_bcd = new FieldBuilder__F_bcd();
     /**
      * 是否进行bean的数字字段类型检查、针对数字字段包含如下注解
      * {@link F_num}
@@ -446,10 +445,6 @@ public class Parser {
                 final F_bit_skip f_bit_skip = field.getAnnotation(F_bit_skip.class);
                 if (f_bit_skip != null) {
                     fieldbuilder__f_bit_skip.buildDeParse(context);
-                }
-                final F_bcd f_bcd = field.getAnnotation(F_bcd.class);
-                if (f_bcd != null) {
-                    fieldbuilder__f_bcd.buildParse(context);
                 }
             } finally {
                 if (logCollector_deParse != null) {

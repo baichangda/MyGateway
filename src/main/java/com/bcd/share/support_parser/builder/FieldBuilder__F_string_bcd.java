@@ -4,6 +4,7 @@ package com.bcd.share.support_parser.builder;
 import com.bcd.share.exception.BaseRuntimeException;
 import com.bcd.share.support_parser.anno.F_skip;
 import com.bcd.share.support_parser.anno.F_string;
+import com.bcd.share.support_parser.anno.F_string_bcd;
 import com.bcd.share.support_parser.util.ParseUtil;
 import io.netty.buffer.ByteBuf;
 
@@ -15,8 +16,8 @@ public class FieldBuilder__F_string_bcd extends FieldBuilder {
         final StringBuilder body = context.body;
         final Field field = context.field;
         final Class<?> fieldType = field.getType();
-        final F_string anno = field.getAnnotation(F_string.class);
-        final Class<? extends F_string> annoClass = anno.getClass();
+        final F_string_bcd anno = field.getAnnotation(F_string_bcd.class);
+        final Class<? extends F_string_bcd> annoClass = anno.getClass();
         if (fieldType != String.class) {
             ParseUtil.notSupport_type(context.clazz, field, annoClass);
         }
@@ -48,7 +49,7 @@ public class FieldBuilder__F_string_bcd extends FieldBuilder {
     public void buildDeParse(BuilderContext context) {
         final StringBuilder body = context.body;
         final Field field = context.field;
-        final F_string anno = field.getAnnotation(F_string.class);
+        final F_string_bcd anno = field.getAnnotation(F_string_bcd.class);
         final String fieldName = field.getName();
         final String valCode = varNameInstance + "." + fieldName;
         final String varNameField = ParseUtil.getFieldVarName(context);

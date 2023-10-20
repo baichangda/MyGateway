@@ -68,7 +68,6 @@ public class ParseUtil {
         annoSet.add(F_bit_num_array.class);
         annoSet.add(F_bit_skip.class);
 
-        annoSet.add(F_bcd.class);
     }
 
     public static void check_numType(Class<?> clazz, Field field, F_bit_num anno) {
