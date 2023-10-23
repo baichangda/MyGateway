@@ -9,15 +9,15 @@ import com.bcd.share.support_parser.anno.NumType;
  */
 public class VehicleFuelBatteryData {
     //燃料电池电压
-    @F_num(type = NumType.uint16, valType = NumType.float32, valExpr = "x/10")
+    @F_num(type = NumType.uint16, valExpr = "x/10")
     public float voltage;
 
     //燃料电池电流
-    @F_num(type = NumType.uint16, valType = NumType.float32, valExpr = "x/10")
+    @F_num(type = NumType.uint16, valExpr = "x/10")
     public float current;
 
     //燃料消耗率
-    @F_num(type = NumType.uint16, valType = NumType.float32, valExpr = "x/100")
+    @F_num(type = NumType.uint16, valExpr = "x/100")
     public float consumptionRate;
 
     //燃料电池温度探针总数
@@ -29,7 +29,7 @@ public class VehicleFuelBatteryData {
     public short[] temperatures;
 
     //氢系统中最高温度
-    @F_num(type = NumType.uint16, valType = NumType.float32, valExpr = "x/10-40")
+    @F_num(type = NumType.uint16,  valExpr = "x/10-40")
     public float maxTemperature;
 
     //氢系统中最高温度探针代号
@@ -37,7 +37,7 @@ public class VehicleFuelBatteryData {
     public short maxTemperatureCode;
 
     //氢气最高浓度
-    @F_num(type = NumType.uint16, valType = NumType.int32, valExpr = "x-10000")
+    @F_num(type = NumType.uint16,  valExpr = "x-10000")
     public int maxConcentration;
 
     //氢气最高浓度传感器代号
@@ -45,7 +45,7 @@ public class VehicleFuelBatteryData {
     public short maxConcentrationCode;
 
     //氢气最高压力
-    @F_num(type = NumType.uint16, valType = NumType.float32, valExpr = "x/10")
+    @F_num(type = NumType.uint16, valExpr = "x/10")
     public float maxPressure;
 
     //氢气最高压力传感器代号

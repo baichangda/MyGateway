@@ -3,6 +3,7 @@ package com.bcd.share.support_parser.builder;
 import com.bcd.share.support_parser.anno.F_bean;
 import com.bcd.share.support_parser.util.ParseUtil;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 
 public class FieldBuilder__F_bean extends FieldBuilder {
@@ -32,12 +33,17 @@ public class FieldBuilder__F_bean extends FieldBuilder {
         final F_bean anno = field.getAnnotation(F_bean.class);
         final Class<?> fieldType = field.getType();
         final String fieldName = field.getName();
-        final String processContextVarName= context.getProcessContextVarName();
+        final String processContextVarName = context.getProcessContextVarName();
         final String processorVarName = context.getProcessorVarName(fieldType);
         ParseUtil.append(body, "{}.deProcess({},{},{});\n",
                 processorVarName,
                 varNameByteBuf,
                 processContextVarName,
                 varNameInstance + "." + fieldName);
+    }
+
+    @Override
+    public Class<F_bean> annoClass() {
+        return F_bean.class;
     }
 }

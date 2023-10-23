@@ -15,9 +15,9 @@ public class Evt_D00B extends Evt_4_x {
     }
 
     public static class Evt_D00B_BMSCellVol {
-        @F_bit_num(len = 13, valType = NumType.float32, valExpr = "x*0.001")
+        @F_bit_num(len = 13,  valExpr = "x*0.001")
         public float BMSCellVol;
-        @F_bit_num(len = 1, valType = NumType.uint8, bitRemainingMode = BitRemainingMode.ignore)
+        @F_bit_num(len = 1, bitRemainingMode = BitRemainingMode.ignore)
         public byte BMSCellVolV;
     }
 }

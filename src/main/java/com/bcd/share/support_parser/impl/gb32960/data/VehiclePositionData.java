@@ -12,10 +12,10 @@ public class VehiclePositionData {
     public byte status;
 
     //经度
-    @F_num(type = NumType.uint32, valType = NumType.float64, valExpr = "x/1000000")
+    @F_num(type = NumType.uint32,  valExpr = "x/1000000")
     public double lng;
 
     //纬度
-    @F_num(type = NumType.uint32, valType = NumType.float64, valExpr = "x/1000000")
+    @F_num(type = NumType.uint32,  valExpr = "x/1000000")
     public double lat;
 }

@@ -1,5 +1,6 @@
 package com.bcd.share.support_parser.builder;
 
+import com.bcd.share.support_parser.anno.F_date_ts;
 import com.bcd.share.support_parser.anno.F_num;
 import com.bcd.share.support_parser.anno.NumType;
 import com.bcd.share.support_parser.util.ParseUtil;
@@ -34,8 +35,6 @@ public class FieldBuilder__F_num extends FieldBuilder {
         final StringBuilder body = context.body;
         final String varNameInstance = FieldBuilder.varNameInstance;
         final String varNameField = ParseUtil.getFieldVarName(context);
-
-        ParseUtil.check_numType(context.clazz, field, anno);
 
         final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.byteOrder);
         final NumType type = anno.type();
@@ -130,6 +129,7 @@ public class FieldBuilder__F_num extends FieldBuilder {
         if (var != '0') {
             ParseUtil.append(body, "final {} {}={};\n", fieldType.getName(), varNameField, valCode);
             context.varToFieldName.put(var, varNameField);
+            valCode = varNameField;
         }
 
         //最后判断是否用了值表达式、如果用了、进行表达式处理
@@ -177,5 +177,10 @@ public class FieldBuilder__F_num extends FieldBuilder {
                 ParseUtil.notSupport_numType(context.clazz, field, annoClass);
             }
         }
+    }
+
+    @Override
+    public Class<F_num> annoClass() {
+        return F_num.class;
     }
 }

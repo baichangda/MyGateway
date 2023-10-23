@@ -11,9 +11,9 @@ public class Target_info {
     public long track_id;
     @F_num(type = NumType.uint32)
     public long lane_id;
-    @F_num(type = NumType.uint32, valType = NumType.float64, valExpr = "x/10000000")
+    @F_num(type = NumType.uint32,  valExpr = "x/10000000")
     public double lon;
-    @F_num(type = NumType.uint32, valType = NumType.float64, valExpr = "x/10000000")
+    @F_num(type = NumType.uint32,  valExpr = "x/10000000")
     public double lat;
     @F_num(type = NumType.uint32)
     public long alt;
@@ -23,7 +23,7 @@ public class Target_info {
     public int dev_y;
     @F_num(type = NumType.int32)
     public int dev_z;
-    @F_num(type = NumType.uint16, valType = NumType.float32, valExpr = "x/100")
+    @F_num(type = NumType.uint16,  valExpr = "x/100")
     public float azimuth_angle;
     @F_num(type = NumType.int32)
     public int dev_vx;

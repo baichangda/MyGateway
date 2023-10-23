@@ -13,8 +13,10 @@ import javassist.CannotCompileException;
 import javassist.CtClass;
 import javassist.CtField;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class BuilderContext {
@@ -70,7 +72,23 @@ public class BuilderContext {
      */
     public Map<String, String> customize_processorId_processorVarName;
 
-    public BuilderContext(StringBuilder body, Class<?> clazz, CtClass implCc, Map<String, String> classVarDefineToVarName, Map<String, String> beanClassAndOrder_processorVarName, ByteOrder byteOrder, BitOrder bitOrder, Map<String, String> customize_processorId_processorVarName) {
+
+    /**
+     * 字段集合
+     */
+    public final List<Field> fieldList;
+    /**
+     * 当前解析字段索引
+     */
+    public int fieldIndex;
+
+    public final Map<String,Object> cache=new HashMap<>();
+
+    public BuilderContext(StringBuilder body, Class<?> clazz,
+                          CtClass implCc, Map<String, String> classVarDefineToVarName,
+                          Map<String, String> beanClassAndOrder_processorVarName, ByteOrder byteOrder, BitOrder bitOrder,
+                          Map<String, String> customize_processorId_processorVarName,
+                          List<Field> fieldList) {
         this.body = body;
         this.clazz = clazz;
         this.implCc = implCc;
@@ -79,6 +97,7 @@ public class BuilderContext {
         this.byteOrder = byteOrder;
         this.bitOrder = bitOrder;
         this.customize_processorId_processorVarName=customize_processorId_processorVarName;
+        this.fieldList=fieldList;
     }
 
     public final String getCustomizeProcessorVarName(Class<?> processorClass, String processorArgs) {

@@ -1,6 +1,7 @@
 package com.bcd.share.support_parser.builder;
 
 import com.bcd.share.exception.BaseRuntimeException;
+import com.bcd.share.support_parser.anno.F_num;
 import com.bcd.share.support_parser.anno.F_num_array;
 import com.bcd.share.support_parser.anno.F_skip;
 import com.bcd.share.support_parser.anno.NumType;
@@ -19,8 +20,6 @@ public class FieldBuilder__F_num_array extends FieldBuilder {
         final String sourceValTypeName;
         final Class<F_num_array> annoClass = F_num_array.class;
         final F_num_array anno = context.field.getAnnotation(annoClass);
-
-        ParseUtil.check_numType(context.clazz, field, anno);
 
         switch (arrayElementTypeName) {
             case "byte", "short", "int", "long", "float", "double" -> {
@@ -215,5 +214,10 @@ public class FieldBuilder__F_num_array extends FieldBuilder {
             ParseUtil.append(body, "}\n");
         }
         ParseUtil.append(body, "}\n");
+    }
+
+    @Override
+    public Class<F_num_array> annoClass() {
+        return F_num_array.class;
     }
 }

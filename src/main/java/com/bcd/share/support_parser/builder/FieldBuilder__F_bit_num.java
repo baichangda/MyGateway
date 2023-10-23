@@ -1,6 +1,7 @@
 package com.bcd.share.support_parser.builder;
 
 import com.bcd.share.exception.BaseRuntimeException;
+import com.bcd.share.support_parser.anno.F_bean_list;
 import com.bcd.share.support_parser.anno.F_bit_num;
 import com.bcd.share.support_parser.util.ParseUtil;
 import com.bcd.share.support_parser.util.RpnUtil;
@@ -17,8 +18,6 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
         final F_bit_num anno = field.getAnnotation(annoClass);
         final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.bitOrder);
         final boolean unsigned = anno.unsigned();
-
-        ParseUtil.check_numType(context.clazz, field, anno);
 
         final String sourceValTypeName;
         switch (fieldTypeName) {
@@ -91,6 +90,7 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
         if (var != '0') {
             ParseUtil.append(body, "final {} {}={};\n", fieldType.getName(), varNameField, valCode);
             context.varToFieldName.put(var, varNameField);
+            valCode = varNameField;
         }
 
         //最后判断是否用了值表达式、如果用了、进行表达式处理
@@ -114,5 +114,10 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
             ParseUtil.append(body, "{}.finish();\n", varNameBitBuf);
         }
 
+    }
+
+    @Override
+    public Class<F_bit_num> annoClass() {
+        return F_bit_num.class;
     }
 }

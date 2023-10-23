@@ -10,9 +10,9 @@ public class Sensor_body_camera implements Sensor_body {
     public int pixel;
     @F_num(type = NumType.uint16)
     public int focal;
-    @F_num(type = NumType.uint16, valType = NumType.float32, valExpr = "x/100")
+    @F_num(type = NumType.uint16,  valExpr = "x/100")
     public float hori_view_angle;
-    @F_num(type = NumType.uint16, valType = NumType.float32, valExpr = "x/100")
+    @F_num(type = NumType.uint16,  valExpr = "x/100")
     public float vert_view_angle;
 
     @F_skip(mode = SkipMode.reservedFromStart, len = 32)

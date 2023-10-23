@@ -11,9 +11,9 @@ public class Event_info {
     @F_num(type = NumType.uint16)
     public EventType event_type;
     public double event_timestamp;
-    @F_num(type = NumType.int64, valType = NumType.float64, valExpr = "x/10000000")
+    @F_num(type = NumType.int64,  valExpr = "x/10000000")
     public double event_lon;
-    @F_num(type = NumType.int64, valType = NumType.float64, valExpr = "x/10000000")
+    @F_num(type = NumType.int64,  valExpr = "x/10000000")
     public double event_lat;
     @F_num(type = NumType.uint32)
     public long event_alt;

@@ -13,17 +13,17 @@ public class Sensor_info {
     public SensorType sensor_type;
     @F_num(type = NumType.uint8)
     public DataType data_type;
-    @F_num(type = NumType.uint32, valType = NumType.float64, valExpr = "x/10000000")
+    @F_num(type = NumType.uint32,  valExpr = "x/10000000")
     public double sensor_lon;
-    @F_num(type = NumType.uint32, valType = NumType.float64, valExpr = "x/10000000")
+    @F_num(type = NumType.uint32,  valExpr = "x/10000000")
     public double sensor_lat;
     @F_num(type = NumType.uint32)
     public long sensor_alt;
-    @F_num(type = NumType.uint16, valType = NumType.float32, valExpr = "x/100")
+    @F_num(type = NumType.uint16,  valExpr = "x/100")
     public float sensor_azimuth;
-    @F_num(type = NumType.uint16, valType = NumType.float32, valExpr = "x/100")
+    @F_num(type = NumType.uint16,  valExpr = "x/100")
     public float sensor_pitch;
-    @F_num(type = NumType.uint16, valType = NumType.float32, valExpr = "x/100")
+    @F_num(type = NumType.uint16,  valExpr = "x/100")
     public float sensor_roll;
     @F_num(type = NumType.uint8)
     public SensorStatus sensor_status;

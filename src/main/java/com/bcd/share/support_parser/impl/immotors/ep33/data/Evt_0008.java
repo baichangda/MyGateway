@@ -6,9 +6,9 @@ import com.bcd.share.support_parser.anno.NumType;
 import com.bcd.share.support_parser.impl.immotors.Evt_2_6;
 
 public class Evt_0008 extends Evt_2_6 {
-    @F_bit_num(len = 16, valType = NumType.uint16)
+    @F_bit_num(len = 16)
     public int cellMCC;
-    @F_bit_num(len = 16, valType = NumType.uint16)
+    @F_bit_num(len = 16)
     public int cellMNC;
     @F_skip(len = 2)
     public byte skip;

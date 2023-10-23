@@ -1,5 +1,6 @@
 package com.bcd.share.support_parser.builder;
 
+import com.bcd.share.support_parser.anno.F_date_bytes_6;
 import com.bcd.share.support_parser.anno.F_date_bytes_7;
 import com.bcd.share.support_parser.util.ParseUtil;
 
@@ -98,5 +99,10 @@ public class FieldBuilder__F_date_bytes_7 extends FieldBuilder {
                 varNameZoneDateTimeField,
                 varNameZoneDateTimeField,
                 varNameZoneDateTimeField);
+    }
+
+    @Override
+    public Class<F_date_bytes_7> annoClass() {
+        return F_date_bytes_7.class;
     }
 }

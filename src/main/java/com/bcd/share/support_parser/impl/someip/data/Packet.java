@@ -9,10 +9,10 @@ public class Packet {
     @F_num(type = NumType.uint16)
     public int serviceId;
 
-    @F_bit_num(len = 1, valType = NumType.uint8)
+    @F_bit_num(len = 1)
     public byte flag;
 
-    @F_bit_num(len = 15, valType = NumType.uint16)
+    @F_bit_num(len = 15)
     public short methodIdOrEventId;
 
     @F_num(type = NumType.uint32, var = 'a')

@@ -2,6 +2,7 @@ package com.bcd.share.support_parser.builder;
 
 
 import com.bcd.share.exception.BaseRuntimeException;
+import com.bcd.share.support_parser.anno.F_bit_skip;
 import com.bcd.share.support_parser.anno.F_customize;
 import com.bcd.share.support_parser.util.ParseUtil;
 
@@ -81,5 +82,10 @@ public class FieldBuilder__F_customize extends FieldBuilder {
                 }
             }).buildDeParse(context);
         }
+    }
+
+    @Override
+    public Class<F_customize> annoClass() {
+        return F_customize.class;
     }
 }

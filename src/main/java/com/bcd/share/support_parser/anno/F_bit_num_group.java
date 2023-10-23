@@ -6,27 +6,34 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 适用如下字段类型
- * byte、short、int、long、float、double、枚举类
- * <p>
- * 枚举类
- * 仅支持整型数字
- * 要求枚举类必有如下静态方法、例如
- * public enum Example{
- * public static Example fromInteger(int i){}
- * public int toInteger(){}
- * }
+ *
+ * 最高支持连续32位
+ *
+ * 相邻的此注解字段会视为一组
+ * 同一组字段会按照{@link #bitStart()}排序
+ * 根据 bit组总长度 来读取对应长度字节
+ * 1-8 1
+ * 8-16 2
+ * 17-24 3
+ * 25-32 4
  */
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface F_num {
+public @interface F_bit_num_group {
+    /**
+     * bit开始、从0开始、包含
+     */
+    int bitStart();
 
     /**
-     * 读取原始值的数据类型
-     * 数据类型
+     * bit结束、不包含
      */
-    NumType type();
+    int bitEnd();
 
+    /**
+     * 表示当前bit组结束
+     */
+    boolean end() default false;
 
     /**
      * 值处理表达式
@@ -48,10 +55,4 @@ public @interface F_num {
      * 例如: m,n,a
      */
     char var() default '0';
-
-
-    /**
-     * 字节序模式
-     */
-    ByteOrder order() default ByteOrder.Default;
 }

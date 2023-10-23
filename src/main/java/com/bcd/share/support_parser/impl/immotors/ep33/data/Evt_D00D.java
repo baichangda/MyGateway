@@ -11,9 +11,9 @@ public class Evt_D00D extends Evt_4_x {
     public Evt_D00D_BMSBusbarTem[] BMSBusbarTems;
 
     public static class Evt_D00D_BMSBusbarTem {
-        @F_bit_num(len = 8, valType = NumType.float32, valExpr = "x-40")
+        @F_bit_num(len = 8,  valExpr = "x-40")
         public float BMSBusbarTem;
-        @F_bit_num(len = 1, valType = NumType.uint8, bitRemainingMode = BitRemainingMode.ignore)
+        @F_bit_num(len = 1, bitRemainingMode = BitRemainingMode.ignore)
         public byte BMSBusbarTemV;
     }
 }

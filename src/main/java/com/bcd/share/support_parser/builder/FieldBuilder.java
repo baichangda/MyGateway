@@ -5,6 +5,8 @@ import com.bcd.share.support_parser.anno.F_skip;
 import com.bcd.share.support_parser.anno.SkipMode;
 import io.netty.buffer.ByteBuf;
 
+import java.lang.annotation.Annotation;
+
 public abstract class FieldBuilder {
     public final static String varNameThis = "$0";
     public final static String varNameByteBuf = "$1";
@@ -25,5 +27,7 @@ public abstract class FieldBuilder {
     public void buildDeParse(final BuilderContext context) {
 
     }
+
+    public abstract Class<? extends Annotation> annoClass();
 
 }

@@ -2,6 +2,7 @@ package com.bcd.share.support_parser.builder;
 
 
 import com.bcd.share.exception.BaseRuntimeException;
+import com.bcd.share.support_parser.anno.F_num_array;
 import com.bcd.share.support_parser.anno.F_skip;
 import com.bcd.share.support_parser.util.ParseUtil;
 
@@ -69,5 +70,10 @@ public class FieldBuilder__F_skip extends FieldBuilder {
             }
         }
 
+    }
+
+    @Override
+    public Class<F_skip> annoClass() {
+        return F_skip.class;
     }
 }

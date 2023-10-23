@@ -16,7 +16,7 @@ public class VehicleEngineData {
     public int speed;
 
     //燃料消耗率
-    @F_num(type = NumType.uint16, valType = NumType.float32, valExpr = "x/100")
+    @F_num(type = NumType.uint16, valExpr = "x/100")
     public float rate;
 
 }

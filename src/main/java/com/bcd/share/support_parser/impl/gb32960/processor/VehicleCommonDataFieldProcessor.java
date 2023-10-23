@@ -35,47 +35,47 @@ public class VehicleCommonDataFieldProcessor implements Processor<VehicleCommonD
             switch (flag) {
                 case 1: {
                     //2.1、整车数据
-                    vehicleCommonData.vehicleBaseData = processor_vehicleBaseData.process(byteBuf, null);
+                    vehicleCommonData.vehicleBaseData = processor_vehicleBaseData.process(byteBuf, parentContext);
                     break;
                 }
                 case 2: {
                     //2.2、驱动电机数据
-                    vehicleCommonData.vehicleMotorData = processor_vehicleMotorData.process(byteBuf, null);
+                    vehicleCommonData.vehicleMotorData = processor_vehicleMotorData.process(byteBuf, parentContext);
                     break;
                 }
                 case 3: {
                     //2.3、燃料电池数据
-                    vehicleCommonData.vehicleFuelBatteryData = processor_vehicleFuelBatteryData.process(byteBuf, null);
+                    vehicleCommonData.vehicleFuelBatteryData = processor_vehicleFuelBatteryData.process(byteBuf, parentContext);
                     break;
                 }
                 case 4: {
                     //2.4、发动机数据
-                    vehicleCommonData.vehicleEngineData = processor_vehicleEngineData.process(byteBuf, null);
+                    vehicleCommonData.vehicleEngineData = processor_vehicleEngineData.process(byteBuf, parentContext);
                     break;
                 }
                 case 5: {
                     //2.5、车辆位置数据
-                    vehicleCommonData.vehiclePositionData = processor_vehiclePositionData.process(byteBuf, null);
+                    vehicleCommonData.vehiclePositionData = processor_vehiclePositionData.process(byteBuf, parentContext);
                     break;
                 }
                 case 6: {
                     //2.6、极值数据
-                    vehicleCommonData.vehicleLimitValueData = processor_vehicleLimitValueData.process(byteBuf, null);
+                    vehicleCommonData.vehicleLimitValueData = processor_vehicleLimitValueData.process(byteBuf, parentContext);
                     break;
                 }
                 case 7: {
                     //2.7、报警数据
-                    vehicleCommonData.vehicleAlarmData = processor_vehicleAlarmData.process(byteBuf, null);
+                    vehicleCommonData.vehicleAlarmData = processor_vehicleAlarmData.process(byteBuf, parentContext);
                     break;
                 }
                 case 8: {
                     //2.8、可充电储能装置电压数据
-                    vehicleCommonData.vehicleStorageVoltageData = processor_vehicleStorageVoltageData.process(byteBuf, null);
+                    vehicleCommonData.vehicleStorageVoltageData = processor_vehicleStorageVoltageData.process(byteBuf, parentContext);
                     break;
                 }
                 case 9: {
                     //2.9、可充电储能装置温度数据
-                    vehicleCommonData.vehicleStorageTemperatureData = processor_vehicleStorageTemperatureData.process(byteBuf, null);
+                    vehicleCommonData.vehicleStorageTemperatureData = processor_vehicleStorageTemperatureData.process(byteBuf, parentContext);
                     break;
                 }
                 default: {
@@ -98,39 +98,39 @@ public class VehicleCommonDataFieldProcessor implements Processor<VehicleCommonD
     public void deProcess(ByteBuf data, ProcessContext<?> parentContext, VehicleCommonData instance) {
         if (instance.vehicleBaseData != null) {
             data.writeByte(1);
-            processor_vehicleBaseData.deProcess(data, null, instance.vehicleBaseData);
+            processor_vehicleBaseData.deProcess(data, parentContext, instance.vehicleBaseData);
         }
         if (instance.vehicleMotorData != null) {
             data.writeByte(2);
-            processor_vehicleMotorData.deProcess(data, null, instance.vehicleMotorData);
+            processor_vehicleMotorData.deProcess(data, parentContext, instance.vehicleMotorData);
         }
         if (instance.vehicleFuelBatteryData != null) {
             data.writeByte(3);
-            processor_vehicleFuelBatteryData.deProcess(data, null, instance.vehicleFuelBatteryData);
+            processor_vehicleFuelBatteryData.deProcess(data, parentContext, instance.vehicleFuelBatteryData);
         }
         if (instance.vehicleEngineData != null) {
             data.writeByte(4);
-            processor_vehicleEngineData.deProcess(data, null, instance.vehicleEngineData);
+            processor_vehicleEngineData.deProcess(data, parentContext, instance.vehicleEngineData);
         }
         if (instance.vehiclePositionData != null) {
             data.writeByte(5);
-            processor_vehiclePositionData.deProcess(data, null, instance.vehiclePositionData);
+            processor_vehiclePositionData.deProcess(data, parentContext, instance.vehiclePositionData);
         }
         if (instance.vehicleLimitValueData != null) {
             data.writeByte(6);
-            processor_vehicleLimitValueData.deProcess(data, null, instance.vehicleLimitValueData);
+            processor_vehicleLimitValueData.deProcess(data, parentContext, instance.vehicleLimitValueData);
         }
         if (instance.vehicleAlarmData != null) {
             data.writeByte(7);
-            processor_vehicleAlarmData.deProcess(data, null, instance.vehicleAlarmData);
+            processor_vehicleAlarmData.deProcess(data, parentContext, instance.vehicleAlarmData);
         }
         if (instance.vehicleStorageVoltageData != null) {
             data.writeByte(8);
-            processor_vehicleStorageVoltageData.deProcess(data, null, instance.vehicleStorageVoltageData);
+            processor_vehicleStorageVoltageData.deProcess(data, parentContext, instance.vehicleStorageVoltageData);
         }
         if (instance.vehicleStorageTemperatureData != null) {
             data.writeByte(9);
-            processor_vehicleStorageTemperatureData.deProcess(data, null, instance.vehicleStorageTemperatureData);
+            processor_vehicleStorageTemperatureData.deProcess(data, parentContext, instance.vehicleStorageTemperatureData);
         }
     }
 }

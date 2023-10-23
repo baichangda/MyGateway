@@ -10,9 +10,9 @@ public class Road2_info {
     public long road_id;
     @F_num(type = NumType.uint8)
     public RoadType road_type;
-    @F_num(type = NumType.uint32, valType = NumType.float64, valExpr = "x/10000000")
+    @F_num(type = NumType.uint32,  valExpr = "x/10000000")
     public double road_lon;
-    @F_num(type = NumType.uint32, valType = NumType.float64, valExpr = "x/10000000")
+    @F_num(type = NumType.uint32,  valExpr = "x/10000000")
     public double road_lat;
     @F_num(type = NumType.uint32)
     public long road_alt;

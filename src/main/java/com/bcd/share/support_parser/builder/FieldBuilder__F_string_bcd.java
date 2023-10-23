@@ -181,4 +181,9 @@ public class FieldBuilder__F_string_bcd extends FieldBuilder {
         }
         byteBuf.writeBytes(res);
     }
+
+    @Override
+    public Class<F_string_bcd> annoClass() {
+        return F_string_bcd.class;
+    }
 }

@@ -8,7 +8,6 @@ import com.bcd.share.support_parser.builder.BuilderContext;
 import com.bcd.share.support_parser.builder.FieldBuilder;
 import com.bcd.share.support_parser.processor.Processor;
 import com.google.common.collect.Sets;
-import io.netty.buffer.ByteBuf;
 import javassist.CannotCompileException;
 import javassist.CtClass;
 import javassist.CtField;
@@ -24,7 +23,6 @@ import java.util.stream.Collectors;
 
 public class ParseUtil {
 
-    public final static Set<Class<?>> annoSet = new HashSet<>();
     static final double[] pows;
     private final static Set<Class<?>> logFieldTypeSet = Sets.newHashSet(
             byte.class, short.class, int.class, long.class, float.class, double.class,
@@ -43,217 +41,6 @@ public class ParseUtil {
         for (int i = 0; i < pows.length; i++) {
             pows[i] = Math.pow(10, i);
         }
-    }
-
-    static {
-        annoSet.add(F_num.class);
-        annoSet.add(F_num_array.class);
-
-        annoSet.add(F_string.class);
-        annoSet.add(F_string_bcd.class);
-
-        annoSet.add(F_date_bytes_6.class);
-        annoSet.add(F_date_bytes_7.class);
-        annoSet.add(F_date_ts.class);
-        annoSet.add(F_date_bcd.class);
-
-        annoSet.add(F_bean.class);
-        annoSet.add(F_bean_list.class);
-
-        annoSet.add(F_customize.class);
-
-        annoSet.add(F_skip.class);
-
-        annoSet.add(F_bit_num.class);
-        annoSet.add(F_bit_num_array.class);
-        annoSet.add(F_bit_skip.class);
-
-    }
-
-    public static void check_numType(Class<?> clazz, Field field, F_bit_num anno) {
-        if (!Parser.printNumFieldSuggestTypeWarn) {
-            return;
-        }
-        Class<?> suggestType = check_numType(anno.valType());
-        if (suggestType == null) {
-            notSupport_numType(clazz, field, anno.annotationType());
-            return;
-        }
-        Class<?> actualType = field.getType();
-        String fieldStackTrace = LogUtil.getFieldStackTrace(clazz, field.getName());
-        if (!actualType.isEnum()) {
-            if (suggestType != actualType) {
-                logger.warn("{} class[{}] field[{}] @F_bit_num[valType={}] type suggest[{}] actual[{}]",
-                        fieldStackTrace,
-                        clazz.getName(),
-                        field.getName(),
-                        anno.valType(),
-                        suggestType.getName(),
-                        actualType.getName());
-            }
-        }
-    }
-
-    public static void check_numType(Class<?> clazz, Field field, F_bit_num_array anno) {
-        if (!Parser.printNumFieldSuggestTypeWarn) {
-            return;
-        }
-        Class<?> suggestType = check_numType(anno.singleValType());
-        if (suggestType == null) {
-            notSupport_numType(clazz, field, anno.annotationType());
-            return;
-        }
-        Class<?> actualType = field.getType().getComponentType();
-        String fieldStackTrace = LogUtil.getFieldStackTrace(clazz, field.getName());
-        if (!actualType.isEnum()) {
-            if (suggestType != actualType) {
-                logger.warn("{} class[{}] field[{}] @F_num[singleValType={}] type suggest[{}] actual[{}]",
-                        fieldStackTrace,
-                        clazz.getName(),
-                        field.getName(),
-                        anno.singleValType(),
-                        suggestType.getName(),
-                        actualType.getName());
-            }
-        }
-    }
-
-    private static Class<?> check_numType(NumType valType) {
-        final Class<?> suggestType;
-        switch (valType) {
-            case uint8 -> {
-                suggestType = short.class;
-            }
-            case int8 -> {
-                suggestType = byte.class;
-            }
-            case uint16 -> {
-                suggestType = int.class;
-            }
-            case int16 -> {
-                suggestType = short.class;
-            }
-            case uint32 -> {
-                suggestType = long.class;
-            }
-            case int32 -> {
-                suggestType = int.class;
-            }
-            case uint64 -> {
-                suggestType = long.class;
-            }
-            case int64 -> {
-                suggestType = long.class;
-            }
-            case float32 -> {
-                suggestType = float.class;
-            }
-            case float64 -> {
-                suggestType = double.class;
-            }
-            default -> {
-                suggestType = null;
-            }
-        }
-        return suggestType;
-
-    }
-
-    public static void check_numType(Class<?> clazz, Field field, F_num anno) {
-        if (!Parser.printNumFieldSuggestTypeWarn) {
-            return;
-        }
-        Class<?> suggestType = check_numType(anno.type(), anno.valType());
-        if (suggestType == null) {
-            notSupport_numType(clazz, field, anno.annotationType());
-            return;
-        }
-        Class<?> actualType = field.getType();
-        String fieldStackTrace = LogUtil.getFieldStackTrace(clazz, field.getName());
-        if (!actualType.isEnum()) {
-            if (suggestType != actualType) {
-                logger.warn("{} class[{}] field[{}] @F_num[type={},valType={}] type suggest[{}] actual[{}]",
-                        fieldStackTrace,
-                        clazz.getName(),
-                        field.getName(),
-                        anno.type(),
-                        anno.valType(),
-                        suggestType.getName(),
-                        actualType.getName());
-            }
-        }
-    }
-
-    public static void check_numType(Class<?> clazz, Field field, F_num_array anno) {
-        if (!Parser.printNumFieldSuggestTypeWarn) {
-            return;
-        }
-        Class<?> suggestType = check_numType(anno.singleType(), anno.singleValType());
-        if (suggestType == null) {
-            notSupport_numType(clazz, field, anno.annotationType());
-            return;
-        }
-        Class<?> actualType = field.getType().getComponentType();
-        String fieldStackTrace = LogUtil.getFieldStackTrace(clazz, field.getName());
-        if (!actualType.isEnum()) {
-            if (suggestType != actualType) {
-                logger.warn("{} class[{}] field[{}] @F_num_array[singleType={},singleValType={}] type suggest[{}] actual[{}]",
-                        fieldStackTrace,
-                        clazz.getName(),
-                        field.getName(),
-                        anno.singleType(),
-                        anno.singleValType(),
-                        suggestType.getName(),
-                        actualType.getName());
-            }
-        }
-    }
-
-    private static Class<?> check_numType(NumType type, NumType valType) {
-        final NumType tempType;
-        if (valType == NumType.Default) {
-            tempType = type;
-        } else {
-            tempType = valType;
-        }
-        final Class<?> suggestType;
-        switch (tempType) {
-            case uint8 -> {
-                suggestType = short.class;
-            }
-            case int8 -> {
-                suggestType = byte.class;
-            }
-            case uint16 -> {
-                suggestType = int.class;
-            }
-            case int16 -> {
-                suggestType = short.class;
-            }
-            case uint32 -> {
-                suggestType = long.class;
-            }
-            case int32 -> {
-                suggestType = int.class;
-            }
-            case uint64 -> {
-                suggestType = long.class;
-            }
-            case int64 -> {
-                suggestType = long.class;
-            }
-            case float32 -> {
-                suggestType = float.class;
-            }
-            case float64 -> {
-                suggestType = double.class;
-            }
-            default -> {
-                suggestType = null;
-            }
-        }
-        return suggestType;
-
     }
 
     public static void notSupport_numType(Class<?> clazz, Field field, Class<?> annoClass) {
@@ -369,26 +156,17 @@ public class ParseUtil {
 
     public static void newBitBuf_parse(BuilderContext context) {
         final StringBuilder body = context.body;
-        final String bitBuf_reader_className = BitBuf_reader.class.getName();
-        final String bitBuf_reader_log_className = BitBuf_reader_log.class.getName();
-
-        if (Parser.logCollector_parse == null) {
-            ParseUtil.append(body, "final {} {}=new {}({});\n", bitBuf_reader_className, FieldBuilder.varNameBitBuf, bitBuf_reader_className, FieldBuilder.varNameByteBuf);
-        } else {
-            ParseUtil.append(body, "final {} {}=new {}({});\n", bitBuf_reader_log_className, FieldBuilder.varNameBitBuf, bitBuf_reader_log_className, FieldBuilder.varNameByteBuf);
-        }
+        final String bitBuf_reader_className = Parser.logCollector_parse == null ? BitBuf_reader.class.getName() : BitBuf_reader_log.class.getName();
+        final String funcName = Parser.logCollector_parse == null ? "getBitBuf_reader" : "getBitBuf_reader_log";
+        ParseUtil.append(body, "final {} {}={}.{}();\n", bitBuf_reader_className, FieldBuilder.varNameBitBuf, FieldBuilder.varNameParentProcessContext, funcName);
         context.varNameBitBuf = FieldBuilder.varNameBitBuf;
     }
 
     public static void newBitBuf_deParse(BuilderContext context) {
         final StringBuilder body = context.body;
-        final String bitBuf_writer_className = BitBuf_writer.class.getName();
-        final String bitBuf_writer_log_className = BitBuf_writer_log.class.getName();
-        if (Parser.logCollector_parse == null) {
-            ParseUtil.append(body, "final {} {}=new {}({});\n", bitBuf_writer_className, FieldBuilder.varNameBitBuf, bitBuf_writer_className, FieldBuilder.varNameByteBuf);
-        } else {
-            ParseUtil.append(body, "final {} {}=new {}({});\n", bitBuf_writer_log_className, FieldBuilder.varNameBitBuf, bitBuf_writer_log_className, FieldBuilder.varNameByteBuf);
-        }
+        final String bitBuf_writer_className = Parser.logCollector_parse == null ? BitBuf_writer.class.getName() : BitBuf_writer_log.class.getName();
+        final String funcName = Parser.logCollector_parse == null ? "getBitBuf_writer" : "getBitBuf_writer_log";
+        ParseUtil.append(body, "final {} {}={}.{}();\n", bitBuf_writer_className, FieldBuilder.varNameBitBuf, FieldBuilder.varNameParentProcessContext, funcName);
         context.varNameBitBuf = FieldBuilder.varNameBitBuf;
     }
 
@@ -620,7 +398,7 @@ public class ParseUtil {
     public static boolean needParse(Field field) {
         final Annotation[] annotations = field.getAnnotations();
         for (Annotation annotation : annotations) {
-            if (annoSet.contains(annotation.annotationType())) {
+            if (Parser.anno_fieldBuilder.containsKey(annotation.annotationType())) {
                 return true;
             }
         }
@@ -672,4 +450,28 @@ public class ParseUtil {
     }
 
 
+    public static Map<Class<? extends Annotation>, FieldBuilder> getAllFieldBuild() {
+        String pkg = "com.bcd.share.support_parser.builder";
+        Map<Class<? extends Annotation>, FieldBuilder> map = new HashMap<>();
+        try {
+            List<Class<?>> classes = ClassUtil.getClasses(pkg);
+            for (Class<?> clazz : classes) {
+                if (clazz != FieldBuilder.class && FieldBuilder.class.isAssignableFrom(clazz)) {
+                    FieldBuilder instance = (FieldBuilder) clazz.getConstructor().newInstance();
+                    map.put(instance.annoClass(), instance);
+                }
+            }
+        } catch (Exception e) {
+            throw BaseRuntimeException.getException(e);
+        }
+        logger.info("scan pkg[{}] list[{}]:", pkg, map.size());
+        for (Map.Entry<Class<? extends Annotation>, FieldBuilder> entry : map.entrySet()) {
+            logger.info("Anno[{}] FieldBuilder[{}]", entry.getKey().getName(), entry.getValue().getClass().getName());
+        }
+        return map;
+    }
+
+    public static void main(String[] args) {
+        getAllFieldBuild();
+    }
 }

@@ -1,5 +1,6 @@
 package com.bcd.share.support_parser.builder;
 
+import com.bcd.share.support_parser.anno.F_date_bytes_7;
 import com.bcd.share.support_parser.anno.F_date_ts;
 import com.bcd.share.support_parser.util.ParseUtil;
 
@@ -118,5 +119,10 @@ public class FieldBuilder__F_date_ts extends FieldBuilder {
                 ParseUtil.append(body, "{}.{}((double){}/1000d);\n", varNameByteBuf, writeFuncName, varNameLongField);
             }
         }
+    }
+
+    @Override
+    public Class<F_date_ts> annoClass() {
+        return F_date_ts.class;
     }
 }

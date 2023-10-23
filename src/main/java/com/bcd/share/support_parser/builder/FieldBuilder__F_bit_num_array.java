@@ -1,6 +1,8 @@
 package com.bcd.share.support_parser.builder;
 
 import com.bcd.share.exception.BaseRuntimeException;
+import com.bcd.share.support_parser.anno.F_bean;
+import com.bcd.share.support_parser.anno.F_bit_num;
 import com.bcd.share.support_parser.anno.F_bit_num_array;
 import com.bcd.share.support_parser.anno.F_skip;
 import com.bcd.share.support_parser.util.ParseUtil;
@@ -17,8 +19,6 @@ public class FieldBuilder__F_bit_num_array extends FieldBuilder {
         final String arrayElementTypeName = arrayElementType.getName();
         final Class<F_bit_num_array> annoClass = F_bit_num_array.class;
         final F_bit_num_array anno = context.field.getAnnotation(annoClass);
-
-        ParseUtil.check_numType(context.clazz, field, anno);
 
         final boolean bigEndian = ParseUtil.bigEndian(anno.singleOrder(), context.bitOrder);
         final boolean unsigned = anno.singleUnsigned();
@@ -111,5 +111,10 @@ public class FieldBuilder__F_bit_num_array extends FieldBuilder {
         }
         ParseUtil.append(body, "}\n");
 
+    }
+
+    @Override
+    public Class<F_bit_num_array> annoClass() {
+        return F_bit_num_array.class;
     }
 }

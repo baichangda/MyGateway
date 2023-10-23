@@ -1,5 +1,6 @@
 package com.bcd.share.support_parser.builder;
 
+import com.bcd.share.support_parser.anno.F_bean;
 import com.bcd.share.support_parser.anno.F_bean_list;
 import com.bcd.share.support_parser.util.ParseUtil;
 
@@ -104,5 +105,10 @@ public class FieldBuilder__F_bean_list extends FieldBuilder {
         ParseUtil.append(body, "}\n");
 
         ParseUtil.append(body, "}\n");
+    }
+
+    @Override
+    public Class<F_bean_list> annoClass() {
+        return F_bean_list.class;
     }
 }

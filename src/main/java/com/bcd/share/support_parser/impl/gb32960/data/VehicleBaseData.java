@@ -20,19 +20,19 @@ public class VehicleBaseData {
     public short runMode;
 
     //车速
-    @F_num(type = NumType.uint16, valType = NumType.float32, valExpr = "x/10")
+    @F_num(type = NumType.uint16, valExpr = "x/10")
     public float vehicleSpeed;
 
     //累计里程
-    @F_num(type = NumType.uint32, valType = NumType.float64, valExpr = "x/10")
+    @F_num(type = NumType.uint32, valExpr = "x/10")
     public double totalMileage;
 
     //总电压
-    @F_num(type = NumType.uint16, valType = NumType.float32, valExpr = "x/10")
+    @F_num(type = NumType.uint16, valExpr = "x/10")
     public float totalVoltage;
 
     //总电流
-    @F_num(type = NumType.uint16, valType = NumType.float32, valExpr = "x/10-1000")
+    @F_num(type = NumType.uint16, valExpr = "x/10-1000")
     public float totalCurrent;
 
     //soc

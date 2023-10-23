@@ -81,7 +81,7 @@ public class PerformanceUtil {
         for (int i = 1; i <= num; i++) {
             byteBuf.resetReaderIndex();
             byteBuf.resetWriterIndex();
-            final T t = processor.process(byteBuf, null);
+            final T t = processor.process(byteBuf);
             count.increment();
         }
     }
@@ -94,7 +94,7 @@ public class PerformanceUtil {
         for (int i = 1; i <= num; i++) {
             byteBuf.resetReaderIndex();
             byteBuf.resetWriterIndex();
-            processor.deProcess(byteBuf, null, obj);
+            processor.deProcess(byteBuf, obj);
             count.increment();
         }
     }

@@ -1,6 +1,7 @@
 package com.bcd.share.support_parser.builder;
 
 
+import com.bcd.share.support_parser.anno.F_bit_num_group;
 import com.bcd.share.support_parser.anno.F_bit_skip;
 import com.bcd.share.support_parser.util.ParseUtil;
 
@@ -39,5 +40,10 @@ public class FieldBuilder__F_bit_skip extends FieldBuilder {
             ParseUtil.append(body, "{}.finish();\n", varNameBitBuf);
         }
 
+    }
+
+    @Override
+    public Class<F_bit_skip> annoClass() {
+        return F_bit_skip.class;
     }
 }
