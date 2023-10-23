@@ -70,7 +70,7 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
         }
 
 
-        final String varNameBitBuf = getBitBuf_parse(context);
+        final String varNameBitBuf = context.getBitBuf_parse();
 
         ParseUtil.append(body, "final {} {}=({}){}.read({},{},{});\n", sourceValTypeName, varNameField, sourceValTypeName, varNameBitBuf, len, bigEndian, unsigned);
         if (finish(context)) {
@@ -134,7 +134,7 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
             throw BaseRuntimeException.getException("class[{}] field[{}] anno[{}] len[{}] must in range [1,64]", field.getDeclaringClass().getName(), field.getName(), annoClass.getName(), len);
         }
 
-        final String varNameBitBuf = getBitBuf_deParse(context);
+        final String varNameBitBuf = context.getBitBuf_deParse();
 
         ParseUtil.append(body, "{}.write((long)({}),{},{},{});\n", varNameBitBuf, valCode, len, bigEndian, unsigned);
         if (finish(context)) {
@@ -148,25 +148,4 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
         return F_bit_num.class;
     }
 
-    public static String getBitBuf_parse(BuilderContext context) {
-        if (!context.cache.containsKey("hasBitBuf")) {
-            final StringBuilder body = context.body;
-            final String bitBuf_reader_className = Parser.logCollector_parse == null ? BitBuf_reader.class.getName() : BitBuf_reader_log.class.getName();
-            final String funcName = Parser.logCollector_parse == null ? "getBitBuf_reader" : "getBitBuf_reader_log";
-            ParseUtil.append(body, "final {} {}={}.{}();\n", bitBuf_reader_className, FieldBuilder.varNameBitBuf, FieldBuilder.varNameParentProcessContext, funcName);
-            context.cache.put("hasBitBuf", true);
-        }
-        return FieldBuilder.varNameBitBuf;
-    }
-
-    public static String getBitBuf_deParse(BuilderContext context) {
-        if (!context.cache.containsKey("hasBitBuf")) {
-            final StringBuilder body = context.body;
-            final String bitBuf_writer_className = Parser.logCollector_parse == null ? BitBuf_writer.class.getName() : BitBuf_writer_log.class.getName();
-            final String funcName = Parser.logCollector_parse == null ? "getBitBuf_writer" : "getBitBuf_writer_log";
-            ParseUtil.append(body, "final {} {}={}.{}();\n", bitBuf_writer_className, FieldBuilder.varNameBitBuf, FieldBuilder.varNameParentProcessContext, funcName);
-            context.cache.put("hasBitBuf", true);
-        }
-        return FieldBuilder.varNameBitBuf;
-    }
 }

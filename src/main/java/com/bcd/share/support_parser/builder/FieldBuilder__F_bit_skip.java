@@ -33,7 +33,7 @@ public class FieldBuilder__F_bit_skip extends FieldBuilder {
         final F_bit_skip anno = field.getAnnotation(F_bit_skip.class);
         final String varNameField = ParseUtil.getFieldVarName(context);
 
-        final String varNameBitBuf = FieldBuilder__F_bit_num.getBitBuf_parse(context);
+        final String varNameBitBuf = context.getBitBuf_parse();
         ParseUtil.append(body, "{}.skip({});\n", varNameBitBuf, anno.len());
         if (finish(context)) {
             ParseUtil.append(body, "{}.finish();\n", varNameBitBuf);
@@ -50,7 +50,7 @@ public class FieldBuilder__F_bit_skip extends FieldBuilder {
         final F_bit_skip anno = field.getAnnotation(F_bit_skip.class);
         final String varNameField = ParseUtil.getFieldVarName(context);
 
-        final String varNameBitBuf = FieldBuilder__F_bit_num.getBitBuf_deParse(context);
+        final String varNameBitBuf = context.getBitBuf_deParse();
 
         ParseUtil.append(body, "{}.skip({});\n", varNameBitBuf, anno.len());
         if (finish(context)) {

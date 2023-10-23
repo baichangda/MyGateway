@@ -7,7 +7,7 @@ import com.bcd.share.support_parser.anno.ByteOrder;
 import com.bcd.share.support_parser.anno.F_customize;
 import com.bcd.share.support_parser.processor.ProcessContext;
 import com.bcd.share.support_parser.processor.Processor;
-import com.bcd.share.support_parser.util.ParseUtil;
+import com.bcd.share.support_parser.util.*;
 import io.netty.buffer.ByteBuf;
 import javassist.CannotCompileException;
 import javassist.CtClass;
@@ -133,5 +133,25 @@ public class BuilderContext {
             }
             return varName;
         });
+    }
+
+    public final String getBitBuf_parse() {
+        if (!cache.containsKey("hasBitBuf")) {
+            final String bitBuf_reader_className = Parser.logCollector_parse == null ? BitBuf_reader.class.getName() : BitBuf_reader_log.class.getName();
+            final String funcName = Parser.logCollector_parse == null ? "getBitBuf_reader" : "getBitBuf_reader_log";
+            ParseUtil.append(body, "final {} {}={}.{}();\n", bitBuf_reader_className, FieldBuilder.varNameBitBuf, FieldBuilder.varNameParentProcessContext, funcName);
+            cache.put("hasBitBuf", true);
+        }
+        return FieldBuilder.varNameBitBuf;
+    }
+
+    public final String getBitBuf_deParse() {
+        if (!cache.containsKey("hasBitBuf")) {
+            final String bitBuf_writer_className = Parser.logCollector_parse == null ? BitBuf_writer.class.getName() : BitBuf_writer_log.class.getName();
+            final String funcName = Parser.logCollector_parse == null ? "getBitBuf_writer" : "getBitBuf_writer_log";
+            ParseUtil.append(body, "final {} {}={}.{}();\n", bitBuf_writer_className, FieldBuilder.varNameBitBuf, FieldBuilder.varNameParentProcessContext, funcName);
+            cache.put("hasBitBuf", true);
+        }
+        return FieldBuilder.varNameBitBuf;
     }
 }

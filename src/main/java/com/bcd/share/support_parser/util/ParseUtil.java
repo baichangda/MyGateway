@@ -170,7 +170,7 @@ public class ParseUtil {
     }
 
     public static void appendBitLogCode_parse(final BuilderContext context) {
-        final String varNameBitBuf = FieldBuilder__F_bit_num.getBitBuf_parse(context);
+        final String varNameBitBuf = context.getBitBuf_parse();
         if (varNameBitBuf != null) {
             final Class<?> clazz = context.clazz;
             final Class<?> declaringClass = context.field.getDeclaringClass();
@@ -187,7 +187,7 @@ public class ParseUtil {
     }
 
     public static void appendBitLogCode_deParse(final BuilderContext context) {
-        final String varNameBitBuf = FieldBuilder__F_bit_num.getBitBuf_deParse(context);
+        final String varNameBitBuf = context.getBitBuf_deParse();
         if (varNameBitBuf != null) {
             final Class<?> clazz = context.clazz;
             final Class<?> declaringClass = context.field.getDeclaringClass();
