@@ -7,6 +7,7 @@ import java.lang.annotation.Target;
 
 /**
  *
+ * 位解析
  * 最高支持连续32位
  *
  * 相邻的此注解字段会视为一组
@@ -16,10 +17,15 @@ import java.lang.annotation.Target;
  * 8-16 2
  * 17-24 3
  * 25-32 4
+ *
+ * 对比{@link F_bit_num}而言
+ * 这个更轻量、生成的代码效率更高
+ * 优先推荐使用此注解
+ *
  */
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface F_bit_num_group {
+public @interface F_bit_num_easy {
     /**
      * bit开始、从0开始、包含
      */

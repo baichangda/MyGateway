@@ -13,17 +13,12 @@ import javassist.CannotCompileException;
 import javassist.CtClass;
 import javassist.CtField;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class BuilderContext {
-    /**
-     * 主要用于{@link F_customize#builderClass()}缓存、避免在生成解析类的过程中生成多个实例
-     */
-    public final static Map<Class<?>, FieldBuilder> fieldBuilderCache = new HashMap<>();
     /**
      * parse方法体
      */
@@ -55,10 +50,6 @@ public class BuilderContext {
      * 当前字段
      */
     public Field field;
-    public String varNameBitBuf;
-    public boolean bitEndWhenBitField_process;
-    public boolean bitEndWhenBitField_deProcess;
-    public boolean logBit;
     /**
      * 用于给
      * {@link Processor#process(ByteBuf, ProcessContext)}
@@ -72,7 +63,6 @@ public class BuilderContext {
      */
     public Map<String, String> customize_processorId_processorVarName;
 
-
     /**
      * 字段集合
      */
@@ -82,6 +72,10 @@ public class BuilderContext {
      */
     public int fieldIndex;
 
+
+    /**
+     * 上下文缓存、用于不同的注解解析时候、多个字段需要共享某些信息、可以缓存在这里
+     */
     public final Map<String,Object> cache=new HashMap<>();
 
     public BuilderContext(StringBuilder body, Class<?> clazz,
@@ -139,13 +133,5 @@ public class BuilderContext {
             }
             return varName;
         });
-    }
-
-    public final String getVarNameBitBuf_reader() {
-        return varNameBitBuf;
-    }
-
-    public final String getVarNameBitBuf_writer() {
-        return varNameBitBuf;
     }
 }

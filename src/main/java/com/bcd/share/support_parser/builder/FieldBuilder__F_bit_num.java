@@ -1,14 +1,40 @@
 package com.bcd.share.support_parser.builder;
 
 import com.bcd.share.exception.BaseRuntimeException;
-import com.bcd.share.support_parser.anno.F_bean_list;
+import com.bcd.share.support_parser.Parser;
+import com.bcd.share.support_parser.anno.BitRemainingMode;
 import com.bcd.share.support_parser.anno.F_bit_num;
-import com.bcd.share.support_parser.util.ParseUtil;
-import com.bcd.share.support_parser.util.RpnUtil;
+import com.bcd.share.support_parser.anno.F_bit_num_array;
+import com.bcd.share.support_parser.anno.F_bit_skip;
+import com.bcd.share.support_parser.util.*;
 
 import java.lang.reflect.Field;
+import java.util.List;
 
 public class FieldBuilder__F_bit_num extends FieldBuilder {
+
+    private boolean finish(BuilderContext context) {
+        List<Field> fieldList = context.fieldList;
+        F_bit_num f_bit_num = context.field.getAnnotation(F_bit_num.class);
+        if (f_bit_num.bitRemainingMode() == BitRemainingMode.ignore) {
+            return true;
+        } else {
+            if (context.fieldIndex == fieldList.size() - 1) {
+                return f_bit_num.bitRemainingMode() == BitRemainingMode.Default;
+            } else {
+                if (f_bit_num.bitRemainingMode() == BitRemainingMode.Default) {
+                    Field next = fieldList.get(context.fieldIndex + 1);
+                    F_bit_num next_f_bit_num = next.getAnnotation(F_bit_num.class);
+                    F_bit_skip next_f_bit_skip = next.getAnnotation(F_bit_skip.class);
+                    F_bit_num_array next_f_bit_num_array = next.getAnnotation(F_bit_num_array.class);
+                    return next_f_bit_num == null && next_f_bit_skip == null && next_f_bit_num_array == null;
+                } else {
+                    return false;
+                }
+            }
+        }
+    }
+
     @Override
     public void buildParse(BuilderContext context) {
         final Class<F_bit_num> annoClass = F_bit_num.class;
@@ -43,10 +69,11 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
             throw BaseRuntimeException.getException("class[{}] field[{}] anno[{}] len[{}] must in range [1,64]", field.getDeclaringClass().getName(), field.getName(), annoClass.getName(), len);
         }
 
-        final String varNameBitBuf = context.getVarNameBitBuf_reader();
+
+        final String varNameBitBuf = getBitBuf_parse(context);
 
         ParseUtil.append(body, "final {} {}=({}){}.read({},{},{});\n", sourceValTypeName, varNameField, sourceValTypeName, varNameBitBuf, len, bigEndian, unsigned);
-        if (context.bitEndWhenBitField_process) {
+        if (finish(context)) {
             ParseUtil.append(body, "{}.finish();\n", varNameBitBuf);
         }
 
@@ -107,10 +134,10 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
             throw BaseRuntimeException.getException("class[{}] field[{}] anno[{}] len[{}] must in range [1,64]", field.getDeclaringClass().getName(), field.getName(), annoClass.getName(), len);
         }
 
-        final String varNameBitBuf = context.getVarNameBitBuf_writer();
+        final String varNameBitBuf = getBitBuf_deParse(context);
 
         ParseUtil.append(body, "{}.write((long)({}),{},{},{});\n", varNameBitBuf, valCode, len, bigEndian, unsigned);
-        if (context.bitEndWhenBitField_deProcess) {
+        if (finish(context)) {
             ParseUtil.append(body, "{}.finish();\n", varNameBitBuf);
         }
 
@@ -119,5 +146,27 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
     @Override
     public Class<F_bit_num> annoClass() {
         return F_bit_num.class;
+    }
+
+    public static String getBitBuf_parse(BuilderContext context) {
+        if (!context.cache.containsKey("hasBitBuf")) {
+            final StringBuilder body = context.body;
+            final String bitBuf_reader_className = Parser.logCollector_parse == null ? BitBuf_reader.class.getName() : BitBuf_reader_log.class.getName();
+            final String funcName = Parser.logCollector_parse == null ? "getBitBuf_reader" : "getBitBuf_reader_log";
+            ParseUtil.append(body, "final {} {}={}.{}();\n", bitBuf_reader_className, FieldBuilder.varNameBitBuf, FieldBuilder.varNameParentProcessContext, funcName);
+            context.cache.put("hasBitBuf", true);
+        }
+        return FieldBuilder.varNameBitBuf;
+    }
+
+    public static String getBitBuf_deParse(BuilderContext context) {
+        if (!context.cache.containsKey("hasBitBuf")) {
+            final StringBuilder body = context.body;
+            final String bitBuf_writer_className = Parser.logCollector_parse == null ? BitBuf_writer.class.getName() : BitBuf_writer_log.class.getName();
+            final String funcName = Parser.logCollector_parse == null ? "getBitBuf_writer" : "getBitBuf_writer_log";
+            ParseUtil.append(body, "final {} {}={}.{}();\n", bitBuf_writer_className, FieldBuilder.varNameBitBuf, FieldBuilder.varNameParentProcessContext, funcName);
+            context.cache.put("hasBitBuf", true);
+        }
+        return FieldBuilder.varNameBitBuf;
     }
 }

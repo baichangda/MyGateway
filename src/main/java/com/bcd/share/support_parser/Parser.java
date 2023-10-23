@@ -154,61 +154,6 @@ public class Parser {
         generateClassFile = true;
     }
 
-    private static void bitEndWhenBitField(List<Field> fieldList, int i, BuilderContext context) {
-        final Field cur = fieldList.get(i);
-        final F_bit_num f_bit_num1 = cur.getAnnotation(F_bit_num.class);
-        final F_bit_num_array f_bit_num_array1 = cur.getAnnotation(F_bit_num_array.class);
-        final F_bit_skip f_bit_skip1 = cur.getAnnotation(F_bit_skip.class);
-        if (f_bit_num1 != null || f_bit_skip1 != null) {
-            context.logBit = true;
-        } else {
-            context.logBit = false;
-        }
-        BitRemainingMode bitRemainingMode1 = null;
-        if (f_bit_num1 != null) {
-            bitRemainingMode1 = f_bit_num1.bitRemainingMode();
-        }
-        if (f_bit_num_array1 != null) {
-            bitRemainingMode1 = f_bit_num_array1.bitRemainingMode();
-        }
-        if (f_bit_skip1 != null) {
-            bitRemainingMode1 = f_bit_skip1.bitRemainingMode();
-        }
-
-        if (bitRemainingMode1 == null) {
-            return;
-        }
-
-        switch (bitRemainingMode1) {
-            case ignore -> {
-                context.bitEndWhenBitField_process = true;
-                context.bitEndWhenBitField_deProcess = true;
-            }
-            case not_ignore -> {
-                context.bitEndWhenBitField_process = false;
-                context.bitEndWhenBitField_deProcess = false;
-            }
-            default -> {
-                if (i == fieldList.size() - 1) {
-                    context.bitEndWhenBitField_process = true;
-                    context.bitEndWhenBitField_deProcess = true;
-                } else {
-                    final Field next = fieldList.get(i + 1);
-                    final F_bit_num f_bit_num2 = next.getAnnotation(F_bit_num.class);
-                    final F_bit_num_array f_bit_num_array2 = next.getAnnotation(F_bit_num_array.class);
-                    final F_bit_skip f_bit_skip2 = next.getAnnotation(F_bit_skip.class);
-                    if (f_bit_num2 == null && f_bit_skip2 == null && f_bit_num_array2 == null) {
-                        context.bitEndWhenBitField_process = true;
-                        context.bitEndWhenBitField_deProcess = true;
-                    } else {
-                        context.bitEndWhenBitField_process = false;
-                        context.bitEndWhenBitField_deProcess = false;
-                    }
-                }
-            }
-        }
-    }
-
     private static void buildMethodBody_process(BuilderContext context) {
         final List<Field> fieldList = context.fieldList;
         if (fieldList.isEmpty()) {
@@ -221,9 +166,9 @@ public class Parser {
             Field field = fieldList.get(i);
             context.field = field;
             context.fieldIndex = i;
-            bitEndWhenBitField(fieldList, i, context);
+            boolean logBit = field.isAnnotationPresent(F_bit_num.class) || field.isAnnotationPresent(F_skip.class);
             if (logCollector_parse != null) {
-                if (!context.logBit) {
+                if (!logBit) {
                     ParseUtil.prependLogCode_parse(context);
                 }
             }
@@ -236,7 +181,7 @@ public class Parser {
                 }
             } finally {
                 if (logCollector_parse != null) {
-                    if (context.logBit) {
+                    if (logBit) {
                         ParseUtil.appendBitLogCode_parse(context);
                     } else {
                         ParseUtil.appendLogCode_parse(context);
@@ -259,10 +204,10 @@ public class Parser {
             Field field = fieldList.get(i);
             context.field = field;
             context.fieldIndex = i;
-            bitEndWhenBitField(fieldList, i, context);
+            boolean logBit = field.isAnnotationPresent(F_bit_num.class) || field.isAnnotationPresent(F_skip.class);
             try {
                 if (logCollector_deParse != null) {
-                    if (!context.logBit) {
+                    if (!logBit) {
                         ParseUtil.prependLogCode_deParse(context);
                     }
 
@@ -275,7 +220,7 @@ public class Parser {
                 }
             } finally {
                 if (logCollector_deParse != null) {
-                    if (context.logBit) {
+                    if (logBit) {
                         ParseUtil.appendBitLogCode_deParse(context);
                     } else {
                         ParseUtil.appendLogCode_deParse(context);

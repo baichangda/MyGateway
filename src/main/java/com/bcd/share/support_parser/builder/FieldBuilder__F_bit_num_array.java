@@ -1,16 +1,37 @@
 package com.bcd.share.support_parser.builder;
 
 import com.bcd.share.exception.BaseRuntimeException;
-import com.bcd.share.support_parser.anno.F_bean;
-import com.bcd.share.support_parser.anno.F_bit_num;
-import com.bcd.share.support_parser.anno.F_bit_num_array;
-import com.bcd.share.support_parser.anno.F_skip;
+import com.bcd.share.support_parser.anno.*;
 import com.bcd.share.support_parser.util.ParseUtil;
 import com.bcd.share.support_parser.util.RpnUtil;
 
 import java.lang.reflect.Field;
+import java.util.List;
 
 public class FieldBuilder__F_bit_num_array extends FieldBuilder {
+
+    private boolean finish(BuilderContext context) {
+        List<Field> fieldList = context.fieldList;
+        F_bit_num_array f_bit_num_array = context.field.getAnnotation(F_bit_num_array.class);
+        if (f_bit_num_array.bitRemainingMode() == BitRemainingMode.ignore) {
+            return true;
+        } else {
+            if (context.fieldIndex == fieldList.size() - 1) {
+                return f_bit_num_array.bitRemainingMode() == BitRemainingMode.Default;
+            } else {
+                if (f_bit_num_array.bitRemainingMode() == BitRemainingMode.Default) {
+                    Field next = fieldList.get(context.fieldIndex + 1);
+                    F_bit_num next_f_bit_num = next.getAnnotation(F_bit_num.class);
+                    F_bit_skip next_f_bit_skip = next.getAnnotation(F_bit_skip.class);
+                    F_bit_num_array next_f_bit_num_array = next.getAnnotation(F_bit_num_array.class);
+                    return next_f_bit_num == null && next_f_bit_skip == null && next_f_bit_num_array == null;
+                } else {
+                    return false;
+                }
+            }
+        }
+    }
+
     @Override
     public void buildParse(BuilderContext context) {
         final Field field = context.field;
@@ -52,7 +73,7 @@ public class FieldBuilder__F_bit_num_array extends FieldBuilder {
         final String varNameField = ParseUtil.getFieldVarName(context);
         String arrVarName = varNameField + "_arr";
         final String varNameArrayElement = varNameField + "_arrEle";
-        final String varNameBitBuf = context.getVarNameBitBuf_reader();
+        final String varNameBitBuf = FieldBuilder__F_bit_num.getBitBuf_parse(context);
 
         ParseUtil.append(body, "final {}[] {}=new {}[{}];\n", arrayElementTypeName, arrVarName, arrayElementTypeName, arrLenRes);
         ParseUtil.append(body, "for(int i=0;i<{}.length;i++){\n", arrVarName);
@@ -63,8 +84,8 @@ public class FieldBuilder__F_bit_num_array extends FieldBuilder {
         String valCode = ParseUtil.replaceValExprToCode(valExpr, varNameArrayElement);
         ParseUtil.append(body, "{}[i]=({})({});\n", arrVarName, arrayElementTypeName, valCode);
         ParseUtil.append(body, "}\n");
-        if (context.bitEndWhenBitField_process) {
-            ParseUtil.append(body, "{}.finish();\n", context.varNameBitBuf);
+        if (finish(context)) {
+            ParseUtil.append(body, "{}.finish();\n", varNameBitBuf);
         }
         ParseUtil.append(body, "{}.{}={};\n", FieldBuilder.varNameInstance, field.getName(), arrVarName);
     }
@@ -87,7 +108,7 @@ public class FieldBuilder__F_bit_num_array extends FieldBuilder {
 
         String valCode = varNameInstance + "." + fieldName;
         final String varNameField = ParseUtil.getFieldVarName(context);
-        final String varNameBitBuf = context.getVarNameBitBuf_writer();
+        final String varNameBitBuf = FieldBuilder__F_bit_num.getBitBuf_deParse(context);
         ParseUtil.append(body, "if({}!=null){\n", FieldBuilder.varNameInstance, valCode);
         final String varNameFieldArr = varNameField + "_arr";
         ParseUtil.append(body, "final {}[] {}={};\n", arrElementType, varNameFieldArr, valCode);
@@ -106,7 +127,7 @@ public class FieldBuilder__F_bit_num_array extends FieldBuilder {
         }
         ParseUtil.append(body, "}\n");
 
-        if (context.bitEndWhenBitField_deProcess) {
+        if (finish(context)) {
             ParseUtil.append(body, "{}.finish();\n", varNameBitBuf);
         }
         ParseUtil.append(body, "}\n");

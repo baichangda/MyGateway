@@ -23,10 +23,9 @@ import java.lang.annotation.Target;
 public @interface F_customize {
     /**
      * 处理类
-     * 与{@link #builderClass()}互斥
      * 必须是{@link Processor}子类
      */
-    Class<?> processorClass() default void.class;
+    Class<?> processorClass();
 
     /**
      * 处理类参数
@@ -39,13 +38,6 @@ public @interface F_customize {
      * "100,\"test\",100.123"
      */
     String processorArgs() default "";
-
-    /**
-     * asm构建类
-     * 与{@link #processorClass()}互斥
-     * 必须是{@link FieldBuilder}子类
-     */
-    Class<?> builderClass() default void.class;
 
     /**
      * 变量名称

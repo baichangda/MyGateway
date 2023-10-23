@@ -1,22 +1,21 @@
 package com.bcd.share.support_parser.builder;
 
 import com.bcd.share.exception.BaseRuntimeException;
-import com.bcd.share.support_parser.anno.F_bit_num_group;
+import com.bcd.share.support_parser.anno.F_bit_num_easy;
 import com.bcd.share.support_parser.util.ParseUtil;
 import com.bcd.share.support_parser.util.RpnUtil;
-import io.netty.buffer.ByteBuf;
 
 import java.lang.reflect.Field;
 import java.util.Map;
 
-public class FieldBuilder__F_bit_num_group extends FieldBuilder {
+public class FieldBuilder__F_bit_num_easy extends FieldBuilder {
     record Info(String varNameNum, int startFieldIndex, int endFieldIndex, int maxBitEnd) {
 
     }
 
     private Info getInfo(BuilderContext context) {
         Map<String, Object> cache = context.cache;
-        Object object = cache.get(F_bit_num_group.class.getName());
+        Object object = cache.get(F_bit_num_easy.class.getName());
         if (object == null) {
             final String varNameField = ParseUtil.getFieldVarName(context);
             int startFieldIndex = context.fieldIndex;
@@ -31,14 +30,14 @@ public class FieldBuilder__F_bit_num_group extends FieldBuilder {
             if (prevField == null) {
                 first = true;
             } else {
-                F_bit_num_group prevAnno = prevField.getAnnotation(F_bit_num_group.class);
+                F_bit_num_easy prevAnno = prevField.getAnnotation(F_bit_num_easy.class);
                 first = prevAnno == null || prevAnno.end();
             }
             int maxBitEnd = 0;
             if (first) {
                 for (int i = context.fieldIndex; i < context.fieldList.size(); i++) {
                     Field field = context.fieldList.get(i);
-                    F_bit_num_group anno = field.getAnnotation(F_bit_num_group.class);
+                    F_bit_num_easy anno = field.getAnnotation(F_bit_num_easy.class);
                     if (anno == null) {
                         endFieldIndex = i - 1;
                         break;
@@ -54,7 +53,7 @@ public class FieldBuilder__F_bit_num_group extends FieldBuilder {
             final String varNameNum = varNameField + "_num";
 
             Info info = new Info(varNameNum, startFieldIndex, endFieldIndex, maxBitEnd);
-            cache.put(F_bit_num_group.class.getName(), info);
+            cache.put(F_bit_num_easy.class.getName(), info);
             return info;
         } else {
             return (Info) object;
@@ -63,11 +62,11 @@ public class FieldBuilder__F_bit_num_group extends FieldBuilder {
 
     @Override
     public void buildParse(BuilderContext context) {
-        final Class<F_bit_num_group> annoClass = F_bit_num_group.class;
+        final Class<F_bit_num_easy> annoClass = F_bit_num_easy.class;
         final Field field = context.field;
         final Class<?> fieldTypeClass = field.getType();
         final String fieldTypeName = fieldTypeClass.getName();
-        final F_bit_num_group anno = field.getAnnotation(annoClass);
+        final F_bit_num_easy anno = field.getAnnotation(annoClass);
         final String varNameField = ParseUtil.getFieldVarName(context);
         Info info = getInfo(context);
         String varNameNum = info.varNameNum();
@@ -83,7 +82,7 @@ public class FieldBuilder__F_bit_num_group extends FieldBuilder {
             } else if (maxBitEnd <= 32) {
                 funcName = "readInt";
             } else {
-                throw BaseRuntimeException.getException("class[{}] field[{}] anno[{}] maxBitEnd[{}] not support", context.clazz.getName(), field.getName(), F_bit_num_group.class, maxBitEnd);
+                throw BaseRuntimeException.getException("class[{}] field[{}] anno[{}] maxBitEnd[{}] not support", context.clazz.getName(), field.getName(), F_bit_num_easy.class, maxBitEnd);
             }
             ParseUtil.append(context.body, "final int {}={}.{}();\n", varNameNum, FieldBuilder.varNameByteBuf, funcName);
         }
@@ -122,9 +121,9 @@ public class FieldBuilder__F_bit_num_group extends FieldBuilder {
 
     @Override
     public void buildDeParse(BuilderContext context) {
-        final Class<F_bit_num_group> annoClass = F_bit_num_group.class;
+        final Class<F_bit_num_easy> annoClass = F_bit_num_easy.class;
         final Field field = context.field;
-        final F_bit_num_group anno = field.getAnnotation(annoClass);
+        final F_bit_num_easy anno = field.getAnnotation(annoClass);
         final String varNameInstance = FieldBuilder.varNameInstance;
         final StringBuilder body = context.body;
         final String fieldName = field.getName();
@@ -202,7 +201,7 @@ public class FieldBuilder__F_bit_num_group extends FieldBuilder {
     }
 
     @Override
-    public Class<F_bit_num_group> annoClass() {
-        return F_bit_num_group.class;
+    public Class<F_bit_num_easy> annoClass() {
+        return F_bit_num_easy.class;
     }
 }
