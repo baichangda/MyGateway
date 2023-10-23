@@ -87,6 +87,11 @@ dependencies {
 
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-test
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
+
+    // https://mvnrepository.com/artifact/io.jooby/jooby
+    implementation group: 'io.jooby', name: 'jooby', version: "+"
+
+
 }
 
 //生成jar时打包源码
