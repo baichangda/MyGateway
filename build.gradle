@@ -81,6 +81,7 @@ dependencies {
 
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: "+"
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: "+"
 
     // https://mvnrepository.com/artifact/org.javassist/javassist
     implementation group: 'org.javassist', name: 'javassist', version: "+"
@@ -89,7 +90,7 @@ dependencies {
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
 
     // https://mvnrepository.com/artifact/io.jooby/jooby
-    implementation group: 'io.jooby', name: 'jooby', version: "+"
+    implementation group: 'io.jooby', name: 'jooby-netty', version: "+"
 
 
 }
@@ -104,3 +105,9 @@ test {
     useJUnitPlatform()
 }
 
+bootJar{
+    manifest {
+        attributes 'Start-Class':'com.bcd.http.HttpServer'
+//        attributes 'Start-Class':'com.bcd.Application'
+    }
+}
