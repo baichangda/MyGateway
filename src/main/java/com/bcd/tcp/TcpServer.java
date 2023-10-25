@@ -1,6 +1,5 @@
 package com.bcd.tcp;
 
-import com.bcd.properties.GatewayProp;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -13,8 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.net.InetSocketAddress;
@@ -24,11 +22,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 @Component
-public class TcpServer implements CommandLineRunner, ApplicationListener<ContextRefreshedEvent> {
+public class TcpServer implements CommandLineRunner {
 
     final Logger logger = LoggerFactory.getLogger(TcpServer.class);
     @Autowired
-    GatewayProp gatewayProp;
+    TcpProp tcpProp;
     @Autowired
     Handler_dispatch handler_dispatch;
 
@@ -36,28 +34,31 @@ public class TcpServer implements CommandLineRunner, ApplicationListener<Context
     List<Monitor> monitorList;
 
     public void run(String... args) throws Exception {
-        final EventLoopGroup boosGroup = new NioEventLoopGroup();
-        final EventLoopGroup workerGroup = new NioEventLoopGroup();
-        try {
-            final ServerBootstrap serverBootstrap = new ServerBootstrap();
-            serverBootstrap.group(boosGroup, workerGroup).channel(NioServerSocketChannel.class).childHandler(
-                    new ChannelInitializer<>() {
-                        @Override
-                        protected void initChannel(Channel ch) {
-                            ch.pipeline().addLast(new IdleStateHandler(0L, 0L, 30L, TimeUnit.SECONDS));
-                            ch.pipeline().addLast(handler_dispatch);
+        Thread.startVirtualThread(() -> {
+            startMonitor();
+            final EventLoopGroup boosGroup = new NioEventLoopGroup();
+            final EventLoopGroup workerGroup = new NioEventLoopGroup();
+            try {
+                final ServerBootstrap serverBootstrap = new ServerBootstrap();
+                serverBootstrap.group(boosGroup, workerGroup).channel(NioServerSocketChannel.class).childHandler(
+                        new ChannelInitializer<>() {
+                            @Override
+                            protected void initChannel(Channel ch) {
+                                ch.pipeline().addLast(new IdleStateHandler(0L, 0L, 30L, TimeUnit.SECONDS));
+                                ch.pipeline().addLast(handler_dispatch);
+                            }
                         }
-                    }
-            );
-            final ChannelFuture channelFuture = serverBootstrap.bind(new InetSocketAddress(gatewayProp.tcp.port)).sync();
-            logger.info("server listen tcp port[{}]", gatewayProp.tcp.port);
-            channelFuture.channel().closeFuture().sync();
-        } catch (Exception e) {
-            logger.error("run error", e);
-        } finally {
-            boosGroup.shutdownGracefully();
-            workerGroup.shutdownGracefully();
-        }
+                );
+                final ChannelFuture channelFuture = serverBootstrap.bind(new InetSocketAddress(tcpProp.port)).sync();
+                logger.info("server listen tcp port[{}]", tcpProp.port);
+                channelFuture.channel().closeFuture().sync();
+            } catch (Exception e) {
+                logger.error("run error", e);
+            } finally {
+                boosGroup.shutdownGracefully();
+                workerGroup.shutdownGracefully();
+            }
+        });
     }
 
     public void startMonitor() {
@@ -70,11 +71,6 @@ public class TcpServer implements CommandLineRunner, ApplicationListener<Context
             }
             logger.info("{}", sb);
         }, period.toSeconds(), period.toSeconds(), TimeUnit.SECONDS);
-    }
-
-    @Override
-    public void onApplicationEvent(ContextRefreshedEvent event) {
-        startMonitor();
     }
 
 }

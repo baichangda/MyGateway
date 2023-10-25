@@ -1,6 +1,5 @@
 package com.bcd.tcp;
 
-import com.bcd.properties.GatewayProp;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationListener;
@@ -18,18 +17,15 @@ public class GatewayHeartBeat implements ApplicationListener<ContextRefreshedEve
 
     //保持网关在redis状态
     static ScheduledExecutorService pool_saveRedis_heartBeat = Executors.newSingleThreadScheduledExecutor();
-    final GatewayProp gatewayProp;
+    @Autowired
+    TcpProp tcpProp;
     @Autowired
     @Qualifier("string_string_redisTemplate")
     RedisTemplate<String, String> redisTemplate;
 
-    public GatewayHeartBeat(GatewayProp gatewayProp) {
-        this.gatewayProp = gatewayProp;
-    }
-
     private void startHeartBeatToRedis() {
-        final Duration maxBeforeOffline = gatewayProp.tcp.maxBeforeOffline;
-        final String key = RedisKeyConst.gatewayOnline_redisKeyPre + gatewayProp.id;
+        final Duration maxBeforeOffline = tcpProp.maxBeforeOffline;
+        final String key = RedisKeyConst.gatewayOnline_redisKeyPre + tcpProp.id;
         final long period = maxBeforeOffline.getSeconds() / 2 - 1;
         pool_saveRedis_heartBeat.scheduleAtFixedRate(() -> {
             redisTemplate.opsForValue().set(key, "", maxBeforeOffline);

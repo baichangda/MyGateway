@@ -107,7 +107,7 @@ test {
 
 bootJar{
     manifest {
-        attributes 'Start-Class':'com.bcd.http.HttpServer'
-//        attributes 'Start-Class':'com.bcd.Application'
+//        attributes 'Start-Class':'com.bcd.http.HttpServer'
+        attributes 'Start-Class':'com.bcd.Application'
     }
 }
