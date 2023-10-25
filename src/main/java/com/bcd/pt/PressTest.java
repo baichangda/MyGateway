@@ -31,7 +31,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-//@Component
+@Component
 public class PressTest implements CommandLineRunner {
 
     static Logger logger = LoggerFactory.getLogger(PressTest.class);
