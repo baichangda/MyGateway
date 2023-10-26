@@ -45,7 +45,7 @@ public class FieldBuilder__F_customize extends FieldBuilder {
         final String varInstanceName = FieldBuilder.varNameInstance;
         char var = anno.var();
         final String valCode;
-        if (var == '0' || !ParseUtil.checkNeedVar_deProcess(context, var)) {
+        if (var == '0') {
             valCode = varInstanceName + "." + field.getName();
         } else {
             ParseUtil.append(body, "final {} {}={};\n", field.getType().getName(), varNameField, varInstanceName + "." + field.getName());

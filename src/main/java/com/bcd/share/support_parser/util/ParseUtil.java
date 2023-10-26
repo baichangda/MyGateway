@@ -419,30 +419,6 @@ public class ParseUtil {
                 + "_" + (bitOrder == BitOrder.smallEndian ? 0 : 1);
     }
 
-    /**
-     * 反解析时候、不一定需要用到变量、因为某些属性自带长度信息
-     * 只有如下两种用到变量、才需要存储
-     * {@link F_string}
-     * {@link F_string_bcd}
-     * @param context
-     * @param var
-     * @return
-     */
-    public static boolean checkNeedVar_deProcess(BuilderContext context, char var) {
-        List<Field> fieldList = context.fieldList;
-        for (int i = context.fieldIndex + 1; i < fieldList.size(); i++) {
-            Field field = context.fieldList.get(i);
-            F_string f_string = field.getAnnotation(F_string.class);
-            F_string_bcd f_string_bcd = field.getAnnotation(F_string_bcd.class);
-            if ((f_string != null && f_string.lenExpr().contains(var + "")) ||
-                    (f_string_bcd != null && f_string_bcd.lenExpr().contains(var + ""))) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-
     public static Map<Class<? extends Annotation>, FieldBuilder> getAllFieldBuild() {
         String pkg = "com.bcd.share.support_parser.builder";
         Map<Class<? extends Annotation>, FieldBuilder> map = new HashMap<>();
