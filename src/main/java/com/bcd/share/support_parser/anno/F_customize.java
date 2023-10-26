@@ -1,6 +1,5 @@
 package com.bcd.share.support_parser.anno;
 
-import com.bcd.share.support_parser.builder.FieldBuilder;
 import com.bcd.share.support_parser.processor.Processor;
 
 import java.lang.annotation.ElementType;
@@ -11,8 +10,6 @@ import java.lang.annotation.Target;
 /**
  * 适用于任何字段
  * 用户自己实现解析逻辑
- * <p>
- * {@link #builderClass()}和{@link #processorClass()} 二选一
  * <p>
  * 反解析中
  * 值可以为null、null的含义由定制逻辑自己实现

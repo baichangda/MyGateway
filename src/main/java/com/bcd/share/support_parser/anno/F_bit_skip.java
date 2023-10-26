@@ -12,10 +12,4 @@ public @interface F_bit_skip {
      * 占用bit位
      */
     int len();
-
-
-    /**
-     * 表示当前字段bit解析结束时候、剩余多余的bit(不满1字节的)的处理模式
-     */
-    BitRemainingMode bitRemainingMode() default BitRemainingMode.Default;
 }
