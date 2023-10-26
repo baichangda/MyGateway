@@ -1,5 +1,6 @@
 package com.bcd.share.support_mongo;
 
+import com.bcd.share.data.gb32960.Helper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -18,5 +19,9 @@ public class MongoHandler {
         for (int i = 0; i < dbNum; i++) {
             mongoTemplates[i] = new MongoTemplate(new SimpleMongoClientDatabaseFactory(mongodbs[i]));
         }
+    }
+
+    public MongoTemplate getMongoTemplate(String vin) {
+        return mongoTemplates[Helper.getDbIndex(vin, dbNum)];
     }
 }
