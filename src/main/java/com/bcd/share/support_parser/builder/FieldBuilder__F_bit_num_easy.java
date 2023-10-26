@@ -141,7 +141,7 @@ public class FieldBuilder__F_bit_num_easy extends FieldBuilder {
         }
 
         //判断是否用到变量中、如果用到了、需要定义变量
-        if (var != '0') {
+        if (var != '0' && ParseUtil.checkNeedVar_deProcess(context, var)) {
             ParseUtil.append(body, "final {} {}={};\n", fieldType.getName(), varNameField, valCode);
             context.varToFieldName.put(var, varNameField);
             valCode = varNameField;

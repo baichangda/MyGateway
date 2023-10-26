@@ -6,7 +6,6 @@ import com.bcd.share.support_parser.Parser;
 import com.bcd.share.support_parser.anno.*;
 import com.bcd.share.support_parser.builder.BuilderContext;
 import com.bcd.share.support_parser.builder.FieldBuilder;
-import com.bcd.share.support_parser.builder.FieldBuilder__F_bit_num;
 import com.bcd.share.support_parser.processor.Processor;
 import com.google.common.collect.Sets;
 import javassist.CannotCompileException;
@@ -18,7 +17,6 @@ import org.slf4j.helpers.MessageFormatter;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -421,28 +419,24 @@ public class ParseUtil {
                 + "_" + (bitOrder == BitOrder.smallEndian ? 0 : 1);
     }
 
-    public static boolean checkChildrenHasAnno_F_customize(Class<?> clazz) {
-        List<Field> parseFields = getParseFields(clazz);
-        for (int i = 0; i < parseFields.size(); i++) {
-            Field field = parseFields.get(i);
-            F_customize f_customize = field.getAnnotation(F_customize.class);
-            if (f_customize != null) {
+    /**
+     * 反解析时候、不一定需要用到变量、因为某些属性自带长度信息
+     * 只有如下两种用到变量、才需要存储
+     * {@link F_string}
+     * {@link F_string_bcd}
+     * @param context
+     * @param var
+     * @return
+     */
+    public static boolean checkNeedVar_deProcess(BuilderContext context, char var) {
+        List<Field> fieldList = context.fieldList;
+        for (int i = context.fieldIndex + 1; i < fieldList.size(); i++) {
+            Field field = context.fieldList.get(i);
+            F_string f_string = field.getAnnotation(F_string.class);
+            F_string_bcd f_string_bcd = field.getAnnotation(F_string_bcd.class);
+            if ((f_string != null && f_string.lenExpr().contains(var + "")) ||
+                    (f_string_bcd != null && f_string_bcd.lenExpr().contains(var + ""))) {
                 return true;
-            }
-            F_bean f_bean = field.getAnnotation(F_bean.class);
-            if (f_bean != null) {
-                Class<?> fieldType = field.getType();
-                parseFields.addAll(getParseFields(fieldType));
-            }
-            F_bean_list f_bean_list = field.getAnnotation(F_bean_list.class);
-            if (f_bean_list != null) {
-                Class<?> fieldType = field.getType();
-                if (fieldType.isArray()) {
-                    parseFields.addAll(getParseFields(fieldType.getComponentType()));
-                } else {
-                    Class<?> actualTypeArgument = (Class<?>) (((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0]);
-                    parseFields.addAll(getParseFields(actualTypeArgument));
-                }
             }
         }
         return false;

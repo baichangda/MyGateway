@@ -2,12 +2,10 @@ package com.bcd.share.support_parser.builder;
 
 
 import com.bcd.share.exception.BaseRuntimeException;
-import com.bcd.share.support_parser.anno.F_bit_skip;
 import com.bcd.share.support_parser.anno.F_customize;
 import com.bcd.share.support_parser.util.ParseUtil;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 
 public class FieldBuilder__F_customize extends FieldBuilder {
     @Override
@@ -45,8 +43,9 @@ public class FieldBuilder__F_customize extends FieldBuilder {
         final StringBuilder body = context.body;
         final String varNameField = ParseUtil.getFieldVarName(context);
         final String varInstanceName = FieldBuilder.varNameInstance;
+        char var = anno.var();
         final String valCode;
-        if (anno.var() == '0') {
+        if (var == '0' || !ParseUtil.checkNeedVar_deProcess(context, var)) {
             valCode = varInstanceName + "." + field.getName();
         } else {
             ParseUtil.append(body, "final {} {}={};\n", field.getType().getName(), varNameField, varInstanceName + "." + field.getName());

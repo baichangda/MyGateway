@@ -65,7 +65,7 @@ public class FieldBuilder__F_bean_list extends FieldBuilder {
         final String fieldName = field.getName();
         final String valCode = FieldBuilder.varNameInstance + "." + fieldName;
 
-        ParseUtil.append(body, "if({}!=null){\n", FieldBuilder.varNameInstance, valCode);
+        ParseUtil.append(body, "if({}!=null){\n", valCode);
 
         final Class<?> fieldType = field.getType();
         final Class<?> typeClass;

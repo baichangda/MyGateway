@@ -42,7 +42,7 @@ public class PerformanceUtil {
         } else {
             Processor<T> processor = Parser.getProcessor(clazz);
             final ByteBuf buf = Unpooled.wrappedBuffer(bytes);
-            final T t = processor.process(buf, null);
+            final T t = processor.process(buf);
             for (int i = 0; i < pools.length; i++) {
                 pools[i].execute(() -> {
                     testDeParse(t, num, count);
