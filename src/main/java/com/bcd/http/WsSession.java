@@ -1,11 +1,8 @@
 package com.bcd.http;
 
 import com.bcd.share.exception.BaseRuntimeException;
-import com.bcd.share.support_parser.Parser;
 import com.bcd.share.support_parser.impl.gb32960.data.Packet;
-import com.bcd.share.support_parser.impl.gb32960.data.VehicleCommonData;
 import com.bcd.share.support_parser.impl.gb32960.data.VehicleRunData;
-import com.bcd.share.support_parser.processor.Processor;
 import com.bcd.share.util.JsonUtil;
 import io.jooby.WebSocket;
 import io.netty.bootstrap.Bootstrap;
@@ -56,7 +53,7 @@ public class WsSession {
         byte[] bytes = ByteBufUtil.decodeHexDump(sample);
         packet = HttpServer.processor.process(Unpooled.wrappedBuffer(bytes));
         packet.vin = vin;
-        ws_send(new WsOutMsg(101, JsonUtil.toJson(((VehicleRunData) packet.data).vehicleCommonData), true));
+        ws_send(new WsOutMsg(101, JsonUtil.toJson(packet.data), true));
     }
 
     public synchronized void ws_onClose() {
@@ -85,7 +82,7 @@ public class WsSession {
             }
             case 2 -> {
                 try {
-                    ((VehicleRunData) (packet.data)).vehicleCommonData = JsonUtil.GLOBAL_OBJECT_MAPPER.readValue(inMsg.data(), VehicleCommonData.class);
+                    packet.data = JsonUtil.GLOBAL_OBJECT_MAPPER.readValue(inMsg.data(), VehicleRunData.class);
                     ws_send(new WsOutMsg(2, null, true));
                 } catch (IOException ex) {
                     logger.error("error", ex);
