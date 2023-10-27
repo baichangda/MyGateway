@@ -19,4 +19,10 @@ public class DrivingRecorderUpload implements PacketBody{
         drivingRecorderUpload.content = content;
         return drivingRecorderUpload;
     }
+
+    public void write(ByteBuf data){
+        data.writeShort(sn);
+        data.writeByte(flag);
+        data.writeBytes(content);
+    }
 }

@@ -15,4 +15,9 @@ public class PositionReportItem {
         positionReportItem.position = Position.read(data, len);
         return positionReportItem;
     }
+
+    public void write(ByteBuf data){
+        data.writeShort(len);
+        position.write(data);
+    }
 }

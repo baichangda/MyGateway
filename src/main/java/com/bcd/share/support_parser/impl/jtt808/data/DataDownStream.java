@@ -16,4 +16,9 @@ public class DataDownStream implements PacketBody {
         dataDownStream.data = bytes;
         return dataDownStream;
     }
+
+    public void write(ByteBuf data){
+        data.writeByte(type);
+        data.writeBytes(this.data);
+    }
 }

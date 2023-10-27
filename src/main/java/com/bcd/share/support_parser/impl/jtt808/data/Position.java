@@ -22,4 +22,11 @@ public class Position implements PacketBody {
         position.exts = list.toArray(new PositionExt[0]);
         return position;
     }
+
+    public void write(ByteBuf data){
+        base.write(data);
+        for (PositionExt ext : exts) {
+            ext.write(data);
+        }
+    }
 }

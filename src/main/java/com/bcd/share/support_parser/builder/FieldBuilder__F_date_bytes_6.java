@@ -3,10 +3,12 @@ package com.bcd.share.support_parser.builder;
 import com.bcd.share.support_parser.anno.F_date_bcd;
 import com.bcd.share.support_parser.anno.F_date_bytes_6;
 import com.bcd.share.support_parser.util.ParseUtil;
+import com.bcd.share.util.DateZoneUtil;
 import io.netty.buffer.ByteBuf;
 
 import java.lang.reflect.Field;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -100,38 +102,20 @@ public class FieldBuilder__F_date_bytes_6 extends FieldBuilder {
                 varNameZoneDateTimeField);
     }
 
-    public static long readBcd_6(ByteBuf byteBuf, ZoneId zoneId, int baseYear) {
-        byte b1 = byteBuf.readByte();
-        byte b2 = byteBuf.readByte();
-        byte b3 = byteBuf.readByte();
-        byte b4 = byteBuf.readByte();
-        byte b5 = byteBuf.readByte();
-        byte b6 = byteBuf.readByte();
-        int year = ((b1 >> 4) & 0x0f) * 10 + (b1 & 0x0f);
-        int month = ((b2 >> 4) & 0x0f) * 10 + (b2 & 0x0f);
-        int day = ((b3 >> 4) & 0x0f) * 10 + (b3 & 0x0f);
-        int hour = ((b4 >> 4) & 0x0f) * 10 + (b4 & 0x0f);
-        int minute = ((b5 >> 4) & 0x0f) * 10 + (b5 & 0x0f);
-        int second = ((b6 >> 4) & 0x0f) * 10 + (b6 & 0x0f);
-        ZonedDateTime zonedDateTime = ZonedDateTime.of(baseYear + year, month, day, hour, minute, second, 0, zoneId);
-        return zonedDateTime.toInstant().toEpochMilli();
+    public static long read(final ByteBuf data, final ZoneId zoneId, final int baseYear) {
+        return ZonedDateTime.of(data.readByte() + baseYear, data.readByte(), data.readByte(), data.readByte(), data.readByte(), data.readByte(), 0, zoneId).toEpochSecond() * 1000;
     }
 
-    public static void writeBcd_6(ByteBuf byteBuf, long ts, ZoneId zoneId, int baseYear) {
-        ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(ts), zoneId);
-        int year = zonedDateTime.getYear() - baseYear;
-        int month = zonedDateTime.getMonthValue();
-        int day = zonedDateTime.getDayOfMonth();
-        int hour = zonedDateTime.getHour();
-        int minute = zonedDateTime.getMinute();
-        int second = zonedDateTime.getSecond();
-        byte b1 = (byte) (((year / 10) << 4) | (year % 10));
-        byte b2 = (byte) (((month / 10) << 4) | (month % 10));
-        byte b3 = (byte) (((day / 10) << 4) | (day % 10));
-        byte b4 = (byte) (((hour / 10) << 4) | (hour % 10));
-        byte b5 = (byte) (((minute / 10) << 4) | (minute % 10));
-        byte b6 = (byte) (((second / 10) << 4) | (second % 10));
-        byteBuf.writeBytes(new byte[]{b1, b2, b3, b4, b5, b6});
+    public static void write(final ByteBuf data, final long ts, final ZoneId zoneId, final int baseYear) {
+        ZonedDateTime zdt = ZonedDateTime.ofInstant(Instant.ofEpochMilli(ts), zoneId);
+        data.writeBytes(new byte[]{
+                (byte) (zdt.getYear() - baseYear),
+                (byte) zdt.getMonthValue(),
+                (byte) zdt.getDayOfMonth(),
+                (byte) zdt.getHour(),
+                (byte) zdt.getMinute(),
+                (byte) zdt.getSecond(),
+        });
     }
 
     @Override

@@ -20,4 +20,10 @@ public class PositionExt {
         positionExt.data = temp;
         return positionExt;
     }
+
+    public void write(ByteBuf data){
+        data.writeByte(id);
+        data.writeByte(len);
+        data.writeBytes(this.data);
+    }
 }

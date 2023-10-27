@@ -1,13 +1,13 @@
 package com.bcd.share.support_parser.impl.jtt808.data;
 
+import com.bcd.share.support_parser.builder.FieldBuilder__F_date_bytes_6;
 import com.bcd.share.util.DateZoneUtil;
 import io.netty.buffer.ByteBuf;
 
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
 import java.util.Date;
 
-public class RectangleAreaItem  implements AreaOrPathItem {
+public class RectangleAreaItem implements AreaOrPathItem {
     //区域id
     public long id;
     //区域属性
@@ -35,7 +35,7 @@ public class RectangleAreaItem  implements AreaOrPathItem {
     //名称
     public String name;
 
-    public static RectangleAreaItem read(ByteBuf data){
+    public static RectangleAreaItem read(ByteBuf data) {
         RectangleAreaItem item = new RectangleAreaItem();
         item.id = data.readUnsignedInt();
         short attr = data.readShort();
@@ -45,8 +45,8 @@ public class RectangleAreaItem  implements AreaOrPathItem {
         item.lat2 = data.readUnsignedInt() / 1000000d;
         item.lng2 = data.readUnsignedInt() / 1000000d;
         if ((attr & 0x01) != 0) {
-            item.startTime = Date.from(LocalDateTime.of(data.readByte() + 2000, data.readByte(), data.readByte(), data.readByte(), data.readByte(), data.readByte()).toInstant(DateZoneUtil.ZONE_OFFSET));
-            item.endTime = Date.from(LocalDateTime.of(data.readByte() + 2000, data.readByte(), data.readByte(), data.readByte(), data.readByte(), data.readByte()).toInstant(DateZoneUtil.ZONE_OFFSET));
+            item.startTime = new Date(FieldBuilder__F_date_bytes_6.read(data, DateZoneUtil.ZONE_OFFSET, 2000));
+            item.endTime = new Date(FieldBuilder__F_date_bytes_6.read(data, DateZoneUtil.ZONE_OFFSET, 2000));
         }
         if (((attr >> 1) & 0x01) != 0) {
             item.speed = data.readUnsignedShort();
@@ -56,5 +56,26 @@ public class RectangleAreaItem  implements AreaOrPathItem {
         item.nameLen = data.readUnsignedShort();
         item.name = data.readCharSequence(item.nameLen, StandardCharsets.UTF_8).toString();
         return item;
+    }
+
+    @Override
+    public void write(ByteBuf data) {
+        data.writeInt((int) id);
+        data.writeShort(attr);
+        data.writeInt((int) (lat1 * 1000000));
+        data.writeInt((int) (lng1 * 1000000));
+        data.writeInt((int) (lat2 * 1000000));
+        data.writeInt((int) (lng2 * 1000000));
+        if ((attr & 0x01) != 0) {
+            FieldBuilder__F_date_bytes_6.write(data, startTime.getTime(), DateZoneUtil.ZONE_OFFSET, 2000);
+            FieldBuilder__F_date_bytes_6.write(data, endTime.getTime(), DateZoneUtil.ZONE_OFFSET, 2000);
+        }
+        if (((attr >> 1) & 0x01) != 0) {
+            data.writeShort(speed);
+            data.writeByte(duration);
+            data.writeShort(nightSpeed);
+        }
+        data.writeShort(nameLen);
+        data.writeCharSequence(name, StandardCharsets.UTF_8);
     }
 }

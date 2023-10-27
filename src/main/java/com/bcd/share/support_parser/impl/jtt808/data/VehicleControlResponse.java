@@ -17,4 +17,9 @@ public class VehicleControlResponse implements PacketBody {
         vehicleControlResponse.position = Position.read(data, len - 2);
         return vehicleControlResponse;
     }
+
+    public void write(ByteBuf data){
+        data.writeShort(sn);
+        position.write(data);
+    }
 }

@@ -16,4 +16,9 @@ public class DrivingRecorderDownStream implements PacketBody {
         drivingRecorderDownStream.content = content;
         return drivingRecorderDownStream;
     }
+
+    public void write(ByteBuf data){
+        data.writeByte(flag);
+        data.writeBytes(content);
+    }
 }

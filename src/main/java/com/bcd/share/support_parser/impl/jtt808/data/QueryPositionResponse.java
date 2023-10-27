@@ -15,4 +15,9 @@ public class QueryPositionResponse implements PacketBody {
         queryPositionResponse.position = Position.read(data, len - 2);
         return queryPositionResponse;
     }
+
+    public void write(ByteBuf data){
+        data.writeShort(sn);
+        position.write(data);
+    }
 }

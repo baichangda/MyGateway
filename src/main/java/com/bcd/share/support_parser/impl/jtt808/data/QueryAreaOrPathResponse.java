@@ -7,7 +7,7 @@ public class QueryAreaOrPathResponse implements PacketBody {
     //查询类型
     public byte type;
     //查询返回的数据数量
-    public long num;
+    public int num;
     //数据项
     public AreaOrPathItem[] items;
 
@@ -43,5 +43,13 @@ public class QueryAreaOrPathResponse implements PacketBody {
             default -> throw BaseRuntimeException.getException("QueryAreaOrPathResponse type[{}] not support", type);
         }
         return queryAreaOrPathResponse;
+    }
+
+    public void write(ByteBuf data){
+        data.writeByte(type);
+        data.writeInt(num);
+        for (AreaOrPathItem item : items) {
+            item.write(data);
+        }
     }
 }

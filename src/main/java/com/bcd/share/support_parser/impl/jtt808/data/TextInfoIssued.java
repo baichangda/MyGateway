@@ -21,4 +21,10 @@ public class TextInfoIssued implements PacketBody {
         textInfoIssued.info = data.readCharSequence(len - 2, gbk).toString();
         return textInfoIssued;
     }
+
+    public void write(ByteBuf data){
+        data.writeByte(flag);
+        data.writeByte(type);
+        data.writeCharSequence(info,gbk);
+    }
 }

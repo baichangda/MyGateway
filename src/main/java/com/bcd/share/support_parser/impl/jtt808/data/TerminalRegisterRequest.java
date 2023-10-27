@@ -1,11 +1,6 @@
 package com.bcd.share.support_parser.impl.jtt808.data;
 
 import com.bcd.share.support_parser.Parser;
-import com.bcd.share.support_parser.anno.F_customize;
-import com.bcd.share.support_parser.anno.F_num;
-import com.bcd.share.support_parser.anno.F_num_array;
-import com.bcd.share.support_parser.anno.NumType;
-import com.bcd.share.support_parser.impl.jtt808.processor.TerminalRegister_plateNo_processor;
 import com.bcd.share.support_parser.processor.Processor;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
@@ -15,26 +10,49 @@ import java.nio.charset.Charset;
 
 public class TerminalRegisterRequest implements PacketBody {
     //省域id
-    @F_num(type = NumType.uint16)
     public int provinceId;
     //市县域id
-    @F_num(type = NumType.uint16)
     public int cityId;
     //制造商id
-    @F_num_array(singleType = NumType.uint8, len = 11)
     public byte[] manufacturerId;
     //终端型号
-    @F_num_array(singleType = NumType.uint8, len = 30)
     public byte[] terminalType;
     //终端id
-    @F_num_array(singleType = NumType.uint8, len = 30)
     public byte[] terminalId;
     //车牌颜色
-    @F_num(type = NumType.uint8)
     public short plateColor;
     //车牌
-    @F_customize(processorClass = TerminalRegister_plateNo_processor.class)
     public String plateNo;
+
+    static final Charset gbk = Charset.forName("GBK");
+
+    public static TerminalRegisterRequest read(ByteBuf data, int len) {
+        TerminalRegisterRequest terminalRegisterRequest = new TerminalRegisterRequest();
+        terminalRegisterRequest.provinceId = data.readUnsignedShort();
+        terminalRegisterRequest.cityId = data.readUnsignedShort();
+        byte[] bytes1 = new byte[11];
+        data.readBytes(bytes1);
+        terminalRegisterRequest.manufacturerId = bytes1;
+        byte[] bytes2 = new byte[30];
+        data.readBytes(bytes2);
+        terminalRegisterRequest.terminalType = bytes2;
+        byte[] bytes3 = new byte[30];
+        data.readBytes(bytes3);
+        terminalRegisterRequest.terminalId = bytes3;
+        terminalRegisterRequest.plateColor = data.readUnsignedByte();
+        terminalRegisterRequest.plateNo = data.readCharSequence(len - 76, gbk).toString();
+        return terminalRegisterRequest;
+    }
+
+    public void write(ByteBuf data) {
+        data.writeShort(provinceId);
+        data.writeShort(cityId);
+        data.writeBytes(manufacturerId);
+        data.writeBytes(terminalType);
+        data.writeBytes(terminalId);
+        data.writeByte(plateColor);
+        data.writeCharSequence(plateNo, gbk);
+    }
 
     public static void main(String[] args) {
         Parser.enableGenerateClassFile();
@@ -52,7 +70,7 @@ public class TerminalRegisterRequest implements PacketBody {
 
         PacketHeader packetHeader = new PacketHeader();
         packetHeader.msgId = 0x0100;
-        packetHeader.msgLen = 76 + terminalRegisterRequest.plateNo.getBytes(Charset.forName("GBK")).length;
+        packetHeader.msgLen = 76 + terminalRegisterRequest.plateNo.getBytes(gbk).length;
         packetHeader.sn = 1;
 
         Packet packet = new Packet();

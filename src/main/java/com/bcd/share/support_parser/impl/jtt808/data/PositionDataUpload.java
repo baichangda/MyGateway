@@ -28,4 +28,12 @@ public class PositionDataUpload implements PacketBody {
         }
         return positionDataUpload;
     }
+
+    public void write(ByteBuf data) {
+        data.writeShort(num);
+        data.writeByte(type);
+        for (PositionReportItem item : items) {
+            item.write(data);
+        }
+    }
 }

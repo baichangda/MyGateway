@@ -14,11 +14,18 @@ public class TerminalRegisterResponse implements PacketBody {
 
 
     static final Charset gbk = Charset.forName("GBK");
-    public static TerminalRegisterResponse read(ByteBuf data, int len){
+
+    public static TerminalRegisterResponse read(ByteBuf data, int len) {
         TerminalRegisterResponse terminalRegisterResponse = new TerminalRegisterResponse();
         terminalRegisterResponse.sn = data.readUnsignedShort();
         terminalRegisterResponse.res = data.readByte();
         terminalRegisterResponse.code = data.readCharSequence(len - 3, gbk).toString();
         return terminalRegisterResponse;
+    }
+
+    public void write(ByteBuf data) {
+        data.writeShort(sn);
+        data.writeByte(res);
+        data.writeCharSequence(code, gbk);
     }
 }

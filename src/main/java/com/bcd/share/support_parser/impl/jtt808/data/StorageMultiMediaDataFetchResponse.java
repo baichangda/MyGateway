@@ -29,5 +29,15 @@ public class StorageMultiMediaDataFetchResponse implements PacketBody{
         storageMultiMediaDataFetchResponse.position=Position.read(data,len-11);
         return storageMultiMediaDataFetchResponse;
     }
+
+    public void write(ByteBuf data){
+        data.writeShort(sn);
+        data.writeShort(num);
+        data.writeInt((int) id);
+        data.writeByte(type);
+        data.writeByte(channelId);
+        data.writeByte(code);
+        position.write(data);
+    }
 }
 

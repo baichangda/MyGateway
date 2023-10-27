@@ -22,4 +22,12 @@ public class SetRectangleArea implements PacketBody {
         }
         return setRectangleArea;
     }
+
+    public void write(ByteBuf data) {
+        data.writeByte(attr);
+        data.writeByte(num);
+        for (RectangleAreaItem item : items) {
+            item.write(data);
+        }
+    }
 }

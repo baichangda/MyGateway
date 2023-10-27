@@ -16,4 +16,9 @@ public class DataUpStream implements PacketBody {
         dataUpStream.data = bytes;
         return dataUpStream;
     }
+
+    public void write(ByteBuf data){
+        data.writeByte(type);
+        data.writeBytes(this.data);
+    }
 }

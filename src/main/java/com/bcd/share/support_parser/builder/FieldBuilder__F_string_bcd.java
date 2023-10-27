@@ -3,10 +3,11 @@ package com.bcd.share.support_parser.builder;
 
 import com.bcd.share.exception.BaseRuntimeException;
 import com.bcd.share.support_parser.anno.F_skip;
-import com.bcd.share.support_parser.anno.F_string;
 import com.bcd.share.support_parser.anno.F_string_bcd;
 import com.bcd.share.support_parser.util.ParseUtil;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufUtil;
+import io.netty.buffer.Unpooled;
 
 import java.lang.reflect.Field;
 
@@ -161,13 +162,28 @@ public class FieldBuilder__F_string_bcd extends FieldBuilder {
     public static void write_lowAddressAppend(ByteBuf byteBuf, String s, int len) {
         byte[] res = new byte[len];
         char[] charArray = s.toCharArray();
-        int actualLen = charArray.length >> 1;
-        for (int i = actualLen - 1, j = len - 1; i >= 0; i--, j--) {
-            byte b1 = (byte) (Character.getNumericValue(charArray[i << 1]) << 4);
-            byte b2 = (byte) Character.getNumericValue(charArray[(i << 1) + 1]);
-            res[j] = (byte) (b1 | b2);
+        byte b = 0;
+        int charLen = charArray.length;
+        for (int i = 0; i < charLen; i++) {
+            int n = Character.getNumericValue(charArray[charLen - i - 1]);
+            if (i % 2 == 0) {
+                b = (byte) n;
+            } else {
+                b |= (byte) (n << 4);
+                res[len - (i / 2) - 1] = b;
+                b = 0;
+            }
+        }
+        if (charLen % 2 == 1) {
+            res[len - (charLen / 2) - 1] = b;
         }
         byteBuf.writeBytes(res);
+    }
+
+    public static void main(String[] args) {
+        ByteBuf buffer = Unpooled.buffer();
+        write_lowAddressAppend(buffer, "17299841738", 10);
+        System.out.println(ByteBufUtil.hexDump(buffer));
     }
 
     public static void write_highAddressAppend(ByteBuf byteBuf, String s, int len) {

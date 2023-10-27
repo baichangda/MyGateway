@@ -1,5 +1,6 @@
 package com.bcd.share.support_parser.impl.jtt808.data;
 
+import com.bcd.share.support_parser.builder.FieldBuilder__F_date_bytes_6;
 import com.bcd.share.util.DateZoneUtil;
 import io.netty.buffer.ByteBuf;
 
@@ -37,8 +38,8 @@ public class SetPolygonArea implements PacketBody {
         short attr = data.readShort();
         setPolygonArea.attr = attr;
         if ((attr & 0x01) != 0) {
-            setPolygonArea.startTime = Date.from(LocalDateTime.of(data.readByte() + 2000, data.readByte(), data.readByte(), data.readByte(), data.readByte(), data.readByte()).toInstant(DateZoneUtil.ZONE_OFFSET));
-            setPolygonArea.endTime = Date.from(LocalDateTime.of(data.readByte() + 2000, data.readByte(), data.readByte(), data.readByte(), data.readByte(), data.readByte()).toInstant(DateZoneUtil.ZONE_OFFSET));
+            setPolygonArea.startTime = new Date(FieldBuilder__F_date_bytes_6.read(data, DateZoneUtil.ZONE_OFFSET, 2000));
+            setPolygonArea.endTime = new Date(FieldBuilder__F_date_bytes_6.read(data, DateZoneUtil.ZONE_OFFSET, 2000));
         }
         if (((attr >> 1) & 0x01) != 0) {
             setPolygonArea.speed = data.readUnsignedShort();
@@ -57,5 +58,23 @@ public class SetPolygonArea implements PacketBody {
         setPolygonArea.nameLen = data.readUnsignedShort();
         setPolygonArea.name = data.readCharSequence(setPolygonArea.nameLen, StandardCharsets.UTF_8).toString();
         return setPolygonArea;
+    }
+
+    public void write(ByteBuf data) {
+        data.writeInt((int) id);
+        data.writeShort(attr);
+        if ((attr & 0x01) != 0) {
+            FieldBuilder__F_date_bytes_6.write(data, startTime.getTime(), DateZoneUtil.ZONE_OFFSET, 2000);
+            FieldBuilder__F_date_bytes_6.write(data, endTime.getTime(), DateZoneUtil.ZONE_OFFSET, 2000);
+        }
+        data.writeShort(num);
+        for (PolygonAreaItem item : items) {
+            item.write(data);
+        }
+        if (((attr >> 1) & 0x01) != 0) {
+            data.writeShort(nightSpeed);
+        }
+        data.writeShort(nameLen);
+        data.writeCharSequence(name, StandardCharsets.UTF_8);
     }
 }

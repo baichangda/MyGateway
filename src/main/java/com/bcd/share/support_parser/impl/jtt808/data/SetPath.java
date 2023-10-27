@@ -1,13 +1,13 @@
 package com.bcd.share.support_parser.impl.jtt808.data;
 
+import com.bcd.share.support_parser.builder.FieldBuilder__F_date_bytes_6;
 import com.bcd.share.util.DateZoneUtil;
 import io.netty.buffer.ByteBuf;
 
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
 import java.util.Date;
 
-public class SetPath implements PacketBody{
+public class SetPath implements PacketBody {
     //路线id
     public long id;
     //路线属性
@@ -25,14 +25,14 @@ public class SetPath implements PacketBody{
     //路线名称
     public String name;
 
-    public static SetPath read(ByteBuf data){
+    public static SetPath read(ByteBuf data) {
         SetPath setPath = new SetPath();
         setPath.id = data.readUnsignedInt();
         short attr = data.readShort();
         setPath.attr = attr;
         if ((attr & 0x01) != 0) {
-            setPath.startTime = Date.from(LocalDateTime.of(data.readByte() + 2000, data.readByte(), data.readByte(), data.readByte(), data.readByte(), data.readByte()).toInstant(DateZoneUtil.ZONE_OFFSET));
-            setPath.endTime = Date.from(LocalDateTime.of(data.readByte() + 2000, data.readByte(), data.readByte(), data.readByte(), data.readByte(), data.readByte()).toInstant(DateZoneUtil.ZONE_OFFSET));
+            setPath.startTime = new Date(FieldBuilder__F_date_bytes_6.read(data, DateZoneUtil.ZONE_OFFSET, 2000));
+            setPath.endTime = new Date(FieldBuilder__F_date_bytes_6.read(data, DateZoneUtil.ZONE_OFFSET, 2000));
         }
         int num = data.readUnsignedShort();
         setPath.num = num;
@@ -44,5 +44,20 @@ public class SetPath implements PacketBody{
         setPath.nameLen = data.readUnsignedShort();
         setPath.name = data.readCharSequence(setPath.nameLen, StandardCharsets.UTF_8).toString();
         return setPath;
+    }
+
+    public void write(ByteBuf data) {
+        data.writeInt((int) id);
+        data.writeShort(attr);
+        if ((attr & 0x01) != 0) {
+            FieldBuilder__F_date_bytes_6.write(data, startTime.getTime(), DateZoneUtil.ZONE_OFFSET, 2000);
+            FieldBuilder__F_date_bytes_6.write(data, endTime.getTime(), DateZoneUtil.ZONE_OFFSET, 2000);
+        }
+        data.writeShort(num);
+        for (CornerItem item : items) {
+            item.write(data);
+        }
+        data.writeShort(nameLen);
+        data.writeCharSequence(name, StandardCharsets.UTF_8);
     }
 }

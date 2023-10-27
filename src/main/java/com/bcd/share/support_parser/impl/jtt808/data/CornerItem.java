@@ -46,4 +46,22 @@ public class CornerItem implements AreaOrPathItem {
         }
         return item;
     }
+
+    public void write(ByteBuf data) {
+        data.writeInt((int) id);
+        data.writeInt((int) roadId);
+        data.writeInt((int) (lat * 1000000));
+        data.writeInt((int) (lng * 1000000));
+        data.writeByte(width);
+        data.writeByte(attr);
+        if ((attr & 0x01) != 0) {
+            data.writeShort(threshold1);
+            data.writeShort(threshold2);
+        }
+        if (((attr >> 1) & 0x01) != 0) {
+            data.writeShort(speed);
+            data.writeByte(duration);
+            data.writeShort(nightSpeed);
+        }
+    }
 }

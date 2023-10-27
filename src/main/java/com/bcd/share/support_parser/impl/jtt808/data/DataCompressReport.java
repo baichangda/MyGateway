@@ -16,4 +16,9 @@ public class DataCompressReport implements PacketBody {
         dataCompressReport.data = bytes;
         return dataCompressReport;
     }
+
+    public void write(ByteBuf data) {
+        data.writeInt(len);
+        data.writeBytes(this.data);
+    }
 }

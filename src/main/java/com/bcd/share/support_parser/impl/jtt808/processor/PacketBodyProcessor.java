@@ -16,8 +16,6 @@ public class PacketBodyProcessor implements Processor<PacketBody> {
 
     Processor<ServerSubPacketRequest> processor_ServerSubPacketRequest = Parser.getProcessor(ServerSubPacketRequest.class);
 
-    Processor<TerminalRegisterRequest> processor_TerminalRegisterRequest = Parser.getProcessor(TerminalRegisterRequest.class);
-
     Processor<TerminalAuthentication> processor_TerminalAuthentication = Parser.getProcessor(TerminalAuthentication.class);
 
     Processor<SetTerminalParam> processor_SetTerminalParam = Parser.getProcessor(SetTerminalParam.class);
@@ -75,7 +73,7 @@ public class PacketBodyProcessor implements Processor<PacketBody> {
                 packetBody = processor_ServerSubPacketRequest.process(data, parentContext);
             }
             case 0x0100 -> {
-                packetBody = processor_TerminalRegisterRequest.process(data, parentContext);
+                packetBody = TerminalRegisterRequest.read(data, packet.header.msgLen);
             }
             case 0x8100 -> {
                 packetBody = TerminalRegisterResponse.read(data, packet.header.msgLen);
@@ -239,7 +237,7 @@ public class PacketBodyProcessor implements Processor<PacketBody> {
             case 0x8001 -> {
                 processor_PlatformCommonResponse.deProcess(data, parentContext, (PlatformCommonResponse) instance);
             }
-            case 0x0002, 0x0004 -> {
+            case 0x0002, 0x0004, 0x0003, 0x8104, 0x8107, 0x8201, 0x8204, 0x8702 -> {
 
             }
             case 0x8004 -> {
@@ -249,11 +247,156 @@ public class PacketBodyProcessor implements Processor<PacketBody> {
                 processor_ServerSubPacketRequest.deProcess(data, parentContext, (ServerSubPacketRequest) instance);
             }
             case 0x0100 -> {
-                processor_TerminalRegisterRequest.deProcess(data, parentContext, (TerminalRegisterRequest) instance);
+                ((TerminalRegisterRequest) instance).write(data);
             }
-            default -> {
-                throw BaseRuntimeException.getException("msgId[{}] not support", packet.header.msgId);
+            case 0x8100 -> {
+                ((TerminalRegisterResponse) instance).write(data);
             }
+            case 0x0102 -> {
+                processor_TerminalAuthentication.deProcess(data, parentContext, (TerminalAuthentication) instance);
+            }
+            case 0x8103 -> {
+                processor_SetTerminalParam.deProcess(data, parentContext, (SetTerminalParam) instance);
+            }
+            case 0x8106 -> {
+                processor_QueryTerminalParamRequest.deProcess(data, parentContext, (QueryTerminalParamRequest) instance);
+            }
+            case 0x0104 -> {
+                processor_QueryTerminalParamResponse.deProcess(data, parentContext, (QueryTerminalParamResponse) instance);
+            }
+            case 0x8105 -> {
+                ((TerminalControl) instance).write(data);
+            }
+            case 0x0107 -> {
+                processor_QueryTerminalPropResponse.deProcess(data, parentContext, (QueryTerminalPropResponse) instance);
+            }
+            case 0x8108 -> {
+                processor_IssuedTerminalUpgradeRequest.deProcess(data, parentContext, (IssuedTerminalUpgradeRequest) instance);
+            }
+            case 0x0108 -> {
+                processor_TerminalUpgradeResResponse.deProcess(data, parentContext, (TerminalUpgradeResResponse) instance);
+            }
+            case 0x0200 -> {
+                ((Position) instance).write(data);
+            }
+            case 0x0201 -> {
+                ((QueryPositionResponse) instance).write(data);
+            }
+            case 0x8202 -> {
+                processor_TempPositionFollow.deProcess(data, parentContext, (TempPositionFollow) instance);
+            }
+            case 0x8203 -> {
+                processor_ConfirmAlarmMsg.deProcess(data, parentContext, (ConfirmAlarmMsg) instance);
+            }
+            case 0x8300 -> {
+                ((TextInfoIssued) instance).write(data);
+            }
+            case 0x8400 -> {
+                ((PhoneCallback) instance).write(data);
+            }
+            case 0x8401 -> {
+                processor_SetPhoneText.deProcess(data, parentContext, (SetPhoneText) instance);
+            }
+            case 0x8500 -> {
+                ((VehicleControlRequest) instance).write(data);
+            }
+            case 0x0500 -> {
+                ((VehicleControlResponse) instance).write(data);
+            }
+            case 0x8600 -> {
+                ((SetCircleArea) instance).write(data);
+            }
+            case 0x8601 -> {
+                processor_DeleteCircleArea.deProcess(data, parentContext, (DeleteCircleArea) instance);
+            }
+            case 0x8602 -> {
+                ((SetRectangleArea) instance).write(data);
+            }
+            case 0x8603 -> {
+                processor_DeleteRectangleArea.deProcess(data, parentContext, (DeleteRectangleArea) instance);
+            }
+            case 0x8604 -> {
+                ((SetPolygonArea) instance).write(data);
+            }
+            case 0x8605 -> {
+                processor_DeletePolygonArea.deProcess(data, parentContext, (DeletePolygonArea) instance);
+            }
+            case 0x8606 -> {
+                ((SetPath) instance).write(data);
+            }
+            case 0x8607 -> {
+                processor_DeletePath.deProcess(data, parentContext, (DeletePath) instance);
+            }
+            case 0x8608 -> {
+                processor_QueryAreaOrPathRequest.deProcess(data, parentContext, (QueryAreaOrPathRequest) instance);
+            }
+            case 0x0608 -> {
+                ((QueryAreaOrPathResponse) instance).write(data);
+            }
+            case 0x8700 -> {
+                ((DrivingRecorderUpload) instance).write(data);
+            }
+            case 0x8701 -> {
+                ((DrivingRecorderDownStream) instance).write(data);
+            }
+            case 0x0701 -> {
+                processor_WaybillReport.deProcess(data, parentContext, (WaybillReport) instance);
+            }
+            case 0x0702 -> {
+                processor_DriverIdentityReport.deProcess(data, parentContext, (DriverIdentityReport) instance);
+            }
+            case 0x0704 -> {
+                ((PositionDataUpload) instance).write(data);
+            }
+            case 0x0705 -> {
+                processor_CanDataUpload.deProcess(data, parentContext, (CanDataUpload) instance);
+            }
+            case 0x0800 -> {
+                processor_MultiMediaEventUpload.deProcess(data, parentContext, (MultiMediaEventUpload) instance);
+            }
+            case 0x0801 -> {
+                ((MultiMediaDataUploadRequest) instance).write(data);
+            }
+            case 0x8800 -> {
+                ((MultiMediaDataUploadResponse) instance).write(data);
+            }
+            case 0x8801 -> {
+                processor_CameraTakePhotoCmdRequest.deProcess(data, parentContext, (CameraTakePhotoCmdRequest) instance);
+            }
+            case 0x0805 -> {
+                processor_CameraTakePhotoCmdResponse.deProcess(data, parentContext, (CameraTakePhotoCmdResponse) instance);
+            }
+            case 0x8802 -> {
+                processor_StorageMultiMediaDataFetchRequest.deProcess(data, parentContext, (StorageMultiMediaDataFetchRequest) instance);
+            }
+            case 0x0802 -> {
+                ((StorageMultiMediaDataFetchResponse) instance).write(data);
+            }
+            case 0x8803 -> {
+                processor_StorageMultiMediaDataUploadCmd.deProcess(data, parentContext, (StorageMultiMediaDataUploadCmd) instance);
+            }
+            case 0x8804 -> {
+                processor_RecordingStartCmd.deProcess(data, parentContext, (RecordingStartCmd) instance);
+            }
+            case 0x8805 -> {
+                processor_SingleMultiMediaDataFetchUploadCmd.deProcess(data, parentContext, (SingleMultiMediaDataFetchUploadCmd) instance);
+            }
+            case 0x8900 -> {
+                ((DataDownStream) instance).write(data);
+            }
+            case 0x0900 -> {
+                ((DataUpStream) instance).write(data);
+            }
+            case 0x0901 -> {
+                ((DataCompressReport) instance).write(data);
+            }
+            case 0x8A00 -> {
+                processor_PlatformRsa.process(data, parentContext);
+            }
+            case 0x0A00 -> {
+                processor_TerminalRsa.process(data, parentContext);
+            }
+            default -> throw BaseRuntimeException.getException("msgId[{}] not support", packet.header.msgId);
         }
     }
 

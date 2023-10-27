@@ -41,4 +41,14 @@ public class MultiMediaDataUploadRequest implements PacketBody {
         multiMediaDataUploadRequest.data = bytes;
         return multiMediaDataUploadRequest;
     }
+
+    public void write(ByteBuf data){
+        data.writeInt((int) id);
+        data.writeByte(type);
+        data.writeByte(code);
+        data.writeByte(eventCode);
+        data.writeByte(channelId);
+        position.write(data);
+        data.writeBytes(this.data);
+    }
 }

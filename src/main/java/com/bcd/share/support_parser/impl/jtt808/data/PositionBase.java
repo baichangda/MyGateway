@@ -36,4 +36,15 @@ public class PositionBase {
         positionBase.time = new Date(FieldBuilder__F_date_bcd.read(data, DateZoneUtil.ZONE_OFFSET, 1990));
         return positionBase;
     }
+
+    public void write(ByteBuf data) {
+        data.writeInt(flag);
+        data.writeInt(status);
+        data.writeInt((int) (lat * 1000000));
+        data.writeInt((int) (lng * 1000000));
+        data.writeShort(alt);
+        data.writeShort((int) (speed * 10));
+        data.writeShort(direction);
+        FieldBuilder__F_date_bcd.write(data, time.getTime(), DateZoneUtil.ZONE_OFFSET, 1990);
+    }
 }

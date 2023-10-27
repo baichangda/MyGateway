@@ -22,4 +22,12 @@ public class SetCircleArea implements PacketBody {
         }
         return setCircleArea;
     }
+
+    public void write(ByteBuf data){
+        data.writeByte(attr);
+        data.writeByte(num);
+        for (CircleAreaItem item : items) {
+            item.write(data);
+        }
+    }
 }
