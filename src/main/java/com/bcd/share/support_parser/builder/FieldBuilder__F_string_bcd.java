@@ -162,38 +162,34 @@ public class FieldBuilder__F_string_bcd extends FieldBuilder {
     public static void write_lowAddressAppend(ByteBuf byteBuf, String s, int len) {
         byte[] res = new byte[len];
         char[] charArray = s.toCharArray();
-        byte b = 0;
-        int charLen = charArray.length;
-        for (int i = 0; i < charLen; i++) {
-            int n = Character.getNumericValue(charArray[charLen - i - 1]);
-            if (i % 2 == 0) {
-                b = (byte) n;
-            } else {
-                b |= (byte) (n << 4);
-                res[len - (i / 2) - 1] = b;
-                b = 0;
-            }
+        int sLen = charArray.length;
+        int actualLen = sLen >> 1;
+        int offset = sLen & 1;
+        for (int i = len - 1, j = actualLen - 1; j >= 0; i--, j--) {
+            int index = (j << 1) + offset;
+            byte b1 = (byte) (Character.getNumericValue(charArray[index]) << 4);
+            byte b2 = (byte) Character.getNumericValue(charArray[index + 1]);
+            res[i] = (byte) (b1 | b2);
         }
-        if (charLen % 2 == 1) {
-            res[len - (charLen / 2) - 1] = b;
+        if (offset == 1) {
+            res[len - actualLen - 1] = (byte) Character.getNumericValue(charArray[0]);
         }
         byteBuf.writeBytes(res);
     }
 
-    public static void main(String[] args) {
-        ByteBuf buffer = Unpooled.buffer();
-        write_lowAddressAppend(buffer, "17299841738", 10);
-        System.out.println(ByteBufUtil.hexDump(buffer));
-    }
 
     public static void write_highAddressAppend(ByteBuf byteBuf, String s, int len) {
         byte[] res = new byte[len];
         char[] charArray = s.toCharArray();
+        int sLen = charArray.length;
         int actualLen = charArray.length >> 1;
         for (int i = 0; i < actualLen; i++) {
             byte b1 = (byte) (Character.getNumericValue(charArray[i << 1]) << 4);
             byte b2 = (byte) Character.getNumericValue(charArray[(i << 1) + 1]);
             res[i] = (byte) (b1 | b2);
+        }
+        if ((sLen & 1) == 1) {
+            res[actualLen] = (byte) (Character.getNumericValue(charArray[actualLen << 1]) << 4);
         }
         byteBuf.writeBytes(res);
     }
@@ -201,5 +197,16 @@ public class FieldBuilder__F_string_bcd extends FieldBuilder {
     @Override
     public Class<F_string_bcd> annoClass() {
         return F_string_bcd.class;
+    }
+
+    public static void main(String[] args) {
+        ByteBuf buffer1 = Unpooled.buffer();
+//        write_lowAddressAppend(buffer1, "17299841738", 10);
+        write_highAddressAppend(buffer1, "17299841738", 10);
+        System.out.println(ByteBufUtil.hexDump(buffer1));
+        ByteBuf buffer2 = Unpooled.buffer();
+//        write_lowAddressAppend(buffer2, "117299841738", 10);
+        write_highAddressAppend(buffer2, "117299841738", 10);
+        System.out.println(ByteBufUtil.hexDump(buffer2));
     }
 }
