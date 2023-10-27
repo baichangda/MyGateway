@@ -1,8 +1,6 @@
 package com.bcd.share.support_parser.util;
 
 import com.bcd.share.exception.BaseRuntimeException;
-import com.bcd.share.support_parser.impl.immotors.ep33.data.Evt_0006;
-import com.bcd.share.support_parser.impl.immotors.ep33.data.Evt_D00B;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -63,12 +61,5 @@ public class LogUtil {
         } else {
             return "(" + topClass.getSimpleName() + ".java:" + lineNo + ")";
         }
-    }
-
-    public static void main(String[] args) throws NoSuchFieldException {
-        System.out.println("." + getFieldStackTrace(Evt_0006.class, "HDop"));
-        System.out.println("." + getFieldStackTrace(Evt_0006.class, "VDop"));
-        System.out.println("." + getFieldStackTrace(Evt_D00B.class, "BMSCellVols"));
-        System.out.println("." + getFieldStackTrace(Evt_D00B.Evt_D00B_BMSCellVol.class, "BMSCellVolV"));
     }
 }

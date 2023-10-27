@@ -1,19 +1,40 @@
 package com.bcd.share.support_parser.impl.immotors.ep33.data;
 
 
-import com.bcd.share.support_parser.anno.*;
 import com.bcd.share.support_parser.impl.immotors.Evt_4_x;
+import io.netty.buffer.ByteBuf;
 
 public class Evt_D00C extends Evt_4_x {
-    @F_num(type = NumType.uint8, var = 'a')
     public short BMSCellTemSumNum;
-    @F_bean_list(listLenExpr = "a")
-    public Evt_D00C_BMSCellTem[] BMSCellTems;
+    public short[] BMSCellTem;
+    public byte[] BMSCellTemV;
 
-    public static class Evt_D00C_BMSCellTem {
-        @F_bit_num(len = 8,  valExpr = "x-40")
-        public float BMSCellTem;
-        @F_bit_num(len = 1, bitRemainingMode = BitRemainingMode.ignore)
-        public byte BMSCellTemV;
+    public static Evt_D00C read(ByteBuf data) {
+        Evt_D00C evt = new Evt_D00C();
+        evt.evtId=data.readUnsignedShort();
+        evt.evtLen=data.readUnsignedShort();
+        short num = data.readUnsignedByte();
+        evt.BMSCellTemSumNum = num;
+        short[] arr1 = new short[num];
+        byte[] arr2 = new byte[num];
+        evt.BMSCellTem = arr1;
+        evt.BMSCellTemV = arr2;
+        for (int i = 0; i < num; i++) {
+            int temp = data.readUnsignedShort();
+            arr1[i] = (short) ((temp >> 8) - 40);
+            arr2[i] = (byte) ((temp >> 7) & 0x01);
+        }
+        return evt;
+    }
+
+    public void write(ByteBuf data) {
+        data.writeShort(evtId);
+        data.writeShort(evtLen);
+        data.writeByte(BMSCellTemSumNum);
+        for (int i = 0; i < BMSCellTemSumNum; i++) {
+            int i1 = BMSCellTem[i] + 40;
+            int i2 = BMSCellTemV[i];
+            data.writeShort((i1 << 8) | (i2 << 7));
+        }
     }
 }

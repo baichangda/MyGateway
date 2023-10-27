@@ -35,9 +35,6 @@ public class Packet_evts_processor implements Processor<List<Evt>> {
     final Processor<Evt_D008> processor_Evt_D008 = Parser.getProcessor(Evt_D008.class);
     final Processor<Evt_D009> processor_Evt_D009 = Parser.getProcessor(Evt_D009.class);
     final Processor<Evt_D00A> processor_Evt_D00A = Parser.getProcessor(Evt_D00A.class);
-    final Processor<Evt_D00B> processor_Evt_D00B = Parser.getProcessor(Evt_D00B.class);
-    final Processor<Evt_D00C> processor_Evt_D00C = Parser.getProcessor(Evt_D00C.class);
-    final Processor<Evt_D00D> processor_Evt_D00D = Parser.getProcessor(Evt_D00D.class);
     final Processor<Evt_D00E> processor_Evt_D00E = Parser.getProcessor(Evt_D00E.class);
     final Processor<Evt_D00F> processor_Evt_D00F = Parser.getProcessor(Evt_D00F.class);
     final Processor<Evt_D01D> processor_Evt_D01D = Parser.getProcessor(Evt_D01D.class);
@@ -101,13 +98,13 @@ public class Packet_evts_processor implements Processor<List<Evt>> {
                     evt = processor_Evt_D00A.process(data, parentContext);
                 }
                 case 0xD00B -> {
-                    evt = processor_Evt_D00B.process(data, parentContext);
+                    evt = Evt_D00B.read(data);
                 }
                 case 0xD00C -> {
-                    evt = processor_Evt_D00C.process(data, parentContext);
+                    evt = Evt_D00C.read(data);
                 }
                 case 0xD00D -> {
-                    evt = processor_Evt_D00D.process(data, parentContext);
+                    evt = Evt_D00D.read(data);
                 }
                 case 0xD00E -> {
                     evt = processor_Evt_D00E.process(data, parentContext);
@@ -204,13 +201,13 @@ public class Packet_evts_processor implements Processor<List<Evt>> {
                     processor_Evt_D00A.deProcess(data, parentContext, (Evt_D00A) evt);
                 }
                 case 0xD00B -> {
-                    processor_Evt_D00B.deProcess(data, parentContext, (Evt_D00B) evt);
+                    ((Evt_D00B) evt).write(data);
                 }
                 case 0xD00C -> {
-                    processor_Evt_D00C.deProcess(data, parentContext, (Evt_D00C) evt);
+                    ((Evt_D00C) evt).write(data);
                 }
                 case 0xD00D -> {
-                    processor_Evt_D00D.deProcess(data, parentContext, (Evt_D00D) evt);
+                    ((Evt_D00D) evt).write(data);
                 }
                 case 0xD00E -> {
                     processor_Evt_D00E.deProcess(data, parentContext, (Evt_D00E) evt);

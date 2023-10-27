@@ -1,24 +1,45 @@
 package com.bcd.share.support_parser.impl.immotors.ep33.data;
 
 
-import com.bcd.share.support_parser.anno.*;
 import com.bcd.share.support_parser.impl.immotors.Evt_4_x;
+import io.netty.buffer.ByteBuf;
 
 public class Evt_D00B extends Evt_4_x {
-    @F_num(type = NumType.uint8, var = 'a')
     public short BMSCellVolSumNum;
-    @F_bean_list(listLenExpr = "a")
-    public Evt_D00B_BMSCellVol[] BMSCellVols;
+    public float[] BMSCellVol;
+    public byte[] BMSCellVolV;
+
+    public static Evt_D00B read(ByteBuf data) {
+        Evt_D00B evt = new Evt_D00B();
+        evt.evtId=data.readUnsignedShort();
+        evt.evtLen=data.readUnsignedShort();
+        short num = data.readUnsignedByte();
+        evt.BMSCellVolSumNum = num;
+        float[] arr1 = new float[num];
+        byte[] arr2 = new byte[num];
+        evt.BMSCellVol = arr1;
+        evt.BMSCellVolV = arr2;
+        for (int i = 0; i < num; i++) {
+            int temp = data.readUnsignedShort();
+            arr1[i] = (temp >> 3) * 0.001f;
+            arr2[i] = (byte) ((temp >> 2) & 0x01);
+        }
+        return evt;
+    }
+
+    public void write(ByteBuf data) {
+        data.writeShort(evtId);
+        data.writeShort(evtLen);
+        data.writeByte(BMSCellVolSumNum);
+        for (int i = 0; i < BMSCellVolSumNum; i++) {
+            int i1 = (int) (BMSCellVol[i] * 1000);
+            int i2 = BMSCellVolV[i];
+            data.writeShort((i1 << 3) | (i2 << 2));
+        }
+    }
 
     public static void main(String[] args) {
         System.out.println(4.031 / 0.001);
-    }
-
-    public static class Evt_D00B_BMSCellVol {
-        @F_bit_num(len = 13,  valExpr = "x*0.001")
-        public float BMSCellVol;
-        @F_bit_num(len = 1, bitRemainingMode = BitRemainingMode.ignore)
-        public byte BMSCellVolV;
     }
 }
 
