@@ -4,6 +4,7 @@ package com.bcd.share.support_parser.builder;
 import com.bcd.share.exception.BaseRuntimeException;
 import com.bcd.share.support_parser.anno.F_skip;
 import com.bcd.share.support_parser.anno.F_string_bcd;
+import com.bcd.share.support_parser.util.BcdUtil;
 import com.bcd.share.support_parser.util.ParseUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
@@ -91,60 +92,58 @@ public class FieldBuilder__F_string_bcd extends FieldBuilder {
     public static String read_noAppend(ByteBuf byteBuf, int len) {
         byte[] bytes = new byte[len];
         byteBuf.readBytes(bytes);
-        StringBuilder sb = new StringBuilder();
-        for (byte b : bytes) {
-            byte b1 = (byte) ((b >> 4) & 0x0F);
-            byte b2 = (byte) (b & 0x0F);
-            sb.append(b1).append(b2);
+        char[] chars = new char[len << 1];
+        for (int i = 0; i < bytes.length; i++) {
+            byte b = bytes[i];
+            System.arraycopy(BcdUtil.BCD_DUMP_TABLE, (b & 0xff) << 1, chars, i << 1, 2);
         }
-        return sb.toString();
+        return new String(chars);
     }
 
     public static String read_lowAddressAppend(ByteBuf byteBuf, int len) {
         byte[] bytes = new byte[len];
         byteBuf.readBytes(bytes);
-        StringBuilder sb = new StringBuilder();
-        boolean ok = false;
+        char[] chars = new char[len << 1];
+        int startIndex = -1;
         for (int i = 0; i < len; i++) {
             byte b = bytes[i];
-            byte b1 = (byte) ((b >> 4) & 0x0F);
-            byte b2 = (byte) (b & 0x0F);
-            if (ok) {
-                sb.append(b1).append(b2);
-            } else {
-                if (b1 == 0) {
-                    if (b2 != 0) {
-                        sb.append(b2);
-                        ok = true;
+            if (startIndex == -1) {
+                if (b != 0) {
+                    if (((b >> 4) & 0x0F) == 0) {
+                        startIndex = (i << 1) + 1;
+                    } else {
+                        startIndex = i << 1;
                     }
-                } else {
-                    sb.append(b1).append(b2);
-                    ok = true;
+                    System.arraycopy(BcdUtil.BCD_DUMP_TABLE, (b & 0xff) << 1, chars, i << 1, 2);
                 }
+            } else {
+                System.arraycopy(BcdUtil.BCD_DUMP_TABLE, (b & 0xff) << 1, chars, i << 1, 2);
             }
         }
-        return sb.toString();
+        return new String(chars, startIndex, chars.length - startIndex);
     }
 
     public static String read_highAddressAppend(ByteBuf byteBuf, int len) {
         byte[] bytes = new byte[len];
         byteBuf.readBytes(bytes);
-        StringBuilder sb = new StringBuilder();
-        for (byte b : bytes) {
-            byte b1 = (byte) ((b >> 4) & 0x0F);
-            if (b1 == 0) {
-                break;
-            } else {
-                byte b2 = (byte) (b & 0x0F);
-                if (b2 == 0) {
-                    sb.append(b1);
-                    break;
-                } else {
-                    sb.append(b1).append(b2);
+        char[] chars = new char[len << 1];
+        int endIndex = -1;
+        for (int i = len - 1; i >= 0; i--) {
+            byte b = bytes[i];
+            if (endIndex == -1) {
+                if (b != 0) {
+                    if ((b & 0x0F) == 0) {
+                        endIndex = i << 1;
+                    } else {
+                        endIndex = (i << 1) + 1;
+                    }
+                    System.arraycopy(BcdUtil.BCD_DUMP_TABLE, (b & 0xff) << 1, chars, i << 1, 2);
                 }
+            } else {
+                System.arraycopy(BcdUtil.BCD_DUMP_TABLE, (b & 0xff) << 1, chars, i << 1, 2);
             }
         }
-        return sb.toString();
+        return new String(chars, 0, endIndex+1);
     }
 
     public static void write_noAppend(ByteBuf byteBuf, String s) {

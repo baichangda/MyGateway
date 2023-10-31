@@ -2,12 +2,10 @@ package com.bcd.share.support_parser.builder;
 
 import com.bcd.share.support_parser.anno.F_date_bcd;
 import com.bcd.share.support_parser.util.ParseUtil;
-import com.bcd.share.util.DateZoneUtil;
 import io.netty.buffer.ByteBuf;
 
 import java.lang.reflect.Field;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -91,7 +89,7 @@ public class FieldBuilder__F_date_bcd extends FieldBuilder {
         int minute = ((bytes[4] >> 4) & 0x0f) * 10 + (bytes[4] & 0x0f);
         int second = ((bytes[5] >> 4) & 0x0f) * 10 + (bytes[5] & 0x0f);
         ZonedDateTime zonedDateTime = ZonedDateTime.of(baseYear + year, month, day, hour, minute, second, 0, zoneId);
-        return zonedDateTime.toInstant().toEpochMilli();
+        return zonedDateTime.toEpochSecond() * 1000;
     }
 
     public static void write(ByteBuf byteBuf, long ts, ZoneId zoneId, int baseYear) {
@@ -110,7 +108,6 @@ public class FieldBuilder__F_date_bcd extends FieldBuilder {
         byte b6 = (byte) (((second / 10) << 4) | (second % 10));
         byteBuf.writeBytes(new byte[]{b1, b2, b3, b4, b5, b6});
     }
-
 
 
     @Override
