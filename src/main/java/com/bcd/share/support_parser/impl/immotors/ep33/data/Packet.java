@@ -8,5 +8,5 @@ import java.util.List;
 
 public class Packet {
     @F_customize(processorClass = Packet_evts_processor.class)
-    public List<Evt> evts;
+    public Evt[] evts;
 }

@@ -11,11 +11,10 @@ import io.netty.buffer.ByteBufUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
-public class Packet_evts_processor implements Processor<List<Evt>> {
+public class Packet_evts_processor implements Processor<Evt[]> {
 
     static Logger logger = LoggerFactory.getLogger(Packet_evts_processor.class);
 
@@ -43,8 +42,9 @@ public class Packet_evts_processor implements Processor<List<Evt>> {
     final Processor<Evt_4_x_unknown> processor_Evt_4_x_unknown = Parser.getProcessor(Evt_4_x_unknown.class);
 
     @Override
-    public List<Evt> process(ByteBuf data, ProcessContext<?> parentContext) {
-        final List<Evt> evts = new ArrayList<>();
+    public Evt[] process(ByteBuf data, ProcessContext<?> parentContext) {
+        final Evt[] evts = new Evt[512];
+        int index = 0;
         while (data.isReadable()) {
             final int evtId = data.getUnsignedShort(data.readerIndex());
             final Evt evt;
@@ -142,13 +142,15 @@ public class Packet_evts_processor implements Processor<List<Evt>> {
                     }
                 }
             }
-            evts.add(evt);
+            evts[index++] = evt;
         }
-        return evts;
+        Evt[] res = new Evt[index];
+        System.arraycopy(evts, 0, res, 0, index);
+        return res;
     }
 
     @Override
-    public void deProcess(ByteBuf data, ProcessContext<?> parentContext, List<Evt> instance) {
+    public void deProcess(ByteBuf data, ProcessContext<?> parentContext, Evt[] instance) {
         for (Evt evt : instance) {
             final int evtId = evt.evtId;
             switch (evtId) {

@@ -3,27 +3,29 @@ package com.bcd.share.support_parser.impl.jtt808.data;
 
 import io.netty.buffer.ByteBuf;
 
-import java.util.ArrayList;
-
 public class Position implements PacketBody {
     //位置基础数据
     public PositionBase base;
     //位置附加数据
     public PositionExt[] exts;
+
     public static Position read(ByteBuf data, int len) {
         Position position = new Position();
         position.base = PositionBase.read(data);
         int byteLen = len - 28;
         int readerIndex = data.readerIndex();
-        ArrayList<PositionExt> list = new ArrayList<>();
+        int index = 0;
+        PositionExt[] temp = new PositionExt[128];
         while (byteLen > data.readerIndex() - readerIndex) {
-            list.add(PositionExt.read(data));
+            temp[index++] = PositionExt.read(data);
         }
-        position.exts = list.toArray(new PositionExt[0]);
+        PositionExt[] exts = new PositionExt[index];
+        System.arraycopy(temp, 0, exts, 0, index);
+        position.exts = exts;
         return position;
     }
 
-    public void write(ByteBuf data){
+    public void write(ByteBuf data) {
         base.write(data);
         for (PositionExt ext : exts) {
             ext.write(data);
