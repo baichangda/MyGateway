@@ -18,7 +18,7 @@ public class DriverIdentityReport implements PacketBody {
     @F_num(type = NumType.uint8, var = 'n')
     public short nameLen;
     //驾驶员姓名
-    @F_string(lenExpr = "n", appendMode = StringAppendMode.noAppend)
+    @F_string(lenExpr = "n")
     public String name;
     //从业资格证编码
     @F_string(len = 20, appendMode = StringAppendMode.highAddressAppend)
@@ -27,7 +27,7 @@ public class DriverIdentityReport implements PacketBody {
     @F_num(type = NumType.uint8, var = 'm')
     public short orgLen;
     //发证机构
-    @F_string(lenExpr = "m", appendMode = StringAppendMode.noAppend)
+    @F_string(lenExpr = "m")
     public String org;
     //证件有效期
     @F_num_array(len = 4, singleType = NumType.uint8)

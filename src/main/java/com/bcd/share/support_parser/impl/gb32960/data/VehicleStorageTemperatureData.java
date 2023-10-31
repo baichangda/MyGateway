@@ -16,5 +16,5 @@ public class VehicleStorageTemperatureData {
 
     //可充电储能子系统温度信息列表
     @F_bean_list(listLenExpr = "a")
-    public List<StorageTemperatureData> content;
+    public StorageTemperatureData[] content;
 }

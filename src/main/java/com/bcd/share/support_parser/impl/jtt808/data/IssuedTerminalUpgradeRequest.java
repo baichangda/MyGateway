@@ -14,7 +14,7 @@ public class IssuedTerminalUpgradeRequest implements PacketBody {
     @F_num(type = NumType.uint8, var = 'b')
     public short terminalFirmwareVersionLen;
     //终端固件版本号
-    @F_string(lenExpr = "b", charset = "GBK", appendMode = StringAppendMode.noAppend)
+    @F_string(lenExpr = "b", charset = "GBK")
     public String terminalFirmwareVersion;
     //升级数据包长度
     @F_num(type = NumType.uint32, var = 'n')

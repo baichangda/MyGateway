@@ -8,7 +8,7 @@ public class TerminalAuthentication implements PacketBody {
     @F_num(type = NumType.uint8, var = 'n')
     public short codeLen;
     //鉴权码内容
-    @F_string(lenExpr = "n", charset = "GBK", appendMode = StringAppendMode.noAppend)
+    @F_string(lenExpr = "n", charset = "GBK")
     public String code;
     //终端imei
     @F_num_array(singleType = NumType.uint8, len = 15)

@@ -47,6 +47,6 @@ public @interface F_string {
      * 内存地址解释
      * 假如有byte[4]、其中0是低内存地址、3是高内存地址
      */
-    StringAppendMode appendMode() default StringAppendMode.highAddressAppend;
+    StringAppendMode appendMode() default StringAppendMode.noAppend;
 
 }

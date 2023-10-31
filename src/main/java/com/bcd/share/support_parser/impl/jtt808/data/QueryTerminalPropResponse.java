@@ -23,13 +23,13 @@ public class QueryTerminalPropResponse implements PacketBody {
     @F_num(type = NumType.uint8, var = 'a')
     public short terminalHardwareVersionLen;
     //终端硬件版本号
-    @F_string(lenExpr = "a", charset = "GBK", appendMode = StringAppendMode.noAppend)
+    @F_string(lenExpr = "a", charset = "GBK")
     public String terminalHardwareVersion;
     //终端固件版本号长度
     @F_num(type = NumType.uint8, var = 'b')
     public short terminalFirmwareVersionLen;
     //终端固件版本号
-    @F_string(lenExpr = "b", charset = "GBK", appendMode = StringAppendMode.noAppend)
+    @F_string(lenExpr = "b", charset = "GBK")
     public String terminalFirmwareVersion;
     //gnss属性
     @F_num(type = NumType.uint8)

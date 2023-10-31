@@ -13,12 +13,12 @@ public class PhoneContactPerson {
     @F_num(type = NumType.uint8, var = 'a')
     public short phoneNumberLen;
     //电话号码
-    @F_string(lenExpr = "a", charset = "GBK", appendMode = StringAppendMode.noAppend)
+    @F_string(lenExpr = "a", charset = "GBK")
     public String phoneNumber;
     //联系人长度
     @F_num(type = NumType.uint8, var = 'b')
     public short concatPersonLen;
     //联系人
-    @F_string(lenExpr = "b", charset = "GBK", appendMode = StringAppendMode.noAppend)
+    @F_string(lenExpr = "b", charset = "GBK")
     public String concatPerson;
 }
