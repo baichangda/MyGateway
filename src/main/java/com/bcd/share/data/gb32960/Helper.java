@@ -5,6 +5,8 @@ import com.bcd.share.support_parser.Parser;
 import com.bcd.share.support_parser.impl.gb32960.data.Packet;
 import com.bcd.share.support_parser.processor.Processor;
 import com.bcd.share.util.DateZoneUtil;
+import com.bcd.share.util.JsonUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.base.Strings;
 import com.google.common.hash.Hashing;
 import io.netty.buffer.ByteBuf;
@@ -102,6 +104,13 @@ public class Helper {
         }
         query.addCriteria(criteria);
         final List<SaveData> list = mongoTemplate.find(query, SaveData.class);
+        try {
+            for (SaveData saveData : list) {
+                saveData.jsonData = JsonUtil.GLOBAL_OBJECT_MAPPER.readValue(saveData.json, JsonData.class);
+            }
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
         return list;
     }
 
