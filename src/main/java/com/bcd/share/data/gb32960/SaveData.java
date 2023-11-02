@@ -13,8 +13,8 @@ public class SaveData {
     /**
      * vin_hash(长度4)
      * vin(长度17)
-     * 类型flag 16进制(长度2)
      * 时间(长度14、20220101010101)
+     * 类型flag 16进制(长度2)
      */
     @Id
     public String id;
