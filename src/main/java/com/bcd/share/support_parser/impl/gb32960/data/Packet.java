@@ -28,7 +28,6 @@ public class Packet {
     public byte[] dataContent;
     @F_customize(
             processorClass = PacketDataFieldProcessor.class
-//            builderClass = PacketDataFieldBuilder.class
     )
 //    @F_skip(lenExpr = "a")
     public PacketData data;

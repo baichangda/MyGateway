@@ -34,51 +34,41 @@ public class PacketDataFieldProcessor implements Processor<PacketData> {
     static Logger logger = LoggerFactory.getLogger(PacketDataFieldProcessor.class);
 
     @Override
-    public PacketData process(final ByteBuf data, final ProcessContext<?> parentContext) {
+    public final PacketData process(final ByteBuf data, final ProcessContext<?> parentContext) {
 
         final Packet packet = (Packet) parentContext.instance;
         if (packet.replyFlag == 0xfe) {
             PacketData packetData = null;
             switch (packet.flag) {
                 //车辆登入
-                case vehicle_login_data: {
+                case vehicle_login_data -> {
                     packetData = processor_vehicleLoginData.process(data, null);
-                    break;
                 }
 
                 //车辆实时信息
                 //补发信息上报
-                case vehicle_run_data, vehicle_supplement_data: {
+                case vehicle_run_data, vehicle_supplement_data -> {
                     packetData = read_vehicleRunData(data, parentContext);
-                    break;
                 }
 
                 //车辆登出
-                case vehicle_logout_data: {
+                case vehicle_logout_data -> {
                     packetData = processor_vehicleLogoutData.process(data, null);
-                    break;
                 }
 
                 //平台登入
-                case platform_login_data: {
+                case platform_login_data -> {
                     packetData = processor_platformLoginData.process(data, null);
-                    break;
                 }
 
                 //平台登出
-                case platform_logout_data: {
+                case platform_logout_data -> {
                     packetData = processor_platformLogoutData.process(data, null);
-                    break;
                 }
 
                 //心跳
-                case heartbeat: {
-                    break;
-                }
-
                 //终端校时
-                case terminal_timing: {
-                    break;
+                case heartbeat, terminal_timing -> {
                 }
             }
             return packetData;
@@ -91,48 +81,37 @@ public class PacketDataFieldProcessor implements Processor<PacketData> {
     }
 
     @Override
-    public void deProcess(ByteBuf data, ProcessContext parentContext, PacketData instance) {
+    public final void deProcess(ByteBuf data, ProcessContext<?> parentContext, PacketData instance) {
         final Packet packet = (Packet) parentContext.instance;
         if (packet.replyFlag == 0xfe) {
             switch (packet.flag) {
                 //车辆登入
-                case vehicle_login_data: {
+                case vehicle_login_data -> {
                     processor_vehicleLoginData.deProcess(data, null, (VehicleLoginData) instance);
-                    break;
                 }
                 //车辆实时信息
                 //补发信息上报
-                case vehicle_run_data,vehicle_supplement_data: {
-                    write_vehicleRunData(data, (VehicleRunData) instance,parentContext);
-
-                    break;
+                case vehicle_run_data, vehicle_supplement_data -> {
+                    write_vehicleRunData(data, (VehicleRunData) instance, parentContext);
                 }
                 //车辆登出
-                case vehicle_logout_data: {
+                case vehicle_logout_data -> {
                     processor_vehicleLogoutData.deProcess(data, null, (VehicleLogoutData) instance);
-                    break;
                 }
 
                 //平台登入
-                case platform_login_data: {
+                case platform_login_data -> {
                     processor_platformLoginData.deProcess(data, null, (PlatformLoginData) instance);
-                    break;
                 }
 
                 //平台登出
-                case platform_logout_data: {
+                case platform_logout_data -> {
                     processor_platformLogoutData.deProcess(data, null, (PlatformLogoutData) instance);
-                    break;
                 }
 
                 //心跳
-                case heartbeat: {
-                    break;
-                }
-
                 //终端校时
-                case terminal_timing: {
-                    break;
+                case heartbeat, terminal_timing -> {
                 }
             }
         } else {
@@ -155,52 +134,43 @@ public class PacketDataFieldProcessor implements Processor<PacketData> {
             }
             short flag = data.readUnsignedByte();
             switch (flag) {
-                case 1: {
+                case 1 -> {
                     //2.1、整车数据
                     instance.vehicleBaseData = processor_vehicleBaseData.process(data, parentContext);
-                    break;
                 }
-                case 2: {
+                case 2 -> {
                     //2.2、驱动电机数据
                     instance.vehicleMotorData = processor_vehicleMotorData.process(data, parentContext);
-                    break;
                 }
-                case 3: {
+                case 3 -> {
                     //2.3、燃料电池数据
                     instance.vehicleFuelBatteryData = processor_vehicleFuelBatteryData.process(data, parentContext);
-                    break;
                 }
-                case 4: {
+                case 4 -> {
                     //2.4、发动机数据
                     instance.vehicleEngineData = processor_vehicleEngineData.process(data, parentContext);
-                    break;
                 }
-                case 5: {
+                case 5 -> {
                     //2.5、车辆位置数据
                     instance.vehiclePositionData = processor_vehiclePositionData.process(data, parentContext);
-                    break;
                 }
-                case 6: {
+                case 6 -> {
                     //2.6、极值数据
                     instance.vehicleLimitValueData = processor_vehicleLimitValueData.process(data, parentContext);
-                    break;
                 }
-                case 7: {
+                case 7 -> {
                     //2.7、报警数据
                     instance.vehicleAlarmData = processor_vehicleAlarmData.process(data, parentContext);
-                    break;
                 }
-                case 8: {
+                case 8 -> {
                     //2.8、可充电储能装置电压数据
                     instance.vehicleStorageVoltageData = processor_vehicleStorageVoltageData.process(data, parentContext);
-                    break;
                 }
-                case 9: {
+                case 9 -> {
                     //2.9、可充电储能装置温度数据
                     instance.vehicleStorageTemperatureData = processor_vehicleStorageTemperatureData.process(data, parentContext);
-                    break;
                 }
-                default: {
+                default -> {
                     logger.warn("flag[" + flag + "] not support");
                     //2.8、如果是自定义数据,只做展现,不解析
                     //2.8.1、解析长度
@@ -216,7 +186,7 @@ public class PacketDataFieldProcessor implements Processor<PacketData> {
     }
 
     private void write_vehicleRunData(ByteBuf data, VehicleRunData instance, ProcessContext<?> parentContext) {
-        FieldBuilder__F_date_bytes_6.write(data,instance.collectTime.getTime(),DateZoneUtil.ZONE_OFFSET,2000);
+        FieldBuilder__F_date_bytes_6.write(data, instance.collectTime.getTime(), DateZoneUtil.ZONE_OFFSET, 2000);
         if (instance.vehicleBaseData != null) {
             data.writeByte(1);
             processor_vehicleBaseData.deProcess(data, parentContext, instance.vehicleBaseData);

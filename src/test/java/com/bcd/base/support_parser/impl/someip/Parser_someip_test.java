@@ -34,6 +34,7 @@ public class Parser_someip_test {
         assert data.equalsIgnoreCase(ByteBufUtil.hexDump(dest));
     }
 
+    @Test
     public void test_performance() {
         Parser.enablePrintBuildLog();
         Parser.enableGenerateClassFile();
