@@ -51,12 +51,12 @@ spring:
   #  kafka配置
   kafka:
     consumer:
-      bootstrap-servers: ${kafka_bootstrap:10.0.11.42:9092,10.0.11.43:9092,10.0.11.44:9092}
+      bootstrap-servers: ${kafka_bootstrap:192.168.23.128:9092}
       group-id: ${gateway.id}
       key-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
       value-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
     producer:
-      bootstrap-servers: ${kafka_bootstrap:10.0.11.42:9092,10.0.11.43:9092,10.0.11.44:9092}
+      bootstrap-servers: ${kafka_bootstrap:192.168.23.128:9092}
       key-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
       value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
 
