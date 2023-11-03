@@ -12,7 +12,6 @@ import java.time.Duration;
 @Component
 @ConfigurationProperties(prefix = "tcp")
 public class TcpProp {
-    public String id;
     public int port;
     public Duration maxBeforeOffline;
     public String sessionTopic;

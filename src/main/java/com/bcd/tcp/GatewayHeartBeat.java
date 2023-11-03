@@ -2,6 +2,7 @@ package com.bcd.tcp;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -23,9 +24,12 @@ public class GatewayHeartBeat implements ApplicationListener<ContextRefreshedEve
     @Qualifier("string_string_redisTemplate")
     RedisTemplate<String, String> redisTemplate;
 
+    @Value("${gateway.id}")
+    String id;
+
     private void startHeartBeatToRedis() {
         final Duration maxBeforeOffline = tcpProp.maxBeforeOffline;
-        final String key = RedisKeyConst.gatewayOnline_redisKeyPre + tcpProp.id;
+        final String key = RedisKeyConst.gatewayOnline_redisKeyPre + id;
         final long period = maxBeforeOffline.getSeconds() / 2 - 1;
         pool_saveRedis_heartBeat.scheduleAtFixedRate(() -> {
             redisTemplate.opsForValue().set(key, "", maxBeforeOffline);

@@ -5,6 +5,7 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
@@ -24,6 +25,9 @@ public class SessionClusterManager {
     @Autowired
     KafkaTemplate<byte[], byte[]> kafkaTemplate;
 
+    @Value("${gateway.id}")
+    String id;
+
     @KafkaListener(topics = "${tcp.sessionTopic}")
     public void listen(ConsumerRecord<byte[], byte[]> consumerRecord) {
         //格式为 session类型,sessionId,网关id,连接的时间戳(毫秒)
@@ -31,7 +35,7 @@ public class SessionClusterManager {
         final String[] split = value.split(",");
         final String remoteGatewayId = split[2];
         //忽略本网关自己的通知
-        if (!remoteGatewayId.equals(tcpProp.id)) {
+        if (!remoteGatewayId.equals(id)) {
             final int sessionType = Integer.parseInt(split[0]);
             final Session local = Session.getSession(sessionType, split[1]);
             if (local != null) {
@@ -47,7 +51,7 @@ public class SessionClusterManager {
 
     public void send(Session session) {
         pool_sendKafka_sessionNotify.execute(() -> {
-            String msg = session.type + "," + session.id + "," + tcpProp.id + "," + session.createTs;
+            String msg = session.type + "," + session.id + "," + id + "," + session.createTs;
             kafkaTemplate.send(new ProducerRecord<>(tcpProp.sessionTopic, msg.getBytes(StandardCharsets.UTF_8)));
         });
     }
