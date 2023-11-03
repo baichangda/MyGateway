@@ -20,7 +20,6 @@ public class PacketDataFieldProcessor implements Processor<PacketData> {
     final Processor<PlatformLoginData> processor_platformLoginData = Parser.getProcessor(PlatformLoginData.class);
     final Processor<PlatformLogoutData> processor_platformLogoutData = Parser.getProcessor(PlatformLogoutData.class);
 
-
     final Processor<VehicleBaseData> processor_vehicleBaseData = Parser.getProcessor(VehicleBaseData.class);
     final Processor<VehicleMotorData> processor_vehicleMotorData = Parser.getProcessor(VehicleMotorData.class);
     final Processor<VehicleFuelBatteryData> processor_vehicleFuelBatteryData = Parser.getProcessor(VehicleFuelBatteryData.class);
@@ -35,7 +34,6 @@ public class PacketDataFieldProcessor implements Processor<PacketData> {
 
     @Override
     public final PacketData process(final ByteBuf data, final ProcessContext<?> parentContext) {
-
         final Packet packet = (Packet) parentContext.instance;
         if (packet.replyFlag == 0xfe) {
             PacketData packetData = null;
