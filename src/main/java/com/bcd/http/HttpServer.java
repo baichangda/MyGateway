@@ -5,6 +5,7 @@ import com.bcd.share.support_parser.impl.gb32960.data.Packet;
 import com.bcd.share.support_parser.processor.Processor;
 import com.bcd.share.util.JsonUtil;
 import io.jooby.Jooby;
+import io.jooby.handler.AccessLogHandler;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.http.HttpHeaderNames;
@@ -12,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -31,6 +31,7 @@ public class HttpServer implements CommandLineRunner {
     public void run(String... args) throws Exception {
         Thread.startVirtualThread(() -> {
             Jooby.runApp(args, app -> {
+                app.use(new AccessLogHandler());
                 //静态文件
 //            app.assets("/gb32960/*", new ClassPathAssetSource(HttpServer.class.getClassLoader(), "http/gb32960"));
                 app.assets("/gb32960/*", "src/main/resources/http/gb32960");
