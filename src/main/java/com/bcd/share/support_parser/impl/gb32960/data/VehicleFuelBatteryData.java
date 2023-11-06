@@ -25,7 +25,7 @@ public class VehicleFuelBatteryData {
     public long num;
 
     //探针温度值
-    @F_num_array(lenExpr = "a", singleValExpr = "x-40", singleType = NumType.uint8, singleValType = NumType.int16)
+    @F_num_array(lenExpr = "a", singleValExpr = "x-40", singleType = NumType.uint8)
     public short[] temperatures;
 
     //氢系统中最高温度

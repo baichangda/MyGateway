@@ -17,6 +17,6 @@ public class StorageTemperatureData {
     public int num;
 
     //可充电储能子系统各温度探针检测到的温度值
-    @F_num_array(lenExpr = "n", singleValExpr = "x-40", singleType = NumType.uint8, singleValType = NumType.int16)
+    @F_num_array(lenExpr = "n", singleValExpr = "x-40", singleType = NumType.uint8)
     public short[] temperatures;
 }

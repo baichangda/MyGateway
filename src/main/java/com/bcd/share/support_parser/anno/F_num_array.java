@@ -51,25 +51,6 @@ public @interface F_num_array {
 
     /**
      * 每个数组元素
-     * 值数据类型
-     * 对原始值进行{@link #singleValType()}运算后、存储最终值的类型
-     * 默认值代表和{@link #singleType()}一样的类型
-     * <p>
-     * 此属性对java解析程序没有影响、因为java程序在定义bean的field时候已经考虑进去了
-     * 主要用于生成其他语言的解析程序时候用到、例如go
-     * <p>
-     * {@link #singleValExpr()} 为空时
-     * 设置为和{@link #singleType()}一样即可
-     * <p>
-     * {@link #singleValExpr()} 不为空时
-     * 此时定义的类型需要考虑存储如下值都不会出现溢出或错误
-     * 原始值、运算过程中的值、结果值
-     * 因为在解析时候、会先将读取出的原始值{@link #singleType()}转换为{@link #singleValType()}然后再进行{@link #singleValExpr()}运算
-     */
-    NumType singleValType() default NumType.Default;
-
-    /**
-     * 每个数组元素
      * 在读取后、应该skip的byte长度
      */
     int singleSkip() default 0;
