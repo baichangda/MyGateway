@@ -8,7 +8,7 @@ import com.bcd.share.support_parser.anno.NumType;
  */
 public class VehiclePositionData {
     //定位状态
-    @F_num(type = NumType.int8)
+    @F_num(type = NumType.uint8)
     public byte status;
 
     //经度
