@@ -5,6 +5,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
+import org.springframework.data.mongodb.core.convert.DefaultDbRefResolver;
+import org.springframework.data.mongodb.core.convert.DefaultMongoTypeMapper;
+import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
+import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 import org.springframework.stereotype.Component;
 
 @ConditionalOnProperty(value = "mongodbs")
@@ -17,7 +21,10 @@ public class MongoHandler {
         dbNum = mongodbs.length;
         mongoTemplates = new MongoTemplate[dbNum];
         for (int i = 0; i < dbNum; i++) {
-            mongoTemplates[i] = new MongoTemplate(new SimpleMongoClientDatabaseFactory(mongodbs[i]));
+            SimpleMongoClientDatabaseFactory simpleMongoClientDatabaseFactory = new SimpleMongoClientDatabaseFactory(mongodbs[i]);
+            MappingMongoConverter converter = new MappingMongoConverter(new DefaultDbRefResolver(simpleMongoClientDatabaseFactory), new MongoMappingContext());
+            converter.setTypeMapper(new DefaultMongoTypeMapper(null));
+            mongoTemplates[i] = new MongoTemplate(simpleMongoClientDatabaseFactory, converter);
         }
     }
 
