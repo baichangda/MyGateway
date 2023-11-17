@@ -3,8 +3,10 @@ package com.bcd.http;
 import com.bcd.share.support_parser.Parser;
 import com.bcd.share.support_parser.impl.gb32960.data.Packet;
 import com.bcd.share.support_parser.processor.Processor;
+import com.bcd.share.util.DateZoneUtil;
 import com.bcd.share.util.JsonUtil;
-import io.jooby.Jooby;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import io.jooby.*;
 import io.jooby.handler.AccessLogHandler;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
@@ -16,6 +18,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 @ConditionalOnProperty("http.port")
@@ -28,11 +31,19 @@ public class HttpServer implements CommandLineRunner {
 
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
         Thread.startVirtualThread(() -> {
             Jooby.runApp(args, app -> {
-                app.use(new AccessLogHandler());
+                app.use(new AccessLogHandler().dateFormatter(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").withZone(DateZoneUtil.ZONE_OFFSET)));
+                ServerOptions serverOptions=new ServerOptions();
+                serverOptions.setPort(9999);
+                serverOptions.setCompressionLevel(ServerOptions.DEFAULT_COMPRESSION_LEVEL);
+                app.setServerOptions(serverOptions);
                 //静态文件
+                app.get("/", ctx -> {
+                    ctx.sendRedirect(StatusCode.MOVED_PERMANENTLY,"/gb32960/");
+                    return ctx;
+                });
 //            app.assets("/gb32960/*", new ClassPathAssetSource(HttpServer.class.getClassLoader(), "http/gb32960"));
                 app.assets("/gb32960/*", "src/main/resources/http/gb32960");
                 //websocket
