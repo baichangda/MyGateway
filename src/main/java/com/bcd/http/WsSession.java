@@ -4,6 +4,7 @@ import com.bcd.share.exception.BaseRuntimeException;
 import com.bcd.share.support_parser.impl.gb32960.data.Packet;
 import com.bcd.share.support_parser.impl.gb32960.data.VehicleRunData;
 import com.bcd.share.util.JsonUtil;
+import io.jooby.WebSocket;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
@@ -20,31 +21,33 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 public class WsSession {
     static Logger logger = LoggerFactory.getLogger(WsSession.class);
 
     private final static String sample = "232302FE4C534A4533363039364D53313430343935010141170608100A10010103010040000003520F2827811C012E2000000002010101594FDB4E2F4A0F3227100500073944E501DD620A0601090E1B01370E14010145010444070300021387000000000801010F282781006C00016C0E180E190E1A0E190E190E180E180E1A0E1B0E180E190E1A0E180E180E190E1A0E1A0E190E180E1A0E180E1A0E1A0E180E170E190E170E190E170E190E1B0E190E190E190E180E180E170E170E180E170E170E170E190E170E180E170E190E170E170E170E180E180E190E190E140E180E180E170E170E150E160E160E180E190E170E180E170E180E170E180E170E160E190E150E180E160E180E170E160E160E170E150E170E170E140E170E160E160E170E170E170E170E160E170E160E170E140E170E170E160E160E170E170E170E160E160E160E16090101000C454545444544444445444544F5";
+    public final static ConcurrentHashMap<WebSocket, WsSession> ws_session = new ConcurrentHashMap<>();
     static ScheduledExecutorService pool = Executors.newSingleThreadScheduledExecutor();
 
     public final String vin;
-    public final io.helidon.websocket.WsSession ws;
+    public final WebSocket ws;
     public Channel channel;
     public Packet packet;
     public ScheduledFuture<?> scheduledFuture;
 
     static NioEventLoopGroup tcp_workerGroup = new NioEventLoopGroup();
 
-    public WsSession(String vin, io.helidon.websocket.WsSession ws) {
+    public WsSession(String vin, WebSocket ws) {
         this.vin = vin;
         this.ws = ws;
+        ws_session.put(ws, this);
         ws_onConnect(vin);
     }
 
+    public static WsSession getSession(WebSocket ws) {
+        return ws_session.get(ws);
+    }
 
     public synchronized void ws_onConnect(String vin) {
         byte[] bytes = ByteBufUtil.decodeHexDump(sample);
@@ -60,6 +63,7 @@ public class WsSession {
         if (channel != null) {
             channel.close();
         }
+        ws_session.remove(ws);
     }
 
     public synchronized void ws_handleMsg(WsInMsg inMsg) {
@@ -121,7 +125,9 @@ public class WsSession {
     }
 
     public synchronized void ws_send(WsOutMsg outMsg) {
-        ws.send(JsonUtil.toJson(outMsg), true);
+        if (ws.isOpen()) {
+            ws.send(JsonUtil.toJson(outMsg));
+        }
     }
 
     public synchronized void tcp_sendRunData() {
