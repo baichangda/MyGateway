@@ -4,8 +4,6 @@ import com.bcd.share.support_parser.Parser;
 import com.bcd.share.support_parser.impl.gb32960.data.Packet;
 import com.bcd.share.support_parser.processor.Processor;
 import com.bcd.share.util.JsonUtil;
-import io.helidon.common.media.type.MediaType;
-import io.helidon.common.media.type.MediaTypes;
 import io.helidon.http.HeaderNames;
 import io.helidon.http.Headers;
 import io.helidon.http.HttpMediaType;
