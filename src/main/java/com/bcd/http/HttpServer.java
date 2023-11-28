@@ -4,18 +4,11 @@ import com.bcd.share.support_parser.Parser;
 import com.bcd.share.support_parser.impl.gb32960.data.Packet;
 import com.bcd.share.support_parser.processor.Processor;
 import com.bcd.share.util.JsonUtil;
-import io.helidon.http.HeaderNames;
-import io.helidon.http.Headers;
-import io.helidon.http.HttpMediaType;
-import io.helidon.http.HttpPrologue;
-import io.helidon.webserver.WebServer;
-import io.helidon.webserver.http.HttpRouting;
-import io.helidon.webserver.staticcontent.StaticContentService;
-import io.helidon.webserver.websocket.WsRouting;
-import io.helidon.websocket.WsListener;
-import io.helidon.websocket.WsUpgradeException;
+import io.jooby.Jooby;
+import io.jooby.handler.AccessLogHandler;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
+import io.netty.handler.codec.http.HttpHeaderNames;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -23,9 +16,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.Map;
-import java.util.Optional;
 
 @ConditionalOnProperty("http.port")
 @Component
@@ -37,96 +28,62 @@ public class HttpServer implements CommandLineRunner {
 
 
     @Override
-    public void run(String... args) {
+    public void run(String... args) throws Exception {
         Thread.startVirtualThread(() -> {
-            HttpRouting.Builder httpRoutingBuilder = HttpRouting.builder()
-                    .register("/gb32960", StaticContentService.builder(Paths.get("src/main/resources/http/gb32960")).welcomeFileName("index.html").contentType(".html", HttpMediaType.create("text/html;charset=utf-8")))
-//                    .register("/gb32960/*", StaticContentService.builder("http/gb32960"))
-                    .get("/parse/gb32960", (req, rep) -> {
-                        String hex = req.query().get("hex");
-                        rep.header(HeaderNames.CONTENT_TYPE, "application/json;charset=utf-8");
+            Jooby.runApp(args, app -> {
+                app.use(new AccessLogHandler());
+                //静态文件
+//            app.assets("/gb32960/*", new ClassPathAssetSource(HttpServer.class.getClassLoader(), "http/gb32960"));
+                app.assets("/gb32960/*", "src/main/resources/http/gb32960");
+                //websocket
+                app.ws("/ws/gb32960", (ctx, configurer) -> {
+                    configurer.onConnect(ws -> {
+                        String vin = ctx.query("vin").value();
+                        new WsSession(vin, ws);
+                    });
+                    configurer.onMessage((ws, message) -> {
                         try {
-                            byte[] bytes = ByteBufUtil.decodeHexDump(hex);
-                            try {
-                                Packet packet = processor.process(Unpooled.wrappedBuffer(bytes));
-                                String json = JsonUtil.toJson(packet);
-                                rep.send(JsonUtil.toJson(Map.of("data", json, "succeed", true)));
-                            } catch (Exception ex) {
-                                logger.error("parse gb32960 error:\n{}", hex, ex);
-                                rep.send(JsonUtil.toJson(Map.of("msg", "解析失败、报文不符合32960格式", "succeed", false)));
+                            WsInMsg wsInMsg = JsonUtil.GLOBAL_OBJECT_MAPPER.readValue(message.value(), WsInMsg.class);
+                            WsSession session = WsSession.getSession(ws);
+                            if (session != null) {
+                                session.ws_handleMsg(wsInMsg);
                             }
-                        } catch (Exception ex) {
-                            logger.error("parse hex error:\n{}", hex, ex);
-                            rep.send(JsonUtil.toJson(Map.of("msg", "解析失败、报文不是16进制格式", "succeed", false)));
+                        } catch (IOException ex) {
+                            logger.error("receive ws msg parse json error:\n{}", message.value());
                         }
                     });
-            WsRouting.Builder wsRoutingBuilder = WsRouting.builder().endpoint("/ws/gb32960", () -> new WsListener() {
-                private String vin;
-                private WsSession wsSession;
-                private StringBuilder sb = new StringBuilder();
-
-
-                @Override
-                public Optional<Headers> onHttpUpgrade(HttpPrologue prologue, Headers headers) throws WsUpgradeException {
-                    this.vin = prologue.query().get("vin");
-                    return WsListener.super.onHttpUpgrade(prologue, headers);
-                }
-
-                @Override
-                public void onOpen(io.helidon.websocket.WsSession session) {
-                    wsSession = new WsSession(vin, session);
-                    WsListener.super.onOpen(session);
-                }
-
-                @Override
-                public void onMessage(io.helidon.websocket.WsSession session, String text, boolean last) {
-                    final String data;
-                    if (last) {
-                        if (sb == null) {
-                            data = text;
-                        } else {
-                            sb.append(text);
-                            data = sb.toString();
-                            sb = null;
-                        }
-                    } else {
-                        if (sb == null) {
-                            sb = new StringBuilder(text);
-                        } else {
-                            sb.append(text);
-                        }
-                        data = null;
-                    }
-                    if (data != null) {
+                    configurer.onClose((ws, closeStatus) -> {
+                        WsSession session = WsSession.getSession(ws);
+                        session.ws_onClose();
+                    });
+                    configurer.onError((ws, cause) -> {
+                        logger.error("ws onError", cause);
+                        WsSession session = WsSession.getSession(ws);
+                        session.ws_onClose();
+                    });
+                });
+                //解析
+                app.get("/parse/gb32960", ctx -> {
+                    String hex = ctx.query("hex").value();
+                    ctx.setResponseHeader(HttpHeaderNames.CONTENT_TYPE.toString(), "application/json;charset=utf-8");
+                    String res;
+                    try {
+                        byte[] bytes = ByteBufUtil.decodeHexDump(hex);
                         try {
-                            WsInMsg wsInMsg = JsonUtil.GLOBAL_OBJECT_MAPPER.readValue(data, WsInMsg.class);
-                            wsSession.ws_handleMsg(wsInMsg);
-                        } catch (IOException ex) {
-                            logger.error("receive ws msg parse json error:\n{}", data);
+                            Packet packet = processor.process(Unpooled.wrappedBuffer(bytes));
+                            String json = JsonUtil.toJson(packet);
+                            res = JsonUtil.toJson(Map.of("data", json, "succeed", true));
+                        } catch (Exception ex) {
+                            logger.error("parse gb32960 error:\n{}", hex, ex);
+                            res = JsonUtil.toJson(Map.of("msg", "解析失败、报文不符合32960格式", "succeed", false));
                         }
+                        return res;
+                    } catch (Exception ex) {
+                        logger.error("parse hex error:\n{}", hex, ex);
+                        return JsonUtil.toJson(Map.of("msg", "解析失败、报文不是16进制格式", "succeed", false));
                     }
-                    WsListener.super.onMessage(session, text, last);
-                }
-
-                @Override
-                public void onClose(io.helidon.websocket.WsSession session, int status, String reason) {
-                    wsSession.ws_onClose();
-                    WsListener.super.onClose(session, status, reason);
-                }
-
-                @Override
-                public void onError(io.helidon.websocket.WsSession session, Throwable t) {
-                    wsSession.ws_onClose();
-                    WsListener.super.onError(session, t);
-                }
-
-
+                });
             });
-            WebServer.builder()
-                    .addRouting(httpRoutingBuilder)
-                    .addRouting(wsRoutingBuilder)
-                    .port(8080).build().start();
         });
-
     }
 }
