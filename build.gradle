@@ -26,7 +26,7 @@ targetCompatibility = 21
 
 repositories {
     mavenLocal()
-    maven { url "${aliyunPublic}" }
+//    maven { url "${aliyunPublic}" }
     mavenCentral()
 }
 
@@ -90,8 +90,12 @@ dependencies {
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
 
     // https://mvnrepository.com/artifact/io.jooby/jooby
-    implementation group: 'io.jooby', name: 'jooby-netty', version: "+"
+//    implementation group: 'io.jooby', name: 'jooby-netty', version: "+"
 
+    // https://mvnrepository.com/artifact/io.helidon.webserver/helidon-webserver
+    implementation group: 'io.helidon.webserver', name: 'helidon-webserver', version: "4.0.0"
+    implementation group: 'io.helidon.webserver', name: 'helidon-webserver-static-content', version: "4.0.0"
+    implementation group: 'io.helidon.webserver', name: 'helidon-webserver-websocket', version: "4.0.0"
 
 }
 
