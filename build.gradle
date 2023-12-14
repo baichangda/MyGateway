@@ -89,9 +89,6 @@ dependencies {
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-test
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
 
-    // https://mvnrepository.com/artifact/io.jooby/jooby
-//    implementation group: 'io.jooby', name: 'jooby-netty', version: "+"
-
     // https://mvnrepository.com/artifact/io.helidon.webserver/helidon-webserver
     implementation group: 'io.helidon.webserver', name: 'helidon-webserver', version: "4.0.1"
     implementation group: 'io.helidon.webserver', name: 'helidon-webserver-static-content', version: "4.0.1"
