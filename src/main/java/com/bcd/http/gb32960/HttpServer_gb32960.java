@@ -1,5 +1,7 @@
-package com.bcd.http;
+package com.bcd.http.gb32960;
 
+import com.bcd.http.WsInMsg;
+import com.bcd.http.WsSession;
 import com.bcd.share.support_parser.Parser;
 import com.bcd.share.support_parser.impl.gb32960.data.Packet;
 import com.bcd.share.support_parser.processor.Processor;
@@ -19,22 +21,16 @@ import io.netty.buffer.Unpooled;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Optional;
 
-@ConditionalOnProperty("http.port")
-@Component
-public class HttpServer implements CommandLineRunner {
-
-    static Logger logger = LoggerFactory.getLogger(HttpServer.class);
+public class HttpServer_gb32960 implements CommandLineRunner {
+    static Logger logger = LoggerFactory.getLogger(HttpServer_gb32960.class);
 
     public static Processor<Packet> processor = Parser.getProcessor(Packet.class);
-
 
     @Override
     public void run(String... args) {
@@ -52,8 +48,8 @@ public class HttpServer implements CommandLineRunner {
                                 String json = JsonUtil.toJson(packet);
                                 rep.send(JsonUtil.toJson(Map.of("data", json, "succeed", true)));
                             } catch (Exception ex) {
-                                logger.error("parse gb32960 error:\n{}", hex, ex);
-                                rep.send(JsonUtil.toJson(Map.of("msg", "解析失败、报文不符合32960格式", "succeed", false)));
+                                logger.error("parse protocol error:\n{}", hex, ex);
+                                rep.send(JsonUtil.toJson(Map.of("msg", "解析失败、报文不符合格式", "succeed", false)));
                             }
                         } catch (Exception ex) {
                             logger.error("parse hex error:\n{}", hex, ex);
@@ -62,7 +58,7 @@ public class HttpServer implements CommandLineRunner {
                     });
             WsRouting.Builder wsRoutingBuilder = WsRouting.builder().endpoint("/ws/gb32960", () -> new WsListener() {
                 private String vin;
-                private WsSession wsSession;
+                private WsSession<Packet> wsSession;
                 private StringBuilder sb = new StringBuilder();
 
 
@@ -74,7 +70,7 @@ public class HttpServer implements CommandLineRunner {
 
                 @Override
                 public void onOpen(io.helidon.websocket.WsSession session) {
-                    wsSession = new WsSession(vin, session);
+                    wsSession = new WsSession_gb32960(vin, session);
                     WsListener.super.onOpen(session);
                 }
 
@@ -107,20 +103,16 @@ public class HttpServer implements CommandLineRunner {
                     }
                     WsListener.super.onMessage(session, text, last);
                 }
-
                 @Override
                 public void onClose(io.helidon.websocket.WsSession session, int status, String reason) {
                     wsSession.ws_onClose();
                     WsListener.super.onClose(session, status, reason);
                 }
-
                 @Override
                 public void onError(io.helidon.websocket.WsSession session, Throwable t) {
                     wsSession.ws_onClose();
                     WsListener.super.onError(session, t);
                 }
-
-
             });
             WebServer.builder()
                     .addRouting(httpRoutingBuilder)

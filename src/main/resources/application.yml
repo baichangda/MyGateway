@@ -73,11 +73,11 @@ tcp:
   sessionTopic: bcd-gw-session
 http:
   port: 8888
-#pt:
-#  period: 10
-#  startIndex: 0
-#  num: 100
-#  server: 127.0.0.1:6666
+pt:
+  period: 10
+  startIndex: 0
+  num: 100
+  server: 127.0.0.1:6666
 mongodbs: mongodb://10.0.11.50:27017/rvm2_1,mongodb://10.0.11.50:27017/rvm2_2,mongodb://10.0.11.50:27017/rvm2_3
 
 

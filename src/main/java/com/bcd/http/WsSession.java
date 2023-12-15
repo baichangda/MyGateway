@@ -1,13 +1,10 @@
 package com.bcd.http;
 
 import com.bcd.share.exception.BaseRuntimeException;
-import com.bcd.share.support_parser.impl.gb32960.data.Packet;
-import com.bcd.share.support_parser.impl.gb32960.data.VehicleRunData;
 import com.bcd.share.util.JsonUtil;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
@@ -19,43 +16,31 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-public class WsSession {
+public abstract class WsSession<T> {
     static Logger logger = LoggerFactory.getLogger(WsSession.class);
-
-    private final static String sample = "232302FE4C534A4533363039364D53313430343935010141170608100A10010103010040000003520F2827811C012E2000000002010101594FDB4E2F4A0F3227100500073944E501DD620A0601090E1B01370E14010145010444070300021387000000000801010F282781006C00016C0E180E190E1A0E190E190E180E180E1A0E1B0E180E190E1A0E180E180E190E1A0E1A0E190E180E1A0E180E1A0E1A0E180E170E190E170E190E170E190E1B0E190E190E190E180E180E170E170E180E170E170E170E190E170E180E170E190E170E170E170E180E180E190E190E140E180E180E170E170E150E160E160E180E190E170E180E170E180E170E180E170E160E190E150E180E160E180E170E160E160E170E150E170E170E140E170E160E160E170E170E170E170E160E170E160E170E140E170E170E160E160E170E170E170E160E160E160E16090101000C454545444544444445444544F5";
-    static ScheduledExecutorService pool = Executors.newSingleThreadScheduledExecutor();
+    static NioEventLoopGroup tcp_workerGroup = new NioEventLoopGroup();
+    private ScheduledExecutorService pool;
 
     public final String vin;
     public final io.helidon.websocket.WsSession ws;
     public Channel channel;
-    public Packet packet;
-    public ScheduledFuture<?> scheduledFuture;
-
-    static NioEventLoopGroup tcp_workerGroup = new NioEventLoopGroup();
-
+    public volatile T sample;
+    public final Class<T> sampleClazz;
     public WsSession(String vin, io.helidon.websocket.WsSession ws) {
         this.vin = vin;
         this.ws = ws;
-        ws_onConnect(vin);
-    }
-
-
-    public synchronized void ws_onConnect(String vin) {
-        byte[] bytes = ByteBufUtil.decodeHexDump(sample);
-        packet = HttpServer.processor.process(Unpooled.wrappedBuffer(bytes));
-        packet.vin = vin;
-        ws_send(new WsOutMsg(101, JsonUtil.toJson(packet.data), true));
+        this.sample = initSample(vin);
+        this.sampleClazz = (Class<T>) this.sample.getClass();
+        ws_send(new WsOutMsg(101, JsonUtil.toJson(sample), true));
     }
 
     public synchronized void ws_onClose() {
-        if (scheduledFuture != null) {
-            scheduledFuture.cancel(false);
+        if (pool != null) {
+            pool.shutdown();
         }
         if (channel != null) {
             channel.close();
@@ -78,7 +63,7 @@ public class WsSession {
             }
             case 2 -> {
                 try {
-                    packet.data = JsonUtil.GLOBAL_OBJECT_MAPPER.readValue(inMsg.data(), VehicleRunData.class);
+                    sample = JsonUtil.GLOBAL_OBJECT_MAPPER.readValue(inMsg.data(), sampleClazz);
                     ws_send(new WsOutMsg(2, null, true));
                 } catch (IOException ex) {
                     logger.error("error", ex);
@@ -89,7 +74,7 @@ public class WsSession {
     }
 
     public synchronized void tcp_connect(String host, int port) {
-        final WsSession wsSession = this;
+        final WsSession<T> wsSession = this;
         Bootstrap bootstrap = new Bootstrap();
         bootstrap.group(tcp_workerGroup);
         bootstrap.channel(NioSocketChannel.class).option(ChannelOption.TCP_NODELAY, true);
@@ -108,10 +93,10 @@ public class WsSession {
     }
 
     public synchronized void tcp_onDisConnect() {
-        if (scheduledFuture != null) {
-            scheduledFuture.cancel(false);
+        if (pool != null) {
+            pool.shutdown();
         }
-        scheduledFuture = null;
+        pool = null;
         channel = null;
         ws_send(new WsOutMsg(104, null, true));
     }
@@ -125,9 +110,7 @@ public class WsSession {
     }
 
     public synchronized void tcp_sendRunData() {
-        ByteBuf buffer = Unpooled.buffer();
-        ((VehicleRunData) packet.data).collectTime = new Date();
-        HttpServer.processor.deProcess(buffer, packet);
+        ByteBuf buffer = toByteBuf(sample, System.currentTimeMillis());
         String hex = ByteBufUtil.hexDump(buffer);
         try {
             channel.writeAndFlush(buffer).sync();
@@ -138,8 +121,13 @@ public class WsSession {
     }
 
     public synchronized void tcp_startSendRunData() {
-        scheduledFuture = pool.scheduleAtFixedRate(this::tcp_sendRunData, 1, 10, TimeUnit.SECONDS);
+        pool = Executors.newSingleThreadScheduledExecutor();
+        pool.scheduleAtFixedRate(this::tcp_sendRunData, 1, 10, TimeUnit.SECONDS);
     }
 
+
+    public abstract T initSample(String vin);
+
+    public abstract ByteBuf toByteBuf(T sample, long ts);
 
 }
