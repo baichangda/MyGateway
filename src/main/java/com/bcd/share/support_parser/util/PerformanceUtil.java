@@ -12,6 +12,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.LongAdder;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 @SuppressWarnings("unchecked")
 public class PerformanceUtil {
@@ -22,12 +24,11 @@ public class PerformanceUtil {
      * 测试多线程
      *
      * @param bytes
-     * @param clazz
      * @param threadNum
      * @param num
      * @param <T>
      */
-    public static <T> void testMultiThreadPerformance(byte[] bytes, Class<T> clazz, int threadNum, int num, boolean parse) {
+    public static <T> void testMultiThreadPerformance(byte[] bytes, int threadNum, int num, Function<ByteBuf, T> parseFunc, BiConsumer<ByteBuf, T> deParseConsumer, boolean parse) {
         final LongAdder count = new LongAdder();
         final ExecutorService[] pools = new ExecutorService[threadNum];
         for (int i = 0; i < pools.length; i++) {
@@ -36,16 +37,15 @@ public class PerformanceUtil {
         if (parse) {
             for (int i = 0; i < pools.length; i++) {
                 pools[i].execute(() -> {
-                    testParse(bytes, clazz, num, count);
+                    testParse(bytes, num, count, parseFunc);
                 });
             }
         } else {
-            Processor<T> processor = Parser.getProcessor(clazz);
             final ByteBuf buf = Unpooled.wrappedBuffer(bytes);
-            final T t = processor.process(buf);
+            final T t = parseFunc.apply(buf);
             for (int i = 0; i < pools.length; i++) {
                 pools[i].execute(() -> {
-                    testDeParse(t, num, count);
+                    testDeParse(t, num, count,deParseConsumer);
                 });
             }
         }
@@ -73,28 +73,26 @@ public class PerformanceUtil {
         }
     }
 
-    public static <T> void testParse(byte[] bytes, Class<T> clazz, int num, LongAdder count) {
+    public static <T> void testParse(byte[] bytes, int num, LongAdder count, Function<ByteBuf, T> parseFunc) {
         ByteBuf byteBuf = Unpooled.wrappedBuffer(bytes);
         byteBuf.markReaderIndex();
         byteBuf.markWriterIndex();
-        Processor<T> processor = Parser.getProcessor(clazz);
         for (int i = 1; i <= num; i++) {
             byteBuf.resetReaderIndex();
             byteBuf.resetWriterIndex();
-            final T t = processor.process(byteBuf);
+            final T t = parseFunc.apply(byteBuf);
             count.increment();
         }
     }
 
-    public static <T> void testDeParse(T obj, int num, LongAdder count) {
+    public static <T> void testDeParse(T obj, int num, LongAdder count, BiConsumer<ByteBuf, T> deParseConsumer) {
         ByteBuf byteBuf = Unpooled.buffer();
         byteBuf.markReaderIndex();
         byteBuf.markWriterIndex();
-        Processor<T> processor = Parser.getProcessor((Class<T>) obj.getClass());
         for (int i = 1; i <= num; i++) {
             byteBuf.resetReaderIndex();
             byteBuf.resetWriterIndex();
-            processor.deProcess(byteBuf, obj);
+            deParseConsumer.accept(byteBuf, obj);
             count.increment();
         }
     }

@@ -1,7 +1,10 @@
 package com.bcd.share.support_parser.impl.gb32960.data;
 
+import com.bcd.share.support_parser.Parser;
 import com.bcd.share.support_parser.anno.*;
 import com.bcd.share.support_parser.impl.gb32960.processor.PacketDataFieldProcessor;
+import com.bcd.share.support_parser.processor.Processor;
+import io.netty.buffer.ByteBuf;
 
 
 public class Packet {
@@ -34,4 +37,14 @@ public class Packet {
     //异或校验位
     @F_num(type = NumType.uint8)
     public byte code;
+
+
+    static final Processor<Packet> processor = Parser.getProcessor(Packet.class);
+
+    public static Packet read(ByteBuf data) {
+        return processor.process(data);
+    }
+    public void write(ByteBuf data) {
+        processor.deProcess(data, this);
+    }
 }

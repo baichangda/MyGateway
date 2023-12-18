@@ -45,6 +45,7 @@ public class Parser_jtt808_test {
         int threadNum = 1;
         logger.info("param threadNum[{}]", threadNum);
         int num = 1000000000;
-        PerformanceUtil.testMultiThreadPerformance(ByteBufUtil.decodeHexDump(data), Packet.class, threadNum, num, true);
+        Processor<Packet> processor = Parser.getProcessor(Packet.class);
+        PerformanceUtil.testMultiThreadPerformance(ByteBufUtil.decodeHexDump(data), threadNum, num, processor::process, processor::deProcess, true);
     }
 }

@@ -39,12 +39,10 @@ public class Parser_someip_test {
         Parser.enablePrintBuildLog();
         Parser.enableGenerateClassFile();
         String hex = "000100e4000000ac0009000a0304000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000a1";
-
         int threadNum = 1;
         logger.info("param threadNum[{}]", threadNum);
         int num = 1000000000;
-
-        PerformanceUtil.testMultiThreadPerformance(ByteBufUtil.decodeHexDump(hex), Packet.class, threadNum, num, true);
-
+        Processor<Packet> processor = Parser.getProcessor(Packet.class);
+        PerformanceUtil.testMultiThreadPerformance(ByteBufUtil.decodeHexDump(hex), threadNum, num, processor::process, processor::deProcess, true);
     }
 }

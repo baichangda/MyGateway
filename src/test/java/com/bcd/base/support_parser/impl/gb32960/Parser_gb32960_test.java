@@ -2,7 +2,6 @@ package com.bcd.base.support_parser.impl.gb32960;
 
 import com.bcd.share.support_parser.Parser;
 import com.bcd.share.support_parser.impl.gb32960.data.Packet;
-import com.bcd.share.support_parser.processor.Processor;
 import com.bcd.share.support_parser.util.PerformanceUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
@@ -33,10 +32,9 @@ public class Parser_gb32960_test {
         data = data.replaceAll(" ", "");
         byte[] bytes = ByteBufUtil.decodeHexDump(data);
         ByteBuf byteBuf = Unpooled.wrappedBuffer(bytes);
-        final Processor<Packet> processor = Parser.getProcessor(Packet.class);
-        Packet packet = processor.process(byteBuf);
+        Packet packet = Packet.read(byteBuf);
         ByteBuf dest = Unpooled.buffer();
-        processor.deProcess(dest, packet);
+        packet.write(dest);
         logger.info(data.toUpperCase());
         logger.info(ByteBufUtil.hexDump(dest).toUpperCase());
         assert data.equalsIgnoreCase(ByteBufUtil.hexDump(dest));
@@ -50,6 +48,6 @@ public class Parser_gb32960_test {
         int threadNum = 1;
         logger.info("param threadNum[{}]", threadNum);
         int num = 1000000000;
-        PerformanceUtil.testMultiThreadPerformance(ByteBufUtil.decodeHexDump(data), Packet.class, threadNum, num, true);
+        PerformanceUtil.testMultiThreadPerformance(ByteBufUtil.decodeHexDump(data), threadNum, num, Packet::read, (buf, instance) -> instance.write(buf), true);
     }
 }
