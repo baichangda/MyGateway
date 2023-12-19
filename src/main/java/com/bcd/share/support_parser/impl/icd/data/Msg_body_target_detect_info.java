@@ -18,7 +18,7 @@ public class Msg_body_target_detect_info implements Msg_body {
     @F_num(type = NumType.uint16, var = 'b')
     public int target_count;
 
-    @F_skip(len = 64, mode = SkipMode.reservedFromStart)
+    @F_skip(len = 56)
     public byte reserved;
     @F_num_array(lenExpr = "a", singleType = NumType.uint32)
     public long[] src_array;

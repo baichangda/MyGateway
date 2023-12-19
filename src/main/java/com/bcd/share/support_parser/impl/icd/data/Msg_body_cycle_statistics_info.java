@@ -18,7 +18,7 @@ public class Msg_body_cycle_statistics_info implements Msg_body {
     public int src_count;
     @F_num(type = NumType.uint8, var = 'b')
     public short lane_count;
-    @F_skip(len = 32, mode = SkipMode.reservedFromStart)
+    @F_skip(len = 24)
     public byte reserved;
     @F_num_array(lenExpr = "a", singleType = NumType.uint32)
     public long[] src_array;

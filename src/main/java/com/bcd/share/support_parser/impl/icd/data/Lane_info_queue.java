@@ -1,10 +1,10 @@
 package com.bcd.share.support_parser.impl.icd.data;
 
+import com.bcd.share.support_parser.anno.C_skip;
 import com.bcd.share.support_parser.anno.F_num;
-import com.bcd.share.support_parser.anno.F_skip;
 import com.bcd.share.support_parser.anno.NumType;
-import com.bcd.share.support_parser.anno.SkipMode;
 
+@C_skip(len = 16)
 public class Lane_info_queue {
     @F_num(type = NumType.uint8)
     public short lane_id;
@@ -16,6 +16,4 @@ public class Lane_info_queue {
     public int tail_car_pos;
     @F_num(type = NumType.uint16)
     public int car_count;
-    @F_skip(mode = SkipMode.reservedFromStart, len = 16)
-    public byte reserved;
 }

@@ -5,6 +5,7 @@ import com.bcd.share.support_parser.anno.*;
 
 import java.util.Date;
 
+@C_skip(len = 128)
 public class Msg_header {
     @F_num_array(len = 4, singleType = NumType.uint8)
     public byte[] header;
@@ -33,6 +34,4 @@ public class Msg_header {
     @F_num(type = NumType.uint16,  valExpr = "x/100")
     public float dev_azimuth;
 
-    @F_skip(mode = SkipMode.reservedFromStart, len = 128)
-    public byte reserved;
 }

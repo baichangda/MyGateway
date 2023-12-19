@@ -1,10 +1,10 @@
 package com.bcd.share.support_parser.impl.icd.data;
 
+import com.bcd.share.support_parser.anno.C_skip;
 import com.bcd.share.support_parser.anno.F_num;
-import com.bcd.share.support_parser.anno.F_skip;
 import com.bcd.share.support_parser.anno.NumType;
-import com.bcd.share.support_parser.anno.SkipMode;
 
+@C_skip(len = 32)
 public class Dev_func_list {
     @F_num(type = NumType.uint8)
     public byte target_detection;
@@ -24,6 +24,4 @@ public class Dev_func_list {
     public byte status_monitor;
     @F_num(type = NumType.uint8)
     public byte environment_monitor;
-    @F_skip(mode = SkipMode.reservedFromStart, len = 32)
-    public byte reserved;
 }

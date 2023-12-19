@@ -94,6 +94,11 @@ public class Parser {
 
     public static void withDefaultLogCollector_parse() {
         logCollector_parse = new LogCollector_parse() {
+
+            public void collect_field() {
+
+            }
+
             @Override
             public void collect_field(Class<?> clazz, Class<?> fieldDeclaringClass, String fieldName, byte[] content, Object val, String processorClassName) {
                 logger.info("--parse field{}--[{}].[{}] [{}]->[{}]"
@@ -115,6 +120,11 @@ public class Parser {
                             , val
                             , log.msg());
                 }
+            }
+
+            @Override
+            public void collect_class(Class<?> clazz, String msg) {
+                logger.info("--parse class[{}] {}", clazz.getName(), msg);
             }
         };
 
@@ -143,6 +153,11 @@ public class Parser {
                             , log.msg());
                 }
             }
+
+            @Override
+            public void collect_class(Class<?> clazz, String msg) {
+                logger.info("--deParse class[{}] {}", clazz.getName(), msg);
+            }
         };
     }
 
@@ -166,7 +181,7 @@ public class Parser {
             Field field = fieldList.get(i);
             context.field = field;
             context.fieldIndex = i;
-            boolean logBit = field.isAnnotationPresent(F_bit_num.class) || field.isAnnotationPresent(F_skip.class);
+            boolean logBit = field.isAnnotationPresent(F_bit_num.class) || field.isAnnotationPresent(F_bit_skip.class);
             if (logCollector_parse != null) {
                 if (!logBit) {
                     ParseUtil.prependLogCode_parse(context);
@@ -204,13 +219,12 @@ public class Parser {
             Field field = fieldList.get(i);
             context.field = field;
             context.fieldIndex = i;
-            boolean logBit = field.isAnnotationPresent(F_bit_num.class) || field.isAnnotationPresent(F_skip.class);
+            boolean logBit = field.isAnnotationPresent(F_bit_num.class) || field.isAnnotationPresent(F_bit_skip.class);
             try {
                 if (logCollector_deParse != null) {
                     if (!logBit) {
                         ParseUtil.prependLogCode_deParse(context);
                     }
-
                 }
                 for (Map.Entry<Class<? extends Annotation>, FieldBuilder> entry : anno_fieldBuilder.entrySet()) {
                     Class<? extends Annotation> annoClass = entry.getKey();
@@ -298,20 +312,41 @@ public class Parser {
         StringBuilder processBody = new StringBuilder();
         processBody.append("\n{\n");
         ParseUtil.append(processBody, "final {} {}=new {}();\n", clazzName, FieldBuilder.varNameInstance, clazzName);
-        boolean hasFieldSkipModeReserved = Arrays.stream(clazz.getDeclaredFields()).anyMatch(e -> {
-            final F_skip f_skip = e.getAnnotation(F_skip.class);
-            if (f_skip == null) {
-                return false;
-            } else {
-                return f_skip.mode() == SkipMode.reservedFromStart;
-            }
-        });
-        if (hasFieldSkipModeReserved) {
+
+        /**
+         * 处理
+         * {@link C_skip}
+         */
+        C_skip c_skip = clazz.getAnnotation(C_skip.class);
+        if (c_skip != null) {
             ParseUtil.append(processBody, "final int {}={}.readerIndex();\n", FieldBuilder.varNameStartIndex, FieldBuilder.varNameByteBuf);
         }
+
+
         final List<Field> fieldList = ParseUtil.getParseFields(clazz);
         BuilderContext parseBuilderContext = new BuilderContext(processBody, clazz, cc, classVarDefineToVarName, beanClassAndOrder_processorVarName, byteOrder, bitOrder, customize_processorId_processorVarName, fieldList);
         buildMethodBody_process(parseBuilderContext);
+
+        /**
+         * 处理
+         * {@link C_skip}
+         */
+        if (c_skip != null) {
+            String lenValCode;
+            if (c_skip.len() == 0) {
+                lenValCode = ParseUtil.replaceLenExprToCode(c_skip.lenExpr(), parseBuilderContext.varToFieldName, clazz);
+            } else {
+                lenValCode = c_skip.len() + "";
+            }
+            ParseUtil.append(processBody, "final int {}={}-{}.readerIndex()+{};\n", FieldBuilder.varNameShouldSkip, lenValCode, FieldBuilder.varNameByteBuf, FieldBuilder.varNameStartIndex);
+            ParseUtil.append(processBody, "if({}>0){\n", FieldBuilder.varNameShouldSkip);
+            ParseUtil.append(processBody, "{}.skipBytes({});\n", FieldBuilder.varNameByteBuf, FieldBuilder.varNameShouldSkip);
+            if (logCollector_parse != null) {
+                ParseUtil.append(processBody, "{}.logCollector_parse.collect_class({}.class,\"skip[\"+{}+\"]\");\n", Parser.class.getName(), clazzName, FieldBuilder.varNameShouldSkip);
+            }
+            ParseUtil.append(processBody, "}\n");
+        }
+
         ParseUtil.append(processBody, "return {};\n", FieldBuilder.varNameInstance);
         processBody.append("}");
         if (printBuildLog) {
@@ -334,11 +369,39 @@ public class Parser {
         StringBuilder deProcessBody = new StringBuilder();
         deProcessBody.append("\n{\n");
         ParseUtil.append(deProcessBody, "final {} {}=({})$3;\n", clazzName, FieldBuilder.varNameInstance, clazzName);
-        if (hasFieldSkipModeReserved) {
+
+        /**
+         * 处理
+         * {@link C_skip}
+         */
+        if (c_skip != null) {
             ParseUtil.append(deProcessBody, "final int {}={}.writerIndex();\n", FieldBuilder.varNameStartIndex, FieldBuilder.varNameByteBuf);
         }
+
+
         BuilderContext deParseBuilderContext = new BuilderContext(deProcessBody, clazz, cc, classVarDefineToVarName, beanClassAndOrder_processorVarName, byteOrder, bitOrder, customize_processorId_processorVarName, fieldList);
         buildMethodBody_deProcess(deParseBuilderContext);
+
+        /**
+         * 处理
+         * {@link C_skip}
+         */
+        if (c_skip != null) {
+            String lenValCode;
+            if (c_skip.len() == 0) {
+                lenValCode = ParseUtil.replaceLenExprToCode(c_skip.lenExpr(), parseBuilderContext.varToFieldName, clazz);
+            } else {
+                lenValCode = c_skip.len() + "";
+            }
+            ParseUtil.append(deProcessBody, "final int {}={}-{}.writerIndex()+{};\n", FieldBuilder.varNameShouldSkip, lenValCode, FieldBuilder.varNameByteBuf, FieldBuilder.varNameStartIndex);
+            ParseUtil.append(deProcessBody, "if({}>0){\n", FieldBuilder.varNameShouldSkip);
+            ParseUtil.append(deProcessBody, "{}.writeZero({});\n", FieldBuilder.varNameByteBuf, FieldBuilder.varNameShouldSkip);
+            if (logCollector_parse != null) {
+                ParseUtil.append(processBody, "{}.logCollector_deParse.collect_class({}.class,\"skip[\"+{}+\"]\");\n", Parser.class.getName(), clazzName, FieldBuilder.varNameShouldSkip);
+            }
+            ParseUtil.append(deProcessBody, "}\n");
+        }
+
         deProcessBody.append("}");
         if (printBuildLog) {
             logger.info("\n-----------class[{}] deProcess-----------{}\n", clazz.getName(), deProcessBody.toString());
@@ -419,6 +482,16 @@ public class Parser {
          * @param processorClassName  解析器类名
          */
         void collect_field_bit(Class<?> clazz, Class<?> fieldDeclaringClass, String fieldName, BitBuf_reader_log.Log[] logs, Object val, String processorClassName);
+
+
+        /**
+         * 收集类解析的详情
+         * 用于{@link C_skip}
+         *
+         * @param clazz
+         * @param msg
+         */
+        void collect_class(Class<?> clazz, String msg);
     }
 
 
@@ -446,5 +519,14 @@ public class Parser {
          * @param processorClassName  解析器类名
          */
         void collect_field_bit(Class<?> clazz, Class<?> fieldDeclaringClass, String fieldName, Object val, BitBuf_writer_log.Log[] logs, String processorClassName);
+
+        /**
+         * 收集类解析的详情
+         * 用于{@link C_skip}
+         *
+         * @param clazz
+         * @param msg
+         */
+        void collect_class(Class<?> clazz, String msg);
     }
 }

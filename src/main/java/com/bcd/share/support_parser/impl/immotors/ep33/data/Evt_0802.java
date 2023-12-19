@@ -11,6 +11,4 @@ public class Evt_0802 extends Evt_2_6 {
     public double VehSpdAvgDrvn;
     @F_bit_num(len = 1)
     public byte VehSpdAvgDrvnV;
-    @F_skip(len = 4)
-    public byte skip;
 }

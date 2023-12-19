@@ -3,6 +3,7 @@ package com.bcd.share.support_parser.impl.icd.data;
 
 import com.bcd.share.support_parser.anno.*;
 
+@C_skip(len = 32)
 public class Dev_hw_list {
     @F_string(len = 16)
     public String computing_power;
@@ -18,9 +19,5 @@ public class Dev_hw_list {
 
     @F_num(type = NumType.uint16)
     public int bandwidth;
-
-    @F_skip(mode = SkipMode.reservedFromStart, len = 32)
-    public byte reserved;
-
 
 }

@@ -4,6 +4,7 @@ package com.bcd.share.support_parser.impl.icd.data;
 import com.bcd.share.support_parser.anno.*;
 import com.bcd.share.support_parser.impl.icd.processor.Target_info_extras_processor;
 
+@C_skip(len = 128)
 public class Target_info {
     @F_num(type = NumType.uint16)
     public int target_num;
@@ -65,8 +66,5 @@ public class Target_info {
 
     @F_customize(processorClass = Target_info_extras_processor.class)
     public Target_info_extras extras;
-
-    @F_skip(mode = SkipMode.reservedFromStart, len = 128)
-    public byte reserved;
 
 }

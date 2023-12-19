@@ -3,6 +3,7 @@ package com.bcd.share.support_parser.impl.icd.data;
 
 import com.bcd.share.support_parser.anno.*;
 
+@C_skip(len = 128)
 public class Msg_body_device_status_info implements Msg_body {
     @F_num(type = NumType.uint32)
     public long dev_sn;
@@ -15,6 +16,4 @@ public class Msg_body_device_status_info implements Msg_body {
     @F_bean
     public Dev_func_list dev_func_list;
 
-    @F_skip(mode = SkipMode.reservedFromStart, len = 128)
-    public byte reserved;
 }

@@ -12,6 +12,4 @@ public class Evt_0803 extends Evt_2_6 {
     public byte VehOdoV;
     @F_bit_num(len = 1)
     public byte BrkPdlPosV;
-    @F_skip(len = 2)
-    public byte skip;
 }

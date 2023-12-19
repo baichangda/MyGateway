@@ -2,7 +2,6 @@ package com.bcd.share.support_parser.builder;
 
 
 import com.bcd.share.exception.BaseRuntimeException;
-import com.bcd.share.support_parser.anno.F_num_array;
 import com.bcd.share.support_parser.anno.F_skip;
 import com.bcd.share.support_parser.util.ParseUtil;
 
@@ -26,18 +25,8 @@ public class FieldBuilder__F_skip extends FieldBuilder {
         } else {
             lenValCode = anno.len() + "";
         }
-        switch (anno.mode()) {
-            case skip -> {
-                ParseUtil.append(body, "{}.skipBytes({});\n", varNameByteBuf, lenValCode);
-            }
-            case reservedFromStart -> {
-                final String skipVarName = varNameField + "_skip";
-                ParseUtil.append(body, "final int {}={}-{}.readerIndex()+{};\n", skipVarName, lenValCode, varNameByteBuf, varNameStartIndex);
-                ParseUtil.append(body, "if({}>0){\n", skipVarName);
-                ParseUtil.append(body, "{}.skipBytes({});\n", varNameByteBuf, skipVarName);
-                ParseUtil.append(body, "}\n");
-            }
-        }
+
+        ParseUtil.append(body, "{}.skipBytes({});\n", varNameByteBuf, lenValCode);
     }
 
     @Override
@@ -57,18 +46,8 @@ public class FieldBuilder__F_skip extends FieldBuilder {
         } else {
             lenValCode = anno.len() + "";
         }
-        switch (anno.mode()) {
-            case skip -> {
-                ParseUtil.append(body, "{}.writeBytes(new byte[{}]);\n", varNameByteBuf, lenValCode);
-            }
-            case reservedFromStart -> {
-                final String skipVarName = varNameField + "_skip";
-                ParseUtil.append(body, "final int {}={}-{}.writerIndex()+{};\n", skipVarName, lenValCode, varNameByteBuf, varNameStartIndex);
-                ParseUtil.append(body, "if({}>0){\n", skipVarName);
-                ParseUtil.append(body, "{}.writeZero({});\n", varNameByteBuf, skipVarName);
-                ParseUtil.append(body, "}\n");
-            }
-        }
+
+        ParseUtil.append(body, "{}.writeBytes(new byte[{}]);\n", varNameByteBuf, lenValCode);
 
     }
 

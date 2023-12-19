@@ -13,6 +13,4 @@ public class Evt_D00A extends Evt_4_x {
     public String EsimIccid;
     @F_string(len = 32)
     public String EsimID;
-
-
 }

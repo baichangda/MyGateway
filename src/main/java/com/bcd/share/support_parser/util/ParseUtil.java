@@ -332,6 +332,24 @@ public class ParseUtil {
         return sb.toString();
     }
 
+    public static String replaceLenExprToCode(final String lenExpr, final Map<Character, String> map,Class<?> clazz) {
+        final StringBuilder sb = new StringBuilder();
+        final char[] chars = lenExpr.toCharArray();
+        for (char c : chars) {
+            if (c != '+' && c != '-' && c != '*' && c != '/' && !Character.isDigit(c)) {
+                final String s = map.get(c);
+                if (s == null) {
+                    throw BaseRuntimeException.getException("class[{}] c_skip lenExpr[{}] can't find char[{}] value", clazz.getName(), lenExpr, c);
+                }
+                //所有的len字段必须转化为int运算
+                sb.append("(int)(").append(s).append(")");
+            } else {
+                sb.append(c);
+            }
+        }
+        return sb.toString();
+    }
+
     /**
      * 将信息转换为格式化
      * 使用方式和sl4j log一样、例如

@@ -17,7 +17,7 @@ public class Msg_body_lane_detect_info implements Msg_body {
     public int src_count;
     @F_num(type = NumType.uint32, var = 'b')
     public long road_count;
-    @F_skip(len = 32, mode = SkipMode.reservedFromStart)
+    @F_skip(len = 22)
     public byte reserved;
     @F_num_array(lenExpr = "a", singleType = NumType.uint32)
     public long[] src_array;
