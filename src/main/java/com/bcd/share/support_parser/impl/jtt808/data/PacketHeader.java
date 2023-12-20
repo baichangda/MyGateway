@@ -18,7 +18,7 @@ public class PacketHeader {
     @F_bit_num_easy(bitStart = 10, bitEnd = 13)
     public byte encryptType;
     //消息体属性-消息体长度
-    @F_bit_num_easy(bitStart = 0, bitEnd = 10, end = true)
+    @F_bit_num_easy(bitStart = 0, bitEnd = 10)
     public int msgLen;
     //协议版本号
     @F_num(type = NumType.uint8)

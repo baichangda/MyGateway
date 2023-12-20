@@ -11,5 +11,4 @@ public enum NumType {
     int64,
     float32,
     float64,
-    Default,
 }

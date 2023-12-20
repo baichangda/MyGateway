@@ -312,39 +312,52 @@ public class Parser {
         StringBuilder processBody = new StringBuilder();
         processBody.append("\n{\n");
         ParseUtil.append(processBody, "final {} {}=new {}();\n", clazzName, FieldBuilder.varNameInstance, clazzName);
-
-        /**
-         * 处理
-         * {@link C_skip}
-         */
-        C_skip c_skip = clazz.getAnnotation(C_skip.class);
-        if (c_skip != null) {
-            ParseUtil.append(processBody, "final int {}={}.readerIndex();\n", FieldBuilder.varNameStartIndex, FieldBuilder.varNameByteBuf);
-        }
-
-
         final List<Field> fieldList = ParseUtil.getParseFields(clazz);
         BuilderContext parseBuilderContext = new BuilderContext(processBody, clazz, cc, classVarDefineToVarName, beanClassAndOrder_processorVarName, byteOrder, bitOrder, customize_processorId_processorVarName, fieldList);
-        buildMethodBody_process(parseBuilderContext);
 
         /**
-         * 处理
-         * {@link C_skip}
+         * -2:没有c_skip注解
+         * -1:使用变量skip
+         * 其他:硬编码skip
          */
+        int skipNum = -2;
+        C_skip c_skip = clazz.getAnnotation(C_skip.class);
         if (c_skip != null) {
-            String lenValCode;
-            if (c_skip.len() == 0) {
-                lenValCode = ParseUtil.replaceLenExprToCode(c_skip.lenExpr(), parseBuilderContext.varToFieldName, clazz);
+            if (c_skip.len() > 0) {
+                int classByteLen = ParseUtil.getClassByteLenIfPossible(clazz);
+                skipNum = c_skip.len() - classByteLen;
             } else {
-                lenValCode = c_skip.len() + "";
+                skipNum = -1;
             }
-            ParseUtil.append(processBody, "final int {}={}-{}.readerIndex()+{};\n", FieldBuilder.varNameShouldSkip, lenValCode, FieldBuilder.varNameByteBuf, FieldBuilder.varNameStartIndex);
-            ParseUtil.append(processBody, "if({}>0){\n", FieldBuilder.varNameShouldSkip);
-            ParseUtil.append(processBody, "{}.skipBytes({});\n", FieldBuilder.varNameByteBuf, FieldBuilder.varNameShouldSkip);
-            if (logCollector_parse != null) {
-                ParseUtil.append(processBody, "{}.logCollector_parse.collect_class({}.class,\"skip[\"+{}+\"]\");\n", Parser.class.getName(), clazzName, FieldBuilder.varNameShouldSkip);
+        }
+        switch (skipNum) {
+            case -2 -> buildMethodBody_process(parseBuilderContext);
+            case -1 -> {
+                ParseUtil.append(processBody, "final int {}={}.readerIndex();\n", FieldBuilder.varNameStartIndex, FieldBuilder.varNameByteBuf);
+                buildMethodBody_process(parseBuilderContext);
+                String lenValCode;
+                if (c_skip.len() == 0) {
+                    lenValCode = ParseUtil.replaceLenExprToCode(c_skip.lenExpr(), parseBuilderContext.varToFieldName, clazz);
+                } else {
+                    lenValCode = c_skip.len() + "";
+                }
+                ParseUtil.append(processBody, "final int {}={}-{}.readerIndex()+{};\n", FieldBuilder.varNameShouldSkip, lenValCode, FieldBuilder.varNameByteBuf, FieldBuilder.varNameStartIndex);
+                ParseUtil.append(processBody, "if({}>0){\n", FieldBuilder.varNameShouldSkip);
+                ParseUtil.append(processBody, "{}.skipBytes({});\n", FieldBuilder.varNameByteBuf, FieldBuilder.varNameShouldSkip);
+                if (logCollector_parse != null) {
+                    ParseUtil.append(processBody, "{}.logCollector_parse.collect_class({}.class,\"@C_skip skip[\"+{}+\"]\");\n", Parser.class.getName(), clazzName, FieldBuilder.varNameShouldSkip);
+                }
+                ParseUtil.append(processBody, "}\n");
             }
-            ParseUtil.append(processBody, "}\n");
+            default -> {
+                buildMethodBody_process(parseBuilderContext);
+                if (skipNum > 0) {
+                    ParseUtil.append(processBody, "{}.skipBytes({});\n", FieldBuilder.varNameByteBuf, skipNum);
+                    if (logCollector_parse != null) {
+                        ParseUtil.append(processBody, "{}.logCollector_parse.collect_class({}.class,\"@C_skip skip[{}]\");\n", Parser.class.getName(), clazzName, skipNum);
+                    }
+                }
+            }
         }
 
         ParseUtil.append(processBody, "return {};\n", FieldBuilder.varNameInstance);
@@ -369,37 +382,36 @@ public class Parser {
         StringBuilder deProcessBody = new StringBuilder();
         deProcessBody.append("\n{\n");
         ParseUtil.append(deProcessBody, "final {} {}=({})$3;\n", clazzName, FieldBuilder.varNameInstance, clazzName);
-
-        /**
-         * 处理
-         * {@link C_skip}
-         */
-        if (c_skip != null) {
-            ParseUtil.append(deProcessBody, "final int {}={}.writerIndex();\n", FieldBuilder.varNameStartIndex, FieldBuilder.varNameByteBuf);
-        }
-
-
         BuilderContext deParseBuilderContext = new BuilderContext(deProcessBody, clazz, cc, classVarDefineToVarName, beanClassAndOrder_processorVarName, byteOrder, bitOrder, customize_processorId_processorVarName, fieldList);
-        buildMethodBody_deProcess(deParseBuilderContext);
 
-        /**
-         * 处理
-         * {@link C_skip}
-         */
-        if (c_skip != null) {
-            String lenValCode;
-            if (c_skip.len() == 0) {
-                lenValCode = ParseUtil.replaceLenExprToCode(c_skip.lenExpr(), parseBuilderContext.varToFieldName, clazz);
-            } else {
-                lenValCode = c_skip.len() + "";
+        switch (skipNum) {
+            case -2 -> buildMethodBody_deProcess(deParseBuilderContext);
+            case -1 -> {
+                ParseUtil.append(deProcessBody, "final int {}={}.writerIndex();\n", FieldBuilder.varNameStartIndex, FieldBuilder.varNameByteBuf);
+                String lenValCode;
+                if (c_skip.len() == 0) {
+                    lenValCode = ParseUtil.replaceLenExprToCode(c_skip.lenExpr(), parseBuilderContext.varToFieldName, clazz);
+                } else {
+                    lenValCode = c_skip.len() + "";
+                }
+                buildMethodBody_deProcess(deParseBuilderContext);
+                ParseUtil.append(deProcessBody, "final int {}={}-{}.writerIndex()+{};\n", FieldBuilder.varNameShouldSkip, lenValCode, FieldBuilder.varNameByteBuf, FieldBuilder.varNameStartIndex);
+                ParseUtil.append(deProcessBody, "if({}>0){\n", FieldBuilder.varNameShouldSkip);
+                ParseUtil.append(deProcessBody, "{}.writeZero({});\n", FieldBuilder.varNameByteBuf, FieldBuilder.varNameShouldSkip);
+                if (logCollector_parse != null) {
+                    ParseUtil.append(processBody, "{}.logCollector_deParse.collect_class({}.class,\"@C_skip append[\"+{}+\"]\");\n", Parser.class.getName(), clazzName, FieldBuilder.varNameShouldSkip);
+                }
+                ParseUtil.append(deProcessBody, "}\n");
             }
-            ParseUtil.append(deProcessBody, "final int {}={}-{}.writerIndex()+{};\n", FieldBuilder.varNameShouldSkip, lenValCode, FieldBuilder.varNameByteBuf, FieldBuilder.varNameStartIndex);
-            ParseUtil.append(deProcessBody, "if({}>0){\n", FieldBuilder.varNameShouldSkip);
-            ParseUtil.append(deProcessBody, "{}.writeZero({});\n", FieldBuilder.varNameByteBuf, FieldBuilder.varNameShouldSkip);
-            if (logCollector_parse != null) {
-                ParseUtil.append(processBody, "{}.logCollector_deParse.collect_class({}.class,\"skip[\"+{}+\"]\");\n", Parser.class.getName(), clazzName, FieldBuilder.varNameShouldSkip);
+            default -> {
+                buildMethodBody_deProcess(deParseBuilderContext);
+                if (skipNum > 0) {
+                    ParseUtil.append(deProcessBody, "{}.writeZero({});\n", FieldBuilder.varNameByteBuf, skipNum);
+                    if (logCollector_parse != null) {
+                        ParseUtil.append(processBody, "{}.logCollector_deParse.collect_class({}.class,\"@C_skip append[{}]\");\n", Parser.class.getName(), clazzName, skipNum);
+                    }
+                }
             }
-            ParseUtil.append(deProcessBody, "}\n");
         }
 
         deProcessBody.append("}");

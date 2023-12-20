@@ -2,9 +2,9 @@ package com.bcd.share.support_parser.anno;
 
 public enum BitRemainingMode {
     /**
-     * 默认情况下、会有如下场景
-     * 1、为类的最后一个字段、此时视为{@link #ignore}
-     * 2、下一个字段为bit类型字段、此时视为{@link #not_ignore}
+     * 默认情况下、根据不同的情况选择不同的模式
+     * 不是类最后一个字段且下一个字段为 {@link F_bit_num} 或 {@link F_bit_skip} 或 {@link F_bit_num_array}、此时为{@link #not_ignore}
+     * 否则为{@link #ignore}
      */
     Default,
     /**

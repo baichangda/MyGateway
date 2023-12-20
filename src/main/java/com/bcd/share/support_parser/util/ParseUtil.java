@@ -6,6 +6,11 @@ import com.bcd.share.support_parser.Parser;
 import com.bcd.share.support_parser.anno.*;
 import com.bcd.share.support_parser.builder.BuilderContext;
 import com.bcd.share.support_parser.builder.FieldBuilder;
+import com.bcd.share.support_parser.impl.immotors.ep33.data.Evt_0001;
+import com.bcd.share.support_parser.impl.immotors.ep33.data.Evt_0006;
+import com.bcd.share.support_parser.impl.immotors.ep33.data.Evt_0800;
+import com.bcd.share.support_parser.impl.immotors.ep33.data.Evt_D006;
+import com.bcd.share.support_parser.impl.jtt808.data.PacketHeader;
 import com.bcd.share.support_parser.processor.Processor;
 import com.google.common.collect.Sets;
 import javassist.CannotCompileException;
@@ -17,6 +22,7 @@ import org.slf4j.helpers.MessageFormatter;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -332,7 +338,7 @@ public class ParseUtil {
         return sb.toString();
     }
 
-    public static String replaceLenExprToCode(final String lenExpr, final Map<Character, String> map,Class<?> clazz) {
+    public static String replaceLenExprToCode(final String lenExpr, final Map<Character, String> map, Class<?> clazz) {
         final StringBuilder sb = new StringBuilder();
         final char[] chars = lenExpr.toCharArray();
         for (char c : chars) {
@@ -458,7 +464,256 @@ public class ParseUtil {
         return map;
     }
 
+    public static int getClassByteLenIfPossible(Class<?> clazz) {
+        int all = 0;
+        List<Field> parseFields = getParseFields(clazz);
+        int bit = 0;
+        int maxBitEndEasy = 0;
+        for (int i = 0; i < parseFields.size(); i++) {
+            Field parseField = parseFields.get(i);
+            F_num f_num = parseField.getAnnotation(F_num.class);
+            if (f_num != null) {
+                switch (f_num.type()) {
+                    case uint8, int8 -> all += 1;
+                    case uint16, int16 -> all += 2;
+                    case uint32, int32 -> all += 4;
+                    case uint64, int64 -> all += 8;
+                    default -> {
+                        return -1;
+                    }
+                }
+                continue;
+            }
+
+            F_num_array f_num_array = parseField.getAnnotation(F_num_array.class);
+            if (f_num_array != null) {
+                int len = f_num_array.len();
+                int singleSkip = f_num_array.singleSkip();
+                if (len > 0) {
+                    switch (f_num_array.singleType()) {
+                        case uint8, int8 -> all += (1 + singleSkip) * len;
+                        case uint16, int16 -> all += (2 + singleSkip) * len;
+                        case uint32, int32 -> all += (4 + singleSkip) * len;
+                        case uint64, int64 -> all += (8 + singleSkip) * len;
+                        default -> {
+                            return -1;
+                        }
+                    }
+                } else {
+                    return -1;
+                }
+                continue;
+            }
+
+            F_skip f_skip = parseField.getAnnotation(F_skip.class);
+            if (f_skip != null) {
+                int len = f_skip.len();
+                if (len > 0) {
+                    all += len;
+                } else {
+                    return -1;
+                }
+                continue;
+            }
+
+            F_bit_num f_bit_num = parseField.getAnnotation(F_bit_num.class);
+            if (f_bit_num != null) {
+                bit += f_bit_num.len();
+                boolean ignore;
+                switch (f_bit_num.bitRemainingMode()) {
+                    case ignore -> ignore = true;
+                    case not_ignore -> ignore = false;
+                    default -> {
+                        if (i == parseFields.size() - 1) {
+                            ignore = true;
+                        } else {
+                            Field nextField = parseFields.get(i + 1);
+                            ignore = !nextField.isAnnotationPresent(F_bit_num.class)
+                                    && !nextField.isAnnotationPresent(F_bit_skip.class)
+                                    && !nextField.isAnnotationPresent(F_bit_num_array.class);
+                        }
+                    }
+                }
+                if (ignore) {
+                    all += (bit / 8) + (bit % 8 == 0 ? 0 : 1);
+                    bit = 0;
+                }
+                continue;
+            }
+
+            F_bit_num_array f_bit_num_array = parseField.getAnnotation(F_bit_num_array.class);
+            if (f_bit_num_array != null) {
+                int len = f_bit_num_array.len();
+                if (len > 0) {
+                    bit += len * (f_bit_num_array.singleLen() + f_bit_num_array.singleSkip());
+                    boolean ignore;
+                    switch (f_bit_num_array.bitRemainingMode()) {
+                        case ignore -> ignore = true;
+                        case not_ignore -> ignore = false;
+                        default -> {
+                            if (i == parseFields.size() - 1) {
+                                ignore = true;
+                            } else {
+                                Field nextField = parseFields.get(i + 1);
+                                ignore = !nextField.isAnnotationPresent(F_bit_num.class)
+                                        && !nextField.isAnnotationPresent(F_bit_skip.class)
+                                        && !nextField.isAnnotationPresent(F_bit_num_array.class);
+                            }
+                        }
+                    }
+                    if (ignore) {
+                        all += (bit / 8) + (bit % 8 == 0 ? 0 : 1);
+                        bit = 0;
+                    }
+                } else {
+                    return -1;
+                }
+                continue;
+            }
+
+            F_bit_skip f_bit_skip = parseField.getAnnotation(F_bit_skip.class);
+            if (f_bit_skip != null) {
+                int len = f_bit_skip.len();
+                bit += len;
+                boolean ignore;
+                if (i == parseFields.size() - 1) {
+                    ignore = true;
+                } else {
+                    Field nextField = parseFields.get(i + 1);
+                    ignore = !nextField.isAnnotationPresent(F_bit_num.class)
+                            && !nextField.isAnnotationPresent(F_bit_skip.class)
+                            && !nextField.isAnnotationPresent(F_bit_num_array.class);
+                }
+                if (ignore) {
+                    all += (bit / 8) + (bit % 8 == 0 ? 0 : 1);
+                    bit = 0;
+                }
+                continue;
+            }
+
+            F_bit_num_easy f_bit_num_easy = parseField.getAnnotation(F_bit_num_easy.class);
+            if (f_bit_num_easy != null) {
+                maxBitEndEasy = Math.max(maxBitEndEasy, f_bit_num_easy.bitEnd());
+                boolean end;
+                if (f_bit_num_easy.end()) {
+                    end = true;
+                }else{
+                    if (i == parseFields.size() - 1) {
+                        end = true;
+                    } else {
+                        Field nextField = parseFields.get(i + 1);
+                        end = !nextField.isAnnotationPresent(F_bit_num_easy.class);
+                    }
+                }
+                if (end) {
+                    all += (maxBitEndEasy / 8) + (maxBitEndEasy % 8 == 0 ? 0 : 1);
+                    maxBitEndEasy = 0;
+                }
+            }
+
+
+            F_string f_string = parseField.getAnnotation(F_string.class);
+            if (f_string != null) {
+                int len = f_string.len();
+                if (len > 0) {
+                    all += len;
+                } else {
+                    return -1;
+                }
+                continue;
+            }
+
+            F_string_bcd f_string_bcd = parseField.getAnnotation(F_string_bcd.class);
+            if (f_string_bcd != null) {
+                int len = f_string_bcd.len();
+                if (len > 0) {
+                    all += len;
+                } else {
+                    return -1;
+                }
+                continue;
+            }
+
+            F_date_bcd f_date_bcd = parseField.getAnnotation(F_date_bcd.class);
+            if (f_date_bcd != null) {
+                int len = f_date_bcd.len();
+                if (len > 0) {
+                    all += len;
+                } else {
+                    return -1;
+                }
+                continue;
+            }
+
+            F_date_bytes_6 f_date_bytes_6 = parseField.getAnnotation(F_date_bytes_6.class);
+            if (f_date_bytes_6 != null) {
+                all += 6;
+                continue;
+            }
+            F_date_bytes_7 f_date_bytes_7 = parseField.getAnnotation(F_date_bytes_7.class);
+            if (f_date_bytes_7 != null) {
+                all += 7;
+                continue;
+            }
+            F_date_ts f_date_ts = parseField.getAnnotation(F_date_ts.class);
+            if (f_date_ts != null) {
+                switch (f_date_ts.mode()) {
+                    case 1, 2, 4, 5 -> all += 8;
+                    case 3 -> all += 4;
+                    default -> {
+                        return -1;
+                    }
+                }
+                continue;
+            }
+
+            F_bean f_bean = parseField.getAnnotation(F_bean.class);
+            if (f_bean != null) {
+                int beanLen = getClassByteLenIfPossible(parseField.getType());
+                if (beanLen == -1) {
+                    return -1;
+                } else {
+                    all += beanLen;
+                }
+            }
+
+            F_bean_list f_bean_list = parseField.getAnnotation(F_bean_list.class);
+            if (f_bean_list != null) {
+                int listLen = f_bean_list.listLen();
+                if (listLen > 0) {
+                    int beanLen;
+                    final Class<?> fieldType = parseField.getType();
+                    if (fieldType.isArray()) {
+                        beanLen = getClassByteLenIfPossible(fieldType.getComponentType());
+                    } else if (List.class.isAssignableFrom(fieldType)) {
+                        beanLen = getClassByteLenIfPossible((Class<?>) ((ParameterizedType) parseField.getGenericType()).getActualTypeArguments()[0]);
+                    } else {
+                        return -1;
+                    }
+                    if (beanLen == -1) {
+                        return -1;
+                    } else {
+                        all += beanLen * listLen;
+                    }
+                } else {
+                    return -1;
+                }
+            }
+
+            F_customize f_customize = parseField.getAnnotation(F_customize.class);
+            if (f_customize != null) {
+                return -1;
+            }
+        }
+        return all;
+    }
+
     public static void main(String[] args) {
-        getAllFieldBuild();
+//        getAllFieldBuild();
+        System.out.println(getClassByteLenIfPossible(Evt_0001.class));
+        System.out.println(getClassByteLenIfPossible(Evt_0800.class));
+        System.out.println(getClassByteLenIfPossible(PacketHeader.class));
+        System.out.println(getClassByteLenIfPossible(Evt_0006.class));
+        System.out.println(getClassByteLenIfPossible(Evt_D006.class));
     }
 }
