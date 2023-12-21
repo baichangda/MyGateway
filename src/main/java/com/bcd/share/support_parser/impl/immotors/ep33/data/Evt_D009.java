@@ -2,8 +2,6 @@ package com.bcd.share.support_parser.impl.immotors.ep33.data;
 
 
 import com.bcd.share.support_parser.anno.F_bit_num;
-import com.bcd.share.support_parser.anno.F_bit_skip;
-import com.bcd.share.support_parser.anno.NumType;
 import com.bcd.share.support_parser.impl.immotors.Evt_4_x;
 
 public class Evt_D009 extends Evt_4_x {
@@ -21,10 +19,8 @@ public class Evt_D009 extends Evt_4_x {
     public byte BMSWrnngInfoPV;
     @F_bit_num(len = 4)
     public byte BMSWrnngInfoRC;
-    @F_bit_num(len = 1)
+    @F_bit_num(len = 1,skipAfter = 5)
     public byte BMSPreThrmFltInd;
-    @F_bit_skip(len = 5)
-    public byte skip1;
     @F_bit_num(len = 4)
     public byte BMSKeepSysAwkScene;
     @F_bit_num(len = 3)

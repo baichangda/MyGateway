@@ -156,7 +156,7 @@ public class ParseUtil {
     }
 
     public static boolean needBitBuf(List<Field> fieldList) {
-        return fieldList.stream().anyMatch(e -> e.isAnnotationPresent(F_bit_num.class) || e.isAnnotationPresent(F_bit_num_array.class) || e.isAnnotationPresent(F_bit_skip.class));
+        return fieldList.stream().anyMatch(e -> e.isAnnotationPresent(F_bit_num.class) || e.isAnnotationPresent(F_bit_num_array.class));
     }
 
     public static void newBitBuf_parse(BuilderContext context) {
@@ -529,7 +529,6 @@ public class ParseUtil {
                         } else {
                             Field nextField = parseFields.get(i + 1);
                             ignore = !nextField.isAnnotationPresent(F_bit_num.class)
-                                    && !nextField.isAnnotationPresent(F_bit_skip.class)
                                     && !nextField.isAnnotationPresent(F_bit_num_array.class);
                         }
                     }
@@ -556,7 +555,6 @@ public class ParseUtil {
                             } else {
                                 Field nextField = parseFields.get(i + 1);
                                 ignore = !nextField.isAnnotationPresent(F_bit_num.class)
-                                        && !nextField.isAnnotationPresent(F_bit_skip.class)
                                         && !nextField.isAnnotationPresent(F_bit_num_array.class);
                             }
                         }
@@ -567,26 +565,6 @@ public class ParseUtil {
                     }
                 } else {
                     return -1;
-                }
-                continue;
-            }
-
-            F_bit_skip f_bit_skip = parseField.getAnnotation(F_bit_skip.class);
-            if (f_bit_skip != null) {
-                int len = f_bit_skip.len();
-                bit += len;
-                boolean ignore;
-                if (i == parseFields.size() - 1) {
-                    ignore = true;
-                } else {
-                    Field nextField = parseFields.get(i + 1);
-                    ignore = !nextField.isAnnotationPresent(F_bit_num.class)
-                            && !nextField.isAnnotationPresent(F_bit_skip.class)
-                            && !nextField.isAnnotationPresent(F_bit_num_array.class);
-                }
-                if (ignore) {
-                    all += (bit / 8) + (bit % 8 == 0 ? 0 : 1);
-                    bit = 0;
                 }
                 continue;
             }

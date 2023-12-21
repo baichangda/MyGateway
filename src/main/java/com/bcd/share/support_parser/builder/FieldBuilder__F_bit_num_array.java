@@ -22,9 +22,8 @@ public class FieldBuilder__F_bit_num_array extends FieldBuilder {
                 if (f_bit_num_array.bitRemainingMode() == BitRemainingMode.Default) {
                     Field next = fieldList.get(context.fieldIndex + 1);
                     F_bit_num next_f_bit_num = next.getAnnotation(F_bit_num.class);
-                    F_bit_skip next_f_bit_skip = next.getAnnotation(F_bit_skip.class);
                     F_bit_num_array next_f_bit_num_array = next.getAnnotation(F_bit_num_array.class);
-                    return next_f_bit_num == null && next_f_bit_skip == null && next_f_bit_num_array == null;
+                    return next_f_bit_num == null && next_f_bit_num_array == null;
                 } else {
                     return false;
                 }
@@ -43,6 +42,17 @@ public class FieldBuilder__F_bit_num_array extends FieldBuilder {
 
         final boolean bigEndian = ParseUtil.bigEndian(anno.singleOrder(), context.bitOrder);
         final boolean unsigned = anno.singleUnsigned();
+        final String varNameBitBuf = context.getBitBuf_parse();
+        final int singleLen = anno.singleLen();
+        final int singleSkip = anno.singleSkip();
+        final String valExpr = anno.singleValExpr();
+        final StringBuilder body = context.body;
+        final String varNameField = ParseUtil.getFieldVarName(context);
+        int skipBefore = anno.skipBefore();
+        int skipAfter = anno.skipAfter();
+        if(skipBefore>0){
+            ParseUtil.append(body, "{}.skip({});\n", varNameBitBuf, skipBefore);
+        }
         switch (arrayElementTypeName) {
             case "byte", "short", "int", "long", "float", "double" -> {
             }
@@ -66,14 +76,9 @@ public class FieldBuilder__F_bit_num_array extends FieldBuilder {
         }
 
 
-        final int singleLen = anno.singleLen();
-        final int singleSkip = anno.singleSkip();
-        final String valExpr = anno.singleValExpr();
-        final StringBuilder body = context.body;
-        final String varNameField = ParseUtil.getFieldVarName(context);
         String arrVarName = varNameField + "_arr";
         final String varNameArrayElement = varNameField + "_arrEle";
-        final String varNameBitBuf = context.getBitBuf_parse();
+
 
         ParseUtil.append(body, "final {}[] {}=new {}[{}];\n", arrayElementTypeName, arrVarName, arrayElementTypeName, arrLenRes);
         ParseUtil.append(body, "for(int i=0;i<{}.length;i++){\n", arrVarName);
@@ -84,10 +89,13 @@ public class FieldBuilder__F_bit_num_array extends FieldBuilder {
         String valCode = ParseUtil.replaceValExprToCode(valExpr, varNameArrayElement);
         ParseUtil.append(body, "{}[i]=({})({});\n", arrVarName, arrayElementTypeName, valCode);
         ParseUtil.append(body, "}\n");
+        ParseUtil.append(body, "{}.{}={};\n", FieldBuilder.varNameInstance, field.getName(), arrVarName);
         if (finish(context)) {
             ParseUtil.append(body, "{}.finish();\n", varNameBitBuf);
         }
-        ParseUtil.append(body, "{}.{}={};\n", FieldBuilder.varNameInstance, field.getName(), arrVarName);
+        if(skipAfter>0){
+            ParseUtil.append(body, "{}.skip({});\n", varNameBitBuf, skipAfter);
+        }
     }
 
     @Override
@@ -109,6 +117,12 @@ public class FieldBuilder__F_bit_num_array extends FieldBuilder {
         String valCode = varNameInstance + "." + fieldName;
         final String varNameField = ParseUtil.getFieldVarName(context);
         final String varNameBitBuf = context.getBitBuf_deParse();
+        int skipBefore = anno.skipBefore();
+        int skipAfter = anno.skipAfter();
+        if (skipBefore>0){
+            ParseUtil.append(body, "{}.skip({});\n", varNameBitBuf, skipBefore);
+        }
+
         ParseUtil.append(body, "if({}!=null){\n", FieldBuilder.varNameInstance, valCode);
         final String varNameFieldArr = varNameField + "_arr";
         ParseUtil.append(body, "final {}[] {}={};\n", arrElementType, varNameFieldArr, valCode);
@@ -126,12 +140,13 @@ public class FieldBuilder__F_bit_num_array extends FieldBuilder {
             ParseUtil.append(body, "{}.skip({});\n", varNameBitBuf, singleSkip);
         }
         ParseUtil.append(body, "}\n");
-
         if (finish(context)) {
             ParseUtil.append(body, "{}.finish();\n", varNameBitBuf);
         }
         ParseUtil.append(body, "}\n");
-
+        if (skipAfter>0){
+            ParseUtil.append(body, "{}.skip({});\n", varNameBitBuf, skipAfter);
+        }
     }
 
     @Override

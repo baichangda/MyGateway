@@ -181,7 +181,7 @@ public class Parser {
             Field field = fieldList.get(i);
             context.field = field;
             context.fieldIndex = i;
-            boolean logBit = field.isAnnotationPresent(F_bit_num.class) || field.isAnnotationPresent(F_bit_skip.class);
+            boolean logBit = field.isAnnotationPresent(F_bit_num.class);
             if (logCollector_parse != null) {
                 if (!logBit) {
                     ParseUtil.prependLogCode_parse(context);
@@ -219,7 +219,7 @@ public class Parser {
             Field field = fieldList.get(i);
             context.field = field;
             context.fieldIndex = i;
-            boolean logBit = field.isAnnotationPresent(F_bit_num.class) || field.isAnnotationPresent(F_bit_skip.class);
+            boolean logBit = field.isAnnotationPresent(F_bit_num.class);
             try {
                 if (logCollector_deParse != null) {
                     if (!logBit) {

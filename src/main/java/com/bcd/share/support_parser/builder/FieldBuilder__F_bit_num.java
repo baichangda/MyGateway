@@ -1,11 +1,9 @@
 package com.bcd.share.support_parser.builder;
 
 import com.bcd.share.exception.BaseRuntimeException;
-import com.bcd.share.support_parser.Parser;
 import com.bcd.share.support_parser.anno.BitRemainingMode;
 import com.bcd.share.support_parser.anno.F_bit_num;
 import com.bcd.share.support_parser.anno.F_bit_num_array;
-import com.bcd.share.support_parser.anno.F_bit_skip;
 import com.bcd.share.support_parser.util.*;
 
 import java.lang.reflect.Field;
@@ -25,9 +23,8 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
                 if (f_bit_num.bitRemainingMode() == BitRemainingMode.Default) {
                     Field next = fieldList.get(context.fieldIndex + 1);
                     F_bit_num next_f_bit_num = next.getAnnotation(F_bit_num.class);
-                    F_bit_skip next_f_bit_skip = next.getAnnotation(F_bit_skip.class);
                     F_bit_num_array next_f_bit_num_array = next.getAnnotation(F_bit_num_array.class);
-                    return next_f_bit_num == null && next_f_bit_skip == null && next_f_bit_num_array == null;
+                    return next_f_bit_num  == null && next_f_bit_num_array == null;
                 } else {
                     return false;
                 }
@@ -44,6 +41,15 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
         final F_bit_num anno = field.getAnnotation(annoClass);
         final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.bitOrder);
         final boolean unsigned = anno.unsigned();
+        int skipBefore = anno.skipBefore();
+        int skipAfter = anno.skipAfter();
+        final StringBuilder body = context.body;
+        final String varNameInstance = FieldBuilder.varNameInstance;
+        final String varNameField = ParseUtil.getFieldVarName(context);
+        final String varNameBitBuf = context.getBitBuf_parse();
+        if(skipBefore>0){
+            ParseUtil.append(body, "{}.skip({});\n", varNameBitBuf, skipBefore);
+        }
 
         final String sourceValTypeName;
         switch (fieldTypeName) {
@@ -60,9 +66,7 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
             }
         }
 
-        final StringBuilder body = context.body;
-        final String varNameInstance = FieldBuilder.varNameInstance;
-        final String varNameField = ParseUtil.getFieldVarName(context);
+
 
         final int len = anno.len();
         if (len < 1 || len > 64) {
@@ -70,25 +74,29 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
         }
 
 
-        final String varNameBitBuf = context.getBitBuf_parse();
-
         ParseUtil.append(body, "final {} {}=({}){}.read({},{},{});\n", sourceValTypeName, varNameField, sourceValTypeName, varNameBitBuf, len, bigEndian, unsigned);
-        if (finish(context)) {
-            ParseUtil.append(body, "{}.finish();\n", varNameBitBuf);
-        }
 
         String valCode = ParseUtil.replaceValExprToCode(anno.valExpr(), varNameField);
-
         if (fieldTypeClass.isEnum()) {
             ParseUtil.append(body, "{}.{}={}.fromInteger((int){});\n", varNameInstance, field.getName(), fieldTypeName, valCode);
         } else {
             ParseUtil.append(body, "{}.{}=({})({});\n", varNameInstance, field.getName(), fieldTypeName, valCode);
         }
 
+        if (finish(context)) {
+            ParseUtil.append(body, "{}.finish();\n", varNameBitBuf);
+        }
+
+        if(skipAfter>0){
+            ParseUtil.append(body, "{}.skip({});\n", varNameBitBuf, skipAfter);
+        }
+
         final char var = anno.var();
         if (var != '0') {
             context.varToFieldName.put(var, varNameField);
         }
+
+
     }
 
     @Override
@@ -105,6 +113,14 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
         final Class<?> fieldType = field.getType();
         final boolean isFloat = fieldType == float.class || fieldType == double.class;
         final char var = anno.var();
+        int skipBefore = anno.skipBefore();
+        int skipAfter = anno.skipAfter();
+        final String varNameBitBuf = context.getBitBuf_deParse();
+        if (skipBefore>0){
+            ParseUtil.append(body, "{}.skip({});\n", varNameBitBuf, skipBefore);
+        }
+
+
         String valCode;
         //先判断是否是枚举类型、如果是枚举转换为int
         if (fieldType.isEnum()) {
@@ -133,12 +149,13 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
         if (len < 1 || len > 64) {
             throw BaseRuntimeException.getException("class[{}] field[{}] anno[{}] len[{}] must in range [1,64]", field.getDeclaringClass().getName(), field.getName(), annoClass.getName(), len);
         }
-
-        final String varNameBitBuf = context.getBitBuf_deParse();
-
         ParseUtil.append(body, "{}.write((long)({}),{},{},{});\n", varNameBitBuf, valCode, len, bigEndian, unsigned);
+
         if (finish(context)) {
             ParseUtil.append(body, "{}.finish();\n", varNameBitBuf);
+        }
+        if (skipAfter>0){
+            ParseUtil.append(body, "{}.skip({});\n", varNameBitBuf, skipAfter);
         }
 
     }

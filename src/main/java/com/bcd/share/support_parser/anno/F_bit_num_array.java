@@ -104,5 +104,13 @@ public @interface F_bit_num_array {
      */
     BitRemainingMode bitRemainingMode() default BitRemainingMode.Default;
 
+    /**
+     * 在解析之前跳过多少bit
+     */
+    int skipAfter() default 0;
 
+    /**
+     * 在解析之后跳过多少bit
+     */
+    int skipBefore() default 0;
 }
