@@ -95,10 +95,6 @@ public class Parser {
     public static void withDefaultLogCollector_parse() {
         logCollector_parse = new LogCollector_parse() {
 
-            public void collect_field() {
-
-            }
-
             @Override
             public void collect_field(Class<?> clazz, Class<?> fieldDeclaringClass, String fieldName, byte[] content, Object val, String processorClassName) {
                 logger.info("--parse field{}--[{}].[{}] [{}]->[{}]"
@@ -107,6 +103,17 @@ public class Parser {
                         , fieldName
                         , ByteBufUtil.hexDump(content).toUpperCase()
                         , val
+                );
+            }
+
+            @Override
+            public void collect_field_skip(Class<?> clazz, Class<?> fieldDeclaringClass, String fieldName, byte[] content) {
+                logger.info("--parse field{}--[{}].[{}] skip len[{}] hex[{}]"
+                        , LogUtil.getFieldStackTrace(fieldDeclaringClass, fieldName)
+                        , clazz.getSimpleName()
+                        , fieldName
+                        , content.length
+                        , ByteBufUtil.hexDump(content).toUpperCase()
                 );
             }
 
@@ -139,6 +146,16 @@ public class Parser {
                         , clazz.getSimpleName()
                         , fieldName
                         , val
+                        , ByteBufUtil.hexDump(content).toUpperCase());
+            }
+
+            @Override
+            public void collect_field_skip(Class<?> clazz, Class<?> fieldDeclaringClass, String fieldName, byte[] content) {
+                logger.info("--deParse field{}--[{}].[{}] append len[{}] [{}]"
+                        , LogUtil.getFieldStackTrace(fieldDeclaringClass, fieldName)
+                        , clazz.getSimpleName()
+                        , fieldName
+                        , content.length
                         , ByteBufUtil.hexDump(content).toUpperCase());
             }
 
@@ -182,6 +199,10 @@ public class Parser {
             context.field = field;
             context.fieldIndex = i;
             boolean logBit = field.isAnnotationPresent(F_bit_num.class);
+            F_skip anno = field.getAnnotation(F_skip.class);
+            if (anno != null && (anno.lenBefore() != 0 || !anno.lenExprBefore().isEmpty())) {
+                ParseUtil.appendSkip_parse(anno.lenBefore(), anno.lenExprBefore(), context);
+            }
             if (logCollector_parse != null) {
                 if (!logBit) {
                     ParseUtil.prependLogCode_parse(context);
@@ -203,6 +224,9 @@ public class Parser {
                     }
                 }
             }
+            if (anno != null && (anno.lenAfter() != 0 || !anno.lenExprAfter().isEmpty())) {
+                ParseUtil.appendSkip_parse(anno.lenAfter(), anno.lenExprAfter(), context);
+            }
         }
 
     }
@@ -220,12 +244,16 @@ public class Parser {
             context.field = field;
             context.fieldIndex = i;
             boolean logBit = field.isAnnotationPresent(F_bit_num.class);
-            try {
-                if (logCollector_deParse != null) {
-                    if (!logBit) {
-                        ParseUtil.prependLogCode_deParse(context);
-                    }
+            F_skip anno = field.getAnnotation(F_skip.class);
+            if (anno != null && (anno.lenBefore() != 0 || !anno.lenExprBefore().isEmpty())) {
+                ParseUtil.appendSkip_deParse(anno.lenBefore(), anno.lenExprBefore(), context);
+            }
+            if (logCollector_deParse != null) {
+                if (!logBit) {
+                    ParseUtil.prependLogCode_deParse(context);
                 }
+            }
+            try {
                 for (Map.Entry<Class<? extends Annotation>, FieldBuilder> entry : anno_fieldBuilder.entrySet()) {
                     Class<? extends Annotation> annoClass = entry.getKey();
                     if (field.isAnnotationPresent(annoClass)) {
@@ -240,6 +268,9 @@ public class Parser {
                         ParseUtil.appendLogCode_deParse(context);
                     }
                 }
+            }
+            if (anno != null && (anno.lenAfter() != 0 || !anno.lenExprAfter().isEmpty())) {
+                ParseUtil.appendSkip_deParse(anno.lenAfter(), anno.lenExprAfter(), context);
             }
         }
     }
@@ -483,6 +514,8 @@ public class Parser {
          */
         void collect_field(Class<?> clazz, Class<?> fieldDeclaringClass, String fieldName, byte[] content, Object val, String processorClassName);
 
+        void collect_field_skip(Class<?> clazz, Class<?> fieldDeclaringClass, String fieldName, byte[] content);
+
         /**
          * 收集每个字段解析的详情
          *
@@ -519,6 +552,7 @@ public class Parser {
          * @param processorClassName  解析器类名
          */
         void collect_field(Class<?> clazz, Class<?> fieldDeclaringClass, String fieldName, Object val, byte[] content, String processorClassName);
+        void collect_field_skip(Class<?> clazz, Class<?> fieldDeclaringClass, String fieldName,byte[] content);
 
         /**
          * 收集每个字段解析的详情

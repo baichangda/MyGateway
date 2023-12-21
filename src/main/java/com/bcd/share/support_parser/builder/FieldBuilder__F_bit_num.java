@@ -83,12 +83,12 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
             ParseUtil.append(body, "{}.{}=({})({});\n", varNameInstance, field.getName(), fieldTypeName, valCode);
         }
 
-        if (finish(context)) {
-            ParseUtil.append(body, "{}.finish();\n", varNameBitBuf);
-        }
-
         if(skipAfter>0){
             ParseUtil.append(body, "{}.skip({});\n", varNameBitBuf, skipAfter);
+        }
+
+        if (finish(context)) {
+            ParseUtil.append(body, "{}.finish();\n", varNameBitBuf);
         }
 
         final char var = anno.var();
@@ -151,13 +151,12 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
         }
         ParseUtil.append(body, "{}.write((long)({}),{},{},{});\n", varNameBitBuf, valCode, len, bigEndian, unsigned);
 
-        if (finish(context)) {
-            ParseUtil.append(body, "{}.finish();\n", varNameBitBuf);
-        }
         if (skipAfter>0){
             ParseUtil.append(body, "{}.skip({});\n", varNameBitBuf, skipAfter);
         }
-
+        if (finish(context)) {
+            ParseUtil.append(body, "{}.finish();\n", varNameBitBuf);
+        }
     }
 
     @Override

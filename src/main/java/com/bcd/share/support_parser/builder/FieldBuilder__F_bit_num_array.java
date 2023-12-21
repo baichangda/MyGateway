@@ -57,8 +57,7 @@ public class FieldBuilder__F_bit_num_array extends FieldBuilder {
             case "byte", "short", "int", "long", "float", "double" -> {
             }
             default -> {
-                if (arrayElementType.isEnum()) {
-                } else {
+                if (!arrayElementType.isEnum()) {
                     ParseUtil.notSupport_fieldType(context.clazz, field, annoClass);
                 }
             }
@@ -90,11 +89,11 @@ public class FieldBuilder__F_bit_num_array extends FieldBuilder {
         ParseUtil.append(body, "{}[i]=({})({});\n", arrVarName, arrayElementTypeName, valCode);
         ParseUtil.append(body, "}\n");
         ParseUtil.append(body, "{}.{}={};\n", FieldBuilder.varNameInstance, field.getName(), arrVarName);
-        if (finish(context)) {
-            ParseUtil.append(body, "{}.finish();\n", varNameBitBuf);
-        }
         if(skipAfter>0){
             ParseUtil.append(body, "{}.skip({});\n", varNameBitBuf, skipAfter);
+        }
+        if (finish(context)) {
+            ParseUtil.append(body, "{}.finish();\n", varNameBitBuf);
         }
     }
 
@@ -119,11 +118,10 @@ public class FieldBuilder__F_bit_num_array extends FieldBuilder {
         final String varNameBitBuf = context.getBitBuf_deParse();
         int skipBefore = anno.skipBefore();
         int skipAfter = anno.skipAfter();
+        ParseUtil.append(body, "if({}!=null){\n", FieldBuilder.varNameInstance, valCode);
         if (skipBefore>0){
             ParseUtil.append(body, "{}.skip({});\n", varNameBitBuf, skipBefore);
         }
-
-        ParseUtil.append(body, "if({}!=null){\n", FieldBuilder.varNameInstance, valCode);
         final String varNameFieldArr = varNameField + "_arr";
         ParseUtil.append(body, "final {}[] {}={};\n", arrElementType, varNameFieldArr, valCode);
         ParseUtil.append(body, "for(int i=0;i<{}.length;i++){\n", varNameFieldArr);
@@ -140,13 +138,13 @@ public class FieldBuilder__F_bit_num_array extends FieldBuilder {
             ParseUtil.append(body, "{}.skip({});\n", varNameBitBuf, singleSkip);
         }
         ParseUtil.append(body, "}\n");
+        if (skipAfter>0){
+            ParseUtil.append(body, "{}.skip({});\n", varNameBitBuf, skipAfter);
+        }
         if (finish(context)) {
             ParseUtil.append(body, "{}.finish();\n", varNameBitBuf);
         }
         ParseUtil.append(body, "}\n");
-        if (skipAfter>0){
-            ParseUtil.append(body, "{}.skip({});\n", varNameBitBuf, skipAfter);
-        }
     }
 
     @Override

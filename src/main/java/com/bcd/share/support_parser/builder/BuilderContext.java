@@ -76,7 +76,13 @@ public class BuilderContext {
     /**
      * 上下文缓存、用于不同的注解解析时候、多个字段需要共享某些信息、可以缓存在这里
      */
-    public final Map<String,Object> cache=new HashMap<>();
+    public final Map<String, Object> cache = new HashMap<>();
+
+    /**
+     * 变量序号
+     * 为了保证在一个解析方法中、定义的临时变量不重复
+     */
+    public int varIndex = 0;
 
     public BuilderContext(StringBuilder body, Class<?> clazz,
                           CtClass implCc, Map<String, String> classVarDefineToVarName,
@@ -90,8 +96,8 @@ public class BuilderContext {
         this.beanClassAndOrder_processorVarName = beanClassAndOrder_processorVarName;
         this.byteOrder = byteOrder;
         this.bitOrder = bitOrder;
-        this.customize_processorId_processorVarName=customize_processorId_processorVarName;
-        this.fieldList=fieldList;
+        this.customize_processorId_processorVarName = customize_processorId_processorVarName;
+        this.fieldList = fieldList;
     }
 
     public final String getCustomizeProcessorVarName(Class<?> processorClass, String processorArgs) {

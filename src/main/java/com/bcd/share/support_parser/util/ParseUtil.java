@@ -457,10 +457,12 @@ public class ParseUtil {
         } catch (Exception e) {
             throw BaseRuntimeException.getException(e);
         }
-        logger.info("scan pkg[{}] list[{}]:", pkg, map.size());
+
+        StringBuilder sb = new StringBuilder();
         for (Map.Entry<Class<? extends Annotation>, FieldBuilder> entry : map.entrySet()) {
-            logger.info("Anno[{}] FieldBuilder[{}]", entry.getKey().getName(), entry.getValue().getClass().getName());
+            sb.append(format("Anno[{}] FieldBuilder[{}]", entry.getKey().getName(), entry.getValue().getClass().getName()));
         }
+        logger.info("scan pkg[{}] list[{}]:\n{}", pkg, map.size(), sb);
         return map;
     }
 
@@ -471,6 +473,14 @@ public class ParseUtil {
         int maxBitEndEasy = 0;
         for (int i = 0; i < parseFields.size(); i++) {
             Field parseField = parseFields.get(i);
+            F_skip f_skip = parseField.getAnnotation(F_skip.class);
+            if (f_skip != null) {
+                if (f_skip.lenExprBefore().isEmpty() && f_skip.lenExprAfter().isEmpty()) {
+                    all += (f_skip.lenBefore() + f_skip.lenAfter());
+                } else {
+                    return -1;
+                }
+            }
             F_num f_num = parseField.getAnnotation(F_num.class);
             if (f_num != null) {
                 switch (f_num.type()) {
@@ -505,20 +515,10 @@ public class ParseUtil {
                 continue;
             }
 
-            F_skip f_skip = parseField.getAnnotation(F_skip.class);
-            if (f_skip != null) {
-                int len = f_skip.len();
-                if (len > 0) {
-                    all += len;
-                } else {
-                    return -1;
-                }
-                continue;
-            }
 
             F_bit_num f_bit_num = parseField.getAnnotation(F_bit_num.class);
             if (f_bit_num != null) {
-                bit += f_bit_num.len();
+                bit += (f_bit_num.skipBefore() + f_bit_num.len() + f_bit_num.skipAfter());
                 boolean ignore;
                 switch (f_bit_num.bitRemainingMode()) {
                     case ignore -> ignore = true;
@@ -544,6 +544,7 @@ public class ParseUtil {
             if (f_bit_num_array != null) {
                 int len = f_bit_num_array.len();
                 if (len > 0) {
+                    bit += (f_bit_num_array.skipBefore() + f_bit_num_array.skipAfter());
                     bit += len * (f_bit_num_array.singleLen() + f_bit_num_array.singleSkip());
                     boolean ignore;
                     switch (f_bit_num_array.bitRemainingMode()) {
@@ -575,7 +576,7 @@ public class ParseUtil {
                 boolean end;
                 if (f_bit_num_easy.end()) {
                     end = true;
-                }else{
+                } else {
                     if (i == parseFields.size() - 1) {
                         end = true;
                     } else {
@@ -682,8 +683,59 @@ public class ParseUtil {
             if (f_customize != null) {
                 return -1;
             }
+
         }
         return all;
+    }
+
+    public static void appendSkip_parse(int len, String lenExpr, BuilderContext context) {
+        String lenValCode;
+        if (len == 0) {
+            lenValCode = ParseUtil.replaceLenExprToCode(lenExpr, context.varToFieldName, context.field);
+        } else {
+            lenValCode = len + "";
+        }
+        final String fieldByteBufReaderIndexVarName = getFieldByteBufReaderIndexVarName(context) + "_skip_" + (context.varIndex++);
+        final String fieldLogBytesVarName = getFieldLogBytesVarName(context) + "_skip_" + (context.varIndex++);
+        if (Parser.logCollector_parse != null) {
+            append(context.body, "final int {}={}.readerIndex();\n", fieldByteBufReaderIndexVarName, FieldBuilder.varNameByteBuf);
+        }
+        ParseUtil.append(context.body, "{}.skipBytes({});\n", FieldBuilder.varNameByteBuf, lenValCode);
+        if (Parser.logCollector_parse != null) {
+            append(context.body, "final byte[] {}=new byte[{}.readerIndex()-{}];\n", fieldLogBytesVarName, FieldBuilder.varNameByteBuf, fieldByteBufReaderIndexVarName);
+            append(context.body, "{}.getBytes({},{});\n", FieldBuilder.varNameByteBuf, fieldByteBufReaderIndexVarName, fieldLogBytesVarName);
+            append(context.body, "{}.logCollector_parse.collect_field_skip({}.class,{}.class,\"{}\",{});\n",
+                    Parser.class.getName(),
+                    context.clazz.getName(),
+                    context.field.getDeclaringClass().getName(),
+                    context.field.getName(),
+                    fieldLogBytesVarName);
+        }
+    }
+
+    public static void appendSkip_deParse(int len, String lenExpr, BuilderContext context) {
+        String lenValCode;
+        if (len == 0) {
+            lenValCode = ParseUtil.replaceLenExprToCode(lenExpr, context.varToFieldName, context.field);
+        } else {
+            lenValCode = len + "";
+        }
+        final String fieldByteBufWriterIndexVarName = getFieldByteBufWriterIndexVarName(context) + "_skip_" + (context.varIndex++);
+        final String fieldLogBytesVarName = getFieldLogBytesVarName(context) + "_skip_" + (context.varIndex++);
+        if (Parser.logCollector_deParse != null) {
+            append(context.body, "final int {}={}.writerIndex();\n", fieldByteBufWriterIndexVarName, FieldBuilder.varNameByteBuf);
+        }
+        ParseUtil.append(context.body, "{}.writeBytes(new byte[{}]);\n", FieldBuilder.varNameByteBuf, lenValCode);
+        if (Parser.logCollector_deParse != null) {
+            append(context.body, "final byte[] {}=new byte[{}.writerIndex()-{}];\n", fieldLogBytesVarName, FieldBuilder.varNameByteBuf, fieldByteBufWriterIndexVarName);
+            append(context.body, "{}.getBytes({},{});\n", FieldBuilder.varNameByteBuf, fieldByteBufWriterIndexVarName, fieldLogBytesVarName);
+            append(context.body, "{}.logCollector_deParse.collect_field_skip({}.class,{}.class,\"{}\",{});\n",
+                    Parser.class.getName(),
+                    context.clazz.getName(),
+                    context.field.getDeclaringClass().getName(),
+                    context.field.getName(),
+                    fieldLogBytesVarName);
+        }
     }
 
     public static void main(String[] args) {

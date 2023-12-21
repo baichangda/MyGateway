@@ -17,10 +17,8 @@ public class Road2_info {
     @F_num(type = NumType.uint32)
     public long road_alt;
     @F_num(type = NumType.uint32, var = 'a')
+    @F_skip(lenAfter = 43)
     public long lane_count;
-
-    @F_skip(len = 43)
-    public byte reserved;
     @F_bean_list(listLenExpr = "a")
     public List<Road2_info_lane> lane_info_array;
 
