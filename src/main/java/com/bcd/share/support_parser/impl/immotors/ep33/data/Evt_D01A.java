@@ -33,5 +33,5 @@ public class Evt_D01A extends Evt_4_x {
     @F_num(type = NumType.uint8)
     public short iAPSts;
     @F_string(len = 28)
-    public byte networkbackupinfo;
+    public String networkbackupinfo;
 }

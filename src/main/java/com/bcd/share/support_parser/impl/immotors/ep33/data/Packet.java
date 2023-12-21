@@ -47,7 +47,11 @@ public class Packet {
     public Evt_D017 evt_D017;
     public Evt_D018 evt_D018;
     public Evt_D019 evt_D019;
+    public Evt_D01A evt_D01A;
+    public Evt_D01B evt_D01B;
+    public Evt_D01C evt_D01C;
     public Evt_D01D evt_D01D;
+    public Evt_D01F evt_D01F;
     public Evt_2_6_unknown[] evt_2_6_unknown;
     public Evt_4_x_unknown[] evt_4_x_unknown;
     public Evt_FFFF evt_FFFF;
@@ -86,7 +90,11 @@ public class Packet {
     final static Processor<Evt_D017> processor_Evt_D017 = Parser.getProcessor(Evt_D017.class);
     final static Processor<Evt_D018> processor_Evt_D018 = Parser.getProcessor(Evt_D018.class);
     final static Processor<Evt_D019> processor_Evt_D019 = Parser.getProcessor(Evt_D019.class);
+    final static Processor<Evt_D01A> processor_Evt_D01A = Parser.getProcessor(Evt_D01A.class);
+    final static Processor<Evt_D01B> processor_Evt_D01B = Parser.getProcessor(Evt_D01B.class);
+    final static Processor<Evt_D01C> processor_Evt_D01C = Parser.getProcessor(Evt_D01C.class);
     final static Processor<Evt_D01D> processor_Evt_D01D = Parser.getProcessor(Evt_D01D.class);
+    final static Processor<Evt_D01F> processor_Evt_D01F = Parser.getProcessor(Evt_D01F.class);
     final static Processor<Evt_FFFF> processor_Evt_FFFF = Parser.getProcessor(Evt_FFFF.class);
     final static Processor<Evt_2_6_unknown> processor_Evt_2_6_unknown = Parser.getProcessor(Evt_2_6_unknown.class);
     final static Processor<Evt_4_x_unknown> processor_Evt_4_x_unknown = Parser.getProcessor(Evt_4_x_unknown.class);
@@ -141,7 +149,11 @@ public class Packet {
                 case 0xD017 -> packet.evt_D017 = processor_Evt_D017.process(data);
                 case 0xD018 -> packet.evt_D018 = processor_Evt_D018.process(data);
                 case 0xD019 -> packet.evt_D019 = processor_Evt_D019.process(data);
+                case 0xD01A -> packet.evt_D01A = processor_Evt_D01A.process(data);
+                case 0xD01B -> packet.evt_D01B = processor_Evt_D01B.process(data);
+                case 0xD01C -> packet.evt_D01C = processor_Evt_D01C.process(data);
                 case 0xD01D -> packet.evt_D01D = processor_Evt_D01D.process(data);
+                case 0xD01F -> packet.evt_D01F = processor_Evt_D01F.process(data);
                 case 0xFFFF -> packet.evt_FFFF = processor_Evt_FFFF.process(data);
                 default -> {
                     if (evtId >= 0x0001 && evtId <= 0xAFFF) {
@@ -170,7 +182,7 @@ public class Packet {
             }
         }
         if (evt_0003 != null) {
-            processor_Evt_0004.deProcess(data, evt_0004);
+            processor_Evt_0003.deProcess(data, evt_0003);
         }
         if (evt_0004 != null) {
             processor_Evt_0004.deProcess(data, evt_0004);
@@ -277,8 +289,20 @@ public class Packet {
         if (evt_D019 != null) {
             processor_Evt_D019.deProcess(data, evt_D019);
         }
+        if (evt_D01A != null) {
+            processor_Evt_D01A.deProcess(data, evt_D01A);
+        }
+        if (evt_D01B != null) {
+            processor_Evt_D01B.deProcess(data, evt_D01B);
+        }
+        if (evt_D01C != null) {
+            processor_Evt_D01C.deProcess(data, evt_D01C);
+        }
         if (evt_D01D != null) {
             processor_Evt_D01D.deProcess(data, evt_D01D);
+        }
+        if (evt_D01F != null) {
+            processor_Evt_D01F.deProcess(data, evt_D01F);
         }
         if (evt_2_6_unknown != null) {
             for (Evt_2_6_unknown e : evt_2_6_unknown) {
