@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface F_bit_skip {
+public @interface F_bit_skip{
     /**
      * 占用bit位
      */
