@@ -15,9 +15,9 @@ public class Evt_D018 extends Evt_4_x {
     public byte MqttConnFailRsn;
     @F_bit_num(len = 4)
     public byte LocDRSts;
-    @F_bit_num(len = 29,valExpr = "x*0.000001")
+    @F_bit_num(len = 29,valExpr = "x*0.000001",unsigned = false)
     public double LongitudeDR;
-    @F_bit_num(len = 28,valExpr = "x*0.000001")
+    @F_bit_num(len = 28,valExpr = "x*0.000001",unsigned = false)
     public double LatitudeDR;
     @F_bit_num(len = 4)
     public byte LocGnns1Sts;

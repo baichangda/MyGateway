@@ -9,5 +9,5 @@ public class Evt_000B extends Evt_2_6 {
     @F_bit_num(len = 1)
     public byte iNetworkSts;
     @F_bit_num(len = 16)
-    public byte iNetworkSts_ErrCode;
+    public short iNetworkSts_ErrCode;
 }

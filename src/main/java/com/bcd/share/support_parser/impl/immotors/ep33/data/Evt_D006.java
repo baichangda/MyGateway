@@ -95,13 +95,13 @@ public class Evt_D006 extends Evt_4_x {
     @F_bit_num(len = 1)
     public byte TMActuToqV;
     @F_bit_num(len = 11,  valExpr = "x*0.5-512")
-    public double ISGActuToq;
+    public float ISGActuToq;
     @F_bit_num(len = 1)
     public byte ISGActuToqV;
     @F_bit_num(len = 1)
     public byte SAMActuToqV;
     @F_bit_num(len = 11,  valExpr = "x*0.5-512")
-    public double SAMActuToq;
+    public float SAMActuToq;
     @F_bit_num(len = 8,  valExpr = "x-40")
     public short TMSttrTem;
     @F_bit_num(len = 8,  valExpr = "x-40")
@@ -137,7 +137,7 @@ public class Evt_D006 extends Evt_4_x {
     public short BMSCellMinTemIndx;
 
     @F_bit_num(len = 8,  valExpr = "x*0.5-40")
-    public double BMSCellMinTem;
+    public float BMSCellMinTem;
     @F_bit_num(len = 1)
     public byte BMSCellMinTemV;
     @F_bit_num(len = 8)

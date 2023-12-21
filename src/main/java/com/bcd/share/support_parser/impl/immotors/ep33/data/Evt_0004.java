@@ -8,7 +8,7 @@ public class Evt_0004 extends Evt_2_6 {
     @F_bit_num(len = 16,  valExpr = "x*0.1-500")
     public float GnssAlt;
 
-    @F_bit_num(len = 29,  valExpr = "x*0.000001")
+    @F_bit_num(len = 29,unsigned = false,  valExpr = "x*0.000001")
     public double Longitude;
     @F_bit_num(len = 2)
     public byte GPSSts;
