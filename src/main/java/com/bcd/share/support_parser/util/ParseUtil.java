@@ -458,11 +458,11 @@ public class ParseUtil {
             throw BaseRuntimeException.getException(e);
         }
 
-        StringBuilder sb = new StringBuilder();
+        StringJoiner sj=new StringJoiner("\n");
         for (Map.Entry<Class<? extends Annotation>, FieldBuilder> entry : map.entrySet()) {
-            sb.append(format("Anno[{}] FieldBuilder[{}]", entry.getKey().getName(), entry.getValue().getClass().getName()));
+            sj.add(format("Anno[{}] FieldBuilder[{}]", entry.getKey().getName(), entry.getValue().getClass().getName()));
         }
-        logger.info("scan pkg[{}] list[{}]:\n{}", pkg, map.size(), sb);
+        logger.info("scan pkg[{}] list[{}]:\n{}", pkg, map.size(), sj);
         return map;
     }
 
