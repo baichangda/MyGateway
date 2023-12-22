@@ -90,12 +90,10 @@ public class BitBuf_reader {
             byteLen = (temp >> 3) + 1;
             l = (b & 0xffL) << (temp - finalBitOffset);
         }
-
         for (int i = 1; i < byteLen; i++) {
             b = byteBuf.readByte();
             l |= ((b & 0xffL) << ((byteLen - 1 - i) << 3));
         }
-
         this.bitOffset = finalBitOffset;
         this.b = b;
 

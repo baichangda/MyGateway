@@ -2,13 +2,14 @@ package com.bcd.share.support_parser.impl.immotors.ep33.data;
 
 
 import com.bcd.share.support_parser.anno.F_bit_num;
+import com.bcd.share.support_parser.anno.F_num;
 import com.bcd.share.support_parser.anno.NumType;
 import com.bcd.share.support_parser.impl.immotors.Evt_4_x;
 
 public class Evt_D00F extends Evt_4_x {
-    @F_bit_num(len = 8)
+    @F_num(type = NumType.uint8)
     public short BMSWrnngInfoCRC;
-    @F_bit_num(len = 8,  valExpr = "x*0.5-40")
+    @F_num(type = NumType.uint8,  valExpr = "x*0.5-40")
     public float BMSBusbarTempMax;
     @F_bit_num(len = 1)
     public byte BMSPreThrmFltIndBkup;

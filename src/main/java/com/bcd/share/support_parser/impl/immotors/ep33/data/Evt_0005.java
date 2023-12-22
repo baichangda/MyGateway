@@ -2,6 +2,8 @@ package com.bcd.share.support_parser.impl.immotors.ep33.data;
 
 
 import com.bcd.share.support_parser.anno.F_bit_num;
+import com.bcd.share.support_parser.anno.F_num;
+import com.bcd.share.support_parser.anno.NumType;
 import com.bcd.share.support_parser.impl.immotors.Evt_2_6;
 
 public class Evt_0005 extends Evt_2_6 {
@@ -9,6 +11,6 @@ public class Evt_0005 extends Evt_2_6 {
     public double Latitude;
     @F_bit_num(skipBefore = 2,len = 2)
     public byte VehTyp;
-    @F_bit_num(len = 16, valExpr = "x*0.01")
+    @F_num(type = NumType.uint16, valExpr = "x*0.01")
     public float GNSSDirection;
 }
