@@ -466,7 +466,8 @@ public class ParseUtil {
         return map;
     }
 
-    public static int getClassByteLenIfPossible(Class<?> clazz) {
+    public static int getClassByteLenIfPossible(Class<?> clazz, String... ignoreFields) {
+        Set<String> collect = Arrays.stream(ignoreFields).collect(Collectors.toSet());
         int all = 0;
         List<Field> parseFields = getParseFields(clazz);
         int bit = 0;
@@ -481,6 +482,11 @@ public class ParseUtil {
                     return -1;
                 }
             }
+
+            if (collect.contains(parseField.getDeclaringClass().getName() + "." + parseField.getName())) {
+                continue;
+            }
+
             F_num f_num = parseField.getAnnotation(F_num.class);
             if (f_num != null) {
                 switch (f_num.type()) {
