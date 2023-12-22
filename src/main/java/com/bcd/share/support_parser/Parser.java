@@ -347,7 +347,9 @@ public class Parser {
         BuilderContext parseBuilderContext = new BuilderContext(processBody, clazz, cc, classVarDefineToVarName, beanClassAndOrder_processorVarName, byteOrder, bitOrder, customize_processorId_processorVarName, fieldList);
 
         C_skip c_skip = clazz.getAnnotation(C_skip.class);
-        if (c_skip != null) {
+        if (c_skip == null) {
+            buildMethodBody_process(parseBuilderContext);
+        }else{
             int classByteLen = ParseUtil.getClassByteLenIfPossible(clazz,c_skip.ignoreFields());
             if (classByteLen == -1) {
                 ParseUtil.append(processBody, "final int {}={}.readerIndex();\n", FieldBuilder.varNameStartIndex, FieldBuilder.varNameByteBuf);
@@ -410,7 +412,9 @@ public class Parser {
         ParseUtil.append(deProcessBody, "final {} {}=({})$3;\n", clazzName, FieldBuilder.varNameInstance, clazzName);
         BuilderContext deParseBuilderContext = new BuilderContext(deProcessBody, clazz, cc, classVarDefineToVarName, beanClassAndOrder_processorVarName, byteOrder, bitOrder, customize_processorId_processorVarName, fieldList);
 
-        if (c_skip != null) {
+        if (c_skip == null) {
+            buildMethodBody_deProcess(deParseBuilderContext);
+        }else{
             int classByteLen = ParseUtil.getClassByteLenIfPossible(clazz,c_skip.ignoreFields());
             if (classByteLen == -1) {
                 ParseUtil.append(deProcessBody, "final int {}={}.writerIndex();\n", FieldBuilder.varNameStartIndex, FieldBuilder.varNameByteBuf);

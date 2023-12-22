@@ -9,16 +9,16 @@ public class PacketHeader {
     @F_num(type = NumType.uint16)
     public int msgId;
     //消息体属性-版本标志
-    @F_bit_num_easy(bitStart = 14, bitEnd = 15)
+    @F_bit_num_easy(bitStart = 14, bitEnd = 14)
     public byte versionFlag;
     //消息体属性-分包
-    @F_bit_num_easy(bitStart = 13, bitEnd = 14)
+    @F_bit_num_easy(bitStart = 13, bitEnd = 13)
     public byte subPacketFlag;
     //消息体属性-数据加密方式
-    @F_bit_num_easy(bitStart = 10, bitEnd = 13)
+    @F_bit_num_easy(bitStart = 12, bitEnd = 10)
     public byte encryptType;
     //消息体属性-消息体长度
-    @F_bit_num_easy(bitStart = 0, bitEnd = 10)
+    @F_bit_num_easy(bitStart = 9, bitEnd = 0)
     public int msgLen;
     //协议版本号
     @F_num(type = NumType.uint8)

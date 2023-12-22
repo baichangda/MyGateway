@@ -9,7 +9,7 @@ import java.lang.reflect.Field;
 import java.util.Map;
 
 public class FieldBuilder__F_bit_num_easy extends FieldBuilder {
-    record Info(String varNameNum, int startFieldIndex, int endFieldIndex, int maxBitEnd) {
+    record Info(String varNameNum, int startFieldIndex, int endFieldIndex, int maxBit) {
 
     }
 
@@ -33,7 +33,7 @@ public class FieldBuilder__F_bit_num_easy extends FieldBuilder {
                 F_bit_num_easy prevAnno = prevField.getAnnotation(F_bit_num_easy.class);
                 first = prevAnno == null || prevAnno.end();
             }
-            int maxBitEnd = 0;
+            int maxBit = 0;
             if (first) {
                 for (int i = context.fieldIndex; i < context.fieldList.size(); i++) {
                     Field field = context.fieldList.get(i);
@@ -42,7 +42,7 @@ public class FieldBuilder__F_bit_num_easy extends FieldBuilder {
                         endFieldIndex = i - 1;
                         break;
                     } else {
-                        maxBitEnd = Math.max(maxBitEnd, anno.bitEnd());
+                        maxBit = Math.max(maxBit, anno.bitStart());
                         if (anno.end()) {
                             endFieldIndex = i;
                             break;
@@ -52,7 +52,7 @@ public class FieldBuilder__F_bit_num_easy extends FieldBuilder {
             }
             final String varNameNum = varNameField + "_num";
 
-            Info info = new Info(varNameNum, startFieldIndex, endFieldIndex, maxBitEnd);
+            Info info = new Info(varNameNum, startFieldIndex, endFieldIndex, maxBit);
             cache.put(F_bit_num_easy.class.getName(), info);
             return info;
         } else {
@@ -71,18 +71,18 @@ public class FieldBuilder__F_bit_num_easy extends FieldBuilder {
         Info info = getInfo(context);
         String varNameNum = info.varNameNum();
         if (info.startFieldIndex == context.fieldIndex) {
-            int maxBitEnd = info.maxBitEnd();
+            int maxBit = info.maxBit();
             final String funcName;
-            if (maxBitEnd > 0 && maxBitEnd <= 8) {
+            if (maxBit > 0 && maxBit <= 8) {
                 funcName = "readByte";
-            } else if (maxBitEnd <= 16) {
+            } else if (maxBit <= 16) {
                 funcName = "readShort";
-            } else if (maxBitEnd <= 24) {
+            } else if (maxBit <= 24) {
                 funcName = "readMedium";
-            } else if (maxBitEnd <= 32) {
+            } else if (maxBit <= 32) {
                 funcName = "readInt";
             } else {
-                throw BaseRuntimeException.getException("class[{}] field[{}] anno[{}] maxBitEnd[{}] not support", context.clazz.getName(), field.getName(), F_bit_num_easy.class, maxBitEnd);
+                throw BaseRuntimeException.getException("class[{}] field[{}] anno[{}] maxBit[{}] not support", context.clazz.getName(), field.getName(), F_bit_num_easy.class, maxBit);
             }
             ParseUtil.append(context.body, "final int {}={}.{}();\n", varNameNum, FieldBuilder.varNameByteBuf, funcName);
         }
@@ -163,7 +163,7 @@ public class FieldBuilder__F_bit_num_easy extends FieldBuilder {
 
         Info info = getInfo(context);
         String varNameNum = info.varNameNum();
-        int maxBitEnd = info.maxBitEnd();
+        int maxBitEnd = info.maxBit();
         if (info.startFieldIndex == context.fieldIndex) {
             ParseUtil.append(body, "final int {}=0;\n", varNameNum);
         }
@@ -179,24 +179,24 @@ public class FieldBuilder__F_bit_num_easy extends FieldBuilder {
             } else if (maxBitEnd <= 32) {
                 ParseUtil.append(body, "{}.writeInt({});\n", FieldBuilder.varNameByteBuf, varNameNum);
             } else {
-                throw BaseRuntimeException.getException("class[{}] field[{}] anno[{}] maxBitEnd[{}] not support", context.clazz.getName(), field.getName(), annoClass.getName(), maxBitEnd);
+                throw BaseRuntimeException.getException("class[{}] field[{}] anno[{}] maxBit[{}] not support", context.clazz.getName(), field.getName(), annoClass.getName(), maxBitEnd);
             }
         }
     }
 
     private static String getBitNumCode_read(String varNameNum, int startBit, int endBit) {
-        if (startBit == 0) {
-            return ParseUtil.format("{}&{}", varNameNum, (1 << (endBit - startBit)) - 1);
+        if (endBit == 0) {
+            return ParseUtil.format("{}&{}", varNameNum, (1 << (startBit - endBit + 1)) - 1);
         } else {
-            return ParseUtil.format("({}>>{})&{}", varNameNum, startBit, (1 << (endBit - startBit)) - 1);
+            return ParseUtil.format("({}>>{})&{}", varNameNum, endBit, (1 << (startBit - endBit + 1)) - 1);
         }
     }
 
     private static String getBitNumCode_write(String varNameNum, String varVal, int startBit, int endBit) {
-        if (startBit == 0) {
-            return ParseUtil.format("{}|=({}&{})", varNameNum, varVal, (1 << (endBit - startBit)) - 1);
+        if (endBit == 0) {
+            return ParseUtil.format("{}|=({}&{})", varNameNum, varVal, (1 << (startBit - endBit + 1)) - 1);
         } else {
-            return ParseUtil.format("{}|=(({}&{})<<{})", varNameNum, varVal, (1 << (endBit - startBit)) - 1, startBit);
+            return ParseUtil.format("{}|=(({}&{})<<{})", varNameNum, varVal, (1 << (startBit - endBit + 1)) - 1, endBit);
         }
     }
 

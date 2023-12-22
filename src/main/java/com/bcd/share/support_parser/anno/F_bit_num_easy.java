@@ -27,12 +27,14 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface F_bit_num_easy {
     /**
-     * bit开始、从0开始、包含
+     * bit开始、从最高位开始
+     * 包含
      */
     int bitStart();
 
     /**
-     * bit结束、不包含
+     * bit结束
+     * 包含
      */
     int bitEnd();
 
