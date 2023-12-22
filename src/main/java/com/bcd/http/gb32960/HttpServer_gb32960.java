@@ -1,5 +1,6 @@
 package com.bcd.http.gb32960;
 
+import com.bcd.http.HttpProp;
 import com.bcd.http.WsInMsg;
 import com.bcd.http.WsSession;
 import com.bcd.share.support_parser.Parser;
@@ -20,17 +21,26 @@ import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Optional;
 
+@ConditionalOnProperty("http.port")
+@Component
 public class HttpServer_gb32960 implements CommandLineRunner {
     static Logger logger = LoggerFactory.getLogger(HttpServer_gb32960.class);
 
     public static Processor<Packet> processor = Parser.getProcessor(Packet.class);
+
+    @Autowired
+    public HttpProp httpProp;
 
     @Override
     public void run(String... args) {
@@ -117,7 +127,7 @@ public class HttpServer_gb32960 implements CommandLineRunner {
             WebServer.builder()
                     .addRouting(httpRoutingBuilder)
                     .addRouting(wsRoutingBuilder)
-                    .port(8080).build().start();
+                    .port(httpProp.port).build().start();
         });
 
     }
