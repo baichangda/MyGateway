@@ -5,6 +5,5 @@ import io.netty.buffer.ByteBuf;
 
 @JsonTypeInfo(use = JsonTypeInfo.Id.CLASS)
 public interface AreaOrPathItem {
-
      void write(ByteBuf data);
 }
