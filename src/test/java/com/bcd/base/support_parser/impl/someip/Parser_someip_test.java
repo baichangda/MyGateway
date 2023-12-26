@@ -26,9 +26,9 @@ public class Parser_someip_test {
         byte[] bytes = ByteBufUtil.decodeHexDump(data);
         ByteBuf byteBuf = Unpooled.wrappedBuffer(bytes);
         final Processor<Packet> processor = Parser.getProcessor(Packet.class);
-        final Packet packet = processor.process(byteBuf, null);
+        final Packet packet = processor.process(byteBuf);
         ByteBuf dest = Unpooled.buffer();
-        processor.deProcess(dest, null, packet);
+        processor.deProcess(dest, packet);
         logger.info(data.toUpperCase());
         logger.info(ByteBufUtil.hexDump(dest).toLowerCase());
         assert data.equalsIgnoreCase(ByteBufUtil.hexDump(dest));

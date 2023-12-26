@@ -458,7 +458,7 @@ public class ParseUtil {
             throw BaseRuntimeException.getException(e);
         }
 
-        StringJoiner sj=new StringJoiner("\n");
+        StringJoiner sj = new StringJoiner("\n");
         for (Map.Entry<Class<? extends Annotation>, FieldBuilder> entry : map.entrySet()) {
             sj.add(format("Anno[{}] FieldBuilder[{}]", entry.getKey().getName(), entry.getValue().getClass().getName()));
         }
@@ -509,8 +509,12 @@ public class ParseUtil {
                     switch (f_num_array.singleType()) {
                         case uint8, int8 -> all += (1 + singleSkip) * len;
                         case uint16, int16 -> all += (2 + singleSkip) * len;
-                        case uint32, int32 -> all += (4 + singleSkip) * len;
-                        case uint64, int64 -> all += (8 + singleSkip) * len;
+                        case uint24, int24 -> all += (3 + singleSkip) * len;
+                        case uint32, int32, float32 -> all += (4 + singleSkip) * len;
+                        case uint40, int40 -> all += (5 + singleSkip) * len;
+                        case uint48, int48 -> all += (6 + singleSkip) * len;
+                        case uint56, int56 -> all += (7 + singleSkip) * len;
+                        case uint64, int64, float64 -> all += (8 + singleSkip) * len;
                         default -> {
                             return -1;
                         }
