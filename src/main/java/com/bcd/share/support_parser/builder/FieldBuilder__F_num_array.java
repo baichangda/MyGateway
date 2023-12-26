@@ -5,6 +5,7 @@ import com.bcd.share.support_parser.anno.F_num_array;
 import com.bcd.share.support_parser.anno.NumType;
 import com.bcd.share.support_parser.util.ParseUtil;
 import com.bcd.share.support_parser.util.RpnUtil;
+import io.netty.buffer.ByteBuf;
 
 import java.lang.reflect.Field;
 
@@ -54,62 +55,82 @@ public class FieldBuilder__F_num_array extends FieldBuilder {
         final int singleSkip = anno.singleSkip();
         ParseUtil.append(body, "final {}[] {}=new {}[{}];\n", arrayElementTypeName, arrVarName, arrayElementTypeName, arrLenRes);
         //优化处理 byte[]数组解析
-        if (byte[].class.isAssignableFrom(fieldTypeClass) && singleType == NumType.int8 && singleValExpr.isEmpty() && singleSkip == 0) {
+        if (byte[].class.isAssignableFrom(fieldTypeClass) && (singleType == NumType.int8 || singleType == NumType.uint8) && singleValExpr.isEmpty() && singleSkip == 0) {
             ParseUtil.append(body, "{}.readBytes({});\n", FieldBuilder.varNameByteBuf, arrVarName);
         } else {
             String funcName;
             switch (singleType) {
                 case uint8 -> {
                     if (sourceValTypeName.equals("byte")) {
-                        funcName = "readByte";
+                        funcName = varNameByteBuf + ".readByte()";
                     } else {
-                        funcName = "readUnsignedByte";
+                        funcName = varNameByteBuf + ".readUnsignedByte()";
                     }
-                }
-                case int8 -> {
-                    funcName = "readByte";
                 }
                 case uint16 -> {
                     if (sourceValTypeName.equals("short")) {
-                        funcName = "readShort";
+                        funcName = varNameByteBuf + ".readShort" + (bigEndian ? "" : "LE") + "()";
                     } else {
-                        funcName = "readUnsignedShort";
+                        funcName = varNameByteBuf + ".readUnsignedShort" + (bigEndian ? "" : "LE") + "()";
                     }
                 }
-                case int16 -> {
-                    funcName = "readShort";
+                case uint24 -> {
+                    funcName = varNameByteBuf + ".readUnsignedMedium" + (bigEndian ? "" : "LE") + "()";
                 }
                 case uint32 -> {
                     if (sourceValTypeName.equals("int")) {
-                        funcName = "readInt";
+                        funcName = varNameByteBuf + ".readInt" + (bigEndian ? "" : "LE") + "()";
                     } else {
-                        funcName = "readUnsignedInt";
+                        funcName = varNameByteBuf + ".readUnsignedInt" + (bigEndian ? "" : "LE") + "()";
                     }
                 }
-                case int32 -> {
-                    funcName = "readInt";
+                case uint40 -> {
+                    funcName = ParseUtil.format("{}.read_uint40{}({})", FieldBuilder__F_num.class.getName(), bigEndian ? "" : "_le", FieldBuilder.varNameByteBuf);
                 }
-                case uint64, int64 -> {
-                    funcName = "readLong";
+                case uint48 -> {
+                    funcName = ParseUtil.format("{}.read_uint48{}({})", FieldBuilder__F_num.class.getName(), bigEndian ? "" : "_le", FieldBuilder.varNameByteBuf);
+                }
+                case uint56 -> {
+                    funcName = ParseUtil.format("{}.read_uint56{}({})", FieldBuilder__F_num.class.getName(), bigEndian ? "" : "_le", FieldBuilder.varNameByteBuf);
+                }
+                case int8 -> {
+                    funcName = varNameByteBuf + ".readByte()";
+                }
+                case int16 -> {
+                    funcName = varNameByteBuf + ".readShort" + (bigEndian ? "" : "LE") + "()";
+                }
+                case int24 -> {
+                    funcName = varNameByteBuf + ".readMedium" + (bigEndian ? "" : "LE") + "()";
+                }
+                case int32 -> {
+                    funcName = varNameByteBuf + ".readInt" + (bigEndian ? "" : "LE") + "()";
+                }
+                case int40 -> {
+                    funcName = ParseUtil.format("{}.read_int40{}({})", FieldBuilder__F_num.class.getName(), bigEndian ? "" : "_le", FieldBuilder.varNameByteBuf);
+                }
+                case int48 -> {
+                    funcName = ParseUtil.format("{}.read_int48{}({})", FieldBuilder__F_num.class.getName(), bigEndian ? "" : "_le", FieldBuilder.varNameByteBuf);
+                }
+                case int56 -> {
+                    funcName = ParseUtil.format("{}.read_int56{}({})", FieldBuilder__F_num.class.getName(), bigEndian ? "" : "_le", FieldBuilder.varNameByteBuf);
+                }
+                case int64 -> {
+                    funcName = varNameByteBuf + ".readLong" + (bigEndian ? "" : "LE") + "()";
                 }
                 case float32 -> {
-                    funcName = "readFloat";
+                    funcName = varNameByteBuf + ".readFloat" + (bigEndian ? "" : "LE") + "()";
                 }
                 case float64 -> {
-                    funcName = "readDouble";
+                    funcName = varNameByteBuf + ".readDouble" + (bigEndian ? "" : "LE") + "()";
                 }
                 default -> {
                     ParseUtil.notSupport_numType(context.clazz, field, annoClass);
                     funcName = null;
                 }
             }
-            if (!bigEndian && singleType != NumType.uint8 && singleType != NumType.int8) {
-                funcName += "LE";
-            }
-
             ParseUtil.append(body, "for(int i=0;i<{}.length;i++){\n", arrVarName);
             final String varNameArrayElement = varNameField + "_arrEle";
-            ParseUtil.append(body, "final {} {}=({}){}.{}();\n", sourceValTypeName, varNameArrayElement, sourceValTypeName, FieldBuilder.varNameByteBuf, funcName);
+            ParseUtil.append(body, "final {} {}=({}){};\n", sourceValTypeName, varNameArrayElement, sourceValTypeName, funcName);
             if (singleSkip > 0) {
                 ParseUtil.append(body, "{}.skipBytes({});\n", varNameByteBuf, singleSkip);
             }
@@ -143,7 +164,7 @@ public class FieldBuilder__F_num_array extends FieldBuilder {
 
         ParseUtil.append(body, "if({}!=null){\n", valCode);
 
-        if (byte[].class.isAssignableFrom(fieldTypeClass) && singleType == NumType.int8 && singleValExpr.isEmpty() && singleSkip == 0) {
+        if (byte[].class.isAssignableFrom(fieldTypeClass) && (singleType == NumType.int8||singleType==NumType.uint8) && singleValExpr.isEmpty() && singleSkip == 0) {
             ParseUtil.append(body, "{}.writeBytes({});\n", FieldBuilder.varNameByteBuf, valCode);
         } else {
             final Class<?> arrayElementType = fieldTypeClass.componentType();
@@ -166,46 +187,52 @@ public class FieldBuilder__F_num_array extends FieldBuilder {
                     arrEleValCode = ParseUtil.replaceValExprToCode(RpnUtil.reverseExpr(singleValExpr), arrEleValCode);
                 }
             }
-
             final boolean bigEndian = ParseUtil.bigEndian(anno.singleOrder(), context.byteOrder);
-            final String writeCastTypeName;
-            String funcName;
-            if (!bigEndian && singleType != NumType.uint8 && singleType != NumType.int8) {
-                funcName = "LE";
-            } else {
-                funcName = "";
-            }
             switch (singleType) {
                 case uint8, int8 -> {
-                    writeCastTypeName = "int";
-                    funcName = "writeByte" + funcName;
+                    String funcName = "writeByte";
+                    ParseUtil.append(body, "{}.{}((int)({}));\n", varNameByteBuf, funcName, arrEleValCode);
                 }
                 case uint16, int16 -> {
-                    writeCastTypeName = "int";
-                    funcName = "writeShort" + funcName;
+                    String funcName = "writeShort" + (bigEndian ? "" : "LE");
+                    ParseUtil.append(body, "{}.{}((int)({}));\n", varNameByteBuf, funcName, arrEleValCode);
+                }
+                case uint24, int24 -> {
+                    String funcName = "writeMedium" + (bigEndian ? "" : "LE");
+                    ParseUtil.append(body, "{}.{}((int)({}));\n", varNameByteBuf, funcName, arrEleValCode);
                 }
                 case uint32, int32 -> {
-                    writeCastTypeName = "int";
-                    funcName = "writeInt" + funcName;
+                    String funcName = "writeInt" + (bigEndian ? "" : "LE");
+                    ParseUtil.append(body, "{}.{}((int)({}));\n", varNameByteBuf, funcName, arrEleValCode);
+                }
+                case uint40, int40 -> {
+                    String funcName = "write_int40" + (bigEndian ? "" : "_le");
+                    ParseUtil.append(body, "{}.{}({},(long)({}));\n", FieldBuilder__F_num.class.getName(), funcName, varNameByteBuf, arrEleValCode);
+                }
+                case uint48, int48 -> {
+                    String funcName = "write_int48" + (bigEndian ? "" : "_le");
+                    ParseUtil.append(body, "{}.{}({},(long)({}));\n", FieldBuilder__F_num.class.getName(), funcName, varNameByteBuf, arrEleValCode);
+                }
+                case uint56, int56 -> {
+                    String funcName = "write_int56" + (bigEndian ? "" : "_le");
+                    ParseUtil.append(body, "{}.{}({},(long)({}));\n", FieldBuilder__F_num.class.getName(), funcName, varNameByteBuf, arrEleValCode);
                 }
                 case uint64, int64 -> {
-                    writeCastTypeName = "long";
-                    funcName = "writeLong" + funcName;
+                    String funcName = "writeLong" + (bigEndian ? "" : "LE");
+                    ParseUtil.append(body, "{}.{}((long)({}));\n", varNameByteBuf, funcName, arrEleValCode);
                 }
                 case float32 -> {
-                    writeCastTypeName = "float";
-                    funcName = "writeFloat" + funcName;
+                    String funcName = "writeFloat" + (bigEndian ? "" : "LE");
+                    ParseUtil.append(body, "{}.{}((float)({}));\n", varNameByteBuf, funcName, arrEleValCode);
                 }
                 case float64 -> {
-                    writeCastTypeName = "double";
-                    funcName = "writeDouble" + funcName;
+                    String funcName = "writeDouble" + (bigEndian ? "" : "LE");
+                    ParseUtil.append(body, "{}.{}((double)({}));\n", varNameByteBuf, funcName, arrEleValCode);
                 }
                 default -> {
                     ParseUtil.notSupport_numType(context.clazz, field, annoClass);
-                    writeCastTypeName = null;
                 }
             }
-            ParseUtil.append(body, "{}.{}(({})({}));\n", FieldBuilder.varNameByteBuf, funcName, writeCastTypeName, arrEleValCode);
             if (singleSkip > 0) {
                 ParseUtil.append(body, "{}.writeZero({});\n", varNameByteBuf, singleSkip);
             }
