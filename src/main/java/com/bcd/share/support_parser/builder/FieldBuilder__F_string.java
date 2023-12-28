@@ -134,8 +134,4 @@ public class FieldBuilder__F_string extends FieldBuilder {
         }
     }
 
-    @Override
-    public Class<F_string> annoClass() {
-        return F_string.class;
-    }
 }

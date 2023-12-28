@@ -200,8 +200,4 @@ public class FieldBuilder__F_bit_num_easy extends FieldBuilder {
         }
     }
 
-    @Override
-    public Class<F_bit_num_easy> annoClass() {
-        return F_bit_num_easy.class;
-    }
 }

@@ -147,8 +147,4 @@ public class FieldBuilder__F_bit_num_array extends FieldBuilder {
         ParseUtil.append(body, "}\n");
     }
 
-    @Override
-    public Class<F_bit_num_array> annoClass() {
-        return F_bit_num_array.class;
-    }
 }

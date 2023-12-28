@@ -107,8 +107,4 @@ public class FieldBuilder__F_bean_list extends FieldBuilder {
         ParseUtil.append(body, "}\n");
     }
 
-    @Override
-    public Class<F_bean_list> annoClass() {
-        return F_bean_list.class;
-    }
 }

@@ -28,7 +28,4 @@ public abstract class FieldBuilder {
     public void buildDeParse(final BuilderContext context) {
 
     }
-
-    public abstract Class<? extends Annotation> annoClass();
-
 }

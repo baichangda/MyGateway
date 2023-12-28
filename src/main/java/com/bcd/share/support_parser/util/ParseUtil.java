@@ -436,14 +436,18 @@ public class ParseUtil {
     }
 
     public static Map<Class<? extends Annotation>, FieldBuilder> getAllFieldBuild() {
-        String pkg = "com.bcd.share.support_parser.builder";
+        String parserClassName = Parser.class.getName();
+        String pkg = parserClassName.substring(0, parserClassName.lastIndexOf("."));
         Map<Class<? extends Annotation>, FieldBuilder> map = new HashMap<>();
         try {
-            List<Class<?>> classes = ClassUtil.getClasses(pkg);
+            List<Class<?>> classes = ClassUtil.getClasses(pkg + ".builder");
             for (Class<?> clazz : classes) {
                 if (clazz != FieldBuilder.class && FieldBuilder.class.isAssignableFrom(clazz)) {
                     FieldBuilder instance = (FieldBuilder) clazz.getConstructor().newInstance();
-                    map.put(instance.annoClass(), instance);
+                    String clazzSimpleName = clazz.getSimpleName();
+                    String annoSimpleClassName = clazzSimpleName.substring(clazzSimpleName.indexOf("__") + 2);
+                    String annoClassName = pkg + ".anno." + annoSimpleClassName;
+                    map.put((Class<? extends Annotation>) Class.forName(annoClassName), instance);
                 }
             }
         } catch (Exception e) {

@@ -212,11 +212,6 @@ public class FieldBuilder__F_num extends FieldBuilder {
         }
     }
 
-    @Override
-    public Class<F_num> annoClass() {
-        return F_num.class;
-    }
-
     public static long read_int40(ByteBuf byteBuf) {
         byte i1 = byteBuf.readByte();
         long i2 = byteBuf.readUnsignedInt();

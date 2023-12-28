@@ -241,8 +241,4 @@ public class FieldBuilder__F_num_array extends FieldBuilder {
         ParseUtil.append(body, "}\n");
     }
 
-    @Override
-    public Class<F_num_array> annoClass() {
-        return F_num_array.class;
-    }
 }

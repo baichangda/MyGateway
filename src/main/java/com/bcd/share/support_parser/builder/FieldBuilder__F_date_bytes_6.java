@@ -118,8 +118,4 @@ public class FieldBuilder__F_date_bytes_6 extends FieldBuilder {
         });
     }
 
-    @Override
-    public Class<F_date_bytes_6> annoClass() {
-        return F_date_bytes_6.class;
-    }
 }

@@ -42,8 +42,4 @@ public class FieldBuilder__F_bean extends FieldBuilder {
                 varNameInstance + "." + fieldName);
     }
 
-    @Override
-    public Class<F_bean> annoClass() {
-        return F_bean.class;
-    }
 }

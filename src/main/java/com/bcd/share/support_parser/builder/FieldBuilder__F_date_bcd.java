@@ -110,8 +110,4 @@ public class FieldBuilder__F_date_bcd extends FieldBuilder {
     }
 
 
-    @Override
-    public Class<F_date_bcd> annoClass() {
-        return F_date_bcd.class;
-    }
 }

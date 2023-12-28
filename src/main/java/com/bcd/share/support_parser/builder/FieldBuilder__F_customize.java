@@ -57,8 +57,4 @@ public class FieldBuilder__F_customize extends FieldBuilder {
         ParseUtil.append(body, "{}.deProcess({},{},{});\n", processorClassVarName, FieldBuilder.varNameByteBuf, processContextVarName, valCode);
     }
 
-    @Override
-    public Class<F_customize> annoClass() {
-        return F_customize.class;
-    }
 }

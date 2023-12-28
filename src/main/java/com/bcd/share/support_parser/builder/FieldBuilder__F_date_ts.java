@@ -121,8 +121,4 @@ public class FieldBuilder__F_date_ts extends FieldBuilder {
         }
     }
 
-    @Override
-    public Class<F_date_ts> annoClass() {
-        return F_date_ts.class;
-    }
 }

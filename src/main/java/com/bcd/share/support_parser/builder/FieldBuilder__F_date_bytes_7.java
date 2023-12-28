@@ -101,8 +101,4 @@ public class FieldBuilder__F_date_bytes_7 extends FieldBuilder {
                 varNameZoneDateTimeField);
     }
 
-    @Override
-    public Class<F_date_bytes_7> annoClass() {
-        return F_date_bytes_7.class;
-    }
 }

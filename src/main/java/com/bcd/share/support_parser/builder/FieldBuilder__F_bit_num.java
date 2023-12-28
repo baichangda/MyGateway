@@ -159,9 +159,5 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
         }
     }
 
-    @Override
-    public Class<F_bit_num> annoClass() {
-        return F_bit_num.class;
-    }
 
 }

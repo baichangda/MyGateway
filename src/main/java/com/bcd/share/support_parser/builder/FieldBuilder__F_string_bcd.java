@@ -192,11 +192,6 @@ public class FieldBuilder__F_string_bcd extends FieldBuilder {
         byteBuf.writeBytes(res);
     }
 
-    @Override
-    public Class<F_string_bcd> annoClass() {
-        return F_string_bcd.class;
-    }
-
     public static void main(String[] args) {
         ByteBuf buffer1 = Unpooled.buffer();
 //        write_lowAddressAppend(buffer1, "17299841738", 10);
