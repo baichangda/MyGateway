@@ -6,6 +6,7 @@ import com.bcd.share.exception.BaseRuntimeException;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
@@ -19,15 +20,14 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 
-@SuppressWarnings("unchecked")
 public class ClassUtil {
-    public static Type getParentUntil(Class startClass, Class... endClasses) {
+    public static Type getParentUntil(Class<?> startClass, Class<?>... endClasses) {
         Type parentType = startClass.getGenericSuperclass();
         while (true) {
             if (parentType instanceof ParameterizedType) {
-                Class rawType = (Class) ((ParameterizedType) parentType).getRawType();
+                Class<?> rawType = (Class<?>) ((ParameterizedType) parentType).getRawType();
                 boolean isMatch = false;
-                for (Class endClass : endClasses) {
+                for (Class<?> endClass : endClasses) {
                     if (rawType.equals(endClass)) {
                         isMatch = true;
                         break;
@@ -39,7 +39,7 @@ public class ClassUtil {
                     parentType = rawType.getGenericSuperclass();
                 }
             } else {
-                parentType = ((Class) parentType).getGenericSuperclass();
+                parentType = ((Class<?>) parentType).getGenericSuperclass();
             }
         }
         return parentType;
@@ -52,25 +52,25 @@ public class ClassUtil {
      * @param packages
      * @return
      */
-    public static Map<String, List<Class>> findWithSub(Class annoClass, String... packages) {
+    public static Map<String, List<Class<?>>> findWithSub(Class<? extends Annotation> annoClass, String... packages) {
         try {
-            Map<String, List<Class>> annoNameToClassListMap = new HashMap<>();
+            Map<String, List<Class<?>>> annoNameToClassListMap = new HashMap<>();
             //1、找出所有带注解的类
-            List<Class> classList = ClassUtil.getClassesWithAnno(annoClass, packages);
+            List<Class<?>> classList = ClassUtil.getClassesWithAnno(annoClass, packages);
             //2、找出其中的 注解,并从集合中移除
-            List<Class> subAnnoList = new ArrayList<>();
+            List<Class<? extends Annotation>> subAnnoList = new ArrayList<>();
             for (int i = 0; i <= classList.size() - 1; i++) {
-                Class clazz = classList.get(i);
+                Class<?> clazz = classList.get(i);
                 if (clazz.isAnnotation()) {
-                    subAnnoList.add(clazz);
+                    subAnnoList.add((Class<? extends Annotation>) clazz);
                     classList.remove(i);
                     i--;
                 }
             }
             //3、找出所有子注解的类
-            for (Class subAnno : subAnnoList) {
+            for (Class<? extends Annotation> subAnno : subAnnoList) {
                 //3.1、将子注解扫描出来的类添加进去
-                Map<String, List<Class>> tempMap = findWithSub(subAnno, packages);
+                Map<String, List<Class<?>>> tempMap = findWithSub(subAnno, packages);
                 annoNameToClassListMap.putAll(tempMap);
             }
             //4、返回此注解和其子注解 标注的类
@@ -90,8 +90,8 @@ public class ClassUtil {
      * @throws IOException
      * @throws ClassNotFoundException
      */
-    public static List<Class> getClassesWithAnno(Class annoClass, String... packageNames) throws IOException, ClassNotFoundException {
-        Set<Class> classSet = new HashSet<>();
+    public static List<Class<?>> getClassesWithAnno(Class<? extends Annotation> annoClass, String... packageNames) throws IOException, ClassNotFoundException {
+        Set<Class<?>> classSet = new HashSet<>();
         for (String packageName : packageNames) {
             classSet.addAll(getClasses(packageName));
         }
@@ -107,8 +107,8 @@ public class ClassUtil {
      * @throws IOException
      * @throws ClassNotFoundException
      */
-    public static List<Class> getClassesByParentClass(Class parentClass, String... packageNames) throws IOException, ClassNotFoundException {
-        Set<Class> classSet = new HashSet<>();
+    public static List<Class> getClassesByParentClass(Class<?> parentClass, String... packageNames) throws IOException, ClassNotFoundException {
+        Set<Class<?>> classSet = new HashSet<>();
         for (String packageName : packageNames) {
             classSet.addAll(getClasses(packageName));
         }
@@ -127,8 +127,6 @@ public class ClassUtil {
     public static List<Class<?>> getClasses(String packageName) throws IOException, ClassNotFoundException {
         // 第一个class类的集合
         List<Class<?>> classes = new ArrayList<>();
-        // 是否循环迭代
-        boolean recursive = true;
         // 获取包的名字 并进行替换
         String packageDirName = packageName.replace('.', '/');
         // 定义一个枚举的集合 并进行循环来处理这个目录下的things
@@ -143,9 +141,9 @@ public class ClassUtil {
             // 如果是以文件的形式保存在服务器上
             if ("file".equals(protocol)) {
                 // 获取包的物理路径
-                String filePath = URLDecoder.decode(url.getFile(), StandardCharsets.UTF_8.name());
+                String filePath = URLDecoder.decode(url.getFile(), StandardCharsets.UTF_8);
                 // 以文件的方式扫描整个包下的文件 并添加到集合中
-                findAndAddClassesInPackageByFile(packageName, filePath, recursive, classes);
+                findAndAddClassesInPackageByFile(packageName, filePath, classes);
             } else if ("jar".equals(protocol)) {
                 // 如果是jar包文件
                 // 定义一个JarFile
@@ -171,14 +169,12 @@ public class ClassUtil {
                             packageName = name.substring(0, idx).replace('/', '.');
                         }
                         // 如果可以迭代下去 并且是一个包
-                        if ((idx != -1) || recursive) {
-                            // 如果是一个.class文件 而且不是目录
-                            if (name.endsWith(".class") && !entry.isDirectory()) {
-                                // 去掉后面的".class" 获取真正的类名
-                                String className = name.substring(packageName.length() + 1, name.length() - 6);
-                                // 添加到classes
-                                classes.add(Class.forName(packageName + '.' + className));
-                            }
+                        // 如果是一个.class文件 而且不是目录
+                        if (name.endsWith(".class") && !entry.isDirectory()) {
+                            // 去掉后面的".class" 获取真正的类名
+                            String className = name.substring(packageName.length() + 1, name.length() - 6);
+                            // 添加到classes
+                            classes.add(Class.forName(packageName + '.' + className));
                         }
                     }
                 }
@@ -192,10 +188,9 @@ public class ClassUtil {
      *
      * @param packageName
      * @param packagePath
-     * @param recursive
      * @param classes
      */
-    private static void findAndAddClassesInPackageByFile(String packageName, String packagePath, final boolean recursive, List<Class<?>> classes) throws ClassNotFoundException {
+    private static void findAndAddClassesInPackageByFile(String packageName, String packagePath, List<Class<?>> classes) throws ClassNotFoundException {
         // 获取此包的目录 建立一个File
         File dir = new File(packagePath);
         // 如果不存在或者 也不是目录就直接返回
@@ -203,17 +198,13 @@ public class ClassUtil {
             return;
         }
         // 如果存在 就获取包下的所有文件 包括目录
-        File[] dirfiles = dir.listFiles(new FileFilter() {
-            // 自定义过滤规则 如果可以循环(包含子目录) 或则是以.class结尾的文件(编译好的java类文件)
-            public boolean accept(File file) {
-                return (recursive && file.isDirectory()) || (file.getName().endsWith(".class"));
-            }
-        });
+        // 自定义过滤规则 如果可以循环(包含子目录) 或则是以.class结尾的文件(编译好的java类文件)
+        File[] dirfiles = dir.listFiles(file -> file.isDirectory() || (file.getName().endsWith(".class")));
         // 循环所有文件
         for (File file : dirfiles) {
             // 如果是目录 则继续扫描
             if (file.isDirectory()) {
-                findAndAddClassesInPackageByFile(packageName + "." + file.getName(), file.getAbsolutePath(), recursive, classes);
+                findAndAddClassesInPackageByFile(packageName + "." + file.getName(), file.getAbsolutePath(), classes);
             } else {
                 // 如果是java类文件 去掉后面的.class 只留下类名
                 String className = file.getName().substring(0, file.getName().length() - 6);
@@ -255,11 +246,7 @@ public class ClassUtil {
             return false;
         } else if (clazz.isArray()) {
             return false;
-        } else if (List.class.isAssignableFrom(clazz) || Map.class.isAssignableFrom(clazz)) {
-            return false;
-        } else {
-            return true;
-        }
+        } else return !List.class.isAssignableFrom(clazz) && !Map.class.isAssignableFrom(clazz);
     }
 
 

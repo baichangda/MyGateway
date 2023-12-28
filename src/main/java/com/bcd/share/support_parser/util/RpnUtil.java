@@ -421,7 +421,7 @@ public class RpnUtil {
             }
         }
 
-        if (temp.length() > 0) {
+        if (!temp.isEmpty()) {
             output.add(temp.toString());
         }
 

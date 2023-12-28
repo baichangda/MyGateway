@@ -1,7 +1,5 @@
 package com.bcd.share.support_parser.util;
 
-import com.bcd.share.support_parser.Parser;
-import com.bcd.share.support_parser.processor.Processor;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import org.slf4j.Logger;
@@ -15,7 +13,6 @@ import java.util.concurrent.atomic.LongAdder;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
-@SuppressWarnings("unchecked")
 public class PerformanceUtil {
 
     private final static Logger logger = LoggerFactory.getLogger(PerformanceUtil.class);
@@ -35,17 +32,17 @@ public class PerformanceUtil {
             pools[i] = Executors.newSingleThreadExecutor();
         }
         if (parse) {
-            for (int i = 0; i < pools.length; i++) {
-                pools[i].execute(() -> {
+            for (ExecutorService pool : pools) {
+                pool.execute(() -> {
                     testParse(bytes, num, count, parseFunc);
                 });
             }
         } else {
             final ByteBuf buf = Unpooled.wrappedBuffer(bytes);
             final T t = parseFunc.apply(buf);
-            for (int i = 0; i < pools.length; i++) {
-                pools[i].execute(() -> {
-                    testDeParse(t, num, count,deParseConsumer);
+            for (ExecutorService pool : pools) {
+                pool.execute(() -> {
+                    testDeParse(t, num, count, deParseConsumer);
                 });
             }
         }

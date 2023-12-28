@@ -52,20 +52,12 @@ public class ParseUtil {
         throw BaseRuntimeException.getException("class[{}] field[{}] anno[{}] numType not support", clazz.getName(), field.getName(), annoClass.getName());
     }
 
-    public static void notSupport_charset(Class<?> clazz, Field field, Class<?> annoClass) {
-        throw BaseRuntimeException.getException("class[{}] field[{}] anno[{}] charset not support", clazz.getName(), field.getName(), annoClass.getName());
-    }
-
     public static void notSupport_type(Class<?> clazz, Field field, Class<?> annoClass) {
         throw BaseRuntimeException.getException("class[{}] field[{}] anno[{}] type not support", clazz.getName(), field.getName(), annoClass.getName());
     }
 
     public static void notSupport_fieldType(Class<?> clazz, Field field, Class<?> annoClass) {
         throw BaseRuntimeException.getException("class[{}] field[{}] anno[{}] not support", clazz.getName(), field.getName(), annoClass.getName());
-    }
-
-    private static String toFirstLowerCase(final String str) {
-        return str.substring(0, 1).toLowerCase() + str.substring(1);
     }
 
     public static boolean bigEndian(BitOrder order, BitOrder parentOrder) {
