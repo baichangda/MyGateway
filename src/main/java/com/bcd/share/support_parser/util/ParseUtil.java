@@ -643,8 +643,8 @@ public class ParseUtil {
             F_date_ts f_date_ts = parseField.getAnnotation(F_date_ts.class);
             if (f_date_ts != null) {
                 switch (f_date_ts.mode()) {
-                    case 1, 2, 4, 5 -> all += 8;
-                    case 3 -> all += 4;
+                    case uint64_ms, uint64_s, float64_ms, float64_s -> all += 8;
+                    case uint32_s -> all += 4;
                     default -> {
                         return -1;
                     }

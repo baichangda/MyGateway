@@ -22,7 +22,7 @@ public @interface F_date_ts {
      * 4 协议定义float64、代表时间戳毫秒
      * 5 协议定义float64、代表秒、精度为0.001、小数位代表毫秒
      */
-    int mode();
+    DateTsMode mode();
 
 
     /**

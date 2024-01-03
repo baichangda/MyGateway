@@ -1,5 +1,6 @@
 package com.bcd.share.support_parser.builder;
 
+import com.bcd.share.support_parser.anno.DateTsMode;
 import com.bcd.share.support_parser.anno.F_date_bytes_7;
 import com.bcd.share.support_parser.anno.F_date_ts;
 import com.bcd.share.support_parser.util.ParseUtil;
@@ -25,23 +26,23 @@ public class FieldBuilder__F_date_ts extends FieldBuilder {
         final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.byteOrder);
         //先转换为毫秒
         switch (anno.mode()) {
-            case 1 -> {
+            case uint64_ms -> {
                 final String readFuncName = bigEndian ? "readLong" : "readLongLE";
                 ParseUtil.append(body, "final long {}={}.{}();\n", varNameLongField, varNameByteBuf, readFuncName);
             }
-            case 2 -> {
+            case uint64_s -> {
                 final String readFuncName = bigEndian ? "readLong" : "readLongLE";
                 ParseUtil.append(body, "final long {}={}.{}()*1000;\n", varNameLongField, varNameByteBuf, readFuncName);
             }
-            case 3 -> {
+            case uint32_s -> {
                 final String readFuncName = bigEndian ? "readUnsignedInt" : "readUnsignedIntLE";
                 ParseUtil.append(body, "final long {}={}.{}()*1000;\n", varNameLongField, varNameByteBuf, readFuncName);
             }
-            case 4 -> {
+            case float64_ms -> {
                 final String readFuncName = bigEndian ? "readDouble" : "readDoubleLE";
                 ParseUtil.append(body, "final long {}=(long){}.{}();\n", varNameLongField, varNameByteBuf, readFuncName);
             }
-            case 5 -> {
+            case float64_s -> {
                 final String readFuncName = bigEndian ? "readDouble" : "readDoubleLE";
                 ParseUtil.append(body, "final long {}=(long)({}.{}()*1000);\n", varNameLongField, varNameByteBuf, readFuncName);
             }
@@ -98,23 +99,23 @@ public class FieldBuilder__F_date_ts extends FieldBuilder {
 
         //先转换为毫秒
         switch (anno.mode()) {
-            case 1 -> {
+            case uint64_ms -> {
                 final String writeFuncName = bigEndian ? "writeLong" : "writeLongLE";
                 ParseUtil.append(body, "{}.{}({});\n", varNameByteBuf, writeFuncName, varNameLongField);
             }
-            case 2 -> {
+            case uint64_s-> {
                 final String writeFuncName = bigEndian ? "writeLong" : "writeLongLE";
                 ParseUtil.append(body, "{}.{}({}/1000L);\n", varNameByteBuf, writeFuncName, varNameLongField);
             }
-            case 3 -> {
+            case uint32_s -> {
                 final String writeFuncName = bigEndian ? "writeInt" : "writeIntLE";
                 ParseUtil.append(body, "{}.{}((int)({}/1000L));\n", varNameByteBuf, writeFuncName, varNameLongField);
             }
-            case 4 -> {
+            case float64_ms -> {
                 final String writeFuncName = bigEndian ? "writeDouble" : "writeDoubleLE";
                 ParseUtil.append(body, "{}.{}((double)({}));\n", varNameByteBuf, writeFuncName, varNameLongField);
             }
-            case 5 -> {
+            case float64_s -> {
                 final String writeFuncName = bigEndian ? "writeDouble" : "writeDoubleLE";
                 ParseUtil.append(body, "{}.{}((double){}/1000d);\n", varNameByteBuf, writeFuncName, varNameLongField);
             }
