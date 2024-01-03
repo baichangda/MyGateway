@@ -113,6 +113,7 @@ public class PacketDataFieldProcessor implements Processor<PacketData> {
                 }
             }
         } else {
+            ((ResponseData) instance).content = new byte[packet.contentLength];
             data.writeBytes(((ResponseData) instance).content);
         }
     }
