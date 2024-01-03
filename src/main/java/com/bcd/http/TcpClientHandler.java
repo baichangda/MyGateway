@@ -4,9 +4,9 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 
 public class TcpClientHandler extends ChannelInboundHandlerAdapter {
-    public WsSession session;
+    public WsSession<?> session;
 
-    public TcpClientHandler(WsSession session) {
+    public TcpClientHandler(WsSession<?> session) {
         this.session = session;
     }
 
