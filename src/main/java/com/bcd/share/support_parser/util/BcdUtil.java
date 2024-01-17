@@ -29,5 +29,7 @@ public class BcdUtil {
             System.out.println(i + " " + BCD_DUMP_TABLE[i]);
         }
         System.out.println(bytesToString(new byte[]{(byte) 133, (byte) 153}));
+        System.out.println(bytesToString(new byte[]{(byte) 66, (byte) 87}));
+        System.out.println(bytesToString(new byte[]{(byte) 71, (byte) 99}));
     }
 }
