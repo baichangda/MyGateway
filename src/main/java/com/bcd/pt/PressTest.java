@@ -37,8 +37,19 @@ public abstract class PressTest<T> implements CommandLineRunner {
     AtomicInteger sendNum = new AtomicInteger();
     static NioEventLoopGroup tcp_workerGroup = new NioEventLoopGroup();
 
+    /**
+     * 根据vin初始化报文bean
+     * @param vin
+     * @return
+     */
     protected abstract T initSample(String vin);
 
+    /**
+     * 发送之前、得到{@link ByteBuf}
+     * @param t {@link #initSample(String)}得到的报文bean
+     * @param ts 本次发送报文时间戳
+     * @return
+     */
     protected abstract ByteBuf toByteBuf(T t,long ts);
 
     @Override
@@ -80,10 +91,6 @@ public abstract class PressTest<T> implements CommandLineRunner {
                 throw BaseRuntimeException.getException(ex);
             }
         });
-    }
-
-    private void doBeforeSend(Packet packet, long sendTs) {
-        ((VehicleRunData) packet.data).collectTime = new Date(sendTs);
     }
 
     public void startClient(String vin, AtomicBoolean running) {
