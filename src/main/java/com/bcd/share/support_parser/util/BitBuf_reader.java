@@ -118,7 +118,8 @@ public class BitBuf_reader {
         byte b = this.b;
 
         final int temp = bit + bitOffset;
-        final boolean newBitOffsetZero = (temp & 7) == 0;
+        final int finalBitOffset = temp & 7;
+        final boolean newBitOffsetZero = finalBitOffset == 0;
         final int byteLen = (temp >> 3) + (newBitOffsetZero ? 0 : 1);
         if (byteLen == 1) {
             if (bitOffset == 0) {
@@ -141,7 +142,7 @@ public class BitBuf_reader {
                 }
             }
         }
-        this.bitOffset = temp & 7;
+        this.bitOffset = finalBitOffset;
         this.b = b;
     }
 
