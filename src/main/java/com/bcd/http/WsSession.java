@@ -30,15 +30,20 @@ public abstract class WsSession<T> {
     public Channel channel;
     public volatile T sample;
     public final Class<T> sampleClazz;
+
+    public volatile boolean closed;
+
     public WsSession(String vin, io.helidon.websocket.WsSession ws) {
         this.vin = vin;
         this.ws = ws;
         this.sample = initSample(vin);
         this.sampleClazz = (Class<T>) this.sample.getClass();
+        this.closed = false;
         ws_send(new WsOutMsg(101, JsonUtil.toJson(sample), true));
     }
 
     public synchronized void ws_onClose() {
+        closed = true;
         if (pool != null) {
             pool.shutdown();
         }
@@ -85,6 +90,10 @@ public abstract class WsSession<T> {
                 ch.pipeline().addLast(new TcpClientHandler(wsSession));
             }
         });
+        if (channel != null) {
+            channel.close();
+            channel = null;
+        }
         try {
             channel = bootstrap.connect(host, port).sync().channel();
         } catch (InterruptedException e) {
@@ -106,7 +115,9 @@ public abstract class WsSession<T> {
     }
 
     public synchronized void ws_send(WsOutMsg outMsg) {
-        ws.send(JsonUtil.toJson(outMsg), true);
+        if (!closed) {
+            ws.send(JsonUtil.toJson(outMsg), true);
+        }
     }
 
     public synchronized void tcp_sendRunData() {
@@ -121,6 +132,10 @@ public abstract class WsSession<T> {
     }
 
     public synchronized void tcp_startSendRunData() {
+        if (pool != null) {
+            pool.shutdown();
+            pool = null;
+        }
         pool = Executors.newSingleThreadScheduledExecutor();
         pool.scheduleAtFixedRate(this::tcp_sendRunData, 1, 10, TimeUnit.SECONDS);
     }
