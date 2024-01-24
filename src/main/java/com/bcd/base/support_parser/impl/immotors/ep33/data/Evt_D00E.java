@@ -9,5 +9,5 @@ public class Evt_D00E extends Evt_4_x {
     @F_num(type = NumType.uint8, var = 'a')
     public short BMSRptBatCodeNum;
     @F_bit_num_array(lenExpr = "a", singleValType = NumType.uint8, singleLen = 8)
-    public short[] BMSRptBatCodeAsc;
+    public byte[] BMSRptBatCodeAsc;
 }
