@@ -1,15 +1,9 @@
 package com.bcd.pt;
 
-import com.bcd.share.exception.BaseRuntimeException;
-import com.bcd.share.support_parser.Parser;
-import com.bcd.share.support_parser.impl.gb32960.data.Packet;
-import com.bcd.share.support_parser.impl.gb32960.data.VehicleRunData;
-import com.bcd.share.support_parser.processor.Processor;
+import com.bcd.base.exception.BaseRuntimeException;
 import com.google.common.base.Strings;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufUtil;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
@@ -22,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 
-import java.util.Date;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;

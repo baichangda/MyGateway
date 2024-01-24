@@ -1,9 +1,9 @@
 package com.bcd.base.support_parser.impl.someip;
 
-import com.bcd.share.support_parser.Parser;
-import com.bcd.share.support_parser.impl.someip.data.Packet;
-import com.bcd.share.support_parser.processor.Processor;
-import com.bcd.share.support_parser.util.PerformanceUtil;
+import com.bcd.base.support_parser.Parser;
+import com.bcd.base.support_parser.impl.someip.data.Packet;
+import com.bcd.base.support_parser.processor.Processor;
+import com.bcd.base.support_parser.util.PerformanceUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;

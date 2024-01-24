@@ -1,7 +1,7 @@
 package com.bcd.http;
 
-import com.bcd.share.exception.BaseRuntimeException;
-import com.bcd.share.util.JsonUtil;
+import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.util.JsonUtil;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;

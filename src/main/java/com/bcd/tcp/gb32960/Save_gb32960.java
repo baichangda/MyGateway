@@ -1,9 +1,7 @@
 package com.bcd.tcp.gb32960;
 
-import com.bcd.share.data.gb32960.Helper;
-import com.bcd.share.data.gb32960.SaveData;
-import com.bcd.share.exception.BaseRuntimeException;
-import com.bcd.share.support_mongo.MongoHandler;
+import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.support_mongo.MongoHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationListener;

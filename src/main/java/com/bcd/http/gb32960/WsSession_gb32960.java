@@ -1,8 +1,8 @@
 package com.bcd.http.gb32960;
 
 import com.bcd.http.WsSession;
-import com.bcd.share.support_parser.impl.gb32960.data.Packet;
-import com.bcd.share.support_parser.impl.gb32960.data.VehicleRunData;
+import com.bcd.base.support_parser.impl.gb32960.data.Packet;
+import com.bcd.base.support_parser.impl.gb32960.data.VehicleRunData;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;

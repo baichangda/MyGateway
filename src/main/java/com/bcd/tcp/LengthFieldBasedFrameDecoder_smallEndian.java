@@ -1,6 +1,6 @@
 package com.bcd.tcp;
 
-import com.bcd.share.exception.BaseRuntimeException;
+import com.bcd.base.exception.BaseRuntimeException;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 
