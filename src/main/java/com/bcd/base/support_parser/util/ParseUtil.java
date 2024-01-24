@@ -6,10 +6,7 @@ import com.bcd.base.support_parser.Parser;
 import com.bcd.base.support_parser.anno.*;
 import com.bcd.base.support_parser.builder.BuilderContext;
 import com.bcd.base.support_parser.builder.FieldBuilder;
-import com.bcd.base.support_parser.impl.immotors.ep33.data.Evt_0001;
-import com.bcd.base.support_parser.impl.immotors.ep33.data.Evt_0006;
-import com.bcd.base.support_parser.impl.immotors.ep33.data.Evt_0800;
-import com.bcd.base.support_parser.impl.immotors.ep33.data.Evt_D006;
+import com.bcd.base.support_parser.impl.immotors.ep33.data.*;
 import com.bcd.base.support_parser.impl.jtt808.data.PacketHeader;
 import com.bcd.base.support_parser.processor.Processor;
 import com.google.common.collect.Sets;
@@ -488,8 +485,12 @@ public class ParseUtil {
                 switch (f_num.type()) {
                     case uint8, int8 -> all += 1;
                     case uint16, int16 -> all += 2;
-                    case uint32, int32 -> all += 4;
-                    case uint64, int64 -> all += 8;
+                    case uint24, int24 -> all += 3;
+                    case uint32, int32, float32 -> all += 4;
+                    case uint40, int40 -> all += 5;
+                    case uint48, int48 -> all += 6;
+                    case uint56, int56 -> all += 7;
+                    case uint64, int64, float64 -> all += 8;
                     default -> {
                         return -1;
                     }
@@ -748,8 +749,15 @@ public class ParseUtil {
 //        getAllFieldBuild();
         System.out.println(getClassByteLenIfPossible(Evt_0001.class));
         System.out.println(getClassByteLenIfPossible(Evt_0800.class));
-        System.out.println(getClassByteLenIfPossible(PacketHeader.class));
         System.out.println(getClassByteLenIfPossible(Evt_0006.class));
         System.out.println(getClassByteLenIfPossible(Evt_D006.class));
+        System.out.println(getClassByteLenIfPossible(Evt_D010.class));
+        System.out.println(getClassByteLenIfPossible(Evt_D011.class));
+        System.out.println(getClassByteLenIfPossible(Evt_D012.class));
+        System.out.println(getClassByteLenIfPossible(Evt_D013.class));
+        System.out.println(getClassByteLenIfPossible(Evt_D014.class));
+        System.out.println(getClassByteLenIfPossible(Evt_D015.class));
+        System.out.println(getClassByteLenIfPossible(Evt_D016.class));
+        System.out.println(getClassByteLenIfPossible(Evt_D017.class));
     }
 }
