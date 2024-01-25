@@ -47,6 +47,10 @@ public class FieldBuilder__F_bit_num_easy extends FieldBuilder {
                             endFieldIndex = i;
                             break;
                         }
+                        if (i == context.fieldList.size() - 1) {
+                            endFieldIndex = i;
+                            break;
+                        }
                     }
                 }
             }
