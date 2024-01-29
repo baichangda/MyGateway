@@ -90,9 +90,9 @@ dependencies {
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
 
     // https://mvnrepository.com/artifact/io.helidon.webserver/helidon-webserver
-    implementation group: 'io.helidon.webserver', name: 'helidon-webserver', version: "4.0.3"
-    implementation group: 'io.helidon.webserver', name: 'helidon-webserver-static-content', version: "4.0.3"
-    implementation group: 'io.helidon.webserver', name: 'helidon-webserver-websocket', version: "4.0.3"
+    implementation group: 'io.helidon.webserver', name: 'helidon-webserver', version: "4.+"
+    implementation group: 'io.helidon.webserver', name: 'helidon-webserver-static-content', version: "4.+"
+    implementation group: 'io.helidon.webserver', name: 'helidon-webserver-websocket', version: "4.+"
 
 }
 
