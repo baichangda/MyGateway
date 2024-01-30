@@ -48,7 +48,7 @@ public class Parser_immotors_ep33_test {
         logger.info(hex);
         int threadNum = 1;
         logger.info("param threadNum[{}]", threadNum);
-        int num = 100000000;
+        int num = 1000000000;
         PerformanceUtil.testMultiThreadPerformance(ByteBufUtil.decodeHexDump(hex), threadNum, num, Packet::read, (buf, instance) -> instance.write(buf), true);
     }
 }
