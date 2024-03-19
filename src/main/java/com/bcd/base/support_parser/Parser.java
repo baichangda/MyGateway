@@ -349,7 +349,7 @@ public class Parser {
         if (c_skip == null) {
             buildMethodBody_process(parseBuilderContext);
         }else{
-            int classByteLen = ParseUtil.getClassByteLenIfPossible(clazz,c_skip.ignoreFields());
+            int classByteLen = ParseUtil.getClassByteLenIfPossible(clazz);
             if (classByteLen == -1) {
                 ParseUtil.append(processBody, "final int {}={}.readerIndex();\n", FieldBuilder.varNameStartIndex, FieldBuilder.varNameByteBuf);
                 buildMethodBody_process(parseBuilderContext);
@@ -414,7 +414,7 @@ public class Parser {
         if (c_skip == null) {
             buildMethodBody_deProcess(deParseBuilderContext);
         }else{
-            int classByteLen = ParseUtil.getClassByteLenIfPossible(clazz,c_skip.ignoreFields());
+            int classByteLen = ParseUtil.getClassByteLenIfPossible(clazz);
             if (classByteLen == -1) {
                 ParseUtil.append(deProcessBody, "final int {}={}.writerIndex();\n", FieldBuilder.varNameStartIndex, FieldBuilder.varNameByteBuf);
                 buildMethodBody_deProcess(deParseBuilderContext);

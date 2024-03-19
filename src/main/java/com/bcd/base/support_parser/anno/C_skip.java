@@ -7,6 +7,8 @@ import java.lang.annotation.*;
  * 用于标定类中所有解析字段应该占用的字节
  * 如果解析未达到指定长度、则skip
  * 反解析未达到指定长度、则write byte 0
+ *
+ * 其实现有两种情况、取决于是否能统计出类的所有字段总字节长度、即{@link com.bcd.base.support_parser.util.ParseUtil#getClassByteLenIfPossible(Class, String...)}
  */
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
@@ -30,14 +32,4 @@ public @interface C_skip {
      * a*(b-2)
      */
     String lenExpr() default "";
-
-    /**
-     * 忽略参与统计的字段
-     * 格式为
-     * 类名.属性名
-     *
-     * 注意
-     * 忽略的是字段本身的长度、不会忽略其上面的{@link F_skip}长度
-     */
-    String[] ignoreFields() default {};
 }
