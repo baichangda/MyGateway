@@ -6,7 +6,6 @@ import com.bcd.base.support_parser.anno.F_string_bcd;
 import com.bcd.base.support_parser.util.BcdUtil;
 import com.bcd.base.support_parser.util.ParseUtil;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 
 import java.lang.reflect.Field;
@@ -91,12 +90,7 @@ public class FieldBuilder__F_string_bcd extends FieldBuilder {
     public static String read_noAppend(ByteBuf byteBuf, int len) {
         byte[] bytes = new byte[len];
         byteBuf.readBytes(bytes);
-        char[] chars = new char[len << 1];
-        for (int i = 0; i < bytes.length; i++) {
-            byte b = bytes[i];
-            System.arraycopy(BcdUtil.BCD_DUMP_TABLE, (b & 0xff) << 1, chars, i << 1, 2);
-        }
-        return new String(chars);
+        return BcdUtil.bytesToString_8421(bytes);
     }
 
     public static String read_lowAddressAppend(ByteBuf byteBuf, int len) {
@@ -113,10 +107,10 @@ public class FieldBuilder__F_string_bcd extends FieldBuilder {
                     } else {
                         startIndex = i << 1;
                     }
-                    System.arraycopy(BcdUtil.BCD_DUMP_TABLE, (b & 0xff) << 1, chars, i << 1, 2);
+                    System.arraycopy(BcdUtil.BCD_8421_DUMP_TABLE, (b & 0xff) << 1, chars, i << 1, 2);
                 }
             } else {
-                System.arraycopy(BcdUtil.BCD_DUMP_TABLE, (b & 0xff) << 1, chars, i << 1, 2);
+                System.arraycopy(BcdUtil.BCD_8421_DUMP_TABLE, (b & 0xff) << 1, chars, i << 1, 2);
             }
         }
         return new String(chars, startIndex, chars.length - startIndex);
@@ -136,25 +130,19 @@ public class FieldBuilder__F_string_bcd extends FieldBuilder {
                     } else {
                         endIndex = (i << 1) + 1;
                     }
-                    System.arraycopy(BcdUtil.BCD_DUMP_TABLE, (b & 0xff) << 1, chars, i << 1, 2);
+                    System.arraycopy(BcdUtil.BCD_8421_DUMP_TABLE, (b & 0xff) << 1, chars, i << 1, 2);
                 }
             } else {
-                System.arraycopy(BcdUtil.BCD_DUMP_TABLE, (b & 0xff) << 1, chars, i << 1, 2);
+                System.arraycopy(BcdUtil.BCD_8421_DUMP_TABLE, (b & 0xff) << 1, chars, i << 1, 2);
             }
         }
-        return new String(chars, 0, endIndex+1);
+        return new String(chars, 0, endIndex + 1);
     }
 
-    public static void write_noAppend(ByteBuf byteBuf, String s) {
-        char[] charArray = s.toCharArray();
-        int actualLen = charArray.length >> 1;
-        byte[] res = new byte[actualLen];
-        for (int i = 0; i < actualLen; i++) {
-            byte b1 = (byte) (Character.getNumericValue(charArray[i << 1]) << 4);
-            byte b2 = (byte) Character.getNumericValue(charArray[(i << 1) + 1]);
-            res[i] = (byte) (b1 | b2);
-        }
-        byteBuf.writeBytes(res);
+    public static int write_noAppend(ByteBuf byteBuf, String s) {
+        byte[] bytes = BcdUtil.stringToBytes_8421(s);
+        byteBuf.writeBytes(bytes);
+        return bytes.length;
     }
 
     public static void write_lowAddressAppend(ByteBuf byteBuf, String s, int len) {
@@ -165,9 +153,9 @@ public class FieldBuilder__F_string_bcd extends FieldBuilder {
         int offset = sLen & 1;
         for (int i = len - 1, j = actualLen - 1; j >= 0; i--, j--) {
             int index = (j << 1) + offset;
-            byte b1 = (byte) (Character.getNumericValue(charArray[index]) << 4);
-            byte b2 = (byte) Character.getNumericValue(charArray[index + 1]);
-            res[i] = (byte) (b1 | b2);
+            int n1 = charArray[index] - '0';
+            int n2 = charArray[index + 1] - '0';
+            res[i] = (byte) (n1 << 4 | n2);
         }
         if (offset == 1) {
             res[len - actualLen - 1] = (byte) Character.getNumericValue(charArray[0]);
@@ -182,9 +170,10 @@ public class FieldBuilder__F_string_bcd extends FieldBuilder {
         int sLen = charArray.length;
         int actualLen = charArray.length >> 1;
         for (int i = 0; i < actualLen; i++) {
-            byte b1 = (byte) (Character.getNumericValue(charArray[i << 1]) << 4);
-            byte b2 = (byte) Character.getNumericValue(charArray[(i << 1) + 1]);
-            res[i] = (byte) (b1 | b2);
+            int charIndex = i << 1;
+            int n1 = charArray[charIndex] - '0';
+            int n2 = charArray[(charIndex) + 1] - '0';
+            res[i] = (byte) (n1 << 4 | n2);
         }
         if ((sLen & 1) == 1) {
             res[actualLen] = (byte) (Character.getNumericValue(charArray[actualLen << 1]) << 4);
@@ -193,13 +182,20 @@ public class FieldBuilder__F_string_bcd extends FieldBuilder {
     }
 
     public static void main(String[] args) {
+        String s = "2117299841738";
         ByteBuf buffer1 = Unpooled.buffer();
-//        write_lowAddressAppend(buffer1, "17299841738", 10);
-        write_highAddressAppend(buffer1, "17299841738", 10);
-        System.out.println(ByteBufUtil.hexDump(buffer1));
+        write_highAddressAppend(buffer1, s, 20);
+        String s1 = read_highAddressAppend(buffer1, 20);
+        System.out.println(s1);
+
         ByteBuf buffer2 = Unpooled.buffer();
-//        write_lowAddressAppend(buffer2, "117299841738", 10);
-        write_highAddressAppend(buffer2, "117299841738", 10);
-        System.out.println(ByteBufUtil.hexDump(buffer2));
+        write_lowAddressAppend(buffer2, s, 20);
+        String s2 = read_lowAddressAppend(buffer2, 20);
+        System.out.println(s2);
+
+        ByteBuf buffer3 = Unpooled.buffer();
+        int len3 = write_noAppend(buffer3, s);
+        String s3 = read_noAppend(buffer3, len3);
+        System.out.println(s3);
     }
 }
