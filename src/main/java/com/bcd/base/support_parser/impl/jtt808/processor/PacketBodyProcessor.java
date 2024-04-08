@@ -38,7 +38,6 @@ public class PacketBodyProcessor implements Processor<PacketBody> {
     Processor<DeletePath> processor_DeletePath = Parser.getProcessor(DeletePath.class);
     Processor<QueryAreaOrPathRequest> processor_QueryAreaOrPathRequest = Parser.getProcessor(QueryAreaOrPathRequest.class);
     Processor<WaybillReport> processor_WaybillReport = Parser.getProcessor(WaybillReport.class);
-    Processor<DriverIdentityReport> processor_DriverIdentityReport = Parser.getProcessor(DriverIdentityReport.class);
     Processor<CanDataUpload> processor_CanDataUpload = Parser.getProcessor(CanDataUpload.class);
     Processor<MultiMediaEventUpload> processor_MultiMediaEventUpload = Parser.getProcessor(MultiMediaEventUpload.class);
     Processor<CameraTakePhotoCmdRequest> processor_CameraTakePhotoCmdRequest = Parser.getProcessor(CameraTakePhotoCmdRequest.class);
@@ -169,7 +168,7 @@ public class PacketBodyProcessor implements Processor<PacketBody> {
                 packetBody = processor_WaybillReport.process(data, parentContext);
             }
             case 0x0702 -> {
-                packetBody = processor_DriverIdentityReport.process(data, parentContext);
+                packetBody = DriverIdentityReport.read(data);
             }
             case 0x0704 -> {
                 packetBody = PositionDataUpload.read(data);
@@ -343,7 +342,7 @@ public class PacketBodyProcessor implements Processor<PacketBody> {
                 processor_WaybillReport.deProcess(data, parentContext, (WaybillReport) instance);
             }
             case 0x0702 -> {
-                processor_DriverIdentityReport.deProcess(data, parentContext, (DriverIdentityReport) instance);
+                ((DriverIdentityReport) instance).write(data);
             }
             case 0x0704 -> {
                 ((PositionDataUpload) instance).write(data);

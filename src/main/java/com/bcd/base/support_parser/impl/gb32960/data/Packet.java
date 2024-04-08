@@ -18,7 +18,7 @@ public class Packet {
     @F_num(type = NumType.uint8)
     public short replyFlag;
     //唯一识别码 4-21
-    @F_string(len = 17)
+    @F_string(len = 17,appendMode = StringAppendMode.lowAddressAppend)
     public String vin;
     //数据单元加密方式 21-22
     @F_num(type = NumType.uint8)

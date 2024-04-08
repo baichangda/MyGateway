@@ -4,6 +4,7 @@ package com.bcd.base.support_parser.builder;
 import com.bcd.base.exception.BaseRuntimeException;
 import com.bcd.base.support_parser.anno.F_string;
 import com.bcd.base.support_parser.util.ParseUtil;
+import io.netty.buffer.ByteBuf;
 
 import java.lang.reflect.Field;
 import java.nio.charset.Charset;
@@ -39,38 +40,10 @@ public class FieldBuilder__F_string extends FieldBuilder {
                 ParseUtil.append(body, "{}.{}={}.readCharSequence({},{}).toString();\n", varNameInstance, field.getName(), varNameByteBuf, lenRes, charsetVarName);
             }
             case lowAddressAppend -> {
-                final String lenVarName = varNameField + "_len";
-                final String arrVarName = varNameField + "_arr";
-                final String discardLenVarName = varNameField + "_discardLen";
-                ParseUtil.append(body, "final int {}={};\n", lenVarName, lenRes);
-                ParseUtil.append(body, "final byte[] {}=new byte[{}];\n", arrVarName, lenVarName);
-                ParseUtil.append(body, "{}.readBytes({});\n", varNameByteBuf, arrVarName);
-                ParseUtil.append(body, "int {}=0;\n", discardLenVarName);
-                ParseUtil.append(body, "for(int i=0;i<{};i++){\n", lenVarName);
-                ParseUtil.append(body, "if({}[i]==0){\n", arrVarName);
-                ParseUtil.append(body, "{}++;\n", discardLenVarName);
-                ParseUtil.append(body, "}else{\n");
-                ParseUtil.append(body, "break;\n");
-                ParseUtil.append(body, "}\n");
-                ParseUtil.append(body, "}\n");
-                ParseUtil.append(body, "{}.{}=new String({},{},{}-{},{});\n", varNameInstance, field.getName(), arrVarName, discardLenVarName, lenVarName, discardLenVarName, charsetVarName);
+                ParseUtil.append(body, "{}.{}={}.read_lowAddressAppend({},{},{});\n", varNameInstance, field.getName(), FieldBuilder__F_string.class.getName(), varNameByteBuf, lenRes, charsetVarName);
             }
             case highAddressAppend -> {
-                final String lenVarName = varNameField + "_len";
-                final String arrVarName = varNameField + "_arr";
-                final String discardLenVarName = varNameField + "_discardLen";
-                ParseUtil.append(body, "final int {}={};\n", lenVarName, lenRes);
-                ParseUtil.append(body, "final byte[] {}=new byte[{}];\n", arrVarName, lenVarName);
-                ParseUtil.append(body, "{}.readBytes({});\n", varNameByteBuf, arrVarName);
-                ParseUtil.append(body, "int {}=0;\n", discardLenVarName);
-                ParseUtil.append(body, "for(int i={}-1;i>=0;i--){\n", lenVarName);
-                ParseUtil.append(body, "if({}[i]==0){\n", arrVarName);
-                ParseUtil.append(body, "{}++;\n", discardLenVarName);
-                ParseUtil.append(body, "}else{\n");
-                ParseUtil.append(body, "break;\n");
-                ParseUtil.append(body, "}\n");
-                ParseUtil.append(body, "}\n");
-                ParseUtil.append(body, "{}.{}=new String({},0,{}-{},{});\n", varNameInstance, field.getName(), arrVarName, lenVarName, discardLenVarName, charsetVarName);
+                ParseUtil.append(body, "{}.{}={}.read_highAddressAppend({},{},{});\n", varNameInstance, field.getName(), FieldBuilder__F_string.class.getName(), varNameByteBuf, lenRes, charsetVarName);
             }
         }
     }
@@ -104,9 +77,6 @@ public class FieldBuilder__F_string extends FieldBuilder {
         }
 
 
-        String arrVarName = varNameField + "_arr";
-        String arrLeaveVarName = varNameField + "_leave";
-
         final Charset charset = Charset.forName(anno.charset());
         final String charsetClassName = Charset.class.getName();
         final String charsetVarName = ParseUtil.defineClassVar(context, Charset.class, "{}.forName(\"{}\")", charsetClassName, charset.name());
@@ -116,22 +86,56 @@ public class FieldBuilder__F_string extends FieldBuilder {
                 ParseUtil.append(body, "{}.writeBytes({}.getBytes({}));\n", varNameByteBuf, varNameFieldVal, charsetVarName);
             }
             case lowAddressAppend -> {
-                ParseUtil.append(body, "final byte[] {}={}.getBytes({});\n", arrVarName, varNameFieldVal, charsetVarName);
-                ParseUtil.append(body, "final int {}={}-{}.length;\n", arrLeaveVarName, lenRes, arrVarName);
-                ParseUtil.append(body, "if({}>0){\n", arrLeaveVarName);
-                ParseUtil.append(body, "{}.writeZero({});\n", varNameByteBuf, arrLeaveVarName);
-                ParseUtil.append(body, "}\n");
-                ParseUtil.append(body, "{}.writeBytes({});\n", varNameByteBuf, arrVarName);
+                ParseUtil.append(body, "{}.write_lowAddressAppend({},{},{},{});\n", FieldBuilder__F_string.class.getName(), varNameByteBuf, varNameFieldVal, lenRes, charsetVarName);
             }
             case highAddressAppend -> {
-                ParseUtil.append(body, "final byte[] {}={}.getBytes({});\n", arrVarName, varNameFieldVal, charsetVarName);
-                ParseUtil.append(body, "{}.writeBytes({});\n", varNameByteBuf, arrVarName);
-                ParseUtil.append(body, "final int {}={}-{}.length;\n", arrLeaveVarName, lenRes, arrVarName);
-                ParseUtil.append(body, "if({}>0){\n", arrLeaveVarName);
-                ParseUtil.append(body, "{}.writeZero({});\n", varNameByteBuf, arrLeaveVarName);
-                ParseUtil.append(body, "}\n");
+                ParseUtil.append(body, "{}.write_highAddressAppend({},{},{},{});\n", FieldBuilder__F_string.class.getName(), varNameByteBuf, varNameFieldVal, lenRes, charsetVarName);
             }
         }
     }
 
+    public static String read_lowAddressAppend(ByteBuf byteBuf, int len, Charset charset) {
+        final byte[] bytes = new byte[len];
+        byteBuf.readBytes(bytes);
+        int startIndex = 0;
+        for (int i = 0; i < bytes.length; i++) {
+            if (bytes[i] != 0) {
+                startIndex = i;
+                break;
+            }
+        }
+        return new String(bytes, startIndex, len - startIndex, charset);
+    }
+
+    public static String read_highAddressAppend(ByteBuf byteBuf, int len, Charset charset) {
+        final byte[] bytes = new byte[len];
+        byteBuf.readBytes(bytes);
+        int endIndex = bytes.length - 1;
+        for (int i = bytes.length - 1; i >= 0; i--) {
+            if (bytes[i] != 0) {
+                endIndex = i;
+                break;
+            }
+        }
+        return new String(bytes, 0, endIndex + 1, charset);
+    }
+
+
+    public static void write_lowAddressAppend(ByteBuf byteBuf, String str, int len, Charset charset) {
+        byte[] bytes = str.getBytes(charset);
+        int leaveLen = len - bytes.length;
+        if (leaveLen > 0) {
+            byteBuf.writeZero(leaveLen);
+        }
+        byteBuf.writeBytes(bytes);
+    }
+
+    public static void write_highAddressAppend(ByteBuf byteBuf, String str, int len, Charset charset) {
+        byte[] bytes = str.getBytes(charset);
+        byteBuf.writeBytes(bytes);
+        int leaveLen = len - bytes.length;
+        if (leaveLen > 0) {
+            byteBuf.writeZero(leaveLen);
+        }
+    }
 }

@@ -1,7 +1,14 @@
 package com.bcd.base.support_parser.impl.jtt808.data;
 
-import com.bcd.base.support_parser.anno.*;
+import com.bcd.base.support_parser.anno.F_num;
+import com.bcd.base.support_parser.anno.NumType;
+import com.bcd.base.support_parser.builder.FieldBuilder__F_date_bytes_6;
+import com.bcd.base.support_parser.builder.FieldBuilder__F_string;
+import com.bcd.base.support_parser.builder.FieldBuilder__F_string_bcd;
+import com.bcd.base.util.DateZoneUtil;
+import io.netty.buffer.ByteBuf;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 public class DriverIdentityReport implements PacketBody {
@@ -9,30 +16,53 @@ public class DriverIdentityReport implements PacketBody {
     @F_num(type = NumType.uint8)
     public byte status;
     //时间
-    @F_date_bytes_6
     public Date time;
     //ic卡读取结果
-    @F_num(type = NumType.uint8)
     public byte res;
     //驾驶员姓名长度
-    @F_num(type = NumType.uint8, var = 'n')
     public short nameLen;
     //驾驶员姓名
-    @F_string(lenExpr = "n")
     public String name;
     //从业资格证编码
-    @F_string(len = 20, appendMode = StringAppendMode.highAddressAppend)
     public String code;
     //发证机构名称长度
-    @F_num(type = NumType.uint8, var = 'm')
     public short orgLen;
     //发证机构
-    @F_string(lenExpr = "m")
     public String org;
     //证件有效期
-    @F_num_array(len = 4, singleType = NumType.uint8)
-    public byte[] expired;
+    public String expired;
     //驾驶员身份证号
-    @F_string(len = 20, appendMode = StringAppendMode.highAddressAppend)
     public String id;
+
+    public static DriverIdentityReport read(ByteBuf data) {
+        DriverIdentityReport driverIdentityReport = new DriverIdentityReport();
+        driverIdentityReport.status = data.readByte();
+        driverIdentityReport.time = new Date(FieldBuilder__F_date_bytes_6.read(data, DateZoneUtil.ZONE_OFFSET, 2000));
+        driverIdentityReport.res = data.readByte();
+        if (driverIdentityReport.res == 0) {
+            driverIdentityReport.nameLen = data.readUnsignedByte();
+            driverIdentityReport.name = data.readCharSequence(driverIdentityReport.nameLen, StandardCharsets.UTF_8).toString();
+            driverIdentityReport.code = FieldBuilder__F_string.read_highAddressAppend(data, 20, StandardCharsets.UTF_8);
+            driverIdentityReport.orgLen = data.readUnsignedByte();
+            driverIdentityReport.org = data.readCharSequence(driverIdentityReport.orgLen, StandardCharsets.UTF_8).toString();
+            driverIdentityReport.expired = FieldBuilder__F_string_bcd.read_noAppend(data, 4);
+            driverIdentityReport.id = FieldBuilder__F_string.read_highAddressAppend(data, 20, StandardCharsets.UTF_8);
+        }
+        return driverIdentityReport;
+    }
+
+    public void write(ByteBuf data) {
+        data.writeByte(status);
+        FieldBuilder__F_date_bytes_6.write(data, time.getTime(), DateZoneUtil.ZONE_OFFSET, 2000);
+        data.writeByte(res);
+        if (res == 0) {
+            data.writeByte(nameLen);
+            data.writeCharSequence(name, StandardCharsets.UTF_8);
+            FieldBuilder__F_string.write_highAddressAppend(data, code, 20, StandardCharsets.UTF_8);
+            data.writeByte(orgLen);
+            data.writeCharSequence(org, StandardCharsets.UTF_8);
+            FieldBuilder__F_string_bcd.write_noAppend(data, expired);
+            FieldBuilder__F_string.write_highAddressAppend(data, id, 20, StandardCharsets.UTF_8);
+        }
+    }
 }
