@@ -140,7 +140,11 @@ public class ParseUtil {
         if (logFieldTypeSet.contains(fieldType)) {
             return true;
         } else {
-            return fieldType.isEnum();
+            if(fieldType.isEnum()){
+                return true;
+            }else{
+                return context.field.isAnnotationPresent(F_customize.class);
+            }
         }
     }
 
