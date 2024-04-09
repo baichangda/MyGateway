@@ -21,14 +21,9 @@ public class FieldBuilder__F_date_bytes_6 extends FieldBuilder {
         final Class<?> fieldTypeClass = field.getType();
         final String varNameField = ParseUtil.getFieldVarName(context);
         final String varNameLongField = varNameField + "_long";
-        final String zoneDateTimeClassName = ZonedDateTime.class.getName();
         final String varNameZoneId = ParseUtil.defineClassVar(context, ZoneId.class, "{}.of(\"{}\")", ZoneId.class.getName(), anno.zoneId());
         //先转换为毫秒
-        ParseUtil.append(body, "final long {}={}.of({}+{}.readUnsignedByte(),{}.readByte(),{}.readByte(),{}.readByte(),{}.readByte(),{}.readByte(),0,{}).toInstant().toEpochMilli();\n",
-                varNameLongField, zoneDateTimeClassName, anno.baseYear()
-                , varNameByteBuf, varNameByteBuf, varNameByteBuf, varNameByteBuf
-                , varNameByteBuf, varNameByteBuf, varNameZoneId);
-
+        ParseUtil.append(body, "final long {}={}.read({},{},{});\n", varNameLongField, FieldBuilder__F_date_bytes_6.class.getName(), varNameByteBuf, varNameZoneId, anno.baseYear());
         //根据字段类型格式化
         if (Date.class.isAssignableFrom(fieldTypeClass)) {
             final String dateClassName = Date.class.getName();
@@ -38,6 +33,7 @@ public class FieldBuilder__F_date_bytes_6 extends FieldBuilder {
         } else if (int.class.isAssignableFrom(fieldTypeClass)) {
             ParseUtil.append(body, "{}.{}=(int)({}/1000);\n", varNameInstance, field.getName(), varNameLongField);
         } else if (String.class.isAssignableFrom(fieldTypeClass)) {
+            final String zoneDateTimeClassName = ZonedDateTime.class.getName();
             final String varNameStringZoneId = ParseUtil.defineClassVar(context, ZoneId.class, "{}.of(\"{}\")", ZoneId.class.getName(), anno.stringZoneId());
             final String dateTimeFormatterVarName = ParseUtil.defineClassVar(context, DateTimeFormatter.class, "{}.ofPattern(\"{}\").withZone({})", DateTimeFormatter.class.getName(), anno.stringFormat(), varNameStringZoneId);
             ParseUtil.append(body, "{}.{}={}.ofInstant({}.ofEpochMilli({}),{}).format({});\n",
@@ -79,24 +75,7 @@ public class FieldBuilder__F_date_bytes_6 extends FieldBuilder {
             ParseUtil.notSupport_fieldType(context.clazz, field, F_date_bytes_6.class);
         }
 
-
-        final String varNameZoneDateTimeField = varNameField + "zoneDateTime";
-        ParseUtil.append(body, "{} {}={}.ofInstant({}.ofEpochMilli({}),{});\n",
-                zoneDateTimeClassName,
-                varNameZoneDateTimeField,
-                zoneDateTimeClassName,
-                Instant.class.getName(),
-                varNameLongField,
-                varNameZoneId);
-        ParseUtil.append(body, "{}.writeBytes(new byte[]{(byte)({}.getYear()-{}),(byte)({}.getMonthValue()),(byte)({}.getDayOfMonth()),(byte)({}.getHour()),(byte)({}.getMinute()),(byte)({}.getSecond())});\n",
-                varNameByteBuf,
-                varNameZoneDateTimeField,
-                anno.baseYear(),
-                varNameZoneDateTimeField,
-                varNameZoneDateTimeField,
-                varNameZoneDateTimeField,
-                varNameZoneDateTimeField,
-                varNameZoneDateTimeField);
+        ParseUtil.append(body, "{}.write({},{},{},{});\n", FieldBuilder__F_date_bytes_6.class.getName(), varNameByteBuf, varNameLongField, varNameZoneId, anno.baseYear());
     }
 
     public static long read(final ByteBuf data, final ZoneId zoneId, final int baseYear) {
