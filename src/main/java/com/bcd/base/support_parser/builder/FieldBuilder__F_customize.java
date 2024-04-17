@@ -14,7 +14,7 @@ public class FieldBuilder__F_customize extends FieldBuilder {
         final F_customize anno = field.getAnnotation(F_customize.class);
         final Class<?> processorClass = anno.processorClass();
         if (processorClass == void.class) {
-            throw BaseRuntimeException.getException("class[{}] field[{}] anno[] must have builderClass or processorClass", field.getDeclaringClass().getName(), field.getName(), F_customize.class.getName());
+            throw BaseRuntimeException.get("class[{}] field[{}] anno[] must have builderClass or processorClass", field.getDeclaringClass().getName(), field.getName(), F_customize.class.getName());
         } else {
             final StringBuilder body = context.body;
             final String varNameField = ParseUtil.getFieldVarName(context);

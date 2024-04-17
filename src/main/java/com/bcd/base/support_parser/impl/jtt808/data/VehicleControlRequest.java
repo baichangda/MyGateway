@@ -25,7 +25,7 @@ public class VehicleControlRequest implements PacketBody {
                     types[i] = vehicleControlType;
                 }
                 default -> {
-                    throw BaseRuntimeException.getException("VehicleControlType id[{}] not support", id);
+                    throw BaseRuntimeException.get("VehicleControlType id[{}] not support", id);
                 }
             }
         }

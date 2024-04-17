@@ -221,7 +221,7 @@ public class PacketBodyProcessor implements Processor<PacketBody> {
             case 0x0A00 -> {
                 packetBody = processor_TerminalRsa.process(data, parentContext);
             }
-            default -> throw BaseRuntimeException.getException("msgId[{}] not support", packet.header.msgId);
+            default -> throw BaseRuntimeException.get("msgId[{}] not support", packet.header.msgId);
         }
         return packetBody;
     }
@@ -395,7 +395,7 @@ public class PacketBodyProcessor implements Processor<PacketBody> {
             case 0x0A00 -> {
                 processor_TerminalRsa.process(data, parentContext);
             }
-            default -> throw BaseRuntimeException.getException("msgId[{}] not support", packet.header.msgId);
+            default -> throw BaseRuntimeException.get("msgId[{}] not support", packet.header.msgId);
         }
     }
 

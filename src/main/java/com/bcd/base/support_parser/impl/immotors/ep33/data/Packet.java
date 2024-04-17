@@ -162,7 +162,7 @@ public class Packet {
                         evt_4_x_unknown.add(processor_Evt_4_x_unknown.process(data));
                     } else {
                         final String evtIdHex = ByteBufUtil.hexDump(new byte[]{(byte) (evtId >> 8), (byte) evtId});
-                        throw BaseRuntimeException.getException("evtId[{}] not support", evtIdHex);
+                        throw BaseRuntimeException.get("evtId[{}] not support", evtIdHex);
                     }
                 }
             }

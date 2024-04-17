@@ -70,7 +70,7 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
 
         final int len = anno.len();
         if (len < 1 || len > 64) {
-            throw BaseRuntimeException.getException("class[{}] field[{}] anno[{}] len[{}] must in range [1,64]", field.getDeclaringClass().getName(), field.getName(), annoClass.getName(), len);
+            throw BaseRuntimeException.get("class[{}] field[{}] anno[{}] len[{}] must in range [1,64]", field.getDeclaringClass().getName(), field.getName(), annoClass.getName(), len);
         }
 
 
@@ -147,7 +147,7 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
 
         final int len = anno.len();
         if (len < 1 || len > 64) {
-            throw BaseRuntimeException.getException("class[{}] field[{}] anno[{}] len[{}] must in range [1,64]", field.getDeclaringClass().getName(), field.getName(), annoClass.getName(), len);
+            throw BaseRuntimeException.get("class[{}] field[{}] anno[{}] len[{}] must in range [1,64]", field.getDeclaringClass().getName(), field.getName(), annoClass.getName(), len);
         }
         ParseUtil.append(body, "{}.write((long)({}),{},{},{});\n", varNameBitBuf, valCode, len, bigEndian, unsigned);
 

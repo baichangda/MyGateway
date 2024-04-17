@@ -48,7 +48,7 @@ public class DateZoneUtil {
                 return DateZoneUtil.stringToDate_millisecond(dateStr);
             }
             default: {
-                throw BaseRuntimeException.getException("dateStr[{}] not support", dateStr);
+                throw BaseRuntimeException.get("dateStr[{}] not support", dateStr);
             }
         }
     }

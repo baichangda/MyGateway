@@ -88,7 +88,7 @@ public class JsonUtil {
         try {
             return GLOBAL_OBJECT_MAPPER.writeValueAsString(object);
         } catch (JsonProcessingException e) {
-            throw BaseRuntimeException.getException(e);
+            throw BaseRuntimeException.get(e);
         }
     }
 

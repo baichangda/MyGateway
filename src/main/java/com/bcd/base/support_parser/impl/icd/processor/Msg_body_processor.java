@@ -65,7 +65,7 @@ public class Msg_body_processor implements Processor<Msg_body> {
                 msg_body = processor_msg_body_road_info.process(data, parentContext);
             }
             default -> {
-                throw BaseRuntimeException.getException("frame_type[{}] not support", msg.msg_header.frame_type);
+                throw BaseRuntimeException.get("frame_type[{}] not support", msg.msg_header.frame_type);
             }
         }
         return msg_body;
@@ -109,7 +109,7 @@ public class Msg_body_processor implements Processor<Msg_body> {
                 processor_msg_body_road_info.deProcess(data, parentContext, (Msg_body_road_info) instance);
             }
             default -> {
-                throw BaseRuntimeException.getException("frame_type[{}] not support", msg.msg_header.frame_type);
+                throw BaseRuntimeException.get("frame_type[{}] not support", msg.msg_header.frame_type);
             }
         }
     }

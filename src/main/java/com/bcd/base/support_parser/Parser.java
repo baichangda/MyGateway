@@ -500,7 +500,7 @@ public class Parser {
                         return processor;
                     } catch (CannotCompileException | NotFoundException | IOException | NoSuchMethodException |
                              InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                        throw BaseRuntimeException.getException(e);
+                        throw BaseRuntimeException.get(e);
                     }
                 }
             }

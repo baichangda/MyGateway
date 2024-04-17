@@ -97,7 +97,7 @@ public abstract class WsSession<T> {
         try {
             channel = bootstrap.connect(host, port).sync().channel();
         } catch (InterruptedException e) {
-            throw BaseRuntimeException.getException(e);
+            throw BaseRuntimeException.get(e);
         }
     }
 
@@ -126,7 +126,7 @@ public abstract class WsSession<T> {
         try {
             channel.writeAndFlush(buffer).sync();
         } catch (InterruptedException e) {
-            throw BaseRuntimeException.getException(e);
+            throw BaseRuntimeException.get(e);
         }
         ws_send(new WsOutMsg(102, hex, true));
     }

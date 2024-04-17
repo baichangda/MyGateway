@@ -36,7 +36,7 @@ public class FieldBuilder__F_num_array extends FieldBuilder {
         final String arrLenRes;
         if (anno.len() == 0) {
             if (anno.lenExpr().isEmpty()) {
-                throw BaseRuntimeException.getException("class[{}] field[{}] anno[] must have len or lenExpr", field.getDeclaringClass().getName(), field.getName(), F_num_array.class.getName());
+                throw BaseRuntimeException.get("class[{}] field[{}] anno[] must have len or lenExpr", field.getDeclaringClass().getName(), field.getName(), F_num_array.class.getName());
             } else {
                 arrLenRes = ParseUtil.replaceLenExprToCode(anno.lenExpr(), context.varToFieldName, field);
             }

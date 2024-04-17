@@ -76,7 +76,7 @@ public class ClassUtil {
             annoNameToClassListMap.put(annoClass.getName(), classList);
             return annoNameToClassListMap;
         } catch (IOException | ClassNotFoundException e) {
-            throw BaseRuntimeException.getException(e);
+            throw BaseRuntimeException.get(e);
         }
     }
 

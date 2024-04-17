@@ -65,7 +65,7 @@ public class DateUtil {
                     break;
                 }
                 default: {
-                    throw BaseRuntimeException.getException("[DateUtil.getFloorDate],unit[{}}] Not Support!", unit.toString());
+                    throw BaseRuntimeException.get("[DateUtil.getFloorDate],unit[{}}] Not Support!", unit.toString());
                 }
             }
         }
@@ -111,7 +111,7 @@ public class DateUtil {
                     break;
                 }
                 default: {
-                    throw BaseRuntimeException.getException("[DateUtil.getCeilDate],unit[{}}] Not Support!", unit.toString());
+                    throw BaseRuntimeException.get("[DateUtil.getCeilDate],unit[{}}] Not Support!", unit.toString());
                 }
             }
         }
@@ -187,7 +187,7 @@ public class DateUtil {
                 break;
             }
             default: {
-                throw BaseRuntimeException.getException("[DateUtil.rangeDate],unit[{}}] Not Support!", unit.toString());
+                throw BaseRuntimeException.get("[DateUtil.rangeDate],unit[{}}] Not Support!", unit.toString());
             }
         }
         return returnList;
@@ -232,7 +232,7 @@ public class DateUtil {
                 return d2.getTime() - d1.getTime();
             }
             default: {
-                throw BaseRuntimeException.getException("[DateUtil.getDiff],unit[{}] Not Support!", unit.toString());
+                throw BaseRuntimeException.get("[DateUtil.getDiff],unit[{}] Not Support!", unit.toString());
             }
         }
         long begin = d1.getTime();
@@ -298,7 +298,7 @@ public class DateUtil {
      */
     public static boolean isEqual(Date d1, Date d2, ChronoField field) {
         if (Arrays.stream(equal_fields).noneMatch(e -> e == field)) {
-            throw BaseRuntimeException.getException("[DateUtil.isEqual],field[{}] Not Support!", field.toString());
+            throw BaseRuntimeException.get("[DateUtil.isEqual],field[{}] Not Support!", field.toString());
         }
         ZoneId zoneId = ZoneId.systemDefault();
         LocalDateTime ldt1 = LocalDateTime.ofInstant(d1.toInstant(), zoneId);

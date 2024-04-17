@@ -26,7 +26,7 @@ public class SubPacketProcessor implements Processor<SubPacket> {
         PacketHeader packetHeader = (PacketHeader) parentContext.instance;
         if (packetHeader.subPacketFlag == 1) {
             if (instance == null) {
-                throw BaseRuntimeException.getException("subPacketFlag[1] but subPacket is null");
+                throw BaseRuntimeException.get("subPacketFlag[1] but subPacket is null");
             }
             data.writeShort(instance.total);
             data.writeShort(instance.no);

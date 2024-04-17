@@ -20,7 +20,7 @@ public class Target_info_extras_processor implements Processor<Target_info_extra
         } else if (parentContext.instance instanceof Event_target event_target) {
             targetClass = event_target.targetClass;
         } else {
-            throw BaseRuntimeException.getException("parentContext.instance[{}] not support", parentContext.instance.getClass());
+            throw BaseRuntimeException.get("parentContext.instance[{}] not support", parentContext.instance.getClass());
         }
         if (targetClass == null) {
             return null;
@@ -34,7 +34,7 @@ public class Target_info_extras_processor implements Processor<Target_info_extra
                 extras = processor_target_info_extras_car.process(data, parentContext);
             }
             default -> {
-                throw BaseRuntimeException.getException("sensor_type[{}] not support", targetClass);
+                throw BaseRuntimeException.get("sensor_type[{}] not support", targetClass);
             }
         }
         return extras;
@@ -48,7 +48,7 @@ public class Target_info_extras_processor implements Processor<Target_info_extra
         } else if (parentContext.instance instanceof Event_target event_target) {
             targetClass = event_target.targetClass;
         } else {
-            throw BaseRuntimeException.getException("parentContext.instance[{}] not support", parentContext.instance.getClass());
+            throw BaseRuntimeException.get("parentContext.instance[{}] not support", parentContext.instance.getClass());
         }
         if (targetClass == null) {
             return;
@@ -61,7 +61,7 @@ public class Target_info_extras_processor implements Processor<Target_info_extra
                 processor_target_info_extras_car.deProcess(data, parentContext, (Target_info_extras_car) instance);
             }
             default -> {
-                throw BaseRuntimeException.getException("sensor_type[{}] not support", targetClass);
+                throw BaseRuntimeException.get("sensor_type[{}] not support", targetClass);
             }
         }
     }

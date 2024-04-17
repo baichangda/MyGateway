@@ -74,7 +74,7 @@ public class Save_gb32960 implements ApplicationListener<ContextRefreshedEvent> 
                         }
                     }
                 } catch (InterruptedException ex) {
-                    throw BaseRuntimeException.getException(ex);
+                    throw BaseRuntimeException.get(ex);
                 }
             });
         }

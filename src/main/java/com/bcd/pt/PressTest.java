@@ -81,7 +81,7 @@ public abstract class PressTest<T> implements CommandLineRunner {
                     }
                 }
             } catch (Exception ex) {
-                throw BaseRuntimeException.getException(ex);
+                throw BaseRuntimeException.get(ex);
             }
         });
     }

@@ -135,7 +135,7 @@ public class BuilderContext {
             try {
                 implCc.addField(CtField.make(format, implCc));
             } catch (CannotCompileException e) {
-                throw BaseRuntimeException.getException(e);
+                throw BaseRuntimeException.get(e);
             }
             return varName;
         });

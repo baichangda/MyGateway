@@ -40,7 +40,7 @@ public class QueryAreaOrPathResponse implements PacketBody {
                     items[i] = CornerItem.read(data);
                 }
             }
-            default -> throw BaseRuntimeException.getException("QueryAreaOrPathResponse type[{}] not support", type);
+            default -> throw BaseRuntimeException.get("QueryAreaOrPathResponse type[{}] not support", type);
         }
         return queryAreaOrPathResponse;
     }

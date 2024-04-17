@@ -32,7 +32,7 @@ public class LengthFieldBasedFrameDecoder_smallEndian extends LengthFieldBasedFr
                 frameLength = buf.getLongLE(offset);
                 break;
             default:
-                throw BaseRuntimeException.getException("not support");
+                throw BaseRuntimeException.get("not support");
         }
         return frameLength;
     }

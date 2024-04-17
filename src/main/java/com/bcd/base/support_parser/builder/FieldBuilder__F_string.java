@@ -23,7 +23,7 @@ public class FieldBuilder__F_string extends FieldBuilder {
         final String lenRes;
         if (anno.len() == 0) {
             if (anno.lenExpr().isEmpty()) {
-                throw BaseRuntimeException.getException("class[{}] field[{}] anno[] must have len or lenExpr", field.getDeclaringClass().getName(), field.getName(), F_string.class.getName());
+                throw BaseRuntimeException.get("class[{}] field[{}] anno[] must have len or lenExpr", field.getDeclaringClass().getName(), field.getName(), F_string.class.getName());
             } else {
                 lenRes = ParseUtil.replaceLenExprToCode(anno.lenExpr(), context.varToFieldName, field);
             }
@@ -68,7 +68,7 @@ public class FieldBuilder__F_string extends FieldBuilder {
         final String lenRes;
         if (anno.len() == 0) {
             if (anno.lenExpr().isEmpty()) {
-                throw BaseRuntimeException.getException("class[{}] field[{}] anno[] must have len or lenExpr", field.getDeclaringClass().getName(), field.getName(), F_string.class.getName());
+                throw BaseRuntimeException.get("class[{}] field[{}] anno[] must have len or lenExpr", field.getDeclaringClass().getName(), field.getName(), F_string.class.getName());
             } else {
                 lenRes = ParseUtil.replaceLenExprToCode(anno.lenExpr(), context.varToFieldName, field);
             }

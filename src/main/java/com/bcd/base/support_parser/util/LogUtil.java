@@ -45,7 +45,7 @@ public class LogUtil {
                             no++;
                         }
                     } catch (IOException ex) {
-                        throw BaseRuntimeException.getException(ex);
+                        throw BaseRuntimeException.get(ex);
                     }
                 }
                 return resMap;

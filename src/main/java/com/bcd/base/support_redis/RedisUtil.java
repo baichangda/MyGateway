@@ -85,7 +85,7 @@ public class RedisUtil {
         } else if (type instanceof JavaType) {
             redisSerializer = new Jackson2JsonRedisSerializer<>(JsonUtil.GLOBAL_OBJECT_MAPPER, (JavaType) type);
         } else {
-            throw BaseRuntimeException.getException("Param Type[{}] Not Support", type.getTypeName());
+            throw BaseRuntimeException.get("Param Type[{}] Not Support", type.getTypeName());
         }
         return redisSerializer;
     }

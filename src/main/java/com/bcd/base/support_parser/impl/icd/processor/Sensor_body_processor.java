@@ -28,7 +28,7 @@ public class Sensor_body_processor implements Processor<Sensor_body> {
                 sensor_body = processor_sensor_body_lidar.process(data, parentContext);
             }
             default -> {
-                throw BaseRuntimeException.getException("sensor_type[{}] not support", instance.sensor_type);
+                throw BaseRuntimeException.get("sensor_type[{}] not support", instance.sensor_type);
             }
         }
         return sensor_body;
@@ -48,7 +48,7 @@ public class Sensor_body_processor implements Processor<Sensor_body> {
                 processor_sensor_body_lidar.deProcess(data, parentContext, (Sensor_body_lidar) instance);
             }
             default -> {
-                throw BaseRuntimeException.getException("sensor_type[{}] not support", parentInstance.sensor_type);
+                throw BaseRuntimeException.get("sensor_type[{}] not support", parentInstance.sensor_type);
             }
         }
     }
