@@ -23,19 +23,19 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class ParseUtil {
-
-    static final double[] pows;
-    private final static Set<Class<?>> logFieldTypeSet = Sets.newHashSet(
-            byte.class, short.class, int.class, long.class, float.class, double.class,
-            byte[].class, short[].class, int[].class, long[].class, float[].class, double[].class,
-            String.class,
-            Date.class
-    );
     static Logger logger = LoggerFactory.getLogger(ParseUtil.class);
     /**
      * 生成类的序号
      */
     private static int processorIndex = 0;
+
+    private final static Set<Class<?>> logFieldTypeSet = Sets.newHashSet(
+            byte.class, short.class, int.class, long.class, float.class, double.class,
+            byte[].class, short[].class, int[].class, long[].class, float[].class, double[].class,
+            String.class,
+            Date.class);
+
+    static final double[] pows;
 
     static {
         pows = new double[10];
@@ -139,9 +139,9 @@ public class ParseUtil {
         if (logFieldTypeSet.contains(fieldType)) {
             return true;
         } else {
-            if(fieldType.isEnum()){
+            if (fieldType.isEnum()) {
                 return true;
-            }else{
+            } else {
                 return context.field.isAnnotationPresent(F_customize.class);
             }
         }
