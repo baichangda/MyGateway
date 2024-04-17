@@ -8,7 +8,7 @@ import java.lang.annotation.*;
  * 如果解析未达到指定长度、则skip
  * 反解析未达到指定长度、则write byte 0
  *
- * 其实现有两种情况、取决于是否能统计出类的所有字段总字节长度、即{@link com.bcd.base.support_parser.util.ParseUtil#getClassByteLenIfPossible(Class, String...)}
+ * 其实现有两种情况、取决于是否能统计出类的所有字段总字节长度、即{@link com.bcd.base.support_parser.util.ParseUtil#getClassByteLenIfPossible(Class)}
  */
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
