@@ -27,12 +27,11 @@ public class Packet {
     @F_num(type = NumType.uint16, var = 'a')
     public int contentLength;
     //数据单元
-//    @F_integer_array(lenExpr = "a", singleLen = 1)
-    public byte[] dataContent;
+//    @F_num_array(lenExpr = "a", singleType = NumType.uint8)
+//    public byte[] dataContent;
     @F_customize(
             processorClass = PacketDataFieldProcessor.class
     )
-//    @F_skip(lenExpr = "a")
     public PacketData data;
     //异或校验位
     @F_num(type = NumType.uint8)
