@@ -349,7 +349,7 @@ public class RpnUtil {
                 case '+':
                 case '*':
                 case '/': {
-                    if (temp.length() > 0) {
+                    if (!temp.isEmpty()) {
                         //当遇到符号、收集变量
                         output.add(temp.toString());
                         temp.delete(0, temp.length());
@@ -369,12 +369,12 @@ public class RpnUtil {
                     //两种情况下表示不是取负
                     //1、temp里面有数据、代表有变量
                     //2、上一个字符是)、代表刚处理完一个()表达式
-                    if (temp.length() == 0 && (i == 0 || chars[i - 1] != ')')) {
+                    if (temp.isEmpty() && (i == 0 || chars[i - 1] != ')')) {
                         //此时取负号
                         operatorStack[++operatorStackIndex] = '!';
                     } else {
                         //当遇到符号、收集变量
-                        if (temp.length() > 0) {
+                        if (!temp.isEmpty()) {
                             output.add(temp.toString());
                             temp.delete(0, temp.length());
                         }
@@ -396,7 +396,7 @@ public class RpnUtil {
                     break;
                 }
                 case ')': {
-                    if (temp.length() > 0) {
+                    if (!temp.isEmpty()) {
                         //当遇到)、收集变量
                         output.add(temp.toString());
                         temp.delete(0, temp.length());
