@@ -19,7 +19,7 @@ import java.lang.reflect.Type;
 @SuppressWarnings("unchecked")
 public class JsonUtil {
     //此空过滤器必须定义在全局 GLOBAL_OBJECT_MAPPER 之前
-    public final static ObjectMapper GLOBAL_OBJECT_MAPPER = withConfig(new ObjectMapper());
+    public final static ObjectMapper OBJECT_MAPPER = withConfig(new ObjectMapper());
 
 
     public static JavaType getJavaType(Type type) {
@@ -86,7 +86,7 @@ public class JsonUtil {
      */
     public static String toJson(Object object) {
         try {
-            return GLOBAL_OBJECT_MAPPER.writeValueAsString(object);
+            return OBJECT_MAPPER.writeValueAsString(object);
         } catch (JsonProcessingException e) {
             throw BaseRuntimeException.get(e);
         }

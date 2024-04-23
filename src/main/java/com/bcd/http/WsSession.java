@@ -68,7 +68,7 @@ public abstract class WsSession<T> {
             }
             case 2 -> {
                 try {
-                    sample = JsonUtil.GLOBAL_OBJECT_MAPPER.readValue(inMsg.data(), sampleClazz);
+                    sample = JsonUtil.OBJECT_MAPPER.readValue(inMsg.data(), sampleClazz);
                     ws_send(new WsOutMsg(2, null, true));
                 } catch (IOException ex) {
                     logger.error("error", ex);

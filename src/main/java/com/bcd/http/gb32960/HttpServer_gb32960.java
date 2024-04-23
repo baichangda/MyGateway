@@ -104,7 +104,7 @@ public class HttpServer_gb32960 implements CommandLineRunner {
                     }
                     if (data != null) {
                         try {
-                            WsInMsg wsInMsg = JsonUtil.GLOBAL_OBJECT_MAPPER.readValue(data, WsInMsg.class);
+                            WsInMsg wsInMsg = JsonUtil.OBJECT_MAPPER.readValue(data, WsInMsg.class);
                             wsSession.ws_handleMsg(wsInMsg);
                         } catch (IOException ex) {
                             logger.error("receive ws msg parse json error:\n{}", data);

@@ -23,7 +23,7 @@ public class Msg {
         msg.msg_body = new Msg_body_system_runtime_info();
         final String json = JsonUtil.toJson(msg);
         System.out.println(json);
-        final Msg msg1 = JsonUtil.GLOBAL_OBJECT_MAPPER.readValue(json, Msg.class);
+        final Msg msg1 = JsonUtil.OBJECT_MAPPER.readValue(json, Msg.class);
         System.out.println(msg1);
     }
 

@@ -106,7 +106,7 @@ public class Helper {
         final List<SaveData> list = mongoTemplate.find(query, SaveData.class);
         try {
             for (SaveData saveData : list) {
-                saveData.jsonData = JsonUtil.GLOBAL_OBJECT_MAPPER.readValue(saveData.json, JsonData.class);
+                saveData.jsonData = JsonUtil.OBJECT_MAPPER.readValue(saveData.json, JsonData.class);
             }
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
