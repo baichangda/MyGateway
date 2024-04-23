@@ -16,7 +16,6 @@ import java.lang.reflect.Type;
 /**
  * Created by Administrator on 2017/5/12.
  */
-@SuppressWarnings("unchecked")
 public class JsonUtil {
     //此空过滤器必须定义在全局 GLOBAL_OBJECT_MAPPER 之前
     public final static ObjectMapper OBJECT_MAPPER = withConfig(new ObjectMapper());
@@ -27,7 +26,7 @@ public class JsonUtil {
         if (type instanceof ParameterizedType) {
             Type[] actualTypeArguments = ((ParameterizedType) type).getActualTypeArguments();
             //1.1、获取泛型类型
-            Class rawClass = (Class) ((ParameterizedType) type).getRawType();
+            Class<?> rawClass = (Class<?>) ((ParameterizedType) type).getRawType();
             JavaType[] javaTypes = new JavaType[actualTypeArguments.length];
             for (int i = 0; i < actualTypeArguments.length; i++) {
                 //1.2、泛型也可能带有泛型，递归获取
@@ -36,7 +35,7 @@ public class JsonUtil {
             return TypeFactory.defaultInstance().constructParametricType(rawClass, javaTypes);
         } else {
             //2、简单类型直接用该类构建JavaType
-            Class cla = (Class) type;
+            Class<?> cla = (Class<?>) type;
             return TypeFactory.defaultInstance().constructParametricType(cla, new JavaType[0]);
         }
     }
