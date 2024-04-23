@@ -1,6 +1,6 @@
 package com.bcd.base.support_parser;
 
-import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.exception.MyException;
 import com.bcd.base.support_parser.anno.*;
 import com.bcd.base.support_parser.builder.BuilderContext;
 import com.bcd.base.support_parser.builder.FieldBuilder;
@@ -500,7 +500,7 @@ public class Parser {
                         return processor;
                     } catch (CannotCompileException | NotFoundException | IOException | NoSuchMethodException |
                              InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                        throw BaseRuntimeException.get(e);
+                        throw MyException.get(e);
                     }
                 }
             }

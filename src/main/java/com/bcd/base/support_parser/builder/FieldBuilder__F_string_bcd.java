@@ -1,7 +1,7 @@
 package com.bcd.base.support_parser.builder;
 
 
-import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.exception.MyException;
 import com.bcd.base.support_parser.anno.F_string_bcd;
 import com.bcd.base.support_parser.util.BcdUtil;
 import com.bcd.base.support_parser.util.ParseUtil;
@@ -24,7 +24,7 @@ public class FieldBuilder__F_string_bcd extends FieldBuilder {
         final String lenRes;
         if (anno.len() == 0) {
             if (anno.lenExpr().isEmpty()) {
-                throw BaseRuntimeException.get("class[{}] field[{}] anno[] must have len or lenExpr", field.getDeclaringClass().getName(), field.getName(), F_string_bcd.class.getName());
+                throw MyException.get("class[{}] field[{}] anno[] must have len or lenExpr", field.getDeclaringClass().getName(), field.getName(), F_string_bcd.class.getName());
             } else {
                 lenRes = ParseUtil.replaceLenExprToCode(anno.lenExpr(), context.varToFieldName, field);
             }
@@ -65,7 +65,7 @@ public class FieldBuilder__F_string_bcd extends FieldBuilder {
         final String lenRes;
         if (anno.len() == 0) {
             if (anno.lenExpr().isEmpty()) {
-                throw BaseRuntimeException.get("class[{}] field[{}] anno[] must have len or lenExpr", field.getDeclaringClass().getName(), field.getName(), F_string_bcd.class.getName());
+                throw MyException.get("class[{}] field[{}] anno[] must have len or lenExpr", field.getDeclaringClass().getName(), field.getName(), F_string_bcd.class.getName());
             } else {
                 lenRes = ParseUtil.replaceLenExprToCode(anno.lenExpr(), context.varToFieldName, field);
             }

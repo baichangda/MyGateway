@@ -1,6 +1,6 @@
 package com.bcd.base.support_parser.builder;
 
-import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.exception.MyException;
 import com.bcd.base.support_parser.anno.*;
 import com.bcd.base.support_parser.util.ParseUtil;
 import com.bcd.base.support_parser.util.RpnUtil;
@@ -66,7 +66,7 @@ public class FieldBuilder__F_bit_num_array extends FieldBuilder {
         final String arrLenRes;
         if (anno.len() == 0) {
             if (anno.lenExpr().isEmpty()) {
-                throw BaseRuntimeException.get("class[{}] field[{}] anno[] must have len or lenExpr", field.getDeclaringClass().getName(), field.getName(), F_bit_num_array.class.getName());
+                throw MyException.get("class[{}] field[{}] anno[] must have len or lenExpr", field.getDeclaringClass().getName(), field.getName(), F_bit_num_array.class.getName());
             } else {
                 arrLenRes = ParseUtil.replaceLenExprToCode(anno.lenExpr(), context.varToFieldName, field);
             }

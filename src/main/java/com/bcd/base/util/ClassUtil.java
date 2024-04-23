@@ -1,7 +1,7 @@
 package com.bcd.base.util;
 
 
-import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.exception.MyException;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -76,7 +76,7 @@ public class ClassUtil {
             annoNameToClassListMap.put(annoClass.getName(), classList);
             return annoNameToClassListMap;
         } catch (IOException | ClassNotFoundException e) {
-            throw BaseRuntimeException.get(e);
+            throw MyException.get(e);
         }
     }
 

@@ -1,7 +1,7 @@
 package com.bcd.base.support_parser.builder;
 
 
-import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.exception.MyException;
 import com.bcd.base.support_parser.anno.F_customize;
 import com.bcd.base.support_parser.util.ParseUtil;
 
@@ -14,7 +14,7 @@ public class FieldBuilder__F_customize extends FieldBuilder {
         final F_customize anno = field.getAnnotation(F_customize.class);
         final Class<?> processorClass = anno.processorClass();
         if (processorClass == void.class) {
-            throw BaseRuntimeException.get("class[{}] field[{}] anno[] must have builderClass or processorClass", field.getDeclaringClass().getName(), field.getName(), F_customize.class.getName());
+            throw MyException.get("class[{}] field[{}] anno[] must have builderClass or processorClass", field.getDeclaringClass().getName(), field.getName(), F_customize.class.getName());
         } else {
             final StringBuilder body = context.body;
             final String varNameField = ParseUtil.getFieldVarName(context);

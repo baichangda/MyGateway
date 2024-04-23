@@ -1,6 +1,6 @@
 package com.bcd.base.support_parser.impl.icd.processor;
 
-import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.exception.MyException;
 import com.bcd.base.support_parser.Parser;
 import com.bcd.base.support_parser.impl.icd.data.*;
 import com.bcd.base.support_parser.processor.ProcessContext;
@@ -28,7 +28,7 @@ public class Sensor_body_processor implements Processor<Sensor_body> {
                 sensor_body = processor_sensor_body_lidar.process(data, parentContext);
             }
             default -> {
-                throw BaseRuntimeException.get("sensor_type[{}] not support", instance.sensor_type);
+                throw MyException.get("sensor_type[{}] not support", instance.sensor_type);
             }
         }
         return sensor_body;
@@ -48,7 +48,7 @@ public class Sensor_body_processor implements Processor<Sensor_body> {
                 processor_sensor_body_lidar.deProcess(data, parentContext, (Sensor_body_lidar) instance);
             }
             default -> {
-                throw BaseRuntimeException.get("sensor_type[{}] not support", parentInstance.sensor_type);
+                throw MyException.get("sensor_type[{}] not support", parentInstance.sensor_type);
             }
         }
     }

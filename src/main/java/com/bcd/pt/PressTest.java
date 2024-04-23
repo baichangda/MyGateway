@@ -1,6 +1,6 @@
 package com.bcd.pt;
 
-import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.exception.MyException;
 import com.google.common.base.Strings;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
@@ -81,7 +81,7 @@ public abstract class PressTest<T> implements CommandLineRunner {
                     }
                 }
             } catch (Exception ex) {
-                throw BaseRuntimeException.get(ex);
+                throw MyException.get(ex);
             }
         });
     }

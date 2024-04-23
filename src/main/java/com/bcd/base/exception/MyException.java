@@ -7,19 +7,19 @@ import com.bcd.base.util.StringUtil;
  * 1、在所有需要抛非运行时异常的地方,用此异常包装,避免方法调用时候需要捕获异常(若是其他框架自定义的异常,请不要用此类包装)
  * 2、在业务需要出异常的时候,定义异常并且抛出
  */
-public class BaseRuntimeException extends RuntimeException {
+public class MyException extends RuntimeException {
     public int code = 1;
 
-    private BaseRuntimeException(String message) {
+    private MyException(String message) {
         super(message);
     }
 
-    private BaseRuntimeException(Throwable e) {
+    private MyException(Throwable e) {
         super(e);
     }
 
-    public static BaseRuntimeException get(String message) {
-        return new BaseRuntimeException(message);
+    public static MyException get(String message) {
+        return new MyException(message);
     }
 
     /**
@@ -31,19 +31,19 @@ public class BaseRuntimeException extends RuntimeException {
      * @param params
      * @return
      */
-    public static BaseRuntimeException get(String message, Object... params) {
-        return new BaseRuntimeException(StringUtil.format(message, params));
+    public static MyException get(String message, Object... params) {
+        return new MyException(StringUtil.format(message, params));
     }
 
-    public static BaseRuntimeException get(Throwable e) {
-        return new BaseRuntimeException(e);
+    public static MyException get(Throwable e) {
+        return new MyException(e);
     }
 
     public static void main(String[] args) {
-        throw BaseRuntimeException.get("[{}]-[{}]", null, 100000);
+        throw MyException.get("[{}]-[{}]", null, 100000);
     }
 
-    public BaseRuntimeException code(int code) {
+    public MyException code(int code) {
         this.code = code;
         return this;
     }

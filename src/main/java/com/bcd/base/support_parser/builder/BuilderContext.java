@@ -1,6 +1,6 @@
 package com.bcd.base.support_parser.builder;
 
-import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.exception.MyException;
 import com.bcd.base.support_parser.Parser;
 import com.bcd.base.support_parser.anno.BitOrder;
 import com.bcd.base.support_parser.anno.ByteOrder;
@@ -135,7 +135,7 @@ public class BuilderContext {
             try {
                 implCc.addField(CtField.make(format, implCc));
             } catch (CannotCompileException e) {
-                throw BaseRuntimeException.get(e);
+                throw MyException.get(e);
             }
             return varName;
         });

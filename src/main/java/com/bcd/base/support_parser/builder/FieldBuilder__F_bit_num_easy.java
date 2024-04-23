@@ -1,6 +1,6 @@
 package com.bcd.base.support_parser.builder;
 
-import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.exception.MyException;
 import com.bcd.base.support_parser.anno.F_bit_num_easy;
 import com.bcd.base.support_parser.util.ParseUtil;
 import com.bcd.base.support_parser.util.RpnUtil;
@@ -86,7 +86,7 @@ public class FieldBuilder__F_bit_num_easy extends FieldBuilder {
             } else if (maxBit <= 32) {
                 funcName = "readInt";
             } else {
-                throw BaseRuntimeException.get("class[{}] field[{}] anno[{}] maxBit[{}] not support", context.clazz.getName(), field.getName(), F_bit_num_easy.class, maxBit);
+                throw MyException.get("class[{}] field[{}] anno[{}] maxBit[{}] not support", context.clazz.getName(), field.getName(), F_bit_num_easy.class, maxBit);
             }
             ParseUtil.append(context.body, "final int {}={}.{}();\n", varNameNum, FieldBuilder.varNameByteBuf, funcName);
         }
@@ -183,7 +183,7 @@ public class FieldBuilder__F_bit_num_easy extends FieldBuilder {
             } else if (maxBitEnd <= 32) {
                 ParseUtil.append(body, "{}.writeInt({});\n", FieldBuilder.varNameByteBuf, varNameNum);
             } else {
-                throw BaseRuntimeException.get("class[{}] field[{}] anno[{}] maxBit[{}] not support", context.clazz.getName(), field.getName(), annoClass.getName(), maxBitEnd);
+                throw MyException.get("class[{}] field[{}] anno[{}] maxBit[{}] not support", context.clazz.getName(), field.getName(), annoClass.getName(), maxBitEnd);
             }
         }
     }

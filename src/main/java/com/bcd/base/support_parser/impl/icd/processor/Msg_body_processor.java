@@ -1,6 +1,6 @@
 package com.bcd.base.support_parser.impl.icd.processor;
 
-import com.bcd.base.exception.BaseRuntimeException;
+import com.bcd.base.exception.MyException;
 import com.bcd.base.support_parser.Parser;
 import com.bcd.base.support_parser.impl.icd.data.*;
 import com.bcd.base.support_parser.processor.ProcessContext;
@@ -65,7 +65,7 @@ public class Msg_body_processor implements Processor<Msg_body> {
                 msg_body = processor_msg_body_road_info.process(data, parentContext);
             }
             default -> {
-                throw BaseRuntimeException.get("frame_type[{}] not support", msg.msg_header.frame_type);
+                throw MyException.get("frame_type[{}] not support", msg.msg_header.frame_type);
             }
         }
         return msg_body;
@@ -109,7 +109,7 @@ public class Msg_body_processor implements Processor<Msg_body> {
                 processor_msg_body_road_info.deProcess(data, parentContext, (Msg_body_road_info) instance);
             }
             default -> {
-                throw BaseRuntimeException.get("frame_type[{}] not support", msg.msg_header.frame_type);
+                throw MyException.get("frame_type[{}] not support", msg.msg_header.frame_type);
             }
         }
     }
