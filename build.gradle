@@ -39,7 +39,7 @@ idea {
     }
 }
 
-configurations.all {
+configurations.configureEach {
     //去除springboot默认的logback
     exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
     exclude module: 'logback-classic'
