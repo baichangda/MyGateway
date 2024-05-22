@@ -102,7 +102,8 @@ public abstract class PressTest<T> implements CommandLineRunner {
             try {
                 Bootstrap bootstrap = new Bootstrap();
                 bootstrap.group(tcp_workerGroup);
-                bootstrap.channel(NioSocketChannel.class).option(ChannelOption.TCP_NODELAY, true);
+                bootstrap.channel(NioSocketChannel.class);
+                bootstrap.option(ChannelOption.TCP_NODELAY, true);
                 bootstrap.handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) {
