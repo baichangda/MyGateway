@@ -424,7 +424,10 @@ public class ParseUtil {
     public static String getProcessKey(Class<?> clazz, ByteOrder byteOrder, BitOrder bitOrder) {
         return clazz.getName()
                 + "_" + (byteOrder == ByteOrder.smallEndian ? 0 : 1)
-                + "_" + (bitOrder == BitOrder.smallEndian ? 0 : 1);
+                + "_" + (bitOrder == BitOrder.smallEndian ? 0 : 1)
+                + "_" + (Parser.logCollector_parse == null ? 0 : 1)
+                + "_" + (Parser.logCollector_deParse == null ? 0 : 1)
+                ;
     }
 
     public static String getProcessClassName(Class<?> clazz, ByteOrder byteOrder, BitOrder bitOrder) {
