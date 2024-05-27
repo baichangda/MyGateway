@@ -6,7 +6,6 @@ import com.bcd.base.support_parser.Parser;
 import com.bcd.base.support_parser.anno.*;
 import com.bcd.base.support_parser.builder.BuilderContext;
 import com.bcd.base.support_parser.builder.FieldBuilder;
-import com.bcd.base.support_parser.impl.immotors.ep33.data.*;
 import com.bcd.base.support_parser.processor.Processor;
 import com.google.common.collect.Sets;
 import javassist.CannotCompileException;
@@ -745,20 +744,20 @@ public class ParseUtil {
 
     public static void main(String[] args) {
 //        getAllFieldBuild();
-        System.out.println(getClassByteLenIfPossible(Evt_0001.class));
-        System.out.println(getClassByteLenIfPossible(Evt_0800.class));
-        System.out.println(getClassByteLenIfPossible(Evt_0006.class));
-        System.out.println(getClassByteLenIfPossible(Evt_D006.class));
-        System.out.println(getClassByteLenIfPossible(Evt_D010.class));
-        System.out.println(getClassByteLenIfPossible(Evt_D011.class));
-        System.out.println(getClassByteLenIfPossible(Evt_D012.class));
-        System.out.println(getClassByteLenIfPossible(Evt_D013.class));
-        System.out.println(getClassByteLenIfPossible(Evt_D014.class));
-        System.out.println(getClassByteLenIfPossible(Evt_D015.class));
-        System.out.println(getClassByteLenIfPossible(Evt_D016.class));
-        System.out.println(getClassByteLenIfPossible(Evt_D017.class));
-        System.out.println(getClassByteLenIfPossible(Evt_D008.class));
-        System.out.println(getClassByteLenIfPossible(Evt_D009.class));
-        System.out.println(getClassByteLenIfPossible(Evt_D00A.class));
+//        System.out.println(getClassByteLenIfPossible(Evt_0001.class));
+//        System.out.println(getClassByteLenIfPossible(Evt_0800.class));
+//        System.out.println(getClassByteLenIfPossible(Evt_0006.class));
+//        System.out.println(getClassByteLenIfPossible(Evt_D006.class));
+//        System.out.println(getClassByteLenIfPossible(Evt_D010.class));
+//        System.out.println(getClassByteLenIfPossible(Evt_D011.class));
+//        System.out.println(getClassByteLenIfPossible(Evt_D012.class));
+//        System.out.println(getClassByteLenIfPossible(Evt_D013.class));
+//        System.out.println(getClassByteLenIfPossible(Evt_D014.class));
+//        System.out.println(getClassByteLenIfPossible(Evt_D015.class));
+//        System.out.println(getClassByteLenIfPossible(Evt_D016.class));
+//        System.out.println(getClassByteLenIfPossible(Evt_D017.class));
+//        System.out.println(getClassByteLenIfPossible(Evt_D008.class));
+//        System.out.println(getClassByteLenIfPossible(Evt_D009.class));
+//        System.out.println(getClassByteLenIfPossible(Evt_D00A.class));
     }
 }
