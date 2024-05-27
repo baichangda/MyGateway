@@ -11,7 +11,6 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +27,6 @@ public abstract class WsSession<T> {
     public Channel channel;
     public volatile T sample;
     public final Class<T> sampleClazz;
-
     public volatile boolean closed;
 
     public WsSession(io.helidon.websocket.WsSession ws, Object... args) {
@@ -75,6 +73,7 @@ public abstract class WsSession<T> {
         }
     }
 
+
     public synchronized void tcp_connect(String host, int port) {
         final WsSession<T> wsSession = this;
         Bootstrap bootstrap = new Bootstrap();
@@ -83,8 +82,7 @@ public abstract class WsSession<T> {
         bootstrap.handler(new ChannelInitializer<SocketChannel>() {
             @Override
             protected void initChannel(SocketChannel ch) {
-                ch.pipeline().addLast(new LengthFieldBasedFrameDecoder(10 * 1024, 22, 2, 1, 0));
-                ch.pipeline().addLast(new TcpClientHandler(wsSession));
+                initSocketChannel(ch);
             }
         });
         if (channel != null) {
@@ -137,8 +135,9 @@ public abstract class WsSession<T> {
         pool.scheduleAtFixedRate(this::tcp_sendRunData, 1, 10, TimeUnit.SECONDS);
     }
 
+    public abstract void initSocketChannel(SocketChannel sc);
 
-    public abstract T initSample(Object ... args);
+    public abstract T initSample(Object... args);
 
     public abstract ByteBuf toByteBuf(T sample, long ts);
 

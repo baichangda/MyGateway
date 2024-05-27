@@ -1,11 +1,14 @@
 package com.bcd.http.gb32960;
 
+import com.bcd.http.TcpClientHandler;
 import com.bcd.http.WsSession;
 import com.bcd.base.support_parser.impl.gb32960.data.Packet;
 import com.bcd.base.support_parser.impl.gb32960.data.VehicleRunData;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 
 import java.util.Date;
 
@@ -15,6 +18,12 @@ public class WsSession_gb32960 extends WsSession<Packet> {
     public WsSession_gb32960(io.helidon.websocket.WsSession ws,Object ... args) {
         super(ws,args);
     }
+
+    public void initSocketChannel(SocketChannel sc){
+        sc.pipeline().addLast(new LengthFieldBasedFrameDecoder(10 * 1024, 22, 2, 1, 0));
+        sc.pipeline().addLast(new TcpClientHandler(this));
+    }
+
     public Packet initSample(Object ... args){
         byte[] bytes = ByteBufUtil.decodeHexDump(sample);
         Packet packet = HttpServer_gb32960.processor.process(Unpooled.wrappedBuffer(bytes));
