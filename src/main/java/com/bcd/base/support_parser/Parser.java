@@ -54,10 +54,10 @@ import java.util.stream.Collectors;
  * 由于是字节码增强技术、和手动编写代码解析效率一样
  * <p>
  * 可配置方法
- * {@link #enableGenerateClassFile()}
- * {@link #enablePrintBuildLog()}
- * {@link #withDefaultLogCollector_parse()}
- * {@link #withDefaultLogCollector_deParse()}
+ * {@link #enableGenerateClassFile()} 生成class类文件、文件声称在{@link Processor}同目录下
+ * {@link #enablePrintBuildLog()} 开启打印build日志
+ * {@link #withDefaultLogCollector_parse()} 开启解析日志采集、此方法开启后会在解析程序中插入日志采集功能、降低程序性能、建议只在开发调试阶段开启
+ * {@link #withDefaultLogCollector_deParse()} 开启反解析日志采集、此方法开启后会在反解析程序中插入日志采集功能、降低程序性能、建议只在开发调试阶段开启
  * <p>
  * 注意:
  * 如果启动了解析和反解析日志、并不是所有字段都会打印、逻辑参考
