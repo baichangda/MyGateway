@@ -80,6 +80,7 @@ dependencies {
     implementation group: 'io.netty', name: 'netty-all', version: "4.+"
 
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: "+"
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: "+"
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: "+"
 

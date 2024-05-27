@@ -24,8 +24,6 @@ public abstract class WsSession<T> {
     static Logger logger = LoggerFactory.getLogger(WsSession.class);
     static NioEventLoopGroup tcp_workerGroup = new NioEventLoopGroup();
     private ScheduledExecutorService pool;
-
-    public final String vin;
     public final io.helidon.websocket.WsSession ws;
     public Channel channel;
     public volatile T sample;
@@ -33,10 +31,9 @@ public abstract class WsSession<T> {
 
     public volatile boolean closed;
 
-    public WsSession(String vin, io.helidon.websocket.WsSession ws) {
-        this.vin = vin;
+    public WsSession(io.helidon.websocket.WsSession ws, Object... args) {
         this.ws = ws;
-        this.sample = initSample(vin);
+        this.sample = initSample(args);
         this.sampleClazz = (Class<T>) this.sample.getClass();
         this.closed = false;
         ws_send(new WsOutMsg(101, JsonUtil.toJson(sample), true));
@@ -141,7 +138,7 @@ public abstract class WsSession<T> {
     }
 
 
-    public abstract T initSample(String vin);
+    public abstract T initSample(Object ... args);
 
     public abstract ByteBuf toByteBuf(T sample, long ts);
 

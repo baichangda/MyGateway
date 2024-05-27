@@ -1,12 +1,12 @@
 package com.bcd.http.gb32960;
 
-import com.bcd.http.HttpProp;
-import com.bcd.http.WsInMsg;
-import com.bcd.http.WsSession;
 import com.bcd.base.support_parser.Parser;
 import com.bcd.base.support_parser.impl.gb32960.data.Packet;
 import com.bcd.base.support_parser.processor.Processor;
 import com.bcd.base.util.JsonUtil;
+import com.bcd.http.HttpProp;
+import com.bcd.http.WsInMsg;
+import com.bcd.http.WsSession;
 import io.helidon.http.HeaderNames;
 import io.helidon.http.Headers;
 import io.helidon.http.HttpMediaType;
@@ -79,7 +79,7 @@ public class HttpServer_gb32960 implements CommandLineRunner {
 
                 @Override
                 public void onOpen(io.helidon.websocket.WsSession session) {
-                    wsSession = new WsSession_gb32960(vin, session);
+                    wsSession = new WsSession_gb32960(session, vin);
                     WsListener.super.onOpen(session);
                 }
 
@@ -112,11 +112,13 @@ public class HttpServer_gb32960 implements CommandLineRunner {
                     }
                     WsListener.super.onMessage(session, text, last);
                 }
+
                 @Override
                 public void onClose(io.helidon.websocket.WsSession session, int status, String reason) {
                     wsSession.ws_onClose();
                     WsListener.super.onClose(session, status, reason);
                 }
+
                 @Override
                 public void onError(io.helidon.websocket.WsSession session, Throwable t) {
                     wsSession.ws_onClose();
