@@ -19,6 +19,7 @@ public class Parser_icd_test {
     @Test
     public void test() {
         Parser.enablePrintBuildLog();
+        Parser.enableGenerateClassFile();
         Parser.withDefaultLogCollector_parse();
         Parser.withDefaultLogCollector_deParse();
         Processor<Msg> processor = Parser.getProcessor(Msg.class, ByteOrder.smallEndian, BitOrder.bigEndian);
