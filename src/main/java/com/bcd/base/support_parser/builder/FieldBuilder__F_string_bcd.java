@@ -17,9 +17,8 @@ public class FieldBuilder__F_string_bcd extends FieldBuilder {
         final Field field = context.field;
         final Class<?> fieldType = field.getType();
         final F_string_bcd anno = field.getAnnotation(F_string_bcd.class);
-        final Class<? extends F_string_bcd> annoClass = anno.getClass();
         if (fieldType != String.class) {
-            ParseUtil.notSupport_type(context.clazz, field, annoClass);
+            ParseUtil.notSupport_type(context.clazz, field, F_string_bcd.class);
         }
         final String lenRes;
         if (anno.len() == 0) {

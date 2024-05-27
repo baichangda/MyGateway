@@ -8,7 +8,7 @@ public class Target_info_extras_car implements Target_info_extras {
     @F_num(type = NumType.uint32)
     public CarType type;
     @F_string(len = 16)
-    public short lic_plate;
+    public String lic_plate;
     @F_num(type = NumType.uint16)
     public CarColor color;
     @F_num(type = NumType.int8)

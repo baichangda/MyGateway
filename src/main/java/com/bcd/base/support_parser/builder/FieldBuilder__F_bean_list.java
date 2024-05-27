@@ -63,9 +63,8 @@ public class FieldBuilder__F_bean_list extends FieldBuilder {
         final F_bean_list anno = context.field.getAnnotation(F_bean_list.class);
         final String fieldName = field.getName();
         final String valCode = FieldBuilder.varNameInstance + "." + fieldName;
-
+        final String processContextVarName = context.getProcessContextVarName();
         ParseUtil.append(body, "if({}!=null){\n", valCode);
-
         final Class<?> fieldType = field.getType();
         final Class<?> typeClass;
         final int fieldTypeFlag;
@@ -80,10 +79,9 @@ public class FieldBuilder__F_bean_list extends FieldBuilder {
             fieldTypeFlag = 0;
             typeClass = null;
         }
-
         final String typeClassName = typeClass.getName();
         final String processorVarName = context.getProcessorVarName(typeClass);
-        final String processContextVarName = context.getProcessContextVarName();
+
         final String fieldVarNameTemp = varNameField + "_temp";
         switch (fieldTypeFlag) {
             case 1 -> {

@@ -16,9 +16,8 @@ public class FieldBuilder__F_string extends FieldBuilder {
         final Field field = context.field;
         final Class<?> fieldType = field.getType();
         final F_string anno = field.getAnnotation(F_string.class);
-        final Class<? extends F_string> annoClass = anno.getClass();
         if (fieldType != String.class) {
-            ParseUtil.notSupport_type(context.clazz, field, annoClass);
+            ParseUtil.notSupport_type(context.clazz, field, F_string.class);
         }
         final String lenRes;
         if (anno.len() == 0) {
