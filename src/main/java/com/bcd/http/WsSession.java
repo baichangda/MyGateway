@@ -52,7 +52,7 @@ public abstract class WsSession<T> {
         }
     }
 
-    public synchronized void ws_handleMsg(WsInMsg inMsg) {
+    public synchronized void ws_onMsg(WsInMsg inMsg) {
         switch (inMsg.flag()) {
             case 1 -> {
                 String[] split = inMsg.data().split(":");
