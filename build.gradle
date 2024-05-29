@@ -95,6 +95,8 @@ dependencies {
     implementation group: 'io.helidon.webserver', name: 'helidon-webserver-static-content', version: "4.+"
     implementation group: 'io.helidon.webserver', name: 'helidon-webserver-websocket', version: "4.+"
 
+    // https://mvnrepository.com/artifact/org.jctools/jctools-core
+    implementation group: 'org.jctools', name: 'jctools-core', version: "+"
 }
 
 //生成jar时打包源码
