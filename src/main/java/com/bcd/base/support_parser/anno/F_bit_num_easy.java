@@ -6,6 +6,16 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * 适用如下字段类型
+ * byte、short、int、long、float、double、枚举类
+ *
+ * 枚举类
+ * 仅支持整型数字
+ * 要求枚举类必有如下静态方法、例如
+ * public enum Example{
+ *     public static Example fromInteger(int i){}
+ *     public int toInteger(){}
+ * }
  *
  * 位解析
  * 最高支持连续32位

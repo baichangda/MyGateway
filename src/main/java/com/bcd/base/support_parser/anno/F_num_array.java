@@ -15,8 +15,8 @@ import java.lang.annotation.Target;
  * 仅支持整型数字
  * 要求枚举类必有如下静态方法、例如
  * public enum Example{
- * public static Example fromInteger(int i){}
- * public int toInteger(){}
+ *     public static Example fromInteger(int i){}
+ *     public int toInteger(){}
  * }
  * <p>
  * 反解析中
