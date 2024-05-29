@@ -37,7 +37,7 @@ public class ParseUtil {
     static final double[] pows;
 
     static {
-        pows = new double[10];
+        pows = new double[11];
         for (int i = 0; i < pows.length; i++) {
             pows[i] = Math.pow(10, i);
         }
@@ -388,19 +388,19 @@ public class ParseUtil {
         }
     }
 
-    public static double format(double d, int i) {
+    public static double round(double d, int i) {
         if (d > 0) {
             if (i == 0) {
-                return Math.floor(d);
+                return Math.round(d);
             } else {
-                return Math.floor(d * pows[i]) / pows[i];
+                return Math.round(d * pows[i]) / pows[i];
             }
 
         } else if (d < 0) {
             if (i == 0) {
-                return Math.ceil(d);
+                return -Math.round(-d);
             } else {
-                return Math.ceil(d * pows[i]) / pows[i];
+                return -Math.round(-d * pows[i]) / pows[i];
             }
         } else {
             return 0;

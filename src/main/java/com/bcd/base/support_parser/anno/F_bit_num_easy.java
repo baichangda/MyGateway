@@ -65,4 +65,11 @@ public @interface F_bit_num_easy {
      * 例如: m,n,a
      */
     char var() default '0';
+
+    /**
+     * 结果小数精度
+     * 默认-1、代表不进行精度处理、最大为10
+     * 仅当字段类型为float、double时候、此属性才有效
+     */
+    int precision() default -1;
 }

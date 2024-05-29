@@ -114,6 +114,10 @@ public class FieldBuilder__F_bit_num_easy extends FieldBuilder {
         if (fieldTypeClass.isEnum()) {
             ParseUtil.append(body, "{}.{}={}.fromInteger((int){});\n", varNameInstance, field.getName(), fieldTypeName, valCode);
         } else {
+            //格式化精度
+            if ((fieldTypeClass == float.class || fieldTypeClass == double.class) && anno.precision() >= 0) {
+                valCode = ParseUtil.format("{}.round((double){},{})", ParseUtil.class.getName(), valCode, anno.precision());
+            }
             ParseUtil.append(body, "{}.{}=({})({});\n", varNameInstance, field.getName(), fieldTypeName, valCode);
         }
 

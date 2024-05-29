@@ -48,62 +48,62 @@ public class FieldBuilder__F_num extends FieldBuilder {
             }
             case uint16 -> {
                 if (sourceValTypeName.equals("short")) {
-                    funcName = varNameByteBuf + ".readShort" + (bigEndian ? "" : "LE")+"()";
+                    funcName = varNameByteBuf + ".readShort" + (bigEndian ? "" : "LE") + "()";
                 } else {
-                    funcName = varNameByteBuf + ".readUnsignedShort" + (bigEndian ? "" : "LE")+"()";
+                    funcName = varNameByteBuf + ".readUnsignedShort" + (bigEndian ? "" : "LE") + "()";
                 }
             }
             case uint24 -> {
-                funcName = varNameByteBuf + ".readUnsignedMedium" + (bigEndian ? "" : "LE")+"()";
+                funcName = varNameByteBuf + ".readUnsignedMedium" + (bigEndian ? "" : "LE") + "()";
             }
             case uint32 -> {
                 if (sourceValTypeName.equals("int")) {
-                    funcName = varNameByteBuf + ".readInt" + (bigEndian ? "" : "LE")+"()";
+                    funcName = varNameByteBuf + ".readInt" + (bigEndian ? "" : "LE") + "()";
                 } else {
-                    funcName = varNameByteBuf + ".readUnsignedInt" + (bigEndian ? "" : "LE")+"()";
+                    funcName = varNameByteBuf + ".readUnsignedInt" + (bigEndian ? "" : "LE") + "()";
                 }
             }
             case uint40 -> {
-                funcName = ParseUtil.format("{}.read_uint40{}({})", FieldBuilder__F_num.class.getName(), bigEndian ? "" : "_le",FieldBuilder.varNameByteBuf);
+                funcName = ParseUtil.format("{}.read_uint40{}({})", FieldBuilder__F_num.class.getName(), bigEndian ? "" : "_le", FieldBuilder.varNameByteBuf);
             }
             case uint48 -> {
-                funcName = ParseUtil.format("{}.read_uint48{}({})", FieldBuilder__F_num.class.getName(), bigEndian ? "" : "_le",FieldBuilder.varNameByteBuf);
+                funcName = ParseUtil.format("{}.read_uint48{}({})", FieldBuilder__F_num.class.getName(), bigEndian ? "" : "_le", FieldBuilder.varNameByteBuf);
             }
             case uint56 -> {
-                funcName = ParseUtil.format("{}.read_uint56{}({})", FieldBuilder__F_num.class.getName(), bigEndian ? "" : "_le",FieldBuilder.varNameByteBuf);
+                funcName = ParseUtil.format("{}.read_uint56{}({})", FieldBuilder__F_num.class.getName(), bigEndian ? "" : "_le", FieldBuilder.varNameByteBuf);
             }
             case uint64 -> {
-                funcName = varNameByteBuf + ".readLong" + (bigEndian ? "" : "LE")+"()";
+                funcName = varNameByteBuf + ".readLong" + (bigEndian ? "" : "LE") + "()";
             }
             case int8 -> {
                 funcName = varNameByteBuf + ".readByte()";
             }
             case int16 -> {
-                funcName = varNameByteBuf + ".readShort" + (bigEndian ? "" : "LE")+"()";
+                funcName = varNameByteBuf + ".readShort" + (bigEndian ? "" : "LE") + "()";
             }
             case int24 -> {
-                funcName = varNameByteBuf + ".readMedium" + (bigEndian ? "" : "LE")+"()";
+                funcName = varNameByteBuf + ".readMedium" + (bigEndian ? "" : "LE") + "()";
             }
             case int32 -> {
-                funcName = varNameByteBuf + ".readInt" + (bigEndian ? "" : "LE")+"()";
+                funcName = varNameByteBuf + ".readInt" + (bigEndian ? "" : "LE") + "()";
             }
             case int40 -> {
-                funcName = ParseUtil.format("{}.read_int40{}({})", FieldBuilder__F_num.class.getName(), bigEndian ? "" : "_le",FieldBuilder.varNameByteBuf);
+                funcName = ParseUtil.format("{}.read_int40{}({})", FieldBuilder__F_num.class.getName(), bigEndian ? "" : "_le", FieldBuilder.varNameByteBuf);
             }
             case int48 -> {
-                funcName = ParseUtil.format("{}.read_int48{}({})", FieldBuilder__F_num.class.getName(), bigEndian ? "" : "_le",FieldBuilder.varNameByteBuf);
+                funcName = ParseUtil.format("{}.read_int48{}({})", FieldBuilder__F_num.class.getName(), bigEndian ? "" : "_le", FieldBuilder.varNameByteBuf);
             }
             case int56 -> {
-                funcName = ParseUtil.format("{}.read_int56{}({})", FieldBuilder__F_num.class.getName(), bigEndian ? "" : "_le",FieldBuilder.varNameByteBuf);
+                funcName = ParseUtil.format("{}.read_int56{}({})", FieldBuilder__F_num.class.getName(), bigEndian ? "" : "_le", FieldBuilder.varNameByteBuf);
             }
             case int64 -> {
-                funcName = varNameByteBuf + ".readLong" + (bigEndian ? "" : "LE")+"()";
+                funcName = varNameByteBuf + ".readLong" + (bigEndian ? "" : "LE") + "()";
             }
             case float32 -> {
-                funcName = varNameByteBuf + ".readFloat" + (bigEndian ? "" : "LE")+"()";
+                funcName = varNameByteBuf + ".readFloat" + (bigEndian ? "" : "LE") + "()";
             }
             case float64 -> {
-                funcName = varNameByteBuf + ".readDouble" + (bigEndian ? "" : "LE")+"()";
+                funcName = varNameByteBuf + ".readDouble" + (bigEndian ? "" : "LE") + "()";
             }
             default -> {
                 ParseUtil.notSupport_numType(context.clazz, field, annoClass);
@@ -113,13 +113,16 @@ public class FieldBuilder__F_num extends FieldBuilder {
         //读取原始数据
         ParseUtil.append(body, "final {} {}=({}){};\n", sourceValTypeName, varNameField, sourceValTypeName, funcName);
         //表达式运算
-        final String valCode = ParseUtil.replaceValExprToCode(anno.valExpr(), varNameField);
+        String valCode = ParseUtil.replaceValExprToCode(anno.valExpr(), varNameField);
         if (fieldTypeClass.isEnum()) {
             ParseUtil.append(body, "{}.{}={}.fromInteger((int)({}));\n", varNameInstance, field.getName(), fieldTypeName, valCode);
         } else {
+            //格式化精度
+            if ((fieldTypeClass == float.class || fieldTypeClass == double.class) && anno.precision() >= 0) {
+                valCode = ParseUtil.format("{}.round((double){},{})", ParseUtil.class.getName(), valCode, anno.precision());
+            }
             ParseUtil.append(body, "{}.{}=({}){};\n", varNameInstance, field.getName(), sourceValTypeName, valCode);
         }
-
         final char var = anno.var();
         if (var != '0') {
             context.varToFieldName.put(var, varNameField);
@@ -171,39 +174,39 @@ public class FieldBuilder__F_num extends FieldBuilder {
                 ParseUtil.append(body, "{}.{}((int)({}));\n", varNameByteBuf, funcName, valCode);
             }
             case uint16, int16 -> {
-                String funcName = "writeShort" + (bigEndian?"":"LE");
+                String funcName = "writeShort" + (bigEndian ? "" : "LE");
                 ParseUtil.append(body, "{}.{}((int)({}));\n", varNameByteBuf, funcName, valCode);
             }
             case uint24, int24 -> {
-                String funcName = "writeMedium" + (bigEndian?"":"LE");
+                String funcName = "writeMedium" + (bigEndian ? "" : "LE");
                 ParseUtil.append(body, "{}.{}((int)({}));\n", varNameByteBuf, funcName, valCode);
             }
             case uint32, int32 -> {
-                String funcName = "writeInt" + (bigEndian?"":"LE");
+                String funcName = "writeInt" + (bigEndian ? "" : "LE");
                 ParseUtil.append(body, "{}.{}((int)({}));\n", varNameByteBuf, funcName, valCode);
             }
             case uint40, int40 -> {
                 String funcName = "write_int40" + (bigEndian ? "" : "_le");
-                ParseUtil.append(body, "{}.{}({},(long)({}));\n", FieldBuilder__F_num.class.getName(), funcName,varNameByteBuf, valCode);
+                ParseUtil.append(body, "{}.{}({},(long)({}));\n", FieldBuilder__F_num.class.getName(), funcName, varNameByteBuf, valCode);
             }
             case uint48, int48 -> {
                 String funcName = "write_int48" + (bigEndian ? "" : "_le");
-                ParseUtil.append(body, "{}.{}({},(long)({}));\n", FieldBuilder__F_num.class.getName(), funcName,varNameByteBuf, valCode);
+                ParseUtil.append(body, "{}.{}({},(long)({}));\n", FieldBuilder__F_num.class.getName(), funcName, varNameByteBuf, valCode);
             }
             case uint56, int56 -> {
                 String funcName = "write_int56" + (bigEndian ? "" : "_le");
-                ParseUtil.append(body, "{}.{}({},(long)({}));\n", FieldBuilder__F_num.class.getName(), funcName,varNameByteBuf, valCode);
+                ParseUtil.append(body, "{}.{}({},(long)({}));\n", FieldBuilder__F_num.class.getName(), funcName, varNameByteBuf, valCode);
             }
             case uint64, int64 -> {
-                String funcName = "writeLong" + (bigEndian?"":"LE");
+                String funcName = "writeLong" + (bigEndian ? "" : "LE");
                 ParseUtil.append(body, "{}.{}((long)({}));\n", varNameByteBuf, funcName, valCode);
             }
             case float32 -> {
-                String funcName = "writeFloat" + (bigEndian?"":"LE");
+                String funcName = "writeFloat" + (bigEndian ? "" : "LE");
                 ParseUtil.append(body, "{}.{}((float)({}));\n", varNameByteBuf, funcName, valCode);
             }
             case float64 -> {
-                String funcName = "writeDouble" + (bigEndian?"":"LE");
+                String funcName = "writeDouble" + (bigEndian ? "" : "LE");
                 ParseUtil.append(body, "{}.{}((double)({}));\n", varNameByteBuf, funcName, valCode);
             }
             default -> {

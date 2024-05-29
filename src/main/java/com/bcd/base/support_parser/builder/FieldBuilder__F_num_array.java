@@ -134,10 +134,14 @@ public class FieldBuilder__F_num_array extends FieldBuilder {
                 ParseUtil.append(body, "{}.skipBytes({});\n", varNameByteBuf, singleSkip);
             }
             //表达式运算
-            final String valCode = ParseUtil.replaceValExprToCode(singleValExpr, varNameArrayElement);
+            String valCode = ParseUtil.replaceValExprToCode(singleValExpr, varNameArrayElement);
             if (arrayElementType.isEnum()) {
                 ParseUtil.append(body, "{}[i]={}.fromInteger((int)({}));\n", arrVarName, arrayElementTypeName, valCode);
             } else {
+                //格式化精度
+                if ((arrayElementType == float.class || arrayElementType == double.class) && anno.singlePrecision() >= 0) {
+                    valCode = ParseUtil.format("{}.round((double){},{})", ParseUtil.class.getName(), valCode, anno.singlePrecision());
+                }
                 ParseUtil.append(body, "{}[i]=({})({});\n", arrVarName, arrayElementTypeName, valCode);
             }
             ParseUtil.append(body, "}\n");

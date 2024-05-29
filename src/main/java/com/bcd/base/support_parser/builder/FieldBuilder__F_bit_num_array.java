@@ -86,6 +86,10 @@ public class FieldBuilder__F_bit_num_array extends FieldBuilder {
             ParseUtil.append(body, "{}.skip({});\n", varNameBitBuf, singleSkip);
         }
         String valCode = ParseUtil.replaceValExprToCode(valExpr, varNameArrayElement);
+        //格式化精度
+        if ((arrayElementType == float.class || arrayElementType == double.class) && anno.singlePrecision() >= 0) {
+            valCode = ParseUtil.format("{}.round((double){},{})", ParseUtil.class.getName(), valCode, anno.singlePrecision());
+        }
         ParseUtil.append(body, "{}[i]=({})({});\n", arrVarName, arrayElementTypeName, valCode);
         ParseUtil.append(body, "}\n");
         ParseUtil.append(body, "{}.{}={};\n", FieldBuilder.varNameInstance, field.getName(), arrVarName);

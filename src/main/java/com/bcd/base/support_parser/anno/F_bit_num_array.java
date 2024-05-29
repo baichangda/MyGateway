@@ -100,4 +100,11 @@ public @interface F_bit_num_array {
      * 在解析之后跳过多少bit
      */
     int skipBefore() default 0;
+
+    /**
+     * 每个数组元素结果小数精度
+     * 默认-1、代表不进行精度处理、最大为10
+     * 仅当字段类型为float、double时候、此属性才有效
+     */
+    int singlePrecision() default -1;
 }
