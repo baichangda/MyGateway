@@ -53,14 +53,8 @@ public class FieldBuilder__F_string_bcd extends FieldBuilder {
         final String valCode = varNameInstance + "." + fieldName;
         final String varNameField = ParseUtil.getFieldVarName(context);
         final String varNameFieldVal = varNameField + "_val";
-
-        ParseUtil.append(body, "final String {};\n", varNameFieldVal);
-        ParseUtil.append(body, "if({}==null){\n", valCode);
-        ParseUtil.append(body, "{}=\"\";\n", varNameFieldVal);
-        ParseUtil.append(body, "}else{\n", valCode);
-        ParseUtil.append(body, "{}={};\n", varNameFieldVal, valCode);
-        ParseUtil.append(body, "}\n", valCode);
-
+        ParseUtil.append(body, "final String {}={};\n", varNameFieldVal, valCode);
+        ParseUtil.append(body, "if({}!=null){\n", varNameFieldVal);
         final String lenRes;
         if (anno.len() == 0) {
             if (anno.lenExpr().isEmpty()) {
@@ -83,6 +77,7 @@ public class FieldBuilder__F_string_bcd extends FieldBuilder {
                 ParseUtil.append(body, "{}.write_highAddressAppend({},{},{});\n", FieldBuilder__F_string_bcd.class.getName(), varNameByteBuf, varNameFieldVal, lenRes);
             }
         }
+        ParseUtil.append(body, "}\n", valCode);
     }
 
 
