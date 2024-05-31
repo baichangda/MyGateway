@@ -56,14 +56,8 @@ public class FieldBuilder__F_string extends FieldBuilder {
         final String valCode = varNameInstance + "." + fieldName;
         final String varNameField = ParseUtil.getFieldVarName(context);
         final String varNameFieldVal = varNameField + "_val";
-
-        ParseUtil.append(body, "final String {};\n", varNameFieldVal);
-        ParseUtil.append(body, "if({}==null){\n", valCode);
-        ParseUtil.append(body, "{}=\"\";\n", varNameFieldVal);
-        ParseUtil.append(body, "}else{\n", valCode);
-        ParseUtil.append(body, "{}={};\n", varNameFieldVal, valCode);
-        ParseUtil.append(body, "}\n", valCode);
-
+        ParseUtil.append(body, "final String {}={};\n", varNameFieldVal, valCode);
+        ParseUtil.append(body, "if({}!=null){\n", varNameFieldVal);
         final String lenRes;
         if (anno.len() == 0) {
             if (anno.lenExpr().isEmpty()) {
@@ -74,12 +68,9 @@ public class FieldBuilder__F_string extends FieldBuilder {
         } else {
             lenRes = anno.len() + "";
         }
-
-
         final Charset charset = Charset.forName(anno.charset());
         final String charsetClassName = Charset.class.getName();
         final String charsetVarName = ParseUtil.defineClassVar(context, Charset.class, "{}.forName(\"{}\")", charsetClassName, charset.name());
-
         switch (anno.appendMode()) {
             case noAppend -> {
                 ParseUtil.append(body, "{}.writeBytes({}.getBytes({}));\n", varNameByteBuf, varNameFieldVal, charsetVarName);
@@ -91,6 +82,7 @@ public class FieldBuilder__F_string extends FieldBuilder {
                 ParseUtil.append(body, "{}.write_highAddressAppend({},{},{},{});\n", FieldBuilder__F_string.class.getName(), varNameByteBuf, varNameFieldVal, lenRes, charsetVarName);
             }
         }
+        ParseUtil.append(body, "}\n", valCode);
     }
 
     public static String read_lowAddressAppend(ByteBuf byteBuf, int len, Charset charset) {

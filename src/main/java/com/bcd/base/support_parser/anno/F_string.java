@@ -8,9 +8,6 @@ import java.lang.annotation.Target;
 /**
  * 用于如下类型字段
  * String
- * <p>
- * 反解析中
- * 值可以为null、此时null代表空字符串
  */
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
