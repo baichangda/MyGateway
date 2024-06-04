@@ -127,7 +127,7 @@ public class BuilderContext {
             final String varName = "_processor_" + beanClazz.getSimpleName();
             //在build时候预先生成、并在相应的class中生成类变量
             Parser.getProcessor(beanClazz, byteOrder, bitOrder);
-            String format = ParseUtil.format("public final {} {}={}.beanClassNameAndOrder_processor.get(\"{}\");\n",
+            String format = ParseUtil.format("public final {} {}={}.beanProcessorKey_processor.get(\"{}\");\n",
                     Processor.class.getName(),
                     varName,
                     Parser.class.getName(),

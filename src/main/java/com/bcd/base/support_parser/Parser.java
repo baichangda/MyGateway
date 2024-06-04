@@ -91,7 +91,7 @@ public class Parser {
      */
     private static boolean printBuildLog = false;
 
-    public static synchronized void withDefaultLogCollector_parse() {
+    public static void withDefaultLogCollector_parse() {
         logCollector_parse = new LogCollector_parse() {
 
             @Override
@@ -136,7 +136,7 @@ public class Parser {
 
     }
 
-    public static synchronized void withDefaultLogCollector_deParse() {
+    public static void withDefaultLogCollector_deParse() {
         logCollector_deParse = new LogCollector_deParse() {
             @Override
             public void collect_field(Class<?> clazz, Class<?> fieldDeclaringClass, String fieldName, Object val, byte[] content, String processorClassName) {
@@ -177,11 +177,11 @@ public class Parser {
         };
     }
 
-    public static synchronized void enablePrintBuildLog() {
+    public static void enablePrintBuildLog() {
         printBuildLog = true;
     }
 
-    public static synchronized void enableGenerateClassFile() {
+    public static void enableGenerateClassFile() {
         generateClassFile = true;
     }
 
@@ -473,7 +473,7 @@ public class Parser {
      * @param <T>
      * @return
      */
-    public static synchronized <T> Processor<T> getProcessor(Class<T> clazz) {
+    public static <T> Processor<T> getProcessor(Class<T> clazz) {
         return getProcessor(clazz, ByteOrder.Default, BitOrder.Default);
     }
 
@@ -486,19 +486,25 @@ public class Parser {
      * @param <T>
      * @return
      */
-    public static synchronized <T> Processor<T> getProcessor(Class<T> clazz, ByteOrder byteOrder, BitOrder bitOrder) {
+    public static <T> Processor<T> getProcessor(Class<T> clazz, ByteOrder byteOrder, BitOrder bitOrder) {
         final String key = ParseUtil.getProcessorKey(clazz, byteOrder, bitOrder);
-        return (Processor<T>) beanProcessorKey_processor.computeIfAbsent(key, k -> {
-            try {
-                final Class<T> processClass = Parser.buildClass(clazz, byteOrder, bitOrder);
-                Processor<T> processor = (Processor<T>) processClass.getConstructor().newInstance();
-                beanProcessorKey_processor.put(key, processor);
-                return processor;
-            } catch (CannotCompileException | NotFoundException | IOException | NoSuchMethodException |
-                     InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                throw MyException.get(e);
+        Processor<T> processor = (Processor<T>) beanProcessorKey_processor.get(key);
+        if (processor == null) {
+            synchronized (beanProcessorKey_processor) {
+                processor = (Processor<T>) beanProcessorKey_processor.get(key);
+                if (processor == null) {
+                    try {
+                        final Class<T> processClass = Parser.buildClass(clazz, byteOrder, bitOrder);
+                        processor = (Processor<T>) processClass.getConstructor().newInstance();
+                        beanProcessorKey_processor.put(key, processor);
+                    } catch (CannotCompileException | NotFoundException | IOException | NoSuchMethodException |
+                             InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                        throw MyException.get(e);
+                    }
+                }
             }
-        });
+        }
+        return processor;
     }
 
     public interface LogCollector_parse {
