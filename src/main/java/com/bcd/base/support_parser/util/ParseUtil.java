@@ -325,7 +325,7 @@ public class ParseUtil {
             if (c == ' ') {
                 continue;
             }
-            if (c != '+' && c != '-' && c != '*' && c != '/' && !Character.isDigit(c)) {
+            if (c != '+' && c != '-' && c != '*' && c != '/' && c != '(' && c != ')' && !Character.isDigit(c)) {
                 final String s = map.get(c);
                 if (s == null) {
                     throw MyException.get("class[{}] field[{}] expr[{}] can't find char[{}] value", field.getDeclaringClass().getName(), field.getName(), lenExpr, c);
@@ -346,7 +346,7 @@ public class ParseUtil {
             if (c == ' ') {
                 continue;
             }
-            if (c != '+' && c != '-' && c != '*' && c != '/' && !Character.isDigit(c)) {
+            if (c != '+' && c != '-' && c != '*' && c != '/' && c != '(' && c != ')' && !Character.isDigit(c)) {
                 final String s = map.get(c);
                 if (s == null) {
                     throw MyException.get("class[{}] c_skip lenExpr[{}] can't find char[{}] value", clazz.getName(), lenExpr, c);
