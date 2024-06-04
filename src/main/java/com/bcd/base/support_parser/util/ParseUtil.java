@@ -18,6 +18,10 @@ import org.slf4j.helpers.MessageFormatter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -32,7 +36,7 @@ public class ParseUtil {
             byte.class, short.class, int.class, long.class, float.class, double.class,
             byte[].class, short[].class, int[].class, long[].class, float[].class, double[].class,
             String.class,
-            Date.class);
+            Date.class, Instant.class, LocalDateTime.class, OffsetDateTime.class, ZonedDateTime.class);
 
     static final double[] pows;
 

@@ -23,15 +23,15 @@ public class Msg_header {
     public long count;
     @F_date_ts(mode = DateTsMode.float64_s)
     public Date timestamp;
-    @F_num(type = NumType.uint16,  valExpr = "x/10")
+    @F_num(type = NumType.uint16, valExpr = "x/10")
     public float fps;
-    @F_num(type = NumType.uint32,  valExpr = "x/10000000")
+    @F_num(type = NumType.uint32, valExpr = "x/10000000")
     public double dev_lon;
-    @F_num(type = NumType.uint32,  valExpr = "x/10000000")
+    @F_num(type = NumType.uint32, valExpr = "x/10000000")
     public double dev_lat;
     @F_num(type = NumType.uint32)
     public long dev_alt;
-    @F_num(type = NumType.uint16,  valExpr = "x/100")
+    @F_num(type = NumType.uint16, valExpr = "x/100")
     public float dev_azimuth;
 
 }
