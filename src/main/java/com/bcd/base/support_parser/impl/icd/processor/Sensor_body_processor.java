@@ -14,7 +14,7 @@ public class Sensor_body_processor implements Processor<Sensor_body> {
     final Processor<Sensor_body_lidar> processor_sensor_body_lidar = Parser.getProcessor(Sensor_body_lidar.class);
 
     @Override
-    public Sensor_body process(ByteBuf data, ProcessContext parentContext) {
+    public Sensor_body process(ByteBuf data, ProcessContext<?> parentContext) {
         final Sensor_info instance = (Sensor_info) parentContext.instance;
         final Sensor_body sensor_body;
         switch (instance.sensor_type) {
@@ -35,7 +35,7 @@ public class Sensor_body_processor implements Processor<Sensor_body> {
     }
 
     @Override
-    public void deProcess(ByteBuf data, ProcessContext parentContext, Sensor_body instance) {
+    public void deProcess(ByteBuf data, ProcessContext<?> parentContext, Sensor_body instance) {
         final Sensor_info parentInstance = (Sensor_info) parentContext.instance;
         switch (parentInstance.sensor_type) {
             case camera -> {

@@ -1,7 +1,7 @@
 package com.bcd.base.support_parser.impl.immotors.ep33;
 
 import com.bcd.base.support_parser.Parser;
-import com.bcd.base.support_parser.impl.immotors.ep33.data.Packet;
+import com.bcd.base.support_parser.impl.immotors.Packet;
 import com.bcd.base.support_parser.util.PerformanceUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;

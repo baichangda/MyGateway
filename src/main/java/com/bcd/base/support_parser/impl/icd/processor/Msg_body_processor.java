@@ -27,7 +27,7 @@ public class Msg_body_processor implements Processor<Msg_body> {
     }
 
     @Override
-    public Msg_body process(ByteBuf data, ProcessContext parentContext) {
+    public Msg_body process(ByteBuf data, ProcessContext<?> parentContext) {
         final Msg msg = (Msg) parentContext.instance;
         final Msg_body msg_body;
         switch (msg.msg_header.frame_type) {
@@ -72,7 +72,7 @@ public class Msg_body_processor implements Processor<Msg_body> {
     }
 
     @Override
-    public void deProcess(ByteBuf data, ProcessContext parentContext, Msg_body instance) {
+    public void deProcess(ByteBuf data, ProcessContext<?> parentContext, Msg_body instance) {
         final Msg msg = (Msg) parentContext.instance;
         switch (msg.msg_header.frame_type) {
             case system_runtime_info -> {

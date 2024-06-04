@@ -13,7 +13,7 @@ public class Target_info_extras_processor implements Processor<Target_info_extra
     final Processor<Target_info_extras_car> processor_target_info_extras_car = Parser.getProcessor(Target_info_extras_car.class);
 
     @Override
-    public Target_info_extras process(ByteBuf data, ProcessContext parentContext) {
+    public Target_info_extras process(ByteBuf data, ProcessContext<?> parentContext) {
         TargetClass targetClass;
         if (parentContext.instance instanceof Target_info target_info) {
             targetClass = target_info.clazz;
@@ -41,7 +41,7 @@ public class Target_info_extras_processor implements Processor<Target_info_extra
     }
 
     @Override
-    public void deProcess(ByteBuf data, ProcessContext parentContext, Target_info_extras instance) {
+    public void deProcess(ByteBuf data, ProcessContext<?> parentContext, Target_info_extras instance) {
         TargetClass targetClass;
         if (parentContext.instance instanceof Target_info target_info) {
             targetClass = target_info.clazz;
