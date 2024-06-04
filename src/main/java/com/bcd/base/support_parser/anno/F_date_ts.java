@@ -8,6 +8,10 @@ import java.lang.annotation.Target;
 /**
  * 适用于如下类型
  * {@link java.util.Date}
+ * {@link java.time.Instant}
+ * {@link java.time.LocalDateTime}
+ * {@link java.time.OffsetDateTime}
+ * {@link java.time.ZonedDateTime}
  * int 此时代表时间戳秒
  * long 此时代表时间戳毫秒
  * {@link String} 此时使用{@link #stringFormat()}、{@link #stringZoneId()}格式化
