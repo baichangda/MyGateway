@@ -266,6 +266,9 @@ public class ParseUtil {
         final StringBuilder sb = new StringBuilder();
         final char[] chars = expr.toCharArray();
         for (char c : chars) {
+            if (c == ' ') {
+                continue;
+            }
             if (c != '+' && c != '-' && c != '*' && c != '/' && c != '(' && c != ')' && c != '.' && !Character.isDigit(c)) {
                 sb.append(valExpr);
             } else {
@@ -319,6 +322,9 @@ public class ParseUtil {
         final StringBuilder sb = new StringBuilder();
         final char[] chars = lenExpr.toCharArray();
         for (char c : chars) {
+            if (c == ' ') {
+                continue;
+            }
             if (c != '+' && c != '-' && c != '*' && c != '/' && !Character.isDigit(c)) {
                 final String s = map.get(c);
                 if (s == null) {
@@ -337,6 +343,9 @@ public class ParseUtil {
         final StringBuilder sb = new StringBuilder();
         final char[] chars = lenExpr.toCharArray();
         for (char c : chars) {
+            if (c == ' ') {
+                continue;
+            }
             if (c != '+' && c != '-' && c != '*' && c != '/' && !Character.isDigit(c)) {
                 final String s = map.get(c);
                 if (s == null) {

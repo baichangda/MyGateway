@@ -346,6 +346,9 @@ public class RpnUtil {
         for (int i = 0; i <= chars.length - 1; i++) {
             final char c = chars[i];
             switch (c) {
+                case ' ':{
+                    continue;
+                }
                 case '+':
                 case '*':
                 case '/': {
