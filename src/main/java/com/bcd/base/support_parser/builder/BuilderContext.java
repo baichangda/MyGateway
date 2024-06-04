@@ -122,7 +122,7 @@ public class BuilderContext {
 
 
     public final String getProcessorVarName(Class<?> beanClazz) {
-        final String key = ParseUtil.getProcessKey(beanClazz, byteOrder, bitOrder);
+        final String key = ParseUtil.getProcessorKey(beanClazz, byteOrder, bitOrder);
         return beanClassAndOrder_processorVarName.computeIfAbsent(key, k -> {
             final String varName = "_processor_" + beanClazz.getSimpleName();
             //在build时候预先生成、并在相应的class中生成类变量

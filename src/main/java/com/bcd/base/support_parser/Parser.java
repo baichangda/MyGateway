@@ -73,7 +73,7 @@ public class Parser {
         anno_fieldBuilder = ParseUtil.getAllFieldBuild();
     }
 
-    public final static Map<String, Processor<?>> beanClassNameAndOrder_processor = new HashMap<>();
+    public final static Map<String, Processor<?>> beanProcessorKey_processor = new HashMap<>();
     /**
      * 解析log采集器
      * 需要注意的是、此功能用于调试、会在生成的class中加入日志代码、影响性能
@@ -279,7 +279,7 @@ public class Parser {
         final String byteBufClassName = ByteBuf.class.getName();
         final String clazzName = clazz.getName();
 
-        String implProcessor_class_name = ParseUtil.getProcessClassName(clazz, byteOrder, bitOrder);
+        String implProcessor_class_name = ParseUtil.getProcessorClassName(clazz, byteOrder, bitOrder);
         final CtClass cc = ClassPool.getDefault().makeClass(implProcessor_class_name);
 
         //添加泛型
@@ -487,16 +487,16 @@ public class Parser {
      * @return
      */
     public static <T> Processor<T> getProcessor(Class<T> clazz, ByteOrder byteOrder, BitOrder bitOrder) {
-        final String key = ParseUtil.getProcessKey(clazz, byteOrder, bitOrder);
-        Processor<T> processor = (Processor<T>) beanClassNameAndOrder_processor.get(key);
+        final String key = ParseUtil.getProcessorKey(clazz, byteOrder, bitOrder);
+        Processor<T> processor = (Processor<T>) beanProcessorKey_processor.get(key);
         if (processor == null) {
-            synchronized (beanClassNameAndOrder_processor) {
-                processor = (Processor<T>) beanClassNameAndOrder_processor.get(key);
+            synchronized (beanProcessorKey_processor) {
+                processor = (Processor<T>) beanProcessorKey_processor.get(key);
                 if (processor == null) {
                     try {
                         final Class<T> processClass = Parser.buildClass(clazz, byteOrder, bitOrder);
                         processor = (Processor<T>) processClass.getConstructor().newInstance();
-                        beanClassNameAndOrder_processor.put(key, processor);
+                        beanProcessorKey_processor.put(key, processor);
                         return processor;
                     } catch (CannotCompileException | NotFoundException | IOException | NoSuchMethodException |
                              InstantiationException | IllegalAccessException | InvocationTargetException e) {

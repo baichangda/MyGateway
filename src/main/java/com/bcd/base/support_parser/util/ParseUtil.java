@@ -425,24 +425,24 @@ public class ParseUtil {
         return ClassUtil.getAllFields(clazz).stream().filter(ParseUtil::needParse).collect(Collectors.toList());
     }
 
-    private static String getProcessSuffix(ByteOrder byteOrder, BitOrder bitOrder) {
+    private static String getProcessorSuffix(ByteOrder byteOrder, BitOrder bitOrder) {
         return "_" + (byteOrder == ByteOrder.smallEndian ? 0 : 1)
                 + "_" + (bitOrder == BitOrder.smallEndian ? 0 : 1)
                 + "_" + (Parser.logCollector_parse == null ? 0 : 1)
                 + "_" + (Parser.logCollector_deParse == null ? 0 : 1);
     }
 
-    public static String getProcessKey(Class<?> clazz, ByteOrder byteOrder, BitOrder bitOrder) {
-        return clazz.getName() + getProcessSuffix(byteOrder, bitOrder);
+    public static String getProcessorKey(Class<?> clazz, ByteOrder byteOrder, BitOrder bitOrder) {
+        return clazz.getName() + getProcessorSuffix(byteOrder, bitOrder);
     }
 
-    public static String getProcessClassName(Class<?> clazz, ByteOrder byteOrder, BitOrder bitOrder) {
+    public static String getProcessorClassName(Class<?> clazz, ByteOrder byteOrder, BitOrder bitOrder) {
         String clazzName = Processor.class.getName();
         return clazzName.substring(0, clazzName.lastIndexOf("."))
                 + ".P_"
                 + (processorIndex++) + "_"
                 + clazz.getSimpleName()
-                + getProcessSuffix(byteOrder, bitOrder);
+                + getProcessorSuffix(byteOrder, bitOrder);
     }
 
     public static Map<Class<? extends Annotation>, FieldBuilder> getAllFieldBuild() {
