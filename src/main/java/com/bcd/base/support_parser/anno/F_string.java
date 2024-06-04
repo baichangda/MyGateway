@@ -33,6 +33,9 @@ public @interface F_string {
      */
     String lenExpr() default "";
 
+    /**
+     * 字符串编码
+     */
     String charset() default "UTF-8";
 
     /**
