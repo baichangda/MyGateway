@@ -65,7 +65,7 @@ import java.util.stream.Collectors;
  */
 public class Parser {
 
-    public final static Logger logger = LoggerFactory.getLogger(Parser.class);
+    private final static Logger logger = LoggerFactory.getLogger(Parser.class);
 
     public final static Map<Class<? extends Annotation>, FieldBuilder> anno_fieldBuilder;
 
@@ -91,7 +91,7 @@ public class Parser {
      */
     private static boolean printBuildLog = false;
 
-    public static void withDefaultLogCollector_parse() {
+    public static synchronized void withDefaultLogCollector_parse() {
         logCollector_parse = new LogCollector_parse() {
 
             @Override
@@ -136,7 +136,7 @@ public class Parser {
 
     }
 
-    public static void withDefaultLogCollector_deParse() {
+    public static synchronized void withDefaultLogCollector_deParse() {
         logCollector_deParse = new LogCollector_deParse() {
             @Override
             public void collect_field(Class<?> clazz, Class<?> fieldDeclaringClass, String fieldName, Object val, byte[] content, String processorClassName) {
@@ -177,11 +177,11 @@ public class Parser {
         };
     }
 
-    public static void enablePrintBuildLog() {
+    public static synchronized void enablePrintBuildLog() {
         printBuildLog = true;
     }
 
-    public static void enableGenerateClassFile() {
+    public static synchronized void enableGenerateClassFile() {
         generateClassFile = true;
     }
 
@@ -274,7 +274,7 @@ public class Parser {
         }
     }
 
-    public static <T> Class<T> buildClass(Class<T> clazz, ByteOrder byteOrder, BitOrder bitOrder) throws CannotCompileException, NotFoundException, IOException {
+    private static <T> Class<T> buildClass(Class<T> clazz, ByteOrder byteOrder, BitOrder bitOrder) throws CannotCompileException, NotFoundException, IOException {
         final String processor_class_name = Processor.class.getName();
         final String byteBufClassName = ByteBuf.class.getName();
         final String clazzName = clazz.getName();
@@ -348,7 +348,7 @@ public class Parser {
         C_skip c_skip = clazz.getAnnotation(C_skip.class);
         if (c_skip == null) {
             buildMethodBody_process(parseBuilderContext);
-        }else{
+        } else {
             int classByteLen = ParseUtil.getClassByteLenIfPossible(clazz);
             if (classByteLen == -1) {
                 ParseUtil.append(processBody, "final int {}={}.readerIndex();\n", FieldBuilder.varNameStartIndex, FieldBuilder.varNameByteBuf);
@@ -377,7 +377,7 @@ public class Parser {
                     }
                 } else {
                     int skip = c_skip.len() - classByteLen;
-                    if(skip>0){
+                    if (skip > 0) {
                         ParseUtil.append(processBody, "{}.skipBytes({});\n", FieldBuilder.varNameByteBuf, skip);
                         if (logCollector_parse != null) {
                             ParseUtil.append(processBody, "{}.logCollector_parse.collect_class({}.class,\"@C_skip skip[{}]\");\n", Parser.class.getName(), clazzName, skip);
@@ -413,7 +413,7 @@ public class Parser {
 
         if (c_skip == null) {
             buildMethodBody_deProcess(deParseBuilderContext);
-        }else{
+        } else {
             int classByteLen = ParseUtil.getClassByteLenIfPossible(clazz);
             if (classByteLen == -1) {
                 ParseUtil.append(deProcessBody, "final int {}={}.writerIndex();\n", FieldBuilder.varNameStartIndex, FieldBuilder.varNameByteBuf);
@@ -442,7 +442,7 @@ public class Parser {
                     }
                 } else {
                     int skip = c_skip.len() - classByteLen;
-                    if(skip>0) {
+                    if (skip > 0) {
                         ParseUtil.append(deProcessBody, "{}.writeZero({});\n", FieldBuilder.varNameByteBuf, skip);
                         if (logCollector_parse != null) {
                             ParseUtil.append(processBody, "{}.logCollector_deParse.collect_class({}.class,\"@C_skip append[{}]\");\n", Parser.class.getName(), clazzName, skip);
@@ -473,7 +473,7 @@ public class Parser {
      * @param <T>
      * @return
      */
-    public static <T> Processor<T> getProcessor(Class<T> clazz) {
+    public static synchronized <T> Processor<T> getProcessor(Class<T> clazz) {
         return getProcessor(clazz, ByteOrder.Default, BitOrder.Default);
     }
 
@@ -486,26 +486,19 @@ public class Parser {
      * @param <T>
      * @return
      */
-    public static <T> Processor<T> getProcessor(Class<T> clazz, ByteOrder byteOrder, BitOrder bitOrder) {
+    public static synchronized <T> Processor<T> getProcessor(Class<T> clazz, ByteOrder byteOrder, BitOrder bitOrder) {
         final String key = ParseUtil.getProcessorKey(clazz, byteOrder, bitOrder);
-        Processor<T> processor = (Processor<T>) beanProcessorKey_processor.get(key);
-        if (processor == null) {
-            synchronized (beanProcessorKey_processor) {
-                processor = (Processor<T>) beanProcessorKey_processor.get(key);
-                if (processor == null) {
-                    try {
-                        final Class<T> processClass = Parser.buildClass(clazz, byteOrder, bitOrder);
-                        processor = (Processor<T>) processClass.getConstructor().newInstance();
-                        beanProcessorKey_processor.put(key, processor);
-                        return processor;
-                    } catch (CannotCompileException | NotFoundException | IOException | NoSuchMethodException |
-                             InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                        throw MyException.get(e);
-                    }
-                }
+        return (Processor<T>) beanProcessorKey_processor.computeIfAbsent(key, k -> {
+            try {
+                final Class<T> processClass = Parser.buildClass(clazz, byteOrder, bitOrder);
+                Processor<T> processor = (Processor<T>) processClass.getConstructor().newInstance();
+                beanProcessorKey_processor.put(key, processor);
+                return processor;
+            } catch (CannotCompileException | NotFoundException | IOException | NoSuchMethodException |
+                     InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                throw MyException.get(e);
             }
-        }
-        return processor;
+        });
     }
 
     public interface LogCollector_parse {
