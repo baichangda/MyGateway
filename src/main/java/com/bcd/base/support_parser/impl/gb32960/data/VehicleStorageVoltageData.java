@@ -13,6 +13,6 @@ public class VehicleStorageVoltageData {
     public short num;
 
     //可充电储能子系统电压信息集合
-    @F_bean_list(listLenExpr = "a * 1 + (0)")
+    @F_bean_list(listLenExpr = "a")
     public StorageVoltageData[] content;
 }
