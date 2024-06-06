@@ -482,6 +482,14 @@ public class ParseUtil {
     }
 
     public static int getClassByteLenIfPossible(Class<?> clazz) {
+        C_skip c_skip = clazz.getAnnotation(C_skip.class);
+        if (c_skip != null) {
+            if (c_skip.lenExpr().isEmpty()) {
+                return c_skip.len();
+            } else {
+                return -1;
+            }
+        }
         int all = 0;
         List<Field> parseFields = getParseFields(clazz);
         int bit = 0;
