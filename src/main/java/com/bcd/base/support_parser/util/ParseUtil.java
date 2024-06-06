@@ -482,14 +482,7 @@ public class ParseUtil {
     }
 
     public static int getClassByteLenIfPossible(Class<?> clazz) {
-        C_skip c_skip = clazz.getAnnotation(C_skip.class);
-        if (c_skip != null) {
-            if (c_skip.lenExpr().isEmpty()) {
-                return c_skip.len();
-            } else {
-                return -1;
-            }
-        }
+
         int all = 0;
         List<Field> parseFields = getParseFields(clazz);
         int bit = 0;
@@ -680,11 +673,21 @@ public class ParseUtil {
 
             F_bean f_bean = parseField.getAnnotation(F_bean.class);
             if (f_bean != null) {
-                int beanLen = getClassByteLenIfPossible(parseField.getType());
-                if (beanLen == -1) {
-                    return -1;
+                Class<?> parseFieldType = parseField.getType();
+                C_skip c_skip = parseFieldType.getAnnotation(C_skip.class);
+                if (c_skip == null) {
+                    int beanLen = getClassByteLenIfPossible(parseFieldType);
+                    if (beanLen == -1) {
+                        return -1;
+                    } else {
+                        all += beanLen;
+                    }
                 } else {
-                    all += beanLen;
+                    if (c_skip.lenExpr().isEmpty()) {
+                        all += c_skip.len();
+                    } else {
+                        return -1;
+                    }
                 }
             }
 
@@ -692,14 +695,25 @@ public class ParseUtil {
             if (f_bean_list != null) {
                 int listLen = f_bean_list.listLen();
                 if (listLen > 0) {
-                    int beanLen;
                     final Class<?> fieldType = parseField.getType();
+                    final Class<?> fieldBeanType;
                     if (fieldType.isArray()) {
-                        beanLen = getClassByteLenIfPossible(fieldType.getComponentType());
+                        fieldBeanType = fieldType.getComponentType();
                     } else if (List.class.isAssignableFrom(fieldType)) {
-                        beanLen = getClassByteLenIfPossible((Class<?>) ((ParameterizedType) parseField.getGenericType()).getActualTypeArguments()[0]);
+                        fieldBeanType = (Class<?>) ((ParameterizedType) parseField.getGenericType()).getActualTypeArguments()[0];
                     } else {
                         return -1;
+                    }
+                    final int beanLen;
+                    C_skip c_skip = fieldBeanType.getAnnotation(C_skip.class);
+                    if (c_skip == null) {
+                        beanLen = getClassByteLenIfPossible(fieldBeanType);
+                    } else {
+                        if (c_skip.lenExpr().isEmpty()) {
+                            beanLen = c_skip.len();
+                        } else {
+                            return -1;
+                        }
                     }
                     if (beanLen == -1) {
                         return -1;
