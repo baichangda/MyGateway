@@ -12,6 +12,7 @@ public class ProcessContext<T> {
     public final ByteBuf byteBuf;
     public BitBuf_reader bitBuf_reader;
     public BitBuf_writer bitBuf_writer;
+    public int[] globalVars;
 
     public ProcessContext(T instance, ProcessContext<?> parentContext) {
         this.instance = instance;
@@ -19,6 +20,7 @@ public class ProcessContext<T> {
         this.byteBuf = parentContext.byteBuf;
         this.bitBuf_reader = parentContext.bitBuf_reader;
         this.bitBuf_writer = parentContext.bitBuf_writer;
+        this.globalVars = parentContext.globalVars;
     }
 
     public ProcessContext(ByteBuf byteBuf) {
@@ -45,13 +47,32 @@ public class ProcessContext<T> {
         if (bitBuf_reader == null) {
             bitBuf_reader = new BitBuf_reader_log(byteBuf);
         }
-        return (BitBuf_reader_log)bitBuf_reader;
+        return (BitBuf_reader_log) bitBuf_reader;
     }
 
     public final BitBuf_writer_log getBitBuf_writer_log() {
         if (bitBuf_writer == null) {
             bitBuf_writer = new BitBuf_writer_log(byteBuf);
         }
-        return (BitBuf_writer_log)bitBuf_writer;
+        return (BitBuf_writer_log) bitBuf_writer;
+    }
+
+    public void putGlobalVar(char c, int v) {
+        if (globalVars == null) {
+            globalVars = new int[52];
+        }
+        int i = c - 'A';
+        if (i > 26) {
+            i = c - 'a' + 26;
+        }
+        globalVars[i] = v;
+    }
+
+    public int getGlobalVar(char c) {
+        int i = c - 'A';
+        if (i > 26) {
+            i = c - 'a' + 26;
+        }
+        return globalVars[i];
     }
 }

@@ -125,6 +125,10 @@ public class FieldBuilder__F_bit_num_easy extends FieldBuilder {
         if (var != '0') {
             context.varToFieldName.put(var, varNameField);
         }
+        final char globalVar = anno.globalVar();
+        if (globalVar != '0') {
+            ParseUtil.appendPutGlobalVar(context, globalVar, varNameField);
+        }
     }
 
     @Override
@@ -153,6 +157,11 @@ public class FieldBuilder__F_bit_num_easy extends FieldBuilder {
             ParseUtil.append(body, "final {} {}={};\n", fieldType.getName(), varNameField, valCode);
             context.varToFieldName.put(var, varNameField);
             valCode = varNameField;
+        }
+
+        //判断是否用到全局变量中、如果用到了、添加进去
+        if (anno.globalVar() != '0') {
+            ParseUtil.appendPutGlobalVar(context, anno.globalVar(), valCode);
         }
 
         //最后判断是否用了值表达式、如果用了、进行表达式处理

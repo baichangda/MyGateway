@@ -158,14 +158,14 @@ public class ParseUtil {
         final StringBuilder body = context.body;
         final String bitBuf_reader_className = Parser.logCollector_parse == null ? BitBuf_reader.class.getName() : BitBuf_reader_log.class.getName();
         final String funcName = Parser.logCollector_parse == null ? "getBitBuf_reader" : "getBitBuf_reader_log";
-        ParseUtil.append(body, "final {} {}={}.{}();\n", bitBuf_reader_className, FieldBuilder.varNameBitBuf, FieldBuilder.varNameParentProcessContext, funcName);
+        ParseUtil.append(body, "final {} {}={}.{}();\n", bitBuf_reader_className, FieldBuilder.varNameBitBuf, FieldBuilder.varNameProcessContext, funcName);
     }
 
     public static void newBitBuf_deParse(BuilderContext context) {
         final StringBuilder body = context.body;
         final String bitBuf_writer_className = Parser.logCollector_parse == null ? BitBuf_writer.class.getName() : BitBuf_writer_log.class.getName();
         final String funcName = Parser.logCollector_parse == null ? "getBitBuf_writer" : "getBitBuf_writer_log";
-        ParseUtil.append(body, "final {} {}={}.{}();\n", bitBuf_writer_className, FieldBuilder.varNameBitBuf, FieldBuilder.varNameParentProcessContext, funcName);
+        ParseUtil.append(body, "final {} {}={}.{}();\n", bitBuf_writer_className, FieldBuilder.varNameBitBuf, FieldBuilder.varNameProcessContext, funcName);
     }
 
     public static void appendBitLogCode_parse(final BuilderContext context) {
@@ -318,11 +318,24 @@ public class ParseUtil {
         }
     }
 
-    public static String replaceLenExprToCode(final String lenExpr, final Map<Character, String> map, final Field field) {
+    public static String replaceLenExprToCode(final String lenExpr, final BuilderContext context) {
+        final Map<Character, String> map = context.varToFieldName;
+        final Field field = context.field;
         final StringBuilder sb = new StringBuilder();
         final char[] chars = lenExpr.toCharArray();
+        boolean nextGlobalVar = false;
         for (char c : chars) {
             if (c == ' ') {
+                continue;
+            }
+            if (nextGlobalVar) {
+                String globalVarName = context.getGlobalVarName(c);
+                sb.append(globalVarName);
+                nextGlobalVar = false;
+                continue;
+            }
+            if (c == '@') {
+                nextGlobalVar = true;
                 continue;
             }
             if (c != '+' && c != '-' && c != '*' && c != '/' && c != '(' && c != ')' && !Character.isDigit(c)) {
@@ -737,7 +750,7 @@ public class ParseUtil {
     public static void appendSkip_parse(int len, String lenExpr, BuilderContext context) {
         String lenValCode;
         if (len == 0) {
-            lenValCode = ParseUtil.replaceLenExprToCode(lenExpr, context.varToFieldName, context.field);
+            lenValCode = ParseUtil.replaceLenExprToCode(lenExpr, context);
         } else {
             lenValCode = len + "";
         }
@@ -762,7 +775,7 @@ public class ParseUtil {
     public static void appendSkip_deParse(int len, String lenExpr, BuilderContext context) {
         String lenValCode;
         if (len == 0) {
-            lenValCode = ParseUtil.replaceLenExprToCode(lenExpr, context.varToFieldName, context.field);
+            lenValCode = ParseUtil.replaceLenExprToCode(lenExpr, context);
         } else {
             lenValCode = len + "";
         }
@@ -782,6 +795,19 @@ public class ParseUtil {
                     context.field.getName(),
                     fieldLogBytesVarName);
         }
+    }
+
+    public static void appendPutGlobalVar(BuilderContext context, char var, String val) {
+        append(context.body, "{}.putGlobalVar('{}',(int){});\n", FieldBuilder.varNameProcessContext, var, val);
+    }
+
+    public static void appendGetGlobalVar(BuilderContext context, char var) {
+        String globalVarName = getGlobalVarName(var);
+        append(context.body, "final int {} = {}.getGlobalVar('{}');\n", globalVarName, FieldBuilder.varNameProcessContext, var);
+    }
+
+    public static String getGlobalVarName(char var) {
+        return "globalVar_" + var;
     }
 
     public static void main(String[] args) {

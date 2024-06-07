@@ -4,6 +4,7 @@ package com.bcd.base.support_parser.util;
 import com.bcd.base.exception.MyException;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -46,9 +47,9 @@ public class RpnUtil {
 //        System.out.println(Arrays.toString(toRpn("-3*-x-1")));
 //        System.out.println(Arrays.toString(toRpn("-(-x+3)/5")));
 //        System.out.println(Arrays.toString(toRpn("(-x+3)/5")));
-//        System.out.println(Arrays.toString(toRpn("--(a/-3-4)--d")));
+//        System.out.println(Arrays.toString(toRpn("--(a/-3-4)--xy")));
 
-//        System.out.println(reverseExpr("x/10-1000"));
+//        System.out.println(reverseExpr("@b/10-1000"));
 //        System.out.println(reverseExpr("-x"));
 //        System.out.println(reverseExpr("(y-3)/-2"));
 //        System.out.println(reverseExpr("2/(-x*4-3)"));

@@ -33,8 +33,8 @@ public class PacketDataFieldProcessor implements Processor<PacketData> {
     static Logger logger = LoggerFactory.getLogger(PacketDataFieldProcessor.class);
 
     @Override
-    public final PacketData process(final ByteBuf data, final ProcessContext<?> parentContext) {
-        final Packet packet = (Packet) parentContext.instance;
+    public final PacketData process(final ByteBuf data, final ProcessContext<?> processContext) {
+        final Packet packet = (Packet) processContext.instance;
         if (packet.replyFlag == 0xfe) {
             PacketData packetData = null;
             switch (packet.flag) {
@@ -46,7 +46,7 @@ public class PacketDataFieldProcessor implements Processor<PacketData> {
                 //车辆实时信息
                 //补发信息上报
                 case vehicle_run_data, vehicle_supplement_data -> {
-                    packetData = read_vehicleRunData(data, parentContext);
+                    packetData = read_vehicleRunData(data, processContext);
                 }
 
                 //车辆登出
@@ -79,8 +79,8 @@ public class PacketDataFieldProcessor implements Processor<PacketData> {
     }
 
     @Override
-    public final void deProcess(ByteBuf data, ProcessContext<?> parentContext, PacketData instance) {
-        final Packet packet = (Packet) parentContext.instance;
+    public final void deProcess(ByteBuf data, ProcessContext<?> processContext, PacketData instance) {
+        final Packet packet = (Packet) processContext.instance;
         if (packet.replyFlag == 0xfe) {
             switch (packet.flag) {
                 //车辆登入
@@ -90,7 +90,7 @@ public class PacketDataFieldProcessor implements Processor<PacketData> {
                 //车辆实时信息
                 //补发信息上报
                 case vehicle_run_data, vehicle_supplement_data -> {
-                    write_vehicleRunData(data, (VehicleRunData) instance, parentContext);
+                    write_vehicleRunData(data, (VehicleRunData) instance, processContext);
                 }
                 //车辆登出
                 case vehicle_logout_data -> {

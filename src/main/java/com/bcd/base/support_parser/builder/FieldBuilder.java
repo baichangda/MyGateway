@@ -6,7 +6,7 @@ import io.netty.buffer.ByteBuf;
 public abstract class FieldBuilder {
     public final static String varNameThis = "$0";
     public final static String varNameByteBuf = "$1";
-    public final static String varNameParentProcessContext = "$2";
+    public final static String varNameProcessContext = "$2";
 
     public final static String varNameInstance = "_instance";
     /**

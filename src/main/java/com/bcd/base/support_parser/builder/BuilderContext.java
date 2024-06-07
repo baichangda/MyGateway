@@ -114,7 +114,7 @@ public class BuilderContext {
                     processContextVarName,
                     processContextClassName,
                     FieldBuilder.varNameInstance,
-                    FieldBuilder.varNameParentProcessContext
+                    FieldBuilder.varNameProcessContext
             );
         }
         return processContextVarName;
@@ -141,11 +141,18 @@ public class BuilderContext {
         });
     }
 
+    public final String getGlobalVarName(char c) {
+        return (String) cache.computeIfAbsent(ParseUtil.getGlobalVarName(c), k -> {
+            ParseUtil.appendGetGlobalVar(this, c);
+            return k;
+        });
+    }
+
     public final String getBitBuf_parse() {
         if (!cache.containsKey("hasBitBuf")) {
             final String bitBuf_reader_className = Parser.logCollector_parse == null ? BitBuf_reader.class.getName() : BitBuf_reader_log.class.getName();
             final String funcName = Parser.logCollector_parse == null ? "getBitBuf_reader" : "getBitBuf_reader_log";
-            ParseUtil.append(body, "final {} {}={}.{}();\n", bitBuf_reader_className, FieldBuilder.varNameBitBuf, FieldBuilder.varNameParentProcessContext, funcName);
+            ParseUtil.append(body, "final {} {}={}.{}();\n", bitBuf_reader_className, FieldBuilder.varNameBitBuf, FieldBuilder.varNameProcessContext, funcName);
             cache.put("hasBitBuf", true);
         }
         return FieldBuilder.varNameBitBuf;
@@ -155,7 +162,7 @@ public class BuilderContext {
         if (!cache.containsKey("hasBitBuf")) {
             final String bitBuf_writer_className = Parser.logCollector_parse == null ? BitBuf_writer.class.getName() : BitBuf_writer_log.class.getName();
             final String funcName = Parser.logCollector_parse == null ? "getBitBuf_writer" : "getBitBuf_writer_log";
-            ParseUtil.append(body, "final {} {}={}.{}();\n", bitBuf_writer_className, FieldBuilder.varNameBitBuf, FieldBuilder.varNameParentProcessContext, funcName);
+            ParseUtil.append(body, "final {} {}={}.{}();\n", bitBuf_writer_className, FieldBuilder.varNameBitBuf, FieldBuilder.varNameProcessContext, funcName);
             cache.put("hasBitBuf", true);
         }
         return FieldBuilder.varNameBitBuf;

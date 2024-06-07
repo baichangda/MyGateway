@@ -30,11 +30,14 @@ public @interface F_date_bcd {
      * 字段所占字节长度表达式
      * 用于固定长度字段解析,配合var参数使用,代表的是Byte的长度
      * 与{@link #len()}互斥
+     * 变量取值来源于var、globalVar
+     * 使用globalVar时候必须在变量前面带上@
      * 例如:
      * m
      * m*n
      * a*b-1
      * a*(b-2)
+     * a*(b-2)+@a
      */
     String lenExpr() default "";
 

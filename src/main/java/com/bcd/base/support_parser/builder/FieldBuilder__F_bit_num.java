@@ -4,7 +4,8 @@ import com.bcd.base.exception.MyException;
 import com.bcd.base.support_parser.anno.BitRemainingMode;
 import com.bcd.base.support_parser.anno.F_bit_num;
 import com.bcd.base.support_parser.anno.F_bit_num_array;
-import com.bcd.base.support_parser.util.*;
+import com.bcd.base.support_parser.util.ParseUtil;
+import com.bcd.base.support_parser.util.RpnUtil;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -24,7 +25,7 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
                     Field next = fieldList.get(context.fieldIndex + 1);
                     F_bit_num next_f_bit_num = next.getAnnotation(F_bit_num.class);
                     F_bit_num_array next_f_bit_num_array = next.getAnnotation(F_bit_num_array.class);
-                    return next_f_bit_num  == null && next_f_bit_num_array == null;
+                    return next_f_bit_num == null && next_f_bit_num_array == null;
                 } else {
                     return false;
                 }
@@ -47,7 +48,7 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
         final String varNameInstance = FieldBuilder.varNameInstance;
         final String varNameField = ParseUtil.getFieldVarName(context);
         final String varNameBitBuf = context.getBitBuf_parse();
-        if(skipBefore>0){
+        if (skipBefore > 0) {
             ParseUtil.append(body, "{}.skip({});\n", varNameBitBuf, skipBefore);
         }
 
@@ -65,7 +66,6 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
                 }
             }
         }
-
 
 
         final int len = anno.len();
@@ -87,7 +87,7 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
             ParseUtil.append(body, "{}.{}=({})({});\n", varNameInstance, field.getName(), fieldTypeName, valCode);
         }
 
-        if(skipAfter>0){
+        if (skipAfter > 0) {
             ParseUtil.append(body, "{}.skip({});\n", varNameBitBuf, skipAfter);
         }
 
@@ -99,7 +99,10 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
         if (var != '0') {
             context.varToFieldName.put(var, varNameField);
         }
-
+        final char globalVar = anno.globalVar();
+        if (globalVar != '0') {
+            ParseUtil.appendPutGlobalVar(context, globalVar, varNameField);
+        }
 
     }
 
@@ -120,7 +123,7 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
         int skipBefore = anno.skipBefore();
         int skipAfter = anno.skipAfter();
         final String varNameBitBuf = context.getBitBuf_deParse();
-        if (skipBefore>0){
+        if (skipBefore > 0) {
             ParseUtil.append(body, "{}.skip({});\n", varNameBitBuf, skipBefore);
         }
 
@@ -140,6 +143,11 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
             valCode = varNameField;
         }
 
+        //判断是否用到全局变量中、如果用到了、添加进去
+        if (anno.globalVar() != '0') {
+            ParseUtil.appendPutGlobalVar(context, anno.globalVar(), valCode);
+        }
+
         //最后判断是否用了值表达式、如果用了、进行表达式处理
         if (!anno.valExpr().isEmpty()) {
             if (isFloat) {
@@ -155,7 +163,7 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
         }
         ParseUtil.append(body, "{}.write((long)({}),{},{},{});\n", varNameBitBuf, valCode, len, bigEndian, unsigned);
 
-        if (skipAfter>0){
+        if (skipAfter > 0) {
             ParseUtil.append(body, "{}.skip({});\n", varNameBitBuf, skipAfter);
         }
         if (finish(context)) {

@@ -1,7 +1,6 @@
 package com.bcd.base.support_parser.builder;
 
 
-import com.bcd.base.exception.MyException;
 import com.bcd.base.support_parser.anno.F_customize;
 import com.bcd.base.support_parser.util.ParseUtil;
 
@@ -13,24 +12,25 @@ public class FieldBuilder__F_customize extends FieldBuilder {
         final Field field = context.field;
         final F_customize anno = field.getAnnotation(F_customize.class);
         final Class<?> processorClass = anno.processorClass();
-        if (processorClass == void.class) {
-            throw MyException.get("class[{}] field[{}] anno[] must have builderClass or processorClass", field.getDeclaringClass().getName(), field.getName(), F_customize.class.getName());
+        final StringBuilder body = context.body;
+        final String varNameField = ParseUtil.getFieldVarName(context);
+        final String processorClassVarName = context.getCustomizeProcessorVarName(processorClass, anno.processorArgs());
+        final String varNameInstance = FieldBuilder.varNameInstance;
+        final Class<?> fieldType = field.getType();
+        final String fieldTypeClassName = fieldType.getName();
+        final String processContextVarName = context.getProcessContextVarName();
+        final String unBoxing = ParseUtil.unBoxing(ParseUtil.format("{}.process({},{})", processorClassVarName, FieldBuilder.varNameByteBuf, processContextVarName), fieldType);
+        if (anno.var() == '0') {
+            ParseUtil.append(body, "{}.{}={};\n", varNameInstance, field.getName(), unBoxing);
         } else {
-            final StringBuilder body = context.body;
-            final String varNameField = ParseUtil.getFieldVarName(context);
-            final String processorClassVarName = context.getCustomizeProcessorVarName(processorClass, anno.processorArgs());
-            final String varNameInstance = FieldBuilder.varNameInstance;
-            final Class<?> fieldType = field.getType();
-            final String fieldTypeClassName = fieldType.getName();
-            final String processContextVarName = context.getProcessContextVarName();
-            final String unBoxing = ParseUtil.unBoxing(ParseUtil.format("{}.process({},{})", processorClassVarName, FieldBuilder.varNameByteBuf, processContextVarName), fieldType);
-            if (anno.var() == '0') {
-                ParseUtil.append(body, "{}.{}={};\n", varNameInstance, field.getName(), unBoxing);
-            } else {
-                ParseUtil.append(body, "final {} {}={};\n", fieldTypeClassName, varNameField, unBoxing);
-                ParseUtil.append(body, "{}.{}={};\n", varNameInstance, field.getName(), varNameField);
-                context.varToFieldName.put(anno.var(), varNameField);
-            }
+            ParseUtil.append(body, "final {} {}={};\n", fieldTypeClassName, varNameField, unBoxing);
+            ParseUtil.append(body, "{}.{}={};\n", varNameInstance, field.getName(), varNameField);
+            context.varToFieldName.put(anno.var(), varNameField);
+        }
+
+        final char globalVar = anno.globalVar();
+        if (globalVar != '0') {
+            ParseUtil.appendPutGlobalVar(context, globalVar, varNameField);
         }
 
     }
@@ -50,6 +50,11 @@ public class FieldBuilder__F_customize extends FieldBuilder {
         } else {
             ParseUtil.append(body, "final {} {}={};\n", field.getType().getName(), varNameField, varInstanceName + "." + field.getName());
             valCode = varNameField;
+        }
+
+        //判断是否用到全局变量中、如果用到了、添加进去
+        if (anno.globalVar() != '0') {
+            ParseUtil.appendPutGlobalVar(context, anno.globalVar(), valCode);
         }
 
         final String processContextVarName = context.getProcessContextVarName();

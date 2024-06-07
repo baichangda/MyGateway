@@ -15,8 +15,30 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface F_skip {
     int lenBefore() default 0;
+
+    /**
+     * 变量取值来源于var、globalVar
+     * 使用globalVar时候必须在变量前面带上@
+     * 例如:
+     * m
+     * m*n
+     * a*b-1
+     * a*(b-2)
+     * a*(b-2)+@a
+     */
     String lenExprBefore() default "";
 
     int lenAfter() default 0;
+
+    /**
+     * 变量取值来源于var、globalVar
+     * 使用globalVar时候必须在变量前面带上@
+     * 例如:
+     * m
+     * m*n
+     * a*b-1
+     * a*(b-2)
+     * a*(b-2)+@a
+     */
     String lenExprAfter() default "";
 }
