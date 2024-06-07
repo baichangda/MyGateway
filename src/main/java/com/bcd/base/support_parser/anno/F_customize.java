@@ -39,6 +39,7 @@ public @interface F_customize {
     /**
      * 变量名称
      * 标注此标记的会在解析时候将值缓存,供表达式使用
+     * 只能为大小写英文字母、0表示不作为变量
      * 例如: m,n,a
      */
     char var() default '0';
