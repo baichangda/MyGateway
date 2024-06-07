@@ -77,7 +77,7 @@ public @interface F_num_array {
     ByteOrder singleOrder() default ByteOrder.Default;
 
     /**
-     * 每个数组元素结果小数精度
+     * 每个数组元素结果小数精度、会四舍五入
      * 默认-1、代表不进行精度处理、最大为10
      * 仅当字段类型为float、double时候、此属性才有效
      */
