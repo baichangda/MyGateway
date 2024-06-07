@@ -18,14 +18,14 @@ public class PerformanceUtil {
     private final static Logger logger = LoggerFactory.getLogger(PerformanceUtil.class);
 
     /**
-     * 测试多线程
+     * 解析性能测试
      *
      * @param bytes
      * @param threadNum
      * @param num
      * @param <T>
      */
-    public static <T> void testMultiThreadPerformance(byte[] bytes, int threadNum, int num, Function<ByteBuf, T> parseFunc, BiConsumer<ByteBuf, T> deParseConsumer, boolean parse) {
+    public static <T> void testPerformance(byte[] bytes, int threadNum, int num, Function<ByteBuf, T> parseFunc, BiConsumer<ByteBuf, T> deParseConsumer, boolean parse) {
         final LongAdder count = new LongAdder();
         final ExecutorService[] pools = new ExecutorService[threadNum];
         for (int i = 0; i < pools.length; i++) {

@@ -43,6 +43,6 @@ public class Parser_someip_test {
         logger.info("param threadNum[{}]", threadNum);
         int num = 1000000000;
         Processor<Packet> processor = Parser.getProcessor(Packet.class);
-        PerformanceUtil.testMultiThreadPerformance(ByteBufUtil.decodeHexDump(hex), threadNum, num, processor::process, processor::deProcess, true);
+        PerformanceUtil.testPerformance(ByteBufUtil.decodeHexDump(hex), threadNum, num, processor::process, processor::deProcess, true);
     }
 }
