@@ -14,9 +14,15 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface F_skip {
+    /**
+     * 解析前跳过字节
+     * 和{@link #lenExprBefore()}互斥
+     */
     int lenBefore() default 0;
 
     /**
+     * 解析前跳过字节表达式
+     * 和{@link #lenBefore()}互斥
      * 变量取值来源于var、globalVar
      * 使用globalVar时候必须在变量前面带上@
      * 例如:
@@ -28,9 +34,16 @@ public @interface F_skip {
      */
     String lenExprBefore() default "";
 
+
+    /**
+     * 解析后跳过字节
+     * 和{@link #lenExprAfter()}互斥
+     */
     int lenAfter() default 0;
 
     /**
+     * 解析前跳过字节表达式
+     * 和{@link #lenAfter()}互斥
      * 变量取值来源于var、globalVar
      * 使用globalVar时候必须在变量前面带上@
      * 例如:
