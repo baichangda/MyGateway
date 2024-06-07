@@ -15,9 +15,11 @@ public interface Processor<T> {
 
     /**
      * @param data
-     * @param parentContext 父解析上下文、主要用于{@link F_customize}获取父类bean
+     * @param parentContext 父解析上下文、不能为null
      *                      具体指的是当前解析返回值赋值字段所在类的解析环境、其中{@link ProcessContext#instance}代表的是所在类的实例
-     *                      不能为null
+     *                      主要用于{@link F_customize}获取父类bean
+     *                      需要注意的是、如果{@link F_customize#processorClass()}中的类被多个地方复用
+     *                      则需要注意每个地方的解析方法{@link #process(ByteBuf, ProcessContext)}的parentContext不一样
      *                      例如:
      *                      有如下类定义关系
      *                      class A{public B b}
