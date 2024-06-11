@@ -35,7 +35,7 @@ public class FieldBuilder__F_bean_list extends FieldBuilder {
         final String processContextVarName = context.getProcessContextVarName();
         final String varNameListLen = varNameField + "_listLen";
         if (anno.listLen() == 0) {
-            String listLenRes = ParseUtil.replaceLenExprToCode(anno.listLenExpr(), context);
+            String listLenRes = ParseUtil.replaceExprToCode(anno.listLenExpr(), context);
             ParseUtil.append(body, "final int {}={};\n", varNameListLen, listLenRes);
         } else {
             ParseUtil.append(body, "final int {}={};\n", varNameListLen, anno.listLen());

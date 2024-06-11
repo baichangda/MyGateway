@@ -25,7 +25,7 @@ public class FieldBuilder__F_string_bcd extends FieldBuilder {
             if (anno.lenExpr().isEmpty()) {
                 throw MyException.get("class[{}] field[{}] anno[] must have len or lenExpr", field.getDeclaringClass().getName(), field.getName(), F_string_bcd.class.getName());
             } else {
-                lenRes = ParseUtil.replaceLenExprToCode(anno.lenExpr(), context);
+                lenRes = ParseUtil.replaceExprToCode(anno.lenExpr(), context);
             }
         } else {
             lenRes = anno.len() + "";
@@ -60,7 +60,7 @@ public class FieldBuilder__F_string_bcd extends FieldBuilder {
             if (anno.lenExpr().isEmpty()) {
                 throw MyException.get("class[{}] field[{}] anno[] must have len or lenExpr", field.getDeclaringClass().getName(), field.getName(), F_string_bcd.class.getName());
             } else {
-                lenRes = ParseUtil.replaceLenExprToCode(anno.lenExpr(), context);
+                lenRes = ParseUtil.replaceExprToCode(anno.lenExpr(), context);
             }
         } else {
             lenRes = anno.len() + "";

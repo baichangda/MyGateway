@@ -106,7 +106,7 @@ public class ClassUtil {
      * @throws IOException
      * @throws ClassNotFoundException
      */
-    public static List<Class> getClassesByParentClass(Class<?> parentClass, String... packageNames) throws IOException, ClassNotFoundException {
+    public static List<Class<?>> getClassesByParentClass(Class<?> parentClass, String... packageNames) throws IOException, ClassNotFoundException {
         Set<Class<?>> classSet = new HashSet<>();
         for (String packageName : packageNames) {
             classSet.addAll(getClasses(packageName));

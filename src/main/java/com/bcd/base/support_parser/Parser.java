@@ -21,8 +21,9 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -292,35 +293,9 @@ public class Parser {
 
         cc.setModifiers(Modifier.FINAL | Modifier.PUBLIC);
 
-        StringBuilder initBody = new StringBuilder();
+        StringBuilder constructBody = new StringBuilder();
         final CtConstructor constructor = CtNewConstructor.make(new CtClass[]{}, null, cc);
-        initBody.append("{\n");
-        //加processorClass字段并初始化
-        Map<String, String> customize_processorId_processorVarName = new HashMap<>();
-        int processVarIndex = 0;
-        final List<F_customize> f_customize_list = Arrays.stream(clazz.getDeclaredFields()).map(f -> f.getAnnotation(F_customize.class)).filter(Objects::nonNull).filter(e -> e.processorClass() != void.class).collect(Collectors.toList());
-        for (F_customize f_customize : f_customize_list) {
-            Class<?> processorClass = f_customize.processorClass();
-            String processorArgs = f_customize.processorArgs();
-            final String processorClassName = processorClass.getName();
-            final String processorId = processorClassName + "," + processorArgs;
-            String processorVarName = customize_processorId_processorVarName.get(processorId);
-            if (processorVarName == null) {
-                processorVarName = "_processor_" + processVarIndex++;
-                cc.addField(CtField.make("private final " + processorClassName + " " + processorVarName + ";", cc));
-                initBody.append(ParseUtil.format("this.{}=new {}({});\n", processorVarName, processorClassName, processorArgs));
-                customize_processorId_processorVarName.put(processorId, processorVarName);
-            }
-        }
-        initBody.append("}\n");
-        if (printBuildLog) {
-            logger.info("----------clazz[{}] constructor body-------------\n{}", clazz.getName(), initBody.toString());
-        }
-        constructor.setBody(initBody.toString());
-        cc.addConstructor(constructor);
-
         final Map<String, String> classVarDefineToVarName = new HashMap<>();
-        final Map<String, String> beanClassAndOrder_processorVarName = new HashMap<>();
 
         //添加实现、定义process方法
         final CtClass interface_cc = ClassPool.getDefault().get(processor_class_name);
@@ -343,7 +318,7 @@ public class Parser {
         processBody.append("\n{\n");
         ParseUtil.append(processBody, "final {} {}=new {}();\n", clazzName, FieldBuilder.varNameInstance, clazzName);
         final List<Field> fieldList = ParseUtil.getParseFields(clazz);
-        BuilderContext parseBuilderContext = new BuilderContext(processBody, clazz, cc, classVarDefineToVarName, beanClassAndOrder_processorVarName, byteOrder, bitOrder, customize_processorId_processorVarName, fieldList);
+        BuilderContext parseBuilderContext = new BuilderContext(constructBody, processBody, clazz, cc, classVarDefineToVarName, byteOrder, bitOrder, fieldList);
 
         C_skip c_skip = clazz.getAnnotation(C_skip.class);
         if (c_skip == null) {
@@ -355,7 +330,7 @@ public class Parser {
                 buildMethodBody_process(parseBuilderContext);
                 String lenValCode;
                 if (c_skip.len() == 0) {
-                    lenValCode = ParseUtil.replaceLenExprToCode(c_skip.lenExpr(), parseBuilderContext.varToFieldName, clazz);
+                    lenValCode = ParseUtil.replaceExprToCode(c_skip.lenExpr(), parseBuilderContext.varToFieldName, clazz);
                 } else {
                     lenValCode = c_skip.len() + "";
                 }
@@ -369,7 +344,7 @@ public class Parser {
             } else {
                 buildMethodBody_process(parseBuilderContext);
                 if (c_skip.len() == 0) {
-                    String lenValCode = ParseUtil.replaceLenExprToCode(c_skip.lenExpr(), parseBuilderContext.varToFieldName, clazz);
+                    String lenValCode = ParseUtil.replaceExprToCode(c_skip.lenExpr(), parseBuilderContext.varToFieldName, clazz);
                     String skipCode = "(" + lenValCode + "-" + classByteLen + ")";
                     ParseUtil.append(processBody, "{}.skipBytes({});\n", FieldBuilder.varNameByteBuf, skipCode);
                     if (logCollector_parse != null) {
@@ -389,10 +364,6 @@ public class Parser {
 
         ParseUtil.append(processBody, "return {};\n", FieldBuilder.varNameInstance);
         processBody.append("}");
-        if (printBuildLog) {
-            logger.info("\n-----------class[{}] process-----------{}\n", clazz.getName(), processBody.toString());
-        }
-        process_cm.setBody(processBody.toString());
 
         //添加实现、定义deProcess方法
         final CtMethod deProcess_cm = CtNewMethod.make(
@@ -409,8 +380,7 @@ public class Parser {
         StringBuilder deProcessBody = new StringBuilder();
         deProcessBody.append("\n{\n");
         ParseUtil.append(deProcessBody, "final {} {}=({})$3;\n", clazzName, FieldBuilder.varNameInstance, clazzName);
-        BuilderContext deParseBuilderContext = new BuilderContext(deProcessBody, clazz, cc, classVarDefineToVarName, beanClassAndOrder_processorVarName, byteOrder, bitOrder, customize_processorId_processorVarName, fieldList);
-
+        BuilderContext deParseBuilderContext = new BuilderContext(constructBody, deProcessBody, clazz, cc, classVarDefineToVarName, byteOrder, bitOrder, fieldList);
         if (c_skip == null) {
             buildMethodBody_deProcess(deParseBuilderContext);
         } else {
@@ -420,7 +390,7 @@ public class Parser {
                 buildMethodBody_deProcess(deParseBuilderContext);
                 String lenValCode;
                 if (c_skip.len() == 0) {
-                    lenValCode = ParseUtil.replaceLenExprToCode(c_skip.lenExpr(), parseBuilderContext.varToFieldName, clazz);
+                    lenValCode = ParseUtil.replaceExprToCode(c_skip.lenExpr(), parseBuilderContext.varToFieldName, clazz);
                 } else {
                     lenValCode = c_skip.len() + "";
                 }
@@ -434,7 +404,7 @@ public class Parser {
             } else {
                 buildMethodBody_deProcess(deParseBuilderContext);
                 if (c_skip.len() == 0) {
-                    String lenValCode = ParseUtil.replaceLenExprToCode(c_skip.lenExpr(), parseBuilderContext.varToFieldName, clazz);
+                    String lenValCode = ParseUtil.replaceExprToCode(c_skip.lenExpr(), parseBuilderContext.varToFieldName, clazz);
                     String skipCode = "(" + lenValCode + "-" + classByteLen + ")";
                     ParseUtil.append(deProcessBody, "{}.writeZero({});\n", FieldBuilder.varNameByteBuf, skipCode);
                     if (logCollector_parse != null) {
@@ -451,8 +421,21 @@ public class Parser {
                 }
             }
         }
-
         deProcessBody.append("}");
+
+
+        //开始创建类
+        constructBody.insert(0, "{\n");
+        constructBody.append("}\n");
+        if (printBuildLog) {
+            logger.info("----------clazz[{}] constructor body-------------\n{}", clazz.getName(), constructBody.toString());
+        }
+        constructor.setBody(constructBody.toString());
+        cc.addConstructor(constructor);
+        if (printBuildLog) {
+            logger.info("\n-----------class[{}] process-----------{}\n", clazz.getName(), processBody.toString());
+        }
+        process_cm.setBody(processBody.toString());
         if (printBuildLog) {
             logger.info("\n-----------class[{}] deProcess-----------{}\n", clazz.getName(), deProcessBody.toString());
         }

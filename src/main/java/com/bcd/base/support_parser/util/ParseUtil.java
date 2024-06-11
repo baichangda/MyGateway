@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZonedDateTime;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class ParseUtil {
@@ -108,6 +109,10 @@ public class ParseUtil {
      * @return
      */
     public static String defineClassVar(final BuilderContext context, Class<?> varClass, final String valDefine, Object... params) {
+        return defineClassVar(context, null, varClass, valDefine, params);
+    }
+
+    public static String defineClassVar(final BuilderContext context, Consumer<String> doAfterDefine, Class<?> varClass, final String valDefine, Object... params) {
         return context.classVarDefineToVarName.computeIfAbsent(format(valDefine, params), k -> {
             final int size = context.classVarDefineToVarName.size();
             final String varName = "_" + size + "_" + varClass.getSimpleName();
@@ -117,6 +122,9 @@ public class ParseUtil {
                 ctClass.addField(ctField);
             } catch (CannotCompileException e) {
                 throw MyException.get(e);
+            }
+            if (doAfterDefine != null) {
+                doAfterDefine.accept(varName);
             }
             return varName;
         });
@@ -318,7 +326,7 @@ public class ParseUtil {
         }
     }
 
-    public static String replaceLenExprToCode(final String lenExpr, final BuilderContext context) {
+    public static String replaceExprToCode(final String lenExpr, final BuilderContext context) {
         final Map<Character, String> map = context.varToFieldName;
         final Field field = context.field;
         final StringBuilder sb = new StringBuilder();
@@ -352,7 +360,7 @@ public class ParseUtil {
         return sb.toString();
     }
 
-    public static String replaceLenExprToCode(final String lenExpr, final Map<Character, String> map, Class<?> clazz) {
+    public static String replaceExprToCode(final String lenExpr, final Map<Character, String> map, Class<?> clazz) {
         final StringBuilder sb = new StringBuilder();
         final char[] chars = lenExpr.toCharArray();
         for (char c : chars) {
@@ -750,7 +758,7 @@ public class ParseUtil {
     public static void appendSkip_parse(int len, String lenExpr, BuilderContext context) {
         String lenValCode;
         if (len == 0) {
-            lenValCode = ParseUtil.replaceLenExprToCode(lenExpr, context);
+            lenValCode = ParseUtil.replaceExprToCode(lenExpr, context);
         } else {
             lenValCode = len + "";
         }
@@ -775,7 +783,7 @@ public class ParseUtil {
     public static void appendSkip_deParse(int len, String lenExpr, BuilderContext context) {
         String lenValCode;
         if (len == 0) {
-            lenValCode = ParseUtil.replaceLenExprToCode(lenExpr, context);
+            lenValCode = ParseUtil.replaceExprToCode(lenExpr, context);
         } else {
             lenValCode = len + "";
         }
