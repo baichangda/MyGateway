@@ -18,6 +18,8 @@ public @interface C_impl {
      * 用于配合{@link F_bean#implClassExpr()}使用
      * 当表达式解析为此值时候
      * 表明其实现类为当前注解标注的类
+     *
+     * 特殊值{@link Integer#MAX_VALUE}代表、当所有分支不命中时候、使用此注解标注的类
      */
     int[] value();
 
