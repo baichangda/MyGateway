@@ -135,29 +135,29 @@ public class FieldBuilder__F_bean extends FieldBuilder {
 
     public static void main(String[] args) throws CannotCompileException, IOException {
         CtClass cc = ClassPool.getDefault().makeClass("com.bcd.base.support_parser.builder.TestSwitch");
-//        String body= """
-//                public void test(int i){
-//                    switch(i){
-//                        case 1->java.lang.System.out.println(1);
-//                        case 2->java.lang.System.out.println(2);
-//                    }
-//                }
-//                """;
-        String body = """
+        String body= """
                 public void test(int i){
                     switch(i){
-                        case 1:{}
-                        case 3:{
-                            java.lang.System.out.println(1);
-                            break;
-                        }
-                        case 2:{
-                            java.lang.System.out.println(2);
-                            break;
-                        }
+                        case 1,3->java.lang.System.out.println(1);
+                        case 2->java.lang.System.out.println(2);
                     }
                 }
                 """;
+//        String body = """
+//                public void test(int i){
+//                    switch(i){
+//                        case 1:{}
+//                        case 3:{
+//                            java.lang.System.out.println(1);
+//                            break;
+//                        }
+//                        case 2:{
+//                            java.lang.System.out.println(2);
+//                            break;
+//                        }
+//                    }
+//                }
+//                """;
         CtMethod cm = CtNewMethod.make(body, cc);
         cc.addMethod(cm);
         cc.writeFile("src/main/java");
