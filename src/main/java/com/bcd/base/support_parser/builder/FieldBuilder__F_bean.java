@@ -9,7 +9,6 @@ import com.bcd.base.support_parser.util.ParseUtil;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 
 public class FieldBuilder__F_bean extends FieldBuilder {
@@ -39,7 +38,12 @@ public class FieldBuilder__F_bean extends FieldBuilder {
                 implClassList = implClassList.stream().filter(e -> e.isAnnotationPresent(C_impl.class)).toList();
                 for (Class<?> implClass : implClassList) {
                     C_impl c_impl = implClass.getAnnotation(C_impl.class);
-                    String implProcessorVarName = context.getProcessorVarName(implClass);
+                    final String implProcessorVarName;
+                    if (c_impl.processorClass() == Void.class) {
+                        implProcessorVarName = context.getProcessorVarName(implClass);
+                    } else {
+                        implProcessorVarName = context.getCustomizeProcessorVarName(c_impl.processorClass(), c_impl.processorArgs());
+                    }
                     ParseUtil.append(body, "switch({}){\n", varNameField_implClassVal);
                     ParseUtil.append(body, "case {}-> {}.{}=({}){}.process({},{});\n",
                             Arrays.toString(c_impl.val()),
@@ -89,7 +93,12 @@ public class FieldBuilder__F_bean extends FieldBuilder {
                 implClassList = implClassList.stream().filter(e -> e.isAnnotationPresent(C_impl.class)).toList();
                 for (Class<?> implClass : implClassList) {
                     C_impl c_impl = implClass.getAnnotation(C_impl.class);
-                    String implProcessorVarName = context.getProcessorVarName(implClass);
+                    final String implProcessorVarName;
+                    if (c_impl.processorClass() == Void.class) {
+                        implProcessorVarName = context.getProcessorVarName(implClass);
+                    } else {
+                        implProcessorVarName = context.getCustomizeProcessorVarName(c_impl.processorClass(), c_impl.processorArgs());
+                    }
                     ParseUtil.append(body, "switch({}){\n", varNameField_implClassVal);
                     ParseUtil.append(body, "case {}-> {}.deProcess({},{},{});\n",
                             Arrays.toString(c_impl.val()),
