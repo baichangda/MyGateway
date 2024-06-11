@@ -12,13 +12,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 
+public class VehicleRunDataProcessor implements Processor<VehicleRunData> {
 
-public class PacketDataFieldProcessor implements Processor<PacketData> {
-
-    final Processor<VehicleLoginData> processor_vehicleLoginData = Parser.getProcessor(VehicleLoginData.class);
-    final Processor<VehicleLogoutData> processor_vehicleLogoutData = Parser.getProcessor(VehicleLogoutData.class);
-    final Processor<PlatformLoginData> processor_platformLoginData = Parser.getProcessor(PlatformLoginData.class);
-    final Processor<PlatformLogoutData> processor_platformLogoutData = Parser.getProcessor(PlatformLogoutData.class);
+    Logger logger= LoggerFactory.getLogger(VehicleRunDataProcessor.class);
 
     final Processor<VehicleBaseData> processor_vehicleBaseData = Parser.getProcessor(VehicleBaseData.class);
     final Processor<VehicleMotorData> processor_vehicleMotorData = Parser.getProcessor(VehicleMotorData.class);
@@ -30,99 +26,12 @@ public class PacketDataFieldProcessor implements Processor<PacketData> {
     final Processor<VehicleStorageVoltageData> processor_vehicleStorageVoltageData = Parser.getProcessor(VehicleStorageVoltageData.class);
     final Processor<VehicleStorageTemperatureData> processor_vehicleStorageTemperatureData = Parser.getProcessor(VehicleStorageTemperatureData.class);
 
-    static Logger logger = LoggerFactory.getLogger(PacketDataFieldProcessor.class);
-
     @Override
-    public final PacketData process(final ByteBuf data, final ProcessContext<?> processContext) {
-        final Packet packet = (Packet) processContext.instance;
-        if (packet.replyFlag == 0xfe) {
-            PacketData packetData = null;
-            switch (packet.flag) {
-                //车辆登入
-                case vehicle_login_data -> {
-                    packetData = processor_vehicleLoginData.process(data, null);
-                }
-
-                //车辆实时信息
-                //补发信息上报
-                case vehicle_run_data, vehicle_supplement_data -> {
-                    packetData = read_vehicleRunData(data, processContext);
-                }
-
-                //车辆登出
-                case vehicle_logout_data -> {
-                    packetData = processor_vehicleLogoutData.process(data, null);
-                }
-
-                //平台登入
-                case platform_login_data -> {
-                    packetData = processor_platformLoginData.process(data, null);
-                }
-
-                //平台登出
-                case platform_logout_data -> {
-                    packetData = processor_platformLogoutData.process(data, null);
-                }
-
-                //心跳
-                //终端校时
-                case heartbeat, terminal_timing -> {
-                }
-            }
-            return packetData;
-        } else {
-            final ResponseData responseData = new ResponseData();
-            responseData.content = new byte[packet.contentLength];
-            data.readBytes(responseData.content);
-            return responseData;
-        }
-    }
-
-    @Override
-    public final void deProcess(ByteBuf data, ProcessContext<?> processContext, PacketData instance) {
-        final Packet packet = (Packet) processContext.instance;
-        if (packet.replyFlag == 0xfe) {
-            switch (packet.flag) {
-                //车辆登入
-                case vehicle_login_data -> {
-                    processor_vehicleLoginData.deProcess(data, null, (VehicleLoginData) instance);
-                }
-                //车辆实时信息
-                //补发信息上报
-                case vehicle_run_data, vehicle_supplement_data -> {
-                    write_vehicleRunData(data, (VehicleRunData) instance, processContext);
-                }
-                //车辆登出
-                case vehicle_logout_data -> {
-                    processor_vehicleLogoutData.deProcess(data, null, (VehicleLogoutData) instance);
-                }
-
-                //平台登入
-                case platform_login_data -> {
-                    processor_platformLoginData.deProcess(data, null, (PlatformLoginData) instance);
-                }
-
-                //平台登出
-                case platform_logout_data -> {
-                    processor_platformLogoutData.deProcess(data, null, (PlatformLogoutData) instance);
-                }
-
-                //心跳
-                //终端校时
-                case heartbeat, terminal_timing -> {
-                }
-            }
-        } else {
-            ((ResponseData) instance).content = new byte[packet.contentLength];
-            data.writeBytes(((ResponseData) instance).content);
-        }
-    }
-
-
-    private VehicleRunData read_vehicleRunData(ByteBuf data, ProcessContext<?> parentContext) {
+    public VehicleRunData process(ByteBuf data, ProcessContext<?> processContext) {
+        ProcessContext<?> parentContext=new ProcessContext<>(data,processContext);
         VehicleRunData instance = new VehicleRunData();
         instance.collectTime = new Date(FieldBuilder__F_date_bytes_6.read(data, DateZoneUtil.ZONE_OFFSET, 2000));
-        final Packet packet = (Packet) parentContext.instance;
+        final Packet packet = (Packet) processContext.instance;
         int allLen = packet.contentLength - 6;
         int beginLeave = data.readableBytes();
         A:
@@ -184,7 +93,9 @@ public class PacketDataFieldProcessor implements Processor<PacketData> {
         return instance;
     }
 
-    private void write_vehicleRunData(ByteBuf data, VehicleRunData instance, ProcessContext<?> parentContext) {
+    @Override
+    public void deProcess(ByteBuf data, ProcessContext<?> processContext, VehicleRunData instance) {
+        ProcessContext<?> parentContext=new ProcessContext<>(data,processContext);
         FieldBuilder__F_date_bytes_6.write(data, instance.collectTime.getTime(), DateZoneUtil.ZONE_OFFSET, 2000);
         if (instance.vehicleBaseData != null) {
             data.writeByte(1);

@@ -2,17 +2,14 @@ package com.bcd.base.support_parser.impl.gb32960.data;
 
 
 import com.bcd.base.support_parser.Parser;
-import com.bcd.base.support_parser.anno.F_date_bytes_6;
-import com.bcd.base.support_parser.anno.F_num;
-import com.bcd.base.support_parser.anno.F_string;
-import com.bcd.base.support_parser.anno.NumType;
+import com.bcd.base.support_parser.anno.*;
 import com.bcd.base.support_parser.processor.Processor;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 
 import java.util.Date;
-
+@C_impl(value = 0x01)
 public class VehicleLoginData implements PacketData {
     //数据采集时间
     @F_date_bytes_6

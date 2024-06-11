@@ -1,8 +1,12 @@
 package com.bcd.base.support_parser.impl.gb32960.data;
 
 
+import com.bcd.base.support_parser.anno.C_impl;
+import com.bcd.base.support_parser.impl.gb32960.processor.VehicleRunDataProcessor;
+
 import java.util.Date;
 
+@C_impl(value = {0x02, 0x03}, processorClass = VehicleRunDataProcessor.class)
 public class VehicleRunData implements PacketData {
     //数据采集时间
     public Date collectTime;

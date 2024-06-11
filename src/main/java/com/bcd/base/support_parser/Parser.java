@@ -362,7 +362,6 @@ public class Parser {
                 }
             }
         }
-
         ParseUtil.append(processBody, "return {};\n", FieldBuilder.varNameInstance);
         processBody.append("}");
 
@@ -399,7 +398,7 @@ public class Parser {
                 ParseUtil.append(deProcessBody, "if({}>0){\n", FieldBuilder.varNameShouldSkip);
                 ParseUtil.append(deProcessBody, "{}.writeZero({});\n", FieldBuilder.varNameByteBuf, FieldBuilder.varNameShouldSkip);
                 if (logCollector_parse != null) {
-                    ParseUtil.append(processBody, "{}.logCollector_deParse.collect_class({}.class,\"@C_skip append[\"+{}+\"]\");\n", Parser.class.getName(), clazzName, FieldBuilder.varNameShouldSkip);
+                    ParseUtil.append(deProcessBody, "{}.logCollector_deParse.collect_class({}.class,\"@C_skip append[\"+{}+\"]\");\n", Parser.class.getName(), clazzName, FieldBuilder.varNameShouldSkip);
                 }
                 ParseUtil.append(deProcessBody, "}\n");
             } else {
@@ -408,15 +407,15 @@ public class Parser {
                     String lenValCode = ParseUtil.replaceExprToCode(c_skip.lenExpr(), parseBuilderContext.varToFieldName, clazz);
                     String skipCode = "(" + lenValCode + "-" + classByteLen + ")";
                     ParseUtil.append(deProcessBody, "{}.writeZero({});\n", FieldBuilder.varNameByteBuf, skipCode);
-                    if (logCollector_parse != null) {
+                    if (logCollector_deParse != null) {
                         ParseUtil.append(deProcessBody, "{}.logCollector_deParse.collect_class({}.class,\"@C_skip append[\"+{}+\"]\");\n", Parser.class.getName(), clazzName, skipCode);
                     }
                 } else {
                     int skip = c_skip.len() - classByteLen;
                     if (skip > 0) {
                         ParseUtil.append(deProcessBody, "{}.writeZero({});\n", FieldBuilder.varNameByteBuf, skip);
-                        if (logCollector_parse != null) {
-                            ParseUtil.append(processBody, "{}.logCollector_deParse.collect_class({}.class,\"@C_skip append[{}]\");\n", Parser.class.getName(), clazzName, skip);
+                        if (logCollector_deParse != null) {
+                            ParseUtil.append(deProcessBody, "{}.logCollector_deParse.collect_class({}.class,\"@C_skip append[{}]\");\n", Parser.class.getName(), clazzName, skip);
                         }
                     }
                 }
@@ -429,6 +428,7 @@ public class Parser {
         if (printBuildLog) {
             logger.info("\n----------clazz[{}] class field define body-------------\n{}\n", clazz.getName(), classFieldDefineBody.toString());
         }
+
         constructBody.insert(0, "\n{\n");
         constructBody.append("}\n");
         if (printBuildLog) {
@@ -436,10 +436,12 @@ public class Parser {
         }
         constructor.setBody(constructBody.toString());
         cc.addConstructor(constructor);
+
         if (printBuildLog) {
             logger.info("\n-----------class[{}] process-----------{}\n", clazz.getName(), processBody.toString());
         }
         process_cm.setBody(processBody.toString());
+
         if (printBuildLog) {
             logger.info("\n-----------class[{}] deProcess-----------{}\n", clazz.getName(), deProcessBody.toString());
         }

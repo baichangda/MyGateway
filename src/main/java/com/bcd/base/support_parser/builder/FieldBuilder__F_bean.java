@@ -13,8 +13,6 @@ import java.util.List;
 
 public class FieldBuilder__F_bean extends FieldBuilder {
 
-    static String pkg = "com.bcd";
-
     @Override
     public void buildParse(BuilderContext context) {
         final Field field = context.field;
@@ -22,7 +20,7 @@ public class FieldBuilder__F_bean extends FieldBuilder {
         final StringBuilder body = context.body;
         final String varNameField = ParseUtil.getFieldVarName(context);
         final Class<?> fieldType = field.getType();
-        final String fieldTypeClassName = fieldType.getName();
+        String fieldTypeName = fieldType.getName();
         final String processContextVarName = context.getProcessContextVarName();
         if (fieldType.isInterface()) {
             String implClassExpr = anno.implClassExpr();
@@ -31,11 +29,13 @@ public class FieldBuilder__F_bean extends FieldBuilder {
             }
             String implClassValCode = ParseUtil.replaceExprToCode(implClassExpr, context);
             String varNameField_implClassVal = varNameField + "_implClassVal";
-            ParseUtil.append(body, "int {}={}", varNameField_implClassVal, implClassValCode);
+            ParseUtil.append(body, "int {}={};\n", varNameField_implClassVal, implClassValCode);
             //找到其实现类子类
             try {
+                String pkg = fieldTypeName.substring(0, fieldTypeName.lastIndexOf("."));
                 List<Class<?>> implClassList = ClassUtil.getClassesByParentClass(fieldType, pkg);
                 implClassList = implClassList.stream().filter(e -> e.isAnnotationPresent(C_impl.class)).toList();
+                ParseUtil.append(body, "switch({}){\n", varNameField_implClassVal);
                 for (Class<?> implClass : implClassList) {
                     C_impl c_impl = implClass.getAnnotation(C_impl.class);
                     final String implProcessorVarName;
@@ -44,17 +44,17 @@ public class FieldBuilder__F_bean extends FieldBuilder {
                     } else {
                         implProcessorVarName = context.getCustomizeProcessorVarName(c_impl.processorClass(), c_impl.processorArgs());
                     }
-                    ParseUtil.append(body, "switch({}){\n", varNameField_implClassVal);
-                    ParseUtil.append(body, "case {}-> {}.{}=({}){}.process({},{});\n",
-                            Arrays.toString(c_impl.val()),
+                    String val = Arrays.toString(c_impl.value());
+                    ParseUtil.append(body, "case {}->{}.{}=({}){}.process({},{});\n",
+                            val.substring(1, val.length() - 1),
                             varNameInstance,
                             field.getName(),
-                            fieldTypeClassName,
+                            fieldTypeName,
                             implProcessorVarName,
                             varNameByteBuf,
                             processContextVarName);
-                    ParseUtil.append(body, "}\n");
                 }
+                ParseUtil.append(body, "}\n");
 
             } catch (IOException | ClassNotFoundException e) {
                 throw MyException.get(e);
@@ -64,7 +64,7 @@ public class FieldBuilder__F_bean extends FieldBuilder {
             ParseUtil.append(body, "{}.{}=({}){}.process({},{});\n",
                     varNameInstance,
                     field.getName(),
-                    fieldTypeClassName,
+                    fieldTypeName,
                     processorVarName,
                     varNameByteBuf,
                     processContextVarName);
@@ -78,6 +78,7 @@ public class FieldBuilder__F_bean extends FieldBuilder {
         final String varNameField = ParseUtil.getFieldVarName(context);
         final F_bean anno = field.getAnnotation(F_bean.class);
         final Class<?> fieldType = field.getType();
+        String fieldTypeName = fieldType.getName();
         final String fieldName = field.getName();
         final String processContextVarName = context.getProcessContextVarName();
         if (fieldType.isInterface()) {
@@ -87,10 +88,12 @@ public class FieldBuilder__F_bean extends FieldBuilder {
             }
             String implClassValCode = ParseUtil.replaceExprToCode(implClassExpr, context);
             String varNameField_implClassVal = varNameField + "_implClassVal";
-            ParseUtil.append(body, "int {}={}", varNameField_implClassVal, implClassValCode);
+            ParseUtil.append(body, "int {}={};\n", varNameField_implClassVal, implClassValCode);
             try {
+                String pkg = fieldTypeName.substring(0, fieldTypeName.lastIndexOf("."));
                 List<Class<?>> implClassList = ClassUtil.getClassesByParentClass(fieldType, pkg);
                 implClassList = implClassList.stream().filter(e -> e.isAnnotationPresent(C_impl.class)).toList();
+                ParseUtil.append(body, "switch({}){\n", varNameField_implClassVal);
                 for (Class<?> implClass : implClassList) {
                     C_impl c_impl = implClass.getAnnotation(C_impl.class);
                     final String implProcessorVarName;
@@ -99,15 +102,15 @@ public class FieldBuilder__F_bean extends FieldBuilder {
                     } else {
                         implProcessorVarName = context.getCustomizeProcessorVarName(c_impl.processorClass(), c_impl.processorArgs());
                     }
-                    ParseUtil.append(body, "switch({}){\n", varNameField_implClassVal);
-                    ParseUtil.append(body, "case {}-> {}.deProcess({},{},{});\n",
-                            Arrays.toString(c_impl.val()),
+                    String val = Arrays.toString(c_impl.value());
+                    ParseUtil.append(body, "case {}->{}.deProcess({},{},{});\n",
+                            val.substring(1, val.length() - 1),
                             implProcessorVarName,
                             varNameByteBuf,
                             processContextVarName,
                             varNameInstance + "." + fieldName);
-                    ParseUtil.append(body, "}\n");
                 }
+                ParseUtil.append(body, "}\n");
 
             } catch (IOException | ClassNotFoundException e) {
                 throw MyException.get(e);

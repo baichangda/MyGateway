@@ -36,8 +36,7 @@ public class ParseUtil {
     private final static Set<Class<?>> logFieldTypeSet = Sets.newHashSet(
             byte.class, short.class, int.class, long.class, float.class, double.class,
             byte[].class, short[].class, int[].class, long[].class, float[].class, double[].class,
-            String.class,
-            Date.class, Instant.class, LocalDateTime.class, OffsetDateTime.class, ZonedDateTime.class);
+            String.class, Date.class, Instant.class, LocalDateTime.class, OffsetDateTime.class, ZonedDateTime.class);
 
     static final double[] pows;
 
@@ -147,17 +146,33 @@ public class ParseUtil {
         return fieldVarName + "_log_bytes";
     }
 
+
+    /**
+     * 当日志开启情况下
+     * 判断字段是否应该记录日志
+     * 如下注解的字段不会记录日志
+     * {@link F_bean}
+     * {@link F_bean_list}
+     *
+     * 注意、如下注解的字段不受此规则约束、一定会记录日志
+     * {@link F_bit_num}
+     * {@link F_bit_num_array}
+     * @param context
+     * @return
+     */
     public static boolean needLog(final BuilderContext context) {
-        final Class<?> fieldType = context.field.getType();
-        if (logFieldTypeSet.contains(fieldType)) {
-            return true;
-        } else {
-            if (fieldType.isEnum()) {
-                return true;
-            } else {
-                return context.field.isAnnotationPresent(F_customize.class);
-            }
-        }
+        Field field = context.field;
+        return !field.isAnnotationPresent(F_bean.class) && !field.isAnnotationPresent(F_bean_list.class);
+//        final Class<?> fieldType = context.field.getType();
+//        if (logFieldTypeSet.contains(fieldType)) {
+//            return true;
+//        } else {
+//            if (fieldType.isEnum()) {
+//                return true;
+//            } else {
+//                return context.field.isAnnotationPresent(F_customize.class);
+//            }
+//        }
     }
 
     public static boolean needBitBuf(List<Field> fieldList) {

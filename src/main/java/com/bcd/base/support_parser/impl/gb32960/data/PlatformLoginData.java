@@ -5,6 +5,7 @@ import com.bcd.base.support_parser.anno.*;
 
 import java.util.Date;
 
+@C_impl(value = 0x05)
 public class PlatformLoginData implements PacketData {
     //平台登入时间
     @F_date_bytes_6
