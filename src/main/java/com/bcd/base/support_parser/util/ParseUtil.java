@@ -798,12 +798,20 @@ public class ParseUtil {
     }
 
     public static void appendPutGlobalVar(BuilderContext context, char var, String val) {
-        append(context.body, "{}.putGlobalVar('{}',(int){});\n", FieldBuilder.varNameProcessContext, var, val);
+        append(context.body, "{}.putGlobalVar({},(int){});\n", FieldBuilder.varNameProcessContext, getGlobalVarIndex(var), val);
     }
 
     public static void appendGetGlobalVar(BuilderContext context, char var) {
         String globalVarName = getGlobalVarName(var);
-        append(context.body, "final int {} = {}.getGlobalVar('{}');\n", globalVarName, FieldBuilder.varNameProcessContext, var);
+        append(context.body, "final int {} = {}.getGlobalVar({});\n", globalVarName, FieldBuilder.varNameProcessContext, getGlobalVarIndex(var));
+    }
+
+    private static int getGlobalVarIndex(char var) {
+        int i = var - 'A';
+        if (i > 26) {
+            i = var - 'a' + 26;
+        }
+        return i;
     }
 
     public static String getGlobalVarName(char var) {

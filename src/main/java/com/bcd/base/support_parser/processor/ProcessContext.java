@@ -57,22 +57,14 @@ public class ProcessContext<T> {
         return (BitBuf_writer_log) bitBuf_writer;
     }
 
-    public void putGlobalVar(char c, int v) {
+    public final void putGlobalVar(int varIndex, int v) {
         if (globalVars == null) {
             globalVars = new int[52];
         }
-        int i = c - 'A';
-        if (i > 26) {
-            i = c - 'a' + 26;
-        }
-        globalVars[i] = v;
+        globalVars[varIndex] = v;
     }
 
-    public int getGlobalVar(char c) {
-        int i = c - 'A';
-        if (i > 26) {
-            i = c - 'a' + 26;
-        }
-        return globalVars[i];
+    public final int getGlobalVar(int varIndex) {
+        return globalVars[varIndex];
     }
 }
