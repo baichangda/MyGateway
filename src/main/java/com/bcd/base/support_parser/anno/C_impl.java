@@ -19,7 +19,7 @@ public @interface C_impl {
      * 当表达式解析为此值时候
      * 表明其实现类为当前注解标注的类
      *
-     * 特殊值{@link Integer#MAX_VALUE}代表、当所有分支不命中时候、使用此注解标注的类
+     * 特殊值{@link Integer#MAX_VALUE}代表默认分支、当所有分支不命中时候、使用此注解标注的类
      */
     int[] value();
 
