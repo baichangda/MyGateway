@@ -3,12 +3,13 @@ package com.bcd.base.support_parser.builder;
 import com.bcd.base.exception.MyException;
 import com.bcd.base.support_parser.anno.C_impl;
 import com.bcd.base.support_parser.anno.F_bean;
+import com.bcd.base.support_parser.processor.Processor;
 import com.bcd.base.support_parser.util.ClassUtil;
 import com.bcd.base.support_parser.util.ParseUtil;
+import javassist.*;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.List;
 
 public class FieldBuilder__F_bean extends FieldBuilder {
@@ -20,8 +21,8 @@ public class FieldBuilder__F_bean extends FieldBuilder {
         final StringBuilder body = context.body;
         final String varNameField = ParseUtil.getFieldVarName(context);
         final Class<?> fieldType = field.getType();
+        String processContextVarName = context.getProcessContextVarName();
         String fieldTypeName = fieldType.getName();
-        final String processContextVarName = context.getProcessContextVarName();
         if (fieldType.isInterface()) {
             String implClassExpr = anno.implClassExpr();
             if (implClassExpr.isEmpty()) {
@@ -44,12 +45,14 @@ public class FieldBuilder__F_bean extends FieldBuilder {
                     } else {
                         implProcessorVarName = context.getCustomizeProcessorVarName(c_impl.processorClass(), c_impl.processorArgs());
                     }
-                    String val = Arrays.toString(c_impl.value());
-                    ParseUtil.append(body, "case {}->{}.{}=({}){}.process({},{});\n",
-                            val.substring(1, val.length() - 1),
+                    int[] value = c_impl.value();
+                    for (int i = 0; i < value.length - 1; i++) {
+                        ParseUtil.append(body, "case {}:{}\n", value[i]);
+                    }
+                    ParseUtil.append(body, "case {}:{\n{}.{}={}.process({},{});\nbreak;\n}\n",
+                            value[value.length - 1],
                             varNameInstance,
                             field.getName(),
-                            fieldTypeName,
                             implProcessorVarName,
                             varNameByteBuf,
                             processContextVarName);
@@ -80,7 +83,7 @@ public class FieldBuilder__F_bean extends FieldBuilder {
         final Class<?> fieldType = field.getType();
         String fieldTypeName = fieldType.getName();
         final String fieldName = field.getName();
-        final String processContextVarName = context.getProcessContextVarName();
+        String processContextVarName = context.getProcessContextVarName();
         if (fieldType.isInterface()) {
             String implClassExpr = anno.implClassExpr();
             if (implClassExpr.isEmpty()) {
@@ -97,17 +100,22 @@ public class FieldBuilder__F_bean extends FieldBuilder {
                 for (Class<?> implClass : implClassList) {
                     C_impl c_impl = implClass.getAnnotation(C_impl.class);
                     final String implProcessorVarName;
+                    final String castClassName= implClass.getName();
                     if (c_impl.processorClass() == Void.class) {
                         implProcessorVarName = context.getProcessorVarName(implClass);
                     } else {
                         implProcessorVarName = context.getCustomizeProcessorVarName(c_impl.processorClass(), c_impl.processorArgs());
                     }
-                    String val = Arrays.toString(c_impl.value());
-                    ParseUtil.append(body, "case {}->{}.deProcess({},{},{});\n",
-                            val.substring(1, val.length() - 1),
+                    int[] value = c_impl.value();
+                    for (int i = 0; i < value.length - 1; i++) {
+                        ParseUtil.append(body, "case {}:{}\n", value[i]);
+                    }
+                    ParseUtil.append(body, "case {}:{\n{}.deProcess({},{},({})({}));\nbreak;\n}\n",
+                            value[value.length - 1],
                             implProcessorVarName,
                             varNameByteBuf,
                             processContextVarName,
+                            castClassName,
                             varNameInstance + "." + fieldName);
                 }
                 ParseUtil.append(body, "}\n");
@@ -123,6 +131,38 @@ public class FieldBuilder__F_bean extends FieldBuilder {
                     processContextVarName,
                     varNameInstance + "." + fieldName);
         }
+    }
+
+    public static void main(String[] args) throws CannotCompileException, IOException {
+        CtClass cc = ClassPool.getDefault().makeClass("com.bcd.base.support_parser.builder.TestSwitch");
+//        String body= """
+//                public void test(int i){
+//                    switch(i){
+//                        case 1->java.lang.System.out.println(1);
+//                        case 2->java.lang.System.out.println(2);
+//                    }
+//                }
+//                """;
+        String body = """
+                public void test(int i){
+                    switch(i){
+                        case 1:{}
+                        case 3:{
+                            java.lang.System.out.println(1);
+                            break;
+                        }
+                        case 2:{
+                            java.lang.System.out.println(2);
+                            break;
+                        }
+                    }
+                }
+                """;
+        CtMethod cm = CtNewMethod.make(body, cc);
+        cc.addMethod(cm);
+        cc.writeFile("src/main/java");
+        Class<?> aClass = cc.toClass(FieldBuilder__F_bean.class);
+        System.out.println(aClass.getName());
     }
 
 }

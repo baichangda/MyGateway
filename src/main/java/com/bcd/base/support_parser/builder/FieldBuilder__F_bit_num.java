@@ -127,18 +127,20 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
             ParseUtil.append(body, "{}.skip({});\n", varNameBitBuf, skipBefore);
         }
 
-
+        final String fieldTypeName;
         String valCode;
         //先判断是否是枚举类型、如果是枚举转换为int
         if (fieldType.isEnum()) {
             valCode = ParseUtil.format("{}.toInteger()", varNameInstance + "." + fieldName);
+            fieldTypeName = "int";
         } else {
             valCode = varNameInstance + "." + fieldName;
+            fieldTypeName = fieldType.getName();
         }
 
         //判断是否用到变量中、如果用到了、需要定义变量
         if (var != '0') {
-            ParseUtil.append(body, "final {} {}={};\n", fieldType.getName(), varNameField, valCode);
+            ParseUtil.append(body, "final {} {}={};\n", fieldTypeName, varNameField, valCode);
             context.varToFieldName.put(var, varNameField);
             valCode = varNameField;
         }
