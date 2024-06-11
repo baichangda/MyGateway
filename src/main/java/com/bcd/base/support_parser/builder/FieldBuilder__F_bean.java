@@ -9,6 +9,7 @@ import javassist.*;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 
 public class FieldBuilder__F_bean extends FieldBuilder {
@@ -36,30 +37,58 @@ public class FieldBuilder__F_bean extends FieldBuilder {
                 List<Class<?>> implClassList = ClassUtil.getClassesByParentClass(fieldType, pkg);
                 implClassList = implClassList.stream().filter(e -> e.isAnnotationPresent(C_impl.class)).toList();
                 ParseUtil.append(body, "switch({}){\n", varNameField_implClassVal);
+                Class<?> defaultClass = null;
                 for (Class<?> implClass : implClassList) {
                     C_impl c_impl = implClass.getAnnotation(C_impl.class);
+                    int[] value = c_impl.value();
+                    List<Integer> filterValue = new ArrayList<>();
+                    for (int i : value) {
+                        if (i == Integer.MAX_VALUE) {
+                            defaultClass = implClass;
+                        } else {
+                            filterValue.add(i);
+                        }
+                    }
+                    if (filterValue.isEmpty()) {
+                        continue;
+                    }
                     final String implProcessorVarName;
                     if (c_impl.processorClass() == Void.class) {
                         implProcessorVarName = context.getProcessorVarName(implClass);
                     } else {
                         implProcessorVarName = context.getCustomizeProcessorVarName(c_impl.processorClass(), c_impl.processorArgs());
                     }
-                    int[] value = c_impl.value();
-                    for (int i = 0; i < value.length - 1; i++) {
+                    for (int i = 0; i < filterValue.size() - 1; i++) {
                         ParseUtil.append(body, "case {}:{}\n", value[i]);
                     }
                     ParseUtil.append(body, "case {}:{\n{}.{}={}.process({},{});\nbreak;\n}\n",
-                            value[value.length - 1],
+                            filterValue.getLast(),
                             varNameInstance,
                             field.getName(),
                             implProcessorVarName,
                             varNameByteBuf,
                             processContextVarName);
                 }
-                ParseUtil.append(body, "default:{\nthrow {}.get(\"class[{}] field[{}] implClass value[\"+" + varNameField_implClassVal + "+\"] not support\");\n}",
-                        MyException.class.getName(),
-                        field.getDeclaringClass().getName(),
-                        field.getName());
+                if(defaultClass==null) {
+                    ParseUtil.append(body, "default:{\nthrow {}.get(\"class[{}] field[{}] implClass value[\"+" + varNameField_implClassVal + "+\"] not support\");\n}",
+                            MyException.class.getName(),
+                            field.getDeclaringClass().getName(),
+                            field.getName());
+                }else{
+                    C_impl c_impl = defaultClass.getAnnotation(C_impl.class);
+                    final String defaultImplProcessorVarName;
+                    if (c_impl.processorClass() == Void.class) {
+                        defaultImplProcessorVarName = context.getProcessorVarName(defaultClass);
+                    } else {
+                        defaultImplProcessorVarName = context.getCustomizeProcessorVarName(c_impl.processorClass(), c_impl.processorArgs());
+                    }
+                    ParseUtil.append(body, "default:{\n{}.{}={}.process({},{});\n}\n",
+                            varNameInstance,
+                            field.getName(),
+                            defaultImplProcessorVarName,
+                            varNameByteBuf,
+                            processContextVarName);
+                }
                 ParseUtil.append(body, "}\n");
 
             } catch (IOException | ClassNotFoundException e) {
@@ -100,34 +129,60 @@ public class FieldBuilder__F_bean extends FieldBuilder {
                 List<Class<?>> implClassList = ClassUtil.getClassesByParentClass(fieldType, pkg);
                 implClassList = implClassList.stream().filter(e -> e.isAnnotationPresent(C_impl.class)).toList();
                 ParseUtil.append(body, "switch({}){\n", varNameField_implClassVal);
+                Class<?> defaultClass = null;
                 for (Class<?> implClass : implClassList) {
                     C_impl c_impl = implClass.getAnnotation(C_impl.class);
+                    int[] value = c_impl.value();
+                    List<Integer> filterValue = new ArrayList<>();
+                    for (int i : value) {
+                        if (i == Integer.MAX_VALUE) {
+                            defaultClass = implClass;
+                        } else {
+                            filterValue.add(i);
+                        }
+                    }
+                    if (filterValue.isEmpty()) {
+                        continue;
+                    }
                     final String implProcessorVarName;
-                    final String castClassName = implClass.getName();
                     if (c_impl.processorClass() == Void.class) {
                         implProcessorVarName = context.getProcessorVarName(implClass);
                     } else {
                         implProcessorVarName = context.getCustomizeProcessorVarName(c_impl.processorClass(), c_impl.processorArgs());
                     }
-                    int[] value = c_impl.value();
-                    for (int i = 0; i < value.length - 1; i++) {
+                    for (int i = 0; i < filterValue.size() - 1; i++) {
                         ParseUtil.append(body, "case {}:{}\n", value[i]);
                     }
                     ParseUtil.append(body, "case {}:{\n{}.deProcess({},{},({})({}));\nbreak;\n}\n",
-                            value[value.length - 1],
+                            filterValue.getLast(),
                             implProcessorVarName,
                             varNameByteBuf,
                             processContextVarName,
-                            castClassName,
+                            implClass.getName(),
                             varNameInstance + "." + fieldName);
                 }
-                ParseUtil.append(body, "default:{\nthrow {}.get(\"class[{}] field[{}] implClass value[\"+" + varNameField_implClassVal + "+\"] not support\");\n}",
-                        MyException.class.getName(),
-                        field.getDeclaringClass().getName(),
-                        field.getName(),
-                        fieldTypeName);
+                if(defaultClass==null){
+                    ParseUtil.append(body, "default:{\nthrow {}.get(\"class[{}] field[{}] implClass value[\"+" + varNameField_implClassVal + "+\"] not support\");\n}",
+                            MyException.class.getName(),
+                            field.getDeclaringClass().getName(),
+                            field.getName(),
+                            fieldTypeName);
+                }else{
+                    C_impl c_impl = defaultClass.getAnnotation(C_impl.class);
+                    final String defaultImplProcessorVarName;
+                    if (c_impl.processorClass() == Void.class) {
+                        defaultImplProcessorVarName = context.getProcessorVarName(defaultClass);
+                    } else {
+                        defaultImplProcessorVarName = context.getCustomizeProcessorVarName(c_impl.processorClass(), c_impl.processorArgs());
+                    }
+                    ParseUtil.append(body, "default:{\n{}.deProcess({},{},({})({}));\n}\n",
+                            defaultImplProcessorVarName,
+                            varNameByteBuf,
+                            processContextVarName,
+                            defaultClass.getName(),
+                            varNameInstance + "." + fieldName);
+                }
                 ParseUtil.append(body, "}\n");
-
             } catch (IOException | ClassNotFoundException e) {
                 throw MyException.get(e);
             }
