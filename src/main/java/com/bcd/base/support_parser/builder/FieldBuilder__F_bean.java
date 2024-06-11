@@ -3,7 +3,6 @@ package com.bcd.base.support_parser.builder;
 import com.bcd.base.exception.MyException;
 import com.bcd.base.support_parser.anno.C_impl;
 import com.bcd.base.support_parser.anno.F_bean;
-import com.bcd.base.support_parser.processor.Processor;
 import com.bcd.base.support_parser.util.ClassUtil;
 import com.bcd.base.support_parser.util.ParseUtil;
 import javassist.*;
@@ -57,6 +56,10 @@ public class FieldBuilder__F_bean extends FieldBuilder {
                             varNameByteBuf,
                             processContextVarName);
                 }
+                ParseUtil.append(body, "default:{\nthrow {}.get(\"class[{}] field[{}] implClass value[\"+" + varNameField_implClassVal + "+\"] not support\");\n}",
+                        MyException.class.getName(),
+                        field.getDeclaringClass().getName(),
+                        field.getName());
                 ParseUtil.append(body, "}\n");
 
             } catch (IOException | ClassNotFoundException e) {
@@ -100,7 +103,7 @@ public class FieldBuilder__F_bean extends FieldBuilder {
                 for (Class<?> implClass : implClassList) {
                     C_impl c_impl = implClass.getAnnotation(C_impl.class);
                     final String implProcessorVarName;
-                    final String castClassName= implClass.getName();
+                    final String castClassName = implClass.getName();
                     if (c_impl.processorClass() == Void.class) {
                         implProcessorVarName = context.getProcessorVarName(implClass);
                     } else {
@@ -118,6 +121,11 @@ public class FieldBuilder__F_bean extends FieldBuilder {
                             castClassName,
                             varNameInstance + "." + fieldName);
                 }
+                ParseUtil.append(body, "default:{\nthrow {}.get(\"class[{}] field[{}] implClass value[\"+" + varNameField_implClassVal + "+\"] not support\");\n}",
+                        MyException.class.getName(),
+                        field.getDeclaringClass().getName(),
+                        field.getName(),
+                        fieldTypeName);
                 ParseUtil.append(body, "}\n");
 
             } catch (IOException | ClassNotFoundException e) {
@@ -135,7 +143,7 @@ public class FieldBuilder__F_bean extends FieldBuilder {
 
     public static void main(String[] args) throws CannotCompileException, IOException {
         CtClass cc = ClassPool.getDefault().makeClass("com.bcd.base.support_parser.builder.TestSwitch");
-        String body= """
+        String body = """
                 public void test(int i){
                     switch(i){
                         case 1,3->java.lang.System.out.println(1);
