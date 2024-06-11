@@ -293,6 +293,7 @@ public class Parser {
 
         cc.setModifiers(Modifier.FINAL | Modifier.PUBLIC);
 
+        StringBuilder classFieldDefineBody = new StringBuilder();
         StringBuilder constructBody = new StringBuilder();
         final CtConstructor constructor = CtNewConstructor.make(new CtClass[]{}, null, cc);
         final Map<String, String> classVarDefineToVarName = new HashMap<>();
@@ -318,7 +319,7 @@ public class Parser {
         processBody.append("\n{\n");
         ParseUtil.append(processBody, "final {} {}=new {}();\n", clazzName, FieldBuilder.varNameInstance, clazzName);
         final List<Field> fieldList = ParseUtil.getParseFields(clazz);
-        BuilderContext parseBuilderContext = new BuilderContext(constructBody, processBody, clazz, cc, classVarDefineToVarName, byteOrder, bitOrder, fieldList);
+        BuilderContext parseBuilderContext = new BuilderContext(classFieldDefineBody, constructBody, processBody, clazz, cc, classVarDefineToVarName, byteOrder, bitOrder, fieldList);
 
         C_skip c_skip = clazz.getAnnotation(C_skip.class);
         if (c_skip == null) {
@@ -380,7 +381,7 @@ public class Parser {
         StringBuilder deProcessBody = new StringBuilder();
         deProcessBody.append("\n{\n");
         ParseUtil.append(deProcessBody, "final {} {}=({})$3;\n", clazzName, FieldBuilder.varNameInstance, clazzName);
-        BuilderContext deParseBuilderContext = new BuilderContext(constructBody, deProcessBody, clazz, cc, classVarDefineToVarName, byteOrder, bitOrder, fieldList);
+        BuilderContext deParseBuilderContext = new BuilderContext(classFieldDefineBody,constructBody, deProcessBody, clazz, cc, classVarDefineToVarName, byteOrder, bitOrder, fieldList);
         if (c_skip == null) {
             buildMethodBody_deProcess(deParseBuilderContext);
         } else {
@@ -425,10 +426,13 @@ public class Parser {
 
 
         //开始创建类
-        constructBody.insert(0, "{\n");
+        if (printBuildLog) {
+            logger.info("\n----------clazz[{}] class field define body-------------\n{}\n", clazz.getName(), classFieldDefineBody.toString());
+        }
+        constructBody.insert(0, "\n{\n");
         constructBody.append("}\n");
         if (printBuildLog) {
-            logger.info("----------clazz[{}] constructor body-------------\n{}", clazz.getName(), constructBody.toString());
+            logger.info("\n----------clazz[{}] constructor body-------------{}\n", clazz.getName(), constructBody.toString());
         }
         constructor.setBody(constructBody.toString());
         cc.addConstructor(constructor);

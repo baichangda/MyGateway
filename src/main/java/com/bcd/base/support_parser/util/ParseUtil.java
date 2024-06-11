@@ -117,8 +117,10 @@ public class ParseUtil {
             final int size = context.classVarDefineToVarName.size();
             final String varName = "_" + size + "_" + varClass.getSimpleName();
             final CtClass ctClass = context.implCc;
+            String define = "private final " + varClass.getName() + " " + varName + "=" + k + ";\n";
+            context.classFieldDefineBody.append(define);
             try {
-                final CtField ctField = CtField.make("private final " + varClass.getName() + " " + varName + "=" + k + ";\n", ctClass);
+                final CtField ctField = CtField.make(define, ctClass);
                 ctClass.addField(ctField);
             } catch (CannotCompileException e) {
                 throw MyException.get(e);

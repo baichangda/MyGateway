@@ -16,6 +16,10 @@ import java.util.Map;
 
 public class BuilderContext {
     /**
+     * 类变量定义体
+     */
+    public final StringBuilder classFieldDefineBody;
+    /**
      * 构造方法体
      */
     public final StringBuilder constructBody;
@@ -75,9 +79,10 @@ public class BuilderContext {
      */
     public int varIndex = 0;
 
-    public BuilderContext(StringBuilder constructBody, StringBuilder body, Class<?> clazz,
+    public BuilderContext(StringBuilder classFieldDefineBody,StringBuilder constructBody, StringBuilder body, Class<?> clazz,
                           CtClass implCc, Map<String, String> classVarDefineToVarName, ByteOrder byteOrder, BitOrder bitOrder,
                           List<Field> fieldList) {
+        this.classFieldDefineBody = classFieldDefineBody;
         this.constructBody = constructBody;
         this.body = body;
         this.clazz = clazz;
@@ -105,10 +110,7 @@ public class BuilderContext {
 
     public final String getCustomizeProcessorVarName(Class<?> processorClass, String processorArgs) {
         final String processorClassName = processorClass.getName();
-        String valDefine = ParseUtil.format("new {}({})", processorClassName, processorArgs);
-        return ParseUtil.defineClassVar(this, e -> {
-            ParseUtil.append(constructBody, "this.{}={};\n", e, valDefine);
-        }, processorClass, valDefine);
+        return ParseUtil.defineClassVar(this, null, processorClass, "new {}({})", processorClassName, processorArgs);
     }
 
     public final String getProcessorVarName(Class<?> beanClazz) {
