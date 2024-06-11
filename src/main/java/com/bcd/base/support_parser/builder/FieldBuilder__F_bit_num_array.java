@@ -11,7 +11,7 @@ import java.util.List;
 public class FieldBuilder__F_bit_num_array extends FieldBuilder {
 
     private boolean finish(BuilderContext context) {
-        List<Field> fieldList = context.fieldList;
+        List<Field> fieldList = context.class_fieldList;
         F_bit_num_array f_bit_num_array = context.field.getAnnotation(F_bit_num_array.class);
         if (f_bit_num_array.bitRemainingMode() == BitRemainingMode.ignore) {
             return true;
@@ -46,7 +46,7 @@ public class FieldBuilder__F_bit_num_array extends FieldBuilder {
         final int singleLen = anno.singleLen();
         final int singleSkip = anno.singleSkip();
         final String valExpr = anno.singleValExpr();
-        final StringBuilder body = context.body;
+        final StringBuilder body = context.method_body;
         final String varNameField = ParseUtil.getFieldVarName(context);
         int skipBefore = anno.skipBefore();
         int skipAfter = anno.skipAfter();
@@ -113,7 +113,7 @@ public class FieldBuilder__F_bit_num_array extends FieldBuilder {
         final int singleSkip = anno.singleSkip();
         final Class<?> arrElementType = fieldTypeClass.componentType();
         final boolean isFloat = arrElementType == float.class || arrElementType == double.class;
-        final StringBuilder body = context.body;
+        final StringBuilder body = context.method_body;
         final String varNameInstance = FieldBuilder.varNameInstance;
         final String fieldName = field.getName();
 

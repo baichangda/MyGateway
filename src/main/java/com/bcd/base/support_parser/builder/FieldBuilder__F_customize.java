@@ -12,7 +12,7 @@ public class FieldBuilder__F_customize extends FieldBuilder {
         final Field field = context.field;
         final F_customize anno = field.getAnnotation(F_customize.class);
         final Class<?> processorClass = anno.processorClass();
-        final StringBuilder body = context.body;
+        final StringBuilder body = context.method_body;
         final String varNameField = ParseUtil.getFieldVarName(context);
         final String processorClassVarName = context.getCustomizeProcessorVarName(processorClass, anno.processorArgs());
         final String varNameInstance = FieldBuilder.varNameInstance;
@@ -25,7 +25,7 @@ public class FieldBuilder__F_customize extends FieldBuilder {
         } else {
             ParseUtil.append(body, "final {} {}={};\n", fieldTypeClassName, varNameField, unBoxing);
             ParseUtil.append(body, "{}.{}={};\n", varNameInstance, field.getName(), varNameField);
-            context.varToFieldName.put(anno.var(), varNameField);
+            context.method_varToFieldName.put(anno.var(), varNameField);
         }
 
         final char globalVar = anno.globalVar();
@@ -40,7 +40,7 @@ public class FieldBuilder__F_customize extends FieldBuilder {
         final Field field = context.field;
         final F_customize anno = field.getAnnotation(F_customize.class);
         final Class<?> processorClass = anno.processorClass();
-        final StringBuilder body = context.body;
+        final StringBuilder body = context.method_body;
         final String varNameField = ParseUtil.getFieldVarName(context);
         final String varInstanceName = FieldBuilder.varNameInstance;
         char var = anno.var();

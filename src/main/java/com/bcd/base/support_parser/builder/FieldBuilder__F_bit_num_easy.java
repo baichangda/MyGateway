@@ -14,7 +14,7 @@ public class FieldBuilder__F_bit_num_easy extends FieldBuilder {
     }
 
     private Info getInfo(BuilderContext context) {
-        Map<String, Object> cache = context.cache;
+        Map<String, Object> cache = context.method_cache;
         Object object = cache.get(F_bit_num_easy.class.getName());
         if (object == null) {
             final String varNameField = ParseUtil.getFieldVarName(context);
@@ -24,7 +24,7 @@ public class FieldBuilder__F_bit_num_easy extends FieldBuilder {
             if (context.fieldIndex == 0) {
                 prevField = null;
             } else {
-                prevField = context.fieldList.get(context.fieldIndex - 1);
+                prevField = context.class_fieldList.get(context.fieldIndex - 1);
             }
             final boolean first;
             if (prevField == null) {
@@ -35,8 +35,8 @@ public class FieldBuilder__F_bit_num_easy extends FieldBuilder {
             }
             int maxBit = 0;
             if (first) {
-                for (int i = context.fieldIndex; i < context.fieldList.size(); i++) {
-                    Field field = context.fieldList.get(i);
+                for (int i = context.fieldIndex; i < context.class_fieldList.size(); i++) {
+                    Field field = context.class_fieldList.get(i);
                     F_bit_num_easy anno = field.getAnnotation(F_bit_num_easy.class);
                     if (anno == null) {
                         endFieldIndex = i - 1;
@@ -47,7 +47,7 @@ public class FieldBuilder__F_bit_num_easy extends FieldBuilder {
                             endFieldIndex = i;
                             break;
                         }
-                        if (i == context.fieldList.size() - 1) {
+                        if (i == context.class_fieldList.size() - 1) {
                             endFieldIndex = i;
                             break;
                         }
@@ -88,10 +88,10 @@ public class FieldBuilder__F_bit_num_easy extends FieldBuilder {
             } else {
                 throw MyException.get("class[{}] field[{}] anno[{}] maxBit[{}] not support", context.clazz.getName(), field.getName(), F_bit_num_easy.class, maxBit);
             }
-            ParseUtil.append(context.body, "final int {}={}.{}();\n", varNameNum, FieldBuilder.varNameByteBuf, funcName);
+            ParseUtil.append(context.method_body, "final int {}={}.{}();\n", varNameNum, FieldBuilder.varNameByteBuf, funcName);
         }
 
-        StringBuilder body = context.body;
+        StringBuilder body = context.method_body;
         final String sourceValTypeName;
         switch (fieldTypeName) {
             case "byte", "short", "int", "long", "float", "double" -> {
@@ -123,7 +123,7 @@ public class FieldBuilder__F_bit_num_easy extends FieldBuilder {
 
         final char var = anno.var();
         if (var != '0') {
-            context.varToFieldName.put(var, varNameField);
+            context.method_varToFieldName.put(var, varNameField);
         }
         final char globalVar = anno.globalVar();
         if (globalVar != '0') {
@@ -137,7 +137,7 @@ public class FieldBuilder__F_bit_num_easy extends FieldBuilder {
         final Field field = context.field;
         final F_bit_num_easy anno = field.getAnnotation(annoClass);
         final String varNameInstance = FieldBuilder.varNameInstance;
-        final StringBuilder body = context.body;
+        final StringBuilder body = context.method_body;
         final String fieldName = field.getName();
         final String varNameField = ParseUtil.getFieldVarName(context);
 
@@ -158,7 +158,7 @@ public class FieldBuilder__F_bit_num_easy extends FieldBuilder {
         //判断是否用到变量中、如果用到了、需要定义变量
         if (var != '0') {
             ParseUtil.append(body, "final {} {}={};\n", fieldTypeName, varNameField, valCode);
-            context.varToFieldName.put(var, varNameField);
+            context.method_varToFieldName.put(var, varNameField);
             valCode = varNameField;
         }
 

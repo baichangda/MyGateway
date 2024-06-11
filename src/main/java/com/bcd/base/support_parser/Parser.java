@@ -187,7 +187,7 @@ public class Parser {
     }
 
     private static void buildMethodBody_process(BuilderContext context) {
-        final List<Field> fieldList = context.fieldList;
+        final List<Field> fieldList = context.class_fieldList;
         if (fieldList.isEmpty()) {
             return;
         }
@@ -232,7 +232,7 @@ public class Parser {
     }
 
     private static void buildMethodBody_deProcess(BuilderContext context) {
-        final List<Field> fieldList = context.fieldList;
+        final List<Field> fieldList = context.class_fieldList;
         if (fieldList.isEmpty()) {
             return;
         }
@@ -331,7 +331,7 @@ public class Parser {
                 buildMethodBody_process(parseBuilderContext);
                 String lenValCode;
                 if (c_skip.len() == 0) {
-                    lenValCode = ParseUtil.replaceExprToCode(c_skip.lenExpr(), parseBuilderContext.varToFieldName, clazz);
+                    lenValCode = ParseUtil.replaceExprToCode(c_skip.lenExpr(), parseBuilderContext.method_varToFieldName, clazz);
                 } else {
                     lenValCode = c_skip.len() + "";
                 }
@@ -345,7 +345,7 @@ public class Parser {
             } else {
                 buildMethodBody_process(parseBuilderContext);
                 if (c_skip.len() == 0) {
-                    String lenValCode = ParseUtil.replaceExprToCode(c_skip.lenExpr(), parseBuilderContext.varToFieldName, clazz);
+                    String lenValCode = ParseUtil.replaceExprToCode(c_skip.lenExpr(), parseBuilderContext.method_varToFieldName, clazz);
                     String skipCode = "(" + lenValCode + "-" + classByteLen + ")";
                     ParseUtil.append(processBody, "{}.skipBytes({});\n", FieldBuilder.varNameByteBuf, skipCode);
                     if (logCollector_parse != null) {
@@ -390,7 +390,7 @@ public class Parser {
                 buildMethodBody_deProcess(deParseBuilderContext);
                 String lenValCode;
                 if (c_skip.len() == 0) {
-                    lenValCode = ParseUtil.replaceExprToCode(c_skip.lenExpr(), parseBuilderContext.varToFieldName, clazz);
+                    lenValCode = ParseUtil.replaceExprToCode(c_skip.lenExpr(), parseBuilderContext.method_varToFieldName, clazz);
                 } else {
                     lenValCode = c_skip.len() + "";
                 }
@@ -404,7 +404,7 @@ public class Parser {
             } else {
                 buildMethodBody_deProcess(deParseBuilderContext);
                 if (c_skip.len() == 0) {
-                    String lenValCode = ParseUtil.replaceExprToCode(c_skip.lenExpr(), parseBuilderContext.varToFieldName, clazz);
+                    String lenValCode = ParseUtil.replaceExprToCode(c_skip.lenExpr(), parseBuilderContext.method_varToFieldName, clazz);
                     String skipCode = "(" + lenValCode + "-" + classByteLen + ")";
                     ParseUtil.append(deProcessBody, "{}.writeZero({});\n", FieldBuilder.varNameByteBuf, skipCode);
                     if (logCollector_deParse != null) {

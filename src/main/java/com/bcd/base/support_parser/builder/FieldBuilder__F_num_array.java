@@ -47,7 +47,7 @@ public class FieldBuilder__F_num_array extends FieldBuilder {
 
         final NumType singleType = anno.singleType();
         final String singleValExpr = anno.singleValExpr();
-        final StringBuilder body = context.body;
+        final StringBuilder body = context.method_body;
         final String varNameField = ParseUtil.getFieldVarName(context);
         String arrVarName = varNameField + "_arr";
         final boolean bigEndian = ParseUtil.bigEndian(anno.singleOrder(), context.byteOrder);
@@ -158,7 +158,7 @@ public class FieldBuilder__F_num_array extends FieldBuilder {
         final Class<?> fieldTypeClass = field.getType();
         final NumType singleType = anno.singleType();
         final int singleSkip = anno.singleSkip();
-        final StringBuilder body = context.body;
+        final StringBuilder body = context.method_body;
         final String varNameInstance = FieldBuilder.varNameInstance;
         final String fieldName = field.getName();
         final String singleValExpr = anno.singleValExpr();

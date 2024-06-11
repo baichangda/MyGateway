@@ -13,7 +13,7 @@ import java.util.List;
 public class FieldBuilder__F_bit_num extends FieldBuilder {
 
     private boolean finish(BuilderContext context) {
-        List<Field> fieldList = context.fieldList;
+        List<Field> fieldList = context.class_fieldList;
         F_bit_num f_bit_num = context.field.getAnnotation(F_bit_num.class);
         if (f_bit_num.bitRemainingMode() == BitRemainingMode.ignore) {
             return true;
@@ -44,7 +44,7 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
         final boolean unsigned = anno.unsigned();
         int skipBefore = anno.skipBefore();
         int skipAfter = anno.skipAfter();
-        final StringBuilder body = context.body;
+        final StringBuilder body = context.method_body;
         final String varNameInstance = FieldBuilder.varNameInstance;
         final String varNameField = ParseUtil.getFieldVarName(context);
         final String varNameBitBuf = context.getBitBuf_parse();
@@ -97,7 +97,7 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
 
         final char var = anno.var();
         if (var != '0') {
-            context.varToFieldName.put(var, varNameField);
+            context.method_varToFieldName.put(var, varNameField);
         }
         final char globalVar = anno.globalVar();
         if (globalVar != '0') {
@@ -114,7 +114,7 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
         final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.bitOrder);
         final boolean unsigned = anno.unsigned();
         final String varNameInstance = FieldBuilder.varNameInstance;
-        final StringBuilder body = context.body;
+        final StringBuilder body = context.method_body;
         final String fieldName = field.getName();
         final String varNameField = ParseUtil.getFieldVarName(context);
         final Class<?> fieldType = field.getType();
@@ -141,7 +141,7 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
         //判断是否用到变量中、如果用到了、需要定义变量
         if (var != '0') {
             ParseUtil.append(body, "final {} {}={};\n", fieldTypeName, varNameField, valCode);
-            context.varToFieldName.put(var, varNameField);
+            context.method_varToFieldName.put(var, varNameField);
             valCode = varNameField;
         }
 

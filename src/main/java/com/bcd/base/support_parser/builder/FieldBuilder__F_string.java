@@ -12,7 +12,7 @@ import java.nio.charset.Charset;
 public class FieldBuilder__F_string extends FieldBuilder {
     @Override
     public void buildParse(BuilderContext context) {
-        final StringBuilder body = context.body;
+        final StringBuilder body = context.method_body;
         final Field field = context.field;
         final Class<?> fieldType = field.getType();
         final F_string anno = field.getAnnotation(F_string.class);
@@ -49,7 +49,7 @@ public class FieldBuilder__F_string extends FieldBuilder {
 
     @Override
     public void buildDeParse(BuilderContext context) {
-        final StringBuilder body = context.body;
+        final StringBuilder body = context.method_body;
         final Field field = context.field;
         final F_string anno = field.getAnnotation(F_string.class);
         final String fieldName = field.getName();

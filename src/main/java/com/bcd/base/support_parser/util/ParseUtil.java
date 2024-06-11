@@ -112,12 +112,12 @@ public class ParseUtil {
     }
 
     public static String defineClassVar(final BuilderContext context, Consumer<String> doAfterDefine, Class<?> varClass, final String valDefine, Object... params) {
-        return context.classVarDefineToVarName.computeIfAbsent(format(valDefine, params), k -> {
-            final int size = context.classVarDefineToVarName.size();
+        return context.class_varDefineToVarName.computeIfAbsent(format(valDefine, params), k -> {
+            final int size = context.class_varDefineToVarName.size();
             final String varName = "_" + size + "_" + varClass.getSimpleName();
             final CtClass ctClass = context.implCc;
             String define = "private final " + varClass.getName() + " " + varName + "=" + k + ";\n";
-            context.classFieldDefineBody.append(define);
+            context.class_fieldDefineBody.append(define);
             try {
                 final CtField ctField = CtField.make(define, ctClass);
                 ctClass.addField(ctField);
@@ -180,14 +180,14 @@ public class ParseUtil {
     }
 
     public static void newBitBuf_parse(BuilderContext context) {
-        final StringBuilder body = context.body;
+        final StringBuilder body = context.method_body;
         final String bitBuf_reader_className = Parser.logCollector_parse == null ? BitBuf_reader.class.getName() : BitBuf_reader_log.class.getName();
         final String funcName = Parser.logCollector_parse == null ? "getBitBuf_reader" : "getBitBuf_reader_log";
         ParseUtil.append(body, "final {} {}={}.{}();\n", bitBuf_reader_className, FieldBuilder.varNameBitBuf, FieldBuilder.varNameProcessContext, funcName);
     }
 
     public static void newBitBuf_deParse(BuilderContext context) {
-        final StringBuilder body = context.body;
+        final StringBuilder body = context.method_body;
         final String bitBuf_writer_className = Parser.logCollector_parse == null ? BitBuf_writer.class.getName() : BitBuf_writer_log.class.getName();
         final String funcName = Parser.logCollector_parse == null ? "getBitBuf_writer" : "getBitBuf_writer_log";
         ParseUtil.append(body, "final {} {}={}.{}();\n", bitBuf_writer_className, FieldBuilder.varNameBitBuf, FieldBuilder.varNameProcessContext, funcName);
@@ -199,7 +199,7 @@ public class ParseUtil {
             final Class<?> clazz = context.clazz;
             final Class<?> declaringClass = context.field.getDeclaringClass();
             final String fieldName = context.field.getName();
-            append(context.body, "{}.logCollector_parse.collect_field_bit({}.class,{}.class,\"{}\",{}.takeLogs(),{},\"{}\");\n",
+            append(context.method_body, "{}.logCollector_parse.collect_field_bit({}.class,{}.class,\"{}\",{}.takeLogs(),{},\"{}\");\n",
                     Parser.class.getName()
                     , clazz.getName()
                     , declaringClass.getName()
@@ -216,7 +216,7 @@ public class ParseUtil {
             final Class<?> clazz = context.clazz;
             final Class<?> declaringClass = context.field.getDeclaringClass();
             final String fieldName = context.field.getName();
-            append(context.body, "{}.logCollector_deParse.collect_field_bit({}.class,{}.class,\"{}\",{},{}.takeLogs(),\"{}\");\n",
+            append(context.method_body, "{}.logCollector_deParse.collect_field_bit({}.class,{}.class,\"{}\",{},{}.takeLogs(),\"{}\");\n",
                     Parser.class.getName()
                     , clazz.getName()
                     , declaringClass.getName()
@@ -232,7 +232,7 @@ public class ParseUtil {
             return;
         }
         final String varName = getFieldByteBufReaderIndexVarName(context);
-        append(context.body, "final int {}={}.readerIndex();\n", varName, FieldBuilder.varNameByteBuf);
+        append(context.method_body, "final int {}={}.readerIndex();\n", varName, FieldBuilder.varNameByteBuf);
     }
 
     public static void appendLogCode_parse(final BuilderContext context) {
@@ -241,9 +241,9 @@ public class ParseUtil {
         }
         final String fieldByteBufReaderIndexVarName = getFieldByteBufReaderIndexVarName(context);
         final String fieldLogBytesVarName = getFieldLogBytesVarName(context);
-        append(context.body, "final byte[] {}=new byte[{}.readerIndex()-{}];\n", fieldLogBytesVarName, FieldBuilder.varNameByteBuf, fieldByteBufReaderIndexVarName);
-        append(context.body, "{}.getBytes({},{});\n", FieldBuilder.varNameByteBuf, fieldByteBufReaderIndexVarName, fieldLogBytesVarName);
-        append(context.body, "{}.logCollector_parse.collect_field({}.class,{}.class,\"{}\",{},{},\"{}\");\n",
+        append(context.method_body, "final byte[] {}=new byte[{}.readerIndex()-{}];\n", fieldLogBytesVarName, FieldBuilder.varNameByteBuf, fieldByteBufReaderIndexVarName);
+        append(context.method_body, "{}.getBytes({},{});\n", FieldBuilder.varNameByteBuf, fieldByteBufReaderIndexVarName, fieldLogBytesVarName);
+        append(context.method_body, "{}.logCollector_parse.collect_field({}.class,{}.class,\"{}\",{},{},\"{}\");\n",
                 Parser.class.getName(),
                 context.clazz.getName(),
                 context.field.getDeclaringClass().getName(),
@@ -258,7 +258,7 @@ public class ParseUtil {
             return;
         }
         final String varName = getFieldByteBufWriterIndexVarName(context);
-        append(context.body, "final int {}={}.writerIndex();\n", varName, FieldBuilder.varNameByteBuf);
+        append(context.method_body, "final int {}={}.writerIndex();\n", varName, FieldBuilder.varNameByteBuf);
     }
 
     public static void appendLogCode_deParse(final BuilderContext context) {
@@ -268,9 +268,9 @@ public class ParseUtil {
 
         final String fieldByteBufWriterIndexVarName = getFieldByteBufWriterIndexVarName(context);
         final String fieldLogBytesVarName = getFieldLogBytesVarName(context);
-        append(context.body, "final byte[] {}=new byte[{}.writerIndex()-{}];\n", fieldLogBytesVarName, FieldBuilder.varNameByteBuf, fieldByteBufWriterIndexVarName);
-        append(context.body, "{}.getBytes({},{});\n", FieldBuilder.varNameByteBuf, fieldByteBufWriterIndexVarName, fieldLogBytesVarName);
-        append(context.body, "{}.logCollector_deParse.collect_field({}.class,{}.class,\"{}\",{},{},\"{}\");\n",
+        append(context.method_body, "final byte[] {}=new byte[{}.writerIndex()-{}];\n", fieldLogBytesVarName, FieldBuilder.varNameByteBuf, fieldByteBufWriterIndexVarName);
+        append(context.method_body, "{}.getBytes({},{});\n", FieldBuilder.varNameByteBuf, fieldByteBufWriterIndexVarName, fieldLogBytesVarName);
+        append(context.method_body, "{}.logCollector_deParse.collect_field({}.class,{}.class,\"{}\",{},{},\"{}\");\n",
                 Parser.class.getName(),
                 context.clazz.getName(),
                 context.field.getDeclaringClass().getName(),
@@ -344,7 +344,7 @@ public class ParseUtil {
     }
 
     public static String replaceExprToCode(final String lenExpr, final BuilderContext context) {
-        final Map<Character, String> map = context.varToFieldName;
+        final Map<Character, String> map = context.method_varToFieldName;
         final Field field = context.field;
         final StringBuilder sb = new StringBuilder();
         final char[] chars = lenExpr.toCharArray();
@@ -779,16 +779,16 @@ public class ParseUtil {
         } else {
             lenValCode = len + "";
         }
-        final String fieldByteBufReaderIndexVarName = getFieldByteBufReaderIndexVarName(context) + "_skip_" + (context.varIndex++);
-        final String fieldLogBytesVarName = getFieldLogBytesVarName(context) + "_skip_" + (context.varIndex++);
+        final String fieldByteBufReaderIndexVarName = getFieldByteBufReaderIndexVarName(context) + "_skip_" + (context.method_varIndex++);
+        final String fieldLogBytesVarName = getFieldLogBytesVarName(context) + "_skip_" + (context.method_varIndex++);
         if (Parser.logCollector_parse != null) {
-            append(context.body, "final int {}={}.readerIndex();\n", fieldByteBufReaderIndexVarName, FieldBuilder.varNameByteBuf);
+            append(context.method_body, "final int {}={}.readerIndex();\n", fieldByteBufReaderIndexVarName, FieldBuilder.varNameByteBuf);
         }
-        ParseUtil.append(context.body, "{}.skipBytes({});\n", FieldBuilder.varNameByteBuf, lenValCode);
+        ParseUtil.append(context.method_body, "{}.skipBytes({});\n", FieldBuilder.varNameByteBuf, lenValCode);
         if (Parser.logCollector_parse != null) {
-            append(context.body, "final byte[] {}=new byte[{}.readerIndex()-{}];\n", fieldLogBytesVarName, FieldBuilder.varNameByteBuf, fieldByteBufReaderIndexVarName);
-            append(context.body, "{}.getBytes({},{});\n", FieldBuilder.varNameByteBuf, fieldByteBufReaderIndexVarName, fieldLogBytesVarName);
-            append(context.body, "{}.logCollector_parse.collect_field_skip({}.class,{}.class,\"{}\",{});\n",
+            append(context.method_body, "final byte[] {}=new byte[{}.readerIndex()-{}];\n", fieldLogBytesVarName, FieldBuilder.varNameByteBuf, fieldByteBufReaderIndexVarName);
+            append(context.method_body, "{}.getBytes({},{});\n", FieldBuilder.varNameByteBuf, fieldByteBufReaderIndexVarName, fieldLogBytesVarName);
+            append(context.method_body, "{}.logCollector_parse.collect_field_skip({}.class,{}.class,\"{}\",{});\n",
                     Parser.class.getName(),
                     context.clazz.getName(),
                     context.field.getDeclaringClass().getName(),
@@ -804,16 +804,16 @@ public class ParseUtil {
         } else {
             lenValCode = len + "";
         }
-        final String fieldByteBufWriterIndexVarName = getFieldByteBufWriterIndexVarName(context) + "_skip_" + (context.varIndex++);
-        final String fieldLogBytesVarName = getFieldLogBytesVarName(context) + "_skip_" + (context.varIndex++);
+        final String fieldByteBufWriterIndexVarName = getFieldByteBufWriterIndexVarName(context) + "_skip_" + (context.method_varIndex++);
+        final String fieldLogBytesVarName = getFieldLogBytesVarName(context) + "_skip_" + (context.method_varIndex++);
         if (Parser.logCollector_deParse != null) {
-            append(context.body, "final int {}={}.writerIndex();\n", fieldByteBufWriterIndexVarName, FieldBuilder.varNameByteBuf);
+            append(context.method_body, "final int {}={}.writerIndex();\n", fieldByteBufWriterIndexVarName, FieldBuilder.varNameByteBuf);
         }
-        ParseUtil.append(context.body, "{}.writeBytes(new byte[{}]);\n", FieldBuilder.varNameByteBuf, lenValCode);
+        ParseUtil.append(context.method_body, "{}.writeBytes(new byte[{}]);\n", FieldBuilder.varNameByteBuf, lenValCode);
         if (Parser.logCollector_deParse != null) {
-            append(context.body, "final byte[] {}=new byte[{}.writerIndex()-{}];\n", fieldLogBytesVarName, FieldBuilder.varNameByteBuf, fieldByteBufWriterIndexVarName);
-            append(context.body, "{}.getBytes({},{});\n", FieldBuilder.varNameByteBuf, fieldByteBufWriterIndexVarName, fieldLogBytesVarName);
-            append(context.body, "{}.logCollector_deParse.collect_field_skip({}.class,{}.class,\"{}\",{});\n",
+            append(context.method_body, "final byte[] {}=new byte[{}.writerIndex()-{}];\n", fieldLogBytesVarName, FieldBuilder.varNameByteBuf, fieldByteBufWriterIndexVarName);
+            append(context.method_body, "{}.getBytes({},{});\n", FieldBuilder.varNameByteBuf, fieldByteBufWriterIndexVarName, fieldLogBytesVarName);
+            append(context.method_body, "{}.logCollector_deParse.collect_field_skip({}.class,{}.class,\"{}\",{});\n",
                     Parser.class.getName(),
                     context.clazz.getName(),
                     context.field.getDeclaringClass().getName(),
@@ -823,12 +823,12 @@ public class ParseUtil {
     }
 
     public static void appendPutGlobalVar(BuilderContext context, char var, String val) {
-        append(context.body, "{}.putGlobalVar({},(int){});\n", FieldBuilder.varNameProcessContext, getGlobalVarIndex(var), val);
+        append(context.method_body, "{}.putGlobalVar({},(int){});\n", FieldBuilder.varNameProcessContext, getGlobalVarIndex(var), val);
     }
 
     public static void appendGetGlobalVar(BuilderContext context, char var) {
         String globalVarName = getGlobalVarName(var);
-        append(context.body, "final int {} = {}.getGlobalVar({});\n", globalVarName, FieldBuilder.varNameProcessContext, getGlobalVarIndex(var));
+        append(context.method_body, "final int {} = {}.getGlobalVar({});\n", globalVarName, FieldBuilder.varNameProcessContext, getGlobalVarIndex(var));
     }
 
     private static int getGlobalVarIndex(char var) {

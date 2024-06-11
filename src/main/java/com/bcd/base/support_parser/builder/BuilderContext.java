@@ -16,18 +16,6 @@ import java.util.Map;
 
 public class BuilderContext {
     /**
-     * 类变量定义体
-     */
-    public final StringBuilder classFieldDefineBody;
-    /**
-     * 构造方法体
-     */
-    public final StringBuilder constructBody;
-    /**
-     * parse方法体
-     */
-    public final StringBuilder body;
-    /**
      * 类
      */
     public final Class<?> clazz;
@@ -35,77 +23,106 @@ public class BuilderContext {
      * 生产的{@link Processor}子类
      */
     public final CtClass implCc;
-    /**
-     * 当前字段所属class中的变量名称对应字段名称
-     */
-    public final Map<Character, String> varToFieldName = new HashMap<>();
-    /**
-     * 类全局变量定义内容对应变量名称
-     * 避免重复定义类变量
-     */
-    public final Map<String, String> classVarDefineToVarName;
-    public final ByteOrder byteOrder;
-    public final BitOrder bitOrder;
+
     /**
      * 当前字段
      */
     public Field field;
+
     /**
-     * 用于给
-     * {@link Processor#process(ByteBuf, ProcessContext)}
-     * {@link Processor#deProcess(ByteBuf, ProcessContext, Object)}
-     * 的参数对象、对象复用、避免构造多个
+     * 当前字段所在所有字段中的索引
      */
-    public String processContextVarName;
+    public int fieldIndex;
+
+    /**
+     * 传递进来的字节序
+     */
+    public final ByteOrder byteOrder;
+    public final BitOrder bitOrder;
+
+    /**
+     * 类变量定义体
+     */
+    public final StringBuilder class_fieldDefineBody;
+    /**
+     * 构造方法体
+     */
+    public final StringBuilder class_constructBody;
+
+    /**
+     * 类全局变量定义内容对应变量名称
+     * 避免重复定义类变量
+     * 解析反解析共用
+     */
+    public final Map<String, String> class_varDefineToVarName;
 
     /**
      * 字段集合
      */
-    public final List<Field> fieldList;
-    /**
-     * 当前解析字段索引
-     */
-    public int fieldIndex;
-
+    public final List<Field> class_fieldList;
 
     /**
-     * 上下文缓存、用于不同的注解解析时候、多个字段需要共享某些信息、可以缓存在这里
+     * parse方法体
      */
-    public final Map<String, Object> cache = new HashMap<>();
+    public final StringBuilder method_body;
+
+    /**
+     * 解析/反解析 方法中
+     * 用于给
+     * {@link Processor#process(ByteBuf, ProcessContext)}
+     * {@link Processor#deProcess(ByteBuf, ProcessContext, Object)}
+     * 的参数对象、对象复用、避免构造多个
+     * 解析和反解析不共用
+     */
+    public String method_processContextVarName;
+
+    /**
+     * 解析/反解析 方法中使用的变量对应字段名
+     * 解析和反解析不共用
+     */
+    public final Map<Character, String> method_varToFieldName = new HashMap<>();
+
+    /**
+     *  构造 解析/反解析 方法所使用的缓存
+     *  解析和反解析不共用
+     *  解析或反解析期间所有字段共享缓存
+     */
+    public final Map<String, Object> method_cache = new HashMap<>();
 
     /**
      * 变量序号
-     * 为了保证在一个解析方法中、定义的临时变量不重复
+     * 为了保证在一个 解析/反解析 方法中、定义的临时变量不重复
+     * 解析和反解析不共用
      */
-    public int varIndex = 0;
+    public int method_varIndex = 0;
 
-    public BuilderContext(StringBuilder classFieldDefineBody,StringBuilder constructBody, StringBuilder body, Class<?> clazz,
-                          CtClass implCc, Map<String, String> classVarDefineToVarName, ByteOrder byteOrder, BitOrder bitOrder,
-                          List<Field> fieldList) {
-        this.classFieldDefineBody = classFieldDefineBody;
-        this.constructBody = constructBody;
-        this.body = body;
+    public BuilderContext(StringBuilder class_fieldDefineBody, StringBuilder class_constructBody, StringBuilder method_body, Class<?> clazz,
+                          CtClass implCc, Map<String, String> class_varDefineToVarName, ByteOrder byteOrder, BitOrder bitOrder,
+                          List<Field> class_fieldList) {
+        this.class_fieldDefineBody = class_fieldDefineBody;
+        this.class_constructBody = class_constructBody;
+        this.method_body = method_body;
         this.clazz = clazz;
         this.implCc = implCc;
-        this.classVarDefineToVarName = classVarDefineToVarName;
+        this.class_varDefineToVarName = class_varDefineToVarName;
         this.byteOrder = byteOrder;
         this.bitOrder = bitOrder;
-        this.fieldList = fieldList;
+        this.class_fieldList = class_fieldList;
     }
 
     public final String getProcessContextVarName() {
-        if (processContextVarName == null) {
-            processContextVarName = "processContext";
+        if (method_processContextVarName == null) {
+            method_processContextVarName = "processContext";
             final String processContextClassName = ProcessContext.class.getName();
-            ParseUtil.append(body, "final {} {}=new {}({},{});\n",
+            ParseUtil.append(method_body, "final {} {}=new {}({},{});\n",
                     processContextClassName,
-                    processContextVarName,
+                    method_processContextVarName,
                     processContextClassName,
                     FieldBuilder.varNameInstance,
                     FieldBuilder.varNameProcessContext
             );
         }
-        return processContextVarName;
+        return method_processContextVarName;
     }
 
     public final String getCustomizeProcessorVarName(Class<?> processorClass, String processorArgs) {
@@ -122,28 +139,28 @@ public class BuilderContext {
     }
 
     public final String getGlobalVarName(char c) {
-        return (String) cache.computeIfAbsent(ParseUtil.getGlobalVarName(c), k -> {
+        return (String) method_cache.computeIfAbsent(ParseUtil.getGlobalVarName(c), k -> {
             ParseUtil.appendGetGlobalVar(this, c);
             return k;
         });
     }
 
     public final String getBitBuf_parse() {
-        if (!cache.containsKey("hasBitBuf")) {
+        if (!method_cache.containsKey("hasBitBuf")) {
             final String bitBuf_reader_className = Parser.logCollector_parse == null ? BitBuf_reader.class.getName() : BitBuf_reader_log.class.getName();
             final String funcName = Parser.logCollector_parse == null ? "getBitBuf_reader" : "getBitBuf_reader_log";
-            ParseUtil.append(body, "final {} {}={}.{}();\n", bitBuf_reader_className, FieldBuilder.varNameBitBuf, FieldBuilder.varNameProcessContext, funcName);
-            cache.put("hasBitBuf", true);
+            ParseUtil.append(method_body, "final {} {}={}.{}();\n", bitBuf_reader_className, FieldBuilder.varNameBitBuf, FieldBuilder.varNameProcessContext, funcName);
+            method_cache.put("hasBitBuf", true);
         }
         return FieldBuilder.varNameBitBuf;
     }
 
     public final String getBitBuf_deParse() {
-        if (!cache.containsKey("hasBitBuf")) {
+        if (!method_cache.containsKey("hasBitBuf")) {
             final String bitBuf_writer_className = Parser.logCollector_parse == null ? BitBuf_writer.class.getName() : BitBuf_writer_log.class.getName();
             final String funcName = Parser.logCollector_parse == null ? "getBitBuf_writer" : "getBitBuf_writer_log";
-            ParseUtil.append(body, "final {} {}={}.{}();\n", bitBuf_writer_className, FieldBuilder.varNameBitBuf, FieldBuilder.varNameProcessContext, funcName);
-            cache.put("hasBitBuf", true);
+            ParseUtil.append(method_body, "final {} {}={}.{}();\n", bitBuf_writer_className, FieldBuilder.varNameBitBuf, FieldBuilder.varNameProcessContext, funcName);
+            method_cache.put("hasBitBuf", true);
         }
         return FieldBuilder.varNameBitBuf;
     }

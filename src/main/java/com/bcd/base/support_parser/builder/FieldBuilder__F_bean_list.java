@@ -11,7 +11,7 @@ import java.util.List;
 public class FieldBuilder__F_bean_list extends FieldBuilder {
     @Override
     public void buildParse(BuilderContext context) {
-        final StringBuilder body = context.body;
+        final StringBuilder body = context.method_body;
         final F_bean_list anno = context.field.getAnnotation(F_bean_list.class);
         final Field field = context.field;
         final Class<?> fieldType = field.getType();
@@ -57,7 +57,7 @@ public class FieldBuilder__F_bean_list extends FieldBuilder {
 
     @Override
     public void buildDeParse(BuilderContext context) {
-        final StringBuilder body = context.body;
+        final StringBuilder body = context.method_body;
         final String varNameField = ParseUtil.getFieldVarName(context);
         final Field field = context.field;
         final F_bean_list anno = context.field.getAnnotation(F_bean_list.class);

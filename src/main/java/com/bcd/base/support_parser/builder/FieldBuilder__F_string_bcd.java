@@ -13,7 +13,7 @@ import java.lang.reflect.Field;
 public class FieldBuilder__F_string_bcd extends FieldBuilder {
     @Override
     public void buildParse(BuilderContext context) {
-        final StringBuilder body = context.body;
+        final StringBuilder body = context.method_body;
         final Field field = context.field;
         final Class<?> fieldType = field.getType();
         final F_string_bcd anno = field.getAnnotation(F_string_bcd.class);
@@ -46,7 +46,7 @@ public class FieldBuilder__F_string_bcd extends FieldBuilder {
 
     @Override
     public void buildDeParse(BuilderContext context) {
-        final StringBuilder body = context.body;
+        final StringBuilder body = context.method_body;
         final Field field = context.field;
         final F_string_bcd anno = field.getAnnotation(F_string_bcd.class);
         final String fieldName = field.getName();

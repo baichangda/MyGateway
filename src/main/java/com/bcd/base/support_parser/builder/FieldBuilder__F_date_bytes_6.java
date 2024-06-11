@@ -12,7 +12,7 @@ import java.util.Date;
 public class FieldBuilder__F_date_bytes_6 extends FieldBuilder {
     @Override
     public void buildParse(BuilderContext context) {
-        final StringBuilder body = context.body;
+        final StringBuilder body = context.method_body;
         final F_date_bytes_6 anno = context.field.getAnnotation(F_date_bytes_6.class);
         final Field field = context.field;
         final String varNameInstance = FieldBuilder.varNameInstance;
@@ -60,7 +60,7 @@ public class FieldBuilder__F_date_bytes_6 extends FieldBuilder {
 
     @Override
     public void buildDeParse(BuilderContext context) {
-        final StringBuilder body = context.body;
+        final StringBuilder body = context.method_body;
         final F_date_bytes_6 anno = context.field.getAnnotation(F_date_bytes_6.class);
         final Field field = context.field;
         final Class<?> fieldTypeClass = field.getType();

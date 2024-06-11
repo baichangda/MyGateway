@@ -32,7 +32,7 @@ public class FieldBuilder__F_num extends FieldBuilder {
         }
 
         final F_num anno = field.getAnnotation(annoClass);
-        final StringBuilder body = context.body;
+        final StringBuilder body = context.method_body;
         final String varNameInstance = FieldBuilder.varNameInstance;
         final String varNameField = ParseUtil.getFieldVarName(context);
         final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.byteOrder);
@@ -125,7 +125,7 @@ public class FieldBuilder__F_num extends FieldBuilder {
         }
         final char var = anno.var();
         if (var != '0') {
-            context.varToFieldName.put(var, varNameField);
+            context.method_varToFieldName.put(var, varNameField);
         }
         final char globalVar = anno.globalVar();
         if (globalVar != '0') {
@@ -141,7 +141,7 @@ public class FieldBuilder__F_num extends FieldBuilder {
 
         final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.byteOrder);
         final String varNameInstance = FieldBuilder.varNameInstance;
-        final StringBuilder body = context.body;
+        final StringBuilder body = context.method_body;
         final String fieldName = field.getName();
         final String varNameField = ParseUtil.getFieldVarName(context);
         final Class<?> fieldType = field.getType();
@@ -161,7 +161,7 @@ public class FieldBuilder__F_num extends FieldBuilder {
         //判断是否用到变量中、如果用到了、需要定义变量
         if (var != '0') {
             ParseUtil.append(body, "final {} {}={};\n", fieldTypeName, varNameField, valCode);
-            context.varToFieldName.put(var, varNameField);
+            context.method_varToFieldName.put(var, varNameField);
             valCode = varNameField;
         }
 
