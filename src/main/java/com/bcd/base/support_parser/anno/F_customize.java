@@ -28,11 +28,11 @@ public @interface F_customize {
      * 处理类参数
      * 在new {@link #processorClass()}时候、会传入指定参数、以,分割
      * 空字符串、则不传入参数
-     * 参数类型支持java类型有、int、float、double、String
-     * 例如有3个参数
-     * int、float、double、String
+     * 参数类型支持java类型有、int、long、float、double、String
+     * 例如有5个参数
+     * int、long、float、double、String
      * 则值可以是
-     * "100,1.123F,100.123,\"test\""
+     * "100,1000L,1.123F,100.123,\"test\""
      */
     String processorArgs() default "";
 
