@@ -9,6 +9,7 @@ import java.lang.annotation.Target;
  * 适用于
  * 实体类字段
  * 接口类字段、必须定义{@link #implClassExpr()}属性、且子类配合使用{@link C_impl}标注
+ * 如果是接口类、则其子类必须定义到和接口同一包下、因为只会扫描此包下的实现类
  * <p>
  * 反解析中
  * 值不能为null

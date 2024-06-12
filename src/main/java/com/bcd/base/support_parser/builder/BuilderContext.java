@@ -83,9 +83,9 @@ public class BuilderContext {
     public final Map<Character, String> method_varToFieldName = new HashMap<>();
 
     /**
-     *  构造 解析/反解析 方法所使用的缓存
-     *  解析和反解析不共用
-     *  解析或反解析期间所有字段共享缓存
+     * 构造 解析/反解析 方法所使用的缓存
+     * 解析和反解析不共用
+     * 解析或反解析期间所有字段共享缓存
      */
     public final Map<String, Object> method_cache = new HashMap<>();
 
@@ -127,13 +127,14 @@ public class BuilderContext {
 
     public final String getCustomizeProcessorVarName(Class<?> processorClass, String processorArgs) {
         final String processorClassName = processorClass.getName();
-        return ParseUtil.defineClassVar(this, null, processorClass, "new {}({})", processorClassName, processorArgs);
+        return ParseUtil.defineClassVar(this, processorClass, "new {}({})", processorClassName, processorArgs);
     }
 
     public final String getProcessorVarName(Class<?> beanClazz) {
         return ParseUtil.defineClassVar(this, e -> {
                     Parser.getProcessor(beanClazz, byteOrder, bitOrder);
                 }, Processor.class,
+                Processor.class.getSimpleName() + "_" + beanClazz.getSimpleName(),
                 "{}.beanProcessorKey_processor.get(\"{}\")",
                 Parser.class.getName(), ParseUtil.getProcessorKey(beanClazz, byteOrder, bitOrder));
     }

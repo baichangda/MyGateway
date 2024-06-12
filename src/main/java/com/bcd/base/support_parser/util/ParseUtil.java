@@ -108,13 +108,13 @@ public class ParseUtil {
      * @return
      */
     public static String defineClassVar(final BuilderContext context, Class<?> varClass, final String valDefine, Object... params) {
-        return defineClassVar(context, null, varClass, valDefine, params);
+        return defineClassVar(context, null, varClass, varClass.getSimpleName(), valDefine, params);
     }
 
-    public static String defineClassVar(final BuilderContext context, Consumer<String> doAfterDefine, Class<?> varClass, final String valDefine, Object... params) {
+    public static String defineClassVar(final BuilderContext context, Consumer<String> doAfterDefine, Class<?> varClass, String varNameSuffix, final String valDefine, Object... params) {
         return context.class_varDefineToVarName.computeIfAbsent(format(valDefine, params), k -> {
             final int size = context.class_varDefineToVarName.size();
-            final String varName = "_" + size + "_" + varClass.getSimpleName();
+            final String varName = "_" + size + "_" + varNameSuffix;
             final CtClass ctClass = context.implCc;
             String define = "private final " + varClass.getName() + " " + varName + "=" + k + ";\n";
             context.class_fieldDefineBody.append(define);
@@ -130,6 +130,7 @@ public class ParseUtil {
             return varName;
         });
     }
+
 
     private static String getFieldByteBufReaderIndexVarName(final BuilderContext context) {
         final String fieldVarName = getFieldVarName(context);
@@ -153,10 +154,11 @@ public class ParseUtil {
      * 如下注解的字段不会记录日志
      * {@link F_bean}
      * {@link F_bean_list}
-     *
+     * <p>
      * 注意、如下注解的字段不受此规则约束、一定会记录日志
      * {@link F_bit_num}
      * {@link F_bit_num_array}
+     *
      * @param context
      * @return
      */
