@@ -9,10 +9,7 @@ import javassist.*;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class FieldBuilder__F_bean extends FieldBuilder {
 
@@ -39,7 +36,10 @@ public class FieldBuilder__F_bean extends FieldBuilder {
             String pkg = fieldTypeName.substring(0, fieldTypeName.lastIndexOf("."));
             List<Class<?>> implClassList = interfaceClassToImplClass.computeIfAbsent(fieldType, e1 -> {
                 try {
-                    return ClassUtil.getClassesByParentClass(e1, pkg).stream().filter(e2 -> e2.isAnnotationPresent(C_impl.class)).toList();
+                    return ClassUtil.getClassesByParentClass(e1, pkg).stream()
+                            .filter(e2 -> e2.isAnnotationPresent(C_impl.class))
+                            .sorted(Comparator.comparing(Class::getName))
+                            .toList();
                 } catch (IOException | ClassNotFoundException ex) {
                     throw MyException.get(ex);
                 }
@@ -131,7 +131,10 @@ public class FieldBuilder__F_bean extends FieldBuilder {
             String pkg = fieldTypeName.substring(0, fieldTypeName.lastIndexOf("."));
             List<Class<?>> implClassList = interfaceClassToImplClass.computeIfAbsent(fieldType, e1 -> {
                 try {
-                    return ClassUtil.getClassesByParentClass(e1, pkg).stream().filter(e2 -> e2.isAnnotationPresent(C_impl.class)).toList();
+                    return ClassUtil.getClassesByParentClass(e1, pkg).stream()
+                            .filter(e2 -> e2.isAnnotationPresent(C_impl.class))
+                            .sorted(Comparator.comparing(Class::getName))
+                            .toList();
                 } catch (IOException | ClassNotFoundException ex) {
                     throw MyException.get(ex);
                 }
