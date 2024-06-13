@@ -113,7 +113,9 @@ public class Parser {
              *
              * @param clazz
              * @param fieldName
-             * @param type 1、F_skip 2、F_bit_num 0、other
+             * @param type 1：F_skip
+             *             2、F_bit_num
+             *             0、other
              * @param args
              */
             @Override
