@@ -199,9 +199,9 @@ public class Parser {
             context.field = field;
             context.fieldIndex = i;
             boolean logBit = field.isAnnotationPresent(F_bit_num.class);
-            F_skip anno = field.getAnnotation(F_skip.class);
-            if (anno != null && (anno.lenBefore() != 0 || !anno.lenExprBefore().isEmpty())) {
-                ParseUtil.appendSkip_parse(anno.lenBefore(), anno.lenExprBefore(), context);
+            F_skip f_skip = field.getAnnotation(F_skip.class);
+            if (f_skip != null && (f_skip.lenBefore() != 0 || !f_skip.lenExprBefore().isEmpty())) {
+                ParseUtil.appendSkip_parse(f_skip.lenBefore(), f_skip.lenExprBefore(), context);
             }
             if (logCollector_parse != null) {
                 if (!logBit) {
@@ -224,8 +224,8 @@ public class Parser {
                     }
                 }
             }
-            if (anno != null && (anno.lenAfter() != 0 || !anno.lenExprAfter().isEmpty())) {
-                ParseUtil.appendSkip_parse(anno.lenAfter(), anno.lenExprAfter(), context);
+            if (f_skip != null && (f_skip.lenAfter() != 0 || !f_skip.lenExprAfter().isEmpty())) {
+                ParseUtil.appendSkip_parse(f_skip.lenAfter(), f_skip.lenExprAfter(), context);
             }
         }
 
@@ -244,9 +244,9 @@ public class Parser {
             context.field = field;
             context.fieldIndex = i;
             boolean logBit = field.isAnnotationPresent(F_bit_num.class);
-            F_skip anno = field.getAnnotation(F_skip.class);
-            if (anno != null && (anno.lenBefore() != 0 || !anno.lenExprBefore().isEmpty())) {
-                ParseUtil.appendSkip_deParse(anno.lenBefore(), anno.lenExprBefore(), context);
+            F_skip f_skip = field.getAnnotation(F_skip.class);
+            if (f_skip != null && (f_skip.lenBefore() != 0 || !f_skip.lenExprBefore().isEmpty())) {
+                ParseUtil.appendSkip_deParse(f_skip.lenBefore(), f_skip.lenExprBefore(), context);
             }
             if (logCollector_deParse != null) {
                 if (!logBit) {
@@ -269,8 +269,8 @@ public class Parser {
                     }
                 }
             }
-            if (anno != null && (anno.lenAfter() != 0 || !anno.lenExprAfter().isEmpty())) {
-                ParseUtil.appendSkip_deParse(anno.lenAfter(), anno.lenExprAfter(), context);
+            if (f_skip != null && (f_skip.lenAfter() != 0 || !f_skip.lenExprAfter().isEmpty())) {
+                ParseUtil.appendSkip_deParse(f_skip.lenAfter(), f_skip.lenExprAfter(), context);
             }
         }
     }
