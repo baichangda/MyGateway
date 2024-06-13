@@ -97,12 +97,12 @@ public @interface F_bit_num_array {
     /**
      * 在解析之前跳过多少bit
      */
-    int skipAfter() default 0;
+    int skipBefore() default 0;
 
     /**
      * 在解析之后跳过多少bit
      */
-    int skipBefore() default 0;
+    int skipAfter() default 0;
 
     /**
      * 每个数组元素结果小数精度、会四舍五入
