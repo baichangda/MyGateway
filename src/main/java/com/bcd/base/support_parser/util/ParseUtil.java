@@ -144,9 +144,9 @@ public class ParseUtil {
      * {@link F_bean}
      * {@link F_bean_list}
      * <p>
-     * 注意
-     * {@link F_bit_num} 会记录日志
-     * {@link F_bit_num_array} 不会记录日志
+     * 注意bit注解字段会记录日志
+     * {@link F_bit_num}
+     * {@link F_bit_num_array}
      *
      * @param context
      * @return
