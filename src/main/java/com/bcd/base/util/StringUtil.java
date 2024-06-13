@@ -117,7 +117,7 @@ public class StringUtil {
      * 将信息转换为格式化
      * 使用方式和sl4j log一样、例如
      * {@link org.slf4j.Logger#info(String, Object...)}
-     *
+     * 如果需要转义、则\\{}
      * @param message
      * @param params
      * @return
