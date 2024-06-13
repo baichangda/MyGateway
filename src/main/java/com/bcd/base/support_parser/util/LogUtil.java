@@ -1,6 +1,8 @@
 package com.bcd.base.support_parser.util;
 
 import com.bcd.base.exception.MyException;
+import com.bcd.base.support_parser.impl.immotors.Evt;
+import com.bcd.base.support_parser.impl.immotors.Evt_0001;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -37,9 +39,13 @@ public class LogUtil {
                                 break;
                             }
                             line = line.trim();
-                            for (String endFieldStr : endFieldStrSet) {
-                                if (line.endsWith(endFieldStr)) {
-                                    resMap.put(endFieldStr.substring(1, endFieldStr.length() - 1), no);
+                            if (line.startsWith("public class")) {
+                                resMap.putIfAbsent("class", no);
+                            } else {
+                                for (String endFieldStr : endFieldStrSet) {
+                                    if (line.endsWith(endFieldStr)) {
+                                        resMap.put(endFieldStr.substring(1, endFieldStr.length() - 1), no);
+                                    }
                                 }
                             }
                             no++;
@@ -54,12 +60,18 @@ public class LogUtil {
                 fieldName_lineNo = temp;
             }
         }
-
+        if (fieldName == null) {
+            fieldName = "class";
+        }
         final Integer lineNo = fieldName_lineNo.get(fieldName);
         if (lineNo == null) {
             return "";
         } else {
             return "(" + topClass.getSimpleName() + ".java:" + lineNo + ")";
         }
+    }
+
+    public static void main(String[] args) {
+        System.out.println("." + getFieldStackTrace(Evt_0001.class, null));
     }
 }

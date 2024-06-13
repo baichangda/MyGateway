@@ -102,7 +102,7 @@ public class Parser {
             public void collect_class(Class<?> clazz, int type, Object... args) {
                 switch (type) {
                     case 1 -> {
-                        logger.info("--parse class[{}] {}", clazz.getName(), args[0]);
+                        logger.info("--parse class{} {}", LogUtil.getFieldStackTrace(clazz,null), args[0]);
                     }
                     default -> {
                     }
@@ -216,7 +216,7 @@ public class Parser {
             public void collect_class(Class<?> clazz, int type, Object... args) {
                 switch (type) {
                     case 1 -> {
-                        logger.info("--deParse class[{}] {}", clazz.getName(), args[0]);
+                        logger.info("--deParse class{} {}", LogUtil.getFieldStackTrace(clazz,null), args[0]);
                     }
                     default -> {
                     }

@@ -3,7 +3,7 @@ package com.bcd.base.support_parser.anno;
 import java.lang.annotation.*;
 
 /**
- * 适用于任何类
+ * 适用于任何类、会被子类继承
  * 用于标定类中所有解析字段应该占用的字节
  * 如果解析未达到指定长度、则skip
  * 反解析未达到指定长度、则write byte 0
