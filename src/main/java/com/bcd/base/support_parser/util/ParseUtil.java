@@ -152,8 +152,9 @@ public class ParseUtil {
      * @return
      */
     public static boolean needLog(final BuilderContext context) {
-        Field field = context.field;
-        return !field.isAnnotationPresent(F_bean.class) && !field.isAnnotationPresent(F_bean_list.class);
+//        Field field = context.field;
+//        return !field.isAnnotationPresent(F_bean.class) && !field.isAnnotationPresent(F_bean_list.class);
+        return true;
     }
 
     public static boolean needBitBuf(List<Field> fieldList) {
