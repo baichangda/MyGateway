@@ -102,7 +102,7 @@ public class Parser {
             public void collect_class(Class<?> clazz, int type, Object... args) {
                 switch (type) {
                     case 1 -> {
-                        logger.info("--parse class{} {}", LogUtil.getFieldStackTrace(clazz,null), args[0]);
+                        logger.info("--parse class{} {}", LogUtil.getFieldStackTrace(clazz, null), args[0]);
                     }
                     default -> {
                     }
@@ -216,7 +216,7 @@ public class Parser {
             public void collect_class(Class<?> clazz, int type, Object... args) {
                 switch (type) {
                     case 1 -> {
-                        logger.info("--deParse class{} {}", LogUtil.getFieldStackTrace(clazz,null), args[0]);
+                        logger.info("--deParse class{} {}", LogUtil.getFieldStackTrace(clazz, null), args[0]);
                     }
                     default -> {
                     }
@@ -245,7 +245,7 @@ public class Parser {
             Field field = fieldList.get(i);
             context.field = field;
             context.fieldIndex = i;
-            boolean logBit = field.isAnnotationPresent(F_bit_num.class);
+            boolean logBit = field.isAnnotationPresent(F_bit_num.class) || field.isAnnotationPresent(F_bit_num_array.class);
             F_skip f_skip = field.getAnnotation(F_skip.class);
             if (f_skip != null && (f_skip.lenBefore() != 0 || !f_skip.lenExprBefore().isEmpty())) {
                 ParseUtil.appendSkip_parse(f_skip.lenBefore(), f_skip.lenExprBefore(), context);
