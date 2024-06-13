@@ -386,10 +386,6 @@ public class ParseUtil {
         sb.append(format(message, params));
     }
 
-    public static void insert(final StringBuilder sb, int index, final String message, Object... params) {
-        sb.insert(index, format(message, params));
-    }
-
     public static long round(double d) {
         if (d > 0d) {
             return Math.round(d);
