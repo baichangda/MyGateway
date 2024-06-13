@@ -102,7 +102,7 @@ public class Parser {
             public void collect_class(Class<?> clazz, int type, Object... args) {
                 switch (type) {
                     case 1 -> {
-                        logger.info("--parse class{} {}", LogUtil.getFieldStackTrace(clazz, null), args[0]);
+                        logger.info("--parse skip class{} {}", LogUtil.getFieldStackTrace(clazz, null), args[0]);
                     }
                     default -> {
                     }
@@ -126,7 +126,7 @@ public class Parser {
                     switch (type) {
                         case 1 -> {
                             byte[] content = (byte[]) args[0];
-                            logger.info("--parse field{}--[{}].[{}] skip len[{}] hex[{}]"
+                            logger.info("--parse skip field{}--[{}].[{}] skip len[{}] hex[{}]"
                                     , LogUtil.getFieldStackTrace(fieldDeclaringClass, fieldName)
                                     , clazz.getSimpleName()
                                     , fieldName
@@ -138,7 +138,7 @@ public class Parser {
                             BitBuf_reader_log.Log[] logs = (BitBuf_reader_log.Log[]) args[0];
                             Object val = args[1];
                             for (BitBuf_reader_log.Log log : logs) {
-                                logger.info("--parse field{}--[{}].[{}] val[{}] {}"
+                                logger.info("--parse bit field{}--[{}].[{}] val[{}] {}"
                                         , LogUtil.getFieldStackTrace(fieldDeclaringClass, fieldName)
                                         , clazz.getSimpleName()
                                         , fieldName
@@ -170,6 +170,16 @@ public class Parser {
         logCollector_deParse = new LogCollector_deParse() {
 
             @Override
+            public void collect_class(Class<?> clazz, int type, Object... args) {
+                switch (type) {
+                    case 1 -> {
+                        logger.info("--deParse skip class{} {}", LogUtil.getFieldStackTrace(clazz, null), args[0]);
+                    }
+                    default -> {
+                    }
+                }
+            }
+            @Override
             public void collect_field(Class<?> clazz, String fieldName, int type, Object... args) {
                 try {
                     Field field = clazz.getField(fieldName);
@@ -177,7 +187,7 @@ public class Parser {
                     switch (type) {
                         case 1 -> {
                             byte[] content = (byte[]) args[0];
-                            logger.info("--deParse field{}--[{}].[{}] append len[{}] [{}]"
+                            logger.info("--deParse skip field{}--[{}].[{}] append len[{}] [{}]"
                                     , LogUtil.getFieldStackTrace(fieldDeclaringClass, fieldName)
                                     , clazz.getSimpleName()
                                     , fieldName
@@ -188,7 +198,7 @@ public class Parser {
                             Object val = args[0];
                             BitBuf_writer_log.Log[] logs = (BitBuf_writer_log.Log[]) args[1];
                             for (BitBuf_writer_log.Log log : logs) {
-                                logger.info("--deParse field{}--[{}].[{}] val[{}] {}"
+                                logger.info("--deParse bit field{}--[{}].[{}] val[{}] {}"
                                         , LogUtil.getFieldStackTrace(fieldDeclaringClass, fieldName)
                                         , clazz.getSimpleName()
                                         , fieldName
@@ -212,16 +222,6 @@ public class Parser {
                 }
             }
 
-            @Override
-            public void collect_class(Class<?> clazz, int type, Object... args) {
-                switch (type) {
-                    case 1 -> {
-                        logger.info("--deParse class{} {}", LogUtil.getFieldStackTrace(clazz, null), args[0]);
-                    }
-                    default -> {
-                    }
-                }
-            }
         };
     }
 
