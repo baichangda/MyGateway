@@ -65,6 +65,6 @@ public class BcdUtil {
         }
         System.out.println(bytesToString_8421(new byte[]{(byte) 133, (byte) 153}));
         System.out.println(bytesToString_8421(new byte[]{(byte) 66, (byte) 87}));
-        System.out.println(bytesToString_8421(new byte[]{(byte) 71, (byte) 99}));
+        System.out.println(bytesToString_8421(new byte[]{(byte) 0x12, (byte) 99}));
     }
 }
