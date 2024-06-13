@@ -28,15 +28,9 @@ import java.util.stream.Collectors;
 
 public class ParseUtil {
     static Logger logger = LoggerFactory.getLogger(ParseUtil.class);
-    /**
-     * 生成类的序号
-     */
-    private static int processorIndex = 0;
 
-    private final static Set<Class<?>> logFieldTypeSet = Sets.newHashSet(
-            byte.class, short.class, int.class, long.class, float.class, double.class,
-            byte[].class, short[].class, int[].class, long[].class, float[].class, double[].class,
-            String.class, Date.class, Instant.class, LocalDateTime.class, OffsetDateTime.class, ZonedDateTime.class);
+
+
 
     static final double[] pows;
 
@@ -147,7 +141,6 @@ public class ParseUtil {
         return fieldVarName + "_log_bytes";
     }
 
-
     /**
      * 当日志开启情况下
      * 判断字段是否应该记录日志
@@ -165,16 +158,6 @@ public class ParseUtil {
     public static boolean needLog(final BuilderContext context) {
         Field field = context.field;
         return !field.isAnnotationPresent(F_bean.class) && !field.isAnnotationPresent(F_bean_list.class);
-//        final Class<?> fieldType = context.field.getType();
-//        if (logFieldTypeSet.contains(fieldType)) {
-//            return true;
-//        } else {
-//            if (fieldType.isEnum()) {
-//                return true;
-//            } else {
-//                return context.field.isAnnotationPresent(F_customize.class);
-//            }
-//        }
     }
 
     public static boolean needBitBuf(List<Field> fieldList) {
@@ -485,6 +468,11 @@ public class ParseUtil {
         return clazz.getName() + getProcessorSuffix(byteOrder, bitOrder);
     }
 
+
+    /**
+     * 生成类的序号
+     */
+    private static int processorIndex = 0;
     public static String getProcessorClassName(Class<?> clazz, ByteOrder byteOrder, BitOrder bitOrder) {
         String clazzName = Processor.class.getName();
         return clazzName.substring(0, clazzName.lastIndexOf("."))
