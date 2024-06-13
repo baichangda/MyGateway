@@ -1,7 +1,5 @@
 package com.bcd.base.support_parser.anno;
 
-import com.bcd.base.support_parser.impl.gb32960.data.PacketFlag;
-import com.bcd.base.support_parser.impl.gb32960.data.VehicleLoginData;
 import com.bcd.base.support_parser.processor.Processor;
 
 import java.lang.annotation.*;
