@@ -1,7 +1,7 @@
 package com.bcd.base.util;
 
 
-import com.bcd.base.exception.BusinessException;
+import com.bcd.base.exception.BaseException;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -76,7 +76,7 @@ public class ClassUtil {
             annoNameToClassListMap.put(annoClass.getName(), classList);
             return annoNameToClassListMap;
         } catch (IOException | ClassNotFoundException e) {
-            throw BusinessException.get(e);
+            throw BaseException.get(e);
         }
     }
 

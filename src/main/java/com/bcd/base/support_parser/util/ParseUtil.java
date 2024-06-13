@@ -1,7 +1,7 @@
 package com.bcd.base.support_parser.util;
 
 
-import com.bcd.base.exception.BusinessException;
+import com.bcd.base.exception.BaseException;
 import com.bcd.base.support_parser.Parser;
 import com.bcd.base.support_parser.anno.*;
 import com.bcd.base.support_parser.builder.BuilderContext;
@@ -38,15 +38,15 @@ public class ParseUtil {
     }
 
     public static void notSupport_numType(Class<?> clazz, Field field, Class<?> annoClass) {
-        throw BusinessException.get("class[{}] field[{}] anno[{}] numType not support", clazz.getName(), field.getName(), annoClass.getName());
+        throw BaseException.get("class[{}] field[{}] anno[{}] numType not support", clazz.getName(), field.getName(), annoClass.getName());
     }
 
     public static void notSupport_type(Class<?> clazz, Field field, Class<?> annoClass) {
-        throw BusinessException.get("class[{}] field[{}] anno[{}] type not support", clazz.getName(), field.getName(), annoClass.getName());
+        throw BaseException.get("class[{}] field[{}] anno[{}] type not support", clazz.getName(), field.getName(), annoClass.getName());
     }
 
     public static void notSupport_fieldType(Class<?> clazz, Field field, Class<?> annoClass) {
-        throw BusinessException.get("class[{}] field[{}] anno[{}] not support", clazz.getName(), field.getName(), annoClass.getName());
+        throw BaseException.get("class[{}] field[{}] anno[{}] not support", clazz.getName(), field.getName(), annoClass.getName());
     }
 
     public static boolean bigEndian(BitOrder order, BitOrder parentOrder) {
@@ -112,7 +112,7 @@ public class ParseUtil {
                 final CtField ctField = CtField.make(define, ctClass);
                 ctClass.addField(ctField);
             } catch (CannotCompileException e) {
-                throw BusinessException.get(e);
+                throw BaseException.get(e);
             }
             if (doAfterDefine != null) {
                 doAfterDefine.accept(varName);
@@ -338,7 +338,7 @@ public class ParseUtil {
             if (c != '+' && c != '-' && c != '*' && c != '/' && c != '(' && c != ')' && !Character.isDigit(c)) {
                 final String s = map.get(c);
                 if (s == null) {
-                    throw BusinessException.get("class[{}] field[{}] expr[{}] can't find char[{}] value", field.getDeclaringClass().getName(), field.getName(), lenExpr, c);
+                    throw BaseException.get("class[{}] field[{}] expr[{}] can't find char[{}] value", field.getDeclaringClass().getName(), field.getName(), lenExpr, c);
                 }
                 //所有的len字段必须转化为int运算
                 sb.append("(int)(").append(s).append(")");
@@ -359,7 +359,7 @@ public class ParseUtil {
             if (c != '+' && c != '-' && c != '*' && c != '/' && c != '(' && c != ')' && !Character.isDigit(c)) {
                 final String s = map.get(c);
                 if (s == null) {
-                    throw BusinessException.get("class[{}] c_skip lenExpr[{}] can't find char[{}] value", clazz.getName(), lenExpr, c);
+                    throw BaseException.get("class[{}] c_skip lenExpr[{}] can't find char[{}] value", clazz.getName(), lenExpr, c);
                 }
                 //所有的len字段必须转化为int运算
                 sb.append("(int)(").append(s).append(")");
@@ -482,7 +482,7 @@ public class ParseUtil {
                 }
             }
         } catch (Exception e) {
-            throw BusinessException.get(e);
+            throw BaseException.get(e);
         }
 
         StringJoiner sj = new StringJoiner("\n");

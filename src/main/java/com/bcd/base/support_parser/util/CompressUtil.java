@@ -1,6 +1,6 @@
 package com.bcd.base.support_parser.util;
 
-import com.bcd.base.exception.BusinessException;
+import com.bcd.base.exception.BaseException;
 
 import java.io.*;
 import java.util.zip.GZIPInputStream;
@@ -23,7 +23,7 @@ public class CompressUtil {
             gos.finish();
             return os.toByteArray();
         } catch (IOException e) {
-            throw BusinessException.get(e);
+            throw BaseException.get(e);
         }
     }
 
@@ -41,7 +41,7 @@ public class CompressUtil {
             unGzip(bis, os, batchSize);
             res = os.toByteArray();
         } catch (IOException e) {
-            throw BusinessException.get(e);
+            throw BaseException.get(e);
         }
         return res;
     }
@@ -60,7 +60,7 @@ public class CompressUtil {
                 os.write(bytes, 0, count);
             }
         } catch (IOException e) {
-            throw BusinessException.get(e);
+            throw BaseException.get(e);
         }
     }
 }

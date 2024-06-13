@@ -1,6 +1,6 @@
 package com.bcd.base.support_parser.builder;
 
-import com.bcd.base.exception.BusinessException;
+import com.bcd.base.exception.BaseException;
 import com.bcd.base.support_parser.anno.F_num_array;
 import com.bcd.base.support_parser.anno.NumType;
 import com.bcd.base.support_parser.util.ParseUtil;
@@ -36,7 +36,7 @@ public class FieldBuilder__F_num_array extends FieldBuilder {
         final String arrLenRes;
         if (anno.len() == 0) {
             if (anno.lenExpr().isEmpty()) {
-                throw BusinessException.get("class[{}] field[{}] anno[] must have len or lenExpr", field.getDeclaringClass().getName(), field.getName(), F_num_array.class.getName());
+                throw BaseException.get("class[{}] field[{}] anno[] must have len or lenExpr", field.getDeclaringClass().getName(), field.getName(), F_num_array.class.getName());
             } else {
                 arrLenRes = ParseUtil.replaceExprToCode(anno.lenExpr(), context);
             }

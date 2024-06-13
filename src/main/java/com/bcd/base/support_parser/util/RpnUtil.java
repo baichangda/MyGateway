@@ -1,7 +1,7 @@
 package com.bcd.base.support_parser.util;
 
 
-import com.bcd.base.exception.BusinessException;
+import com.bcd.base.exception.BaseException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -296,7 +296,7 @@ public class RpnUtil {
                     default: {
                         final Double d = dataMap.get(ele.s);
                         if (d == null) {
-                            throw BusinessException.get("var[{}] not exist", ele.s);
+                            throw BaseException.get("var[{}] not exist", ele.s);
                         }
                         stack[++stackIndex] = d;
                     }
@@ -473,7 +473,7 @@ public class RpnUtil {
                 return 3;
             }
             default: {
-                throw BusinessException.get("symbol[" + c + "] not support");
+                throw BaseException.get("symbol[" + c + "] not support");
             }
         }
     }
