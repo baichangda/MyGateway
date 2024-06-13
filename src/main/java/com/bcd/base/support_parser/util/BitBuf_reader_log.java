@@ -147,14 +147,16 @@ public final class BitBuf_reader_log extends BitBuf_reader {
     public void finish() {
         final FinishLog log;
         if (bitOffset == 0) {
-            log = new FinishLog();
+            log = null;
         } else {
             log = new FinishLog(1, bitOffset, 8 - bitOffset);
             log.bytes[0] = b;
         }
         b = 0;
         bitOffset = 0;
-        logs.add(log);
+        if (log != null) {
+            logs.add(log);
+        }
     }
 
     public Log[] takeLogs() {

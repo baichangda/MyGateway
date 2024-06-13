@@ -136,7 +136,7 @@ public final class BitBuf_writer_log extends BitBuf_writer {
     public void finish() {
         final FinishLog log;
         if (bitOffset == 0) {
-            log = new FinishLog();
+            log = null;
         } else {
             byteBuf.writeByte(b);
             log = new FinishLog(1, bitOffset, 8 - bitOffset);
@@ -144,7 +144,9 @@ public final class BitBuf_writer_log extends BitBuf_writer {
         }
         b = 0;
         bitOffset = 0;
-        logs.add(log);
+        if (log != null) {
+            logs.add(log);
+        }
     }
 
     public Log[] takeLogs() {
