@@ -12,11 +12,9 @@ import java.lang.annotation.Target;
  * 用在字段上面只是为了占位、解析不会对字段进行赋值、反解析也不会使用字段值
  *
  * 注意:
- * 如果和{@link F_bit_num}、{@link F_bit_num_array}一起配合使用、需要保证skip之前的bit位已经finish、否则会导致解析出错
- * 因为{@link F_skip}会导致
- * {@link com.bcd.base.support_parser.util.BitBuf_reader}
- * {@link com.bcd.base.support_parser.util.BitBuf_writer}
- * 中的byteBuf变化、但是不会改变b、bitOffset、这样会导致后续解析出错
+ * 如果和{@link F_bit_num}、{@link F_bit_num_array}一起配合使用、需要保证skip之前的bit解析不存在多余的bit
+ * 即{@link #lenBefore()}、{@link #lenExprBefore()}要保证上一个字段解析结束时、没有多余bit
+ * 即{@link #lenAfter()}、{@link #lenExprAfter()}要保证本字段解析结束时、没有多余bit
  */
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)

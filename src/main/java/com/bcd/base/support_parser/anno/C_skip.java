@@ -9,6 +9,9 @@ import java.lang.annotation.*;
  * 反解析未达到指定长度、则write byte 0
  *
  * 其实现有两种情况、取决于是否能统计出类的所有字段总字节长度、即{@link com.bcd.base.support_parser.util.ParseUtil#getClassByteLenIfPossible(Class)}
+ *
+ * 注意:
+ * 如果类最后一个字段是{@link F_bit_num}、{@link F_bit_num_array}、需要保证skip之前的bit解析不存在多余的bit
  */
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)

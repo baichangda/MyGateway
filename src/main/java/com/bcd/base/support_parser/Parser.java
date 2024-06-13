@@ -245,13 +245,13 @@ public class Parser {
             Field field = fieldList.get(i);
             context.field = field;
             context.fieldIndex = i;
-            boolean logBit = field.isAnnotationPresent(F_bit_num.class) || field.isAnnotationPresent(F_bit_num_array.class);
+            boolean bitField = field.isAnnotationPresent(F_bit_num.class) || field.isAnnotationPresent(F_bit_num_array.class);
             F_skip f_skip = field.getAnnotation(F_skip.class);
             if (f_skip != null && (f_skip.lenBefore() != 0 || !f_skip.lenExprBefore().isEmpty())) {
                 ParseUtil.appendSkip_parse(f_skip.lenBefore(), f_skip.lenExprBefore(), context);
             }
             if (logCollector_parse != null) {
-                if (!logBit) {
+                if (!bitField) {
                     ParseUtil.prependLogCode_parse(context);
                 }
             }
@@ -264,7 +264,7 @@ public class Parser {
                 }
             } finally {
                 if (logCollector_parse != null) {
-                    if (logBit) {
+                    if (bitField) {
                         ParseUtil.appendBitLogCode_parse(context);
                     } else {
                         ParseUtil.appendLogCode_parse(context);
