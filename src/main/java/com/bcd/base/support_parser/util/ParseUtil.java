@@ -7,7 +7,6 @@ import com.bcd.base.support_parser.anno.*;
 import com.bcd.base.support_parser.builder.BuilderContext;
 import com.bcd.base.support_parser.builder.FieldBuilder;
 import com.bcd.base.support_parser.processor.Processor;
-import com.google.common.collect.Sets;
 import javassist.CannotCompileException;
 import javassist.CtClass;
 import javassist.CtField;
@@ -18,18 +17,15 @@ import org.slf4j.helpers.MessageFormatter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.StringJoiner;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class ParseUtil {
     static Logger logger = LoggerFactory.getLogger(ParseUtil.class);
-
-
 
 
     static final double[] pows;
@@ -148,9 +144,9 @@ public class ParseUtil {
      * {@link F_bean}
      * {@link F_bean_list}
      * <p>
-     * 注意、如下注解的字段不受此规则约束、一定会记录日志
-     * {@link F_bit_num}
-     * {@link F_bit_num_array}
+     * 注意
+     * {@link F_bit_num} 会记录日志
+     * {@link F_bit_num_array} 不会记录日志
      *
      * @param context
      * @return
@@ -182,16 +178,13 @@ public class ParseUtil {
         final String varNameBitBuf = context.getBitBuf_parse();
         if (varNameBitBuf != null) {
             final Class<?> clazz = context.clazz;
-            final Class<?> declaringClass = context.field.getDeclaringClass();
             final String fieldName = context.field.getName();
-            append(context.method_body, "{}.logCollector_parse.collect_field_bit({}.class,{}.class,\"{}\",{}.takeLogs(),{},\"{}\");\n",
+            append(context.method_body, "{}.logCollector_parse.collect_field({}.class,\"{}\",2,new Object[]{{}.takeLogs(),{}});\n",
                     Parser.class.getName()
                     , clazz.getName()
-                    , declaringClass.getName()
                     , fieldName
                     , varNameBitBuf
-                    , boxing(FieldBuilder.varNameInstance + "." + context.field.getName(), context.field.getType())
-                    , context.implCc.getSimpleName());
+                    , boxing(FieldBuilder.varNameInstance + "." + context.field.getName(), context.field.getType()));
         }
     }
 
@@ -199,16 +192,13 @@ public class ParseUtil {
         final String varNameBitBuf = context.getBitBuf_deParse();
         if (varNameBitBuf != null) {
             final Class<?> clazz = context.clazz;
-            final Class<?> declaringClass = context.field.getDeclaringClass();
             final String fieldName = context.field.getName();
-            append(context.method_body, "{}.logCollector_deParse.collect_field_bit({}.class,{}.class,\"{}\",{},{}.takeLogs(),\"{}\");\n",
+            append(context.method_body, "{}.logCollector_deParse.collect_field({}.class,\"{}\",2,new Object[]{{},{}.takeLogs()});\n",
                     Parser.class.getName()
                     , clazz.getName()
-                    , declaringClass.getName()
                     , fieldName
                     , boxing(FieldBuilder.varNameInstance + "." + context.field.getName(), context.field.getType())
-                    , varNameBitBuf
-                    , context.implCc.getSimpleName());
+                    , varNameBitBuf);
         }
     }
 
@@ -228,14 +218,12 @@ public class ParseUtil {
         final String fieldLogBytesVarName = getFieldLogBytesVarName(context);
         append(context.method_body, "final byte[] {}=new byte[{}.readerIndex()-{}];\n", fieldLogBytesVarName, FieldBuilder.varNameByteBuf, fieldByteBufReaderIndexVarName);
         append(context.method_body, "{}.getBytes({},{});\n", FieldBuilder.varNameByteBuf, fieldByteBufReaderIndexVarName, fieldLogBytesVarName);
-        append(context.method_body, "{}.logCollector_parse.collect_field({}.class,{}.class,\"{}\",{},{},\"{}\");\n",
+        append(context.method_body, "{}.logCollector_parse.collect_field({}.class,\"{}\",0,new Object[]{{},{}});\n",
                 Parser.class.getName(),
                 context.clazz.getName(),
-                context.field.getDeclaringClass().getName(),
                 context.field.getName(),
                 fieldLogBytesVarName,
-                boxing(FieldBuilder.varNameInstance + "." + context.field.getName(), context.field.getType()),
-                context.implCc.getSimpleName());
+                boxing(FieldBuilder.varNameInstance + "." + context.field.getName(), context.field.getType()));
     }
 
     public static void prependLogCode_deParse(final BuilderContext context) {
@@ -255,14 +243,12 @@ public class ParseUtil {
         final String fieldLogBytesVarName = getFieldLogBytesVarName(context);
         append(context.method_body, "final byte[] {}=new byte[{}.writerIndex()-{}];\n", fieldLogBytesVarName, FieldBuilder.varNameByteBuf, fieldByteBufWriterIndexVarName);
         append(context.method_body, "{}.getBytes({},{});\n", FieldBuilder.varNameByteBuf, fieldByteBufWriterIndexVarName, fieldLogBytesVarName);
-        append(context.method_body, "{}.logCollector_deParse.collect_field({}.class,{}.class,\"{}\",{},{},\"{}\");\n",
+        append(context.method_body, "{}.logCollector_deParse.collect_field({}.class,\"{}\",0,new Object[]{{},{}});\n",
                 Parser.class.getName(),
                 context.clazz.getName(),
-                context.field.getDeclaringClass().getName(),
                 context.field.getName(),
                 boxing(FieldBuilder.varNameInstance + "." + context.field.getName(), context.field.getType()),
-                fieldLogBytesVarName,
-                context.implCc.getSimpleName());
+                fieldLogBytesVarName);
     }
 
     public static String getFieldVarName(final BuilderContext context) {
@@ -473,6 +459,7 @@ public class ParseUtil {
      * 生成类的序号
      */
     private static int processorIndex = 0;
+
     public static String getProcessorClassName(Class<?> clazz, ByteOrder byteOrder, BitOrder bitOrder) {
         String clazzName = Processor.class.getName();
         return clazzName.substring(0, clazzName.lastIndexOf("."))
@@ -778,10 +765,9 @@ public class ParseUtil {
         if (Parser.logCollector_parse != null) {
             append(context.method_body, "final byte[] {}=new byte[{}.readerIndex()-{}];\n", fieldLogBytesVarName, FieldBuilder.varNameByteBuf, fieldByteBufReaderIndexVarName);
             append(context.method_body, "{}.getBytes({},{});\n", FieldBuilder.varNameByteBuf, fieldByteBufReaderIndexVarName, fieldLogBytesVarName);
-            append(context.method_body, "{}.logCollector_parse.collect_field_skip({}.class,{}.class,\"{}\",{});\n",
+            append(context.method_body, "{}.logCollector_parse.collect_field({}.class,\"{}\",1,new Object[]{{}});\n",
                     Parser.class.getName(),
                     context.clazz.getName(),
-                    context.field.getDeclaringClass().getName(),
                     context.field.getName(),
                     fieldLogBytesVarName);
         }
@@ -803,10 +789,9 @@ public class ParseUtil {
         if (Parser.logCollector_deParse != null) {
             append(context.method_body, "final byte[] {}=new byte[{}.writerIndex()-{}];\n", fieldLogBytesVarName, FieldBuilder.varNameByteBuf, fieldByteBufWriterIndexVarName);
             append(context.method_body, "{}.getBytes({},{});\n", FieldBuilder.varNameByteBuf, fieldByteBufWriterIndexVarName, fieldLogBytesVarName);
-            append(context.method_body, "{}.logCollector_deParse.collect_field_skip({}.class,{}.class,\"{}\",{});\n",
+            append(context.method_body, "{}.logCollector_deParse.collect_field({}.class,\"{}\",1,new Object[]{{}});\n",
                     Parser.class.getName(),
                     context.clazz.getName(),
-                    context.field.getDeclaringClass().getName(),
                     context.field.getName(),
                     fieldLogBytesVarName);
         }

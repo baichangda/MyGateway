@@ -94,44 +94,71 @@ public class Parser {
 
     public static void withDefaultLogCollector_parse() {
         logCollector_parse = new LogCollector_parse() {
-
-            @Override
-            public void collect_field(Class<?> clazz, Class<?> fieldDeclaringClass, String fieldName, byte[] content, Object val, String processorClassName) {
-                logger.info("--parse field{}--[{}].[{}] [{}]->[{}]"
-                        , LogUtil.getFieldStackTrace(fieldDeclaringClass, fieldName)
-                        , clazz.getSimpleName()
-                        , fieldName
-                        , ByteBufUtil.hexDump(content).toUpperCase()
-                        , val
-                );
-            }
-
-            @Override
-            public void collect_field_skip(Class<?> clazz, Class<?> fieldDeclaringClass, String fieldName, byte[] content) {
-                logger.info("--parse field{}--[{}].[{}] skip len[{}] hex[{}]"
-                        , LogUtil.getFieldStackTrace(fieldDeclaringClass, fieldName)
-                        , clazz.getSimpleName()
-                        , fieldName
-                        , content.length
-                        , ByteBufUtil.hexDump(content).toUpperCase()
-                );
-            }
-
-            @Override
-            public void collect_field_bit(Class<?> clazz, Class<?> fieldDeclaringClass, String fieldName, BitBuf_reader_log.Log[] logs, Object val, String processorClassName) {
-                for (BitBuf_reader_log.Log log : logs) {
-                    logger.info("--parse field{}--[{}].[{}] val[{}] {}"
-                            , LogUtil.getFieldStackTrace(fieldDeclaringClass, fieldName)
-                            , clazz.getSimpleName()
-                            , fieldName
-                            , val
-                            , log.msg());
+            /**
+             * @param clazz
+             * @param type 1、C_skip
+             * @param args
+             */
+            public void collect_class(Class<?> clazz, int type, Object... args) {
+                switch (type) {
+                    case 1 -> {
+                        logger.info("--parse class[{}] {}", clazz.getName(), args[0]);
+                    }
+                    default -> {
+                    }
                 }
             }
 
+            /**
+             *
+             * @param clazz
+             * @param fieldName
+             * @param type 1、F_skip 2、F_bit_num 0、other
+             * @param args
+             */
             @Override
-            public void collect_class(Class<?> clazz, String msg) {
-                logger.info("--parse class[{}] {}", clazz.getName(), msg);
+            public void collect_field(Class<?> clazz, String fieldName, int type, Object... args) {
+                try {
+                    Field field = clazz.getField(fieldName);
+                    Class<?> fieldDeclaringClass = field.getDeclaringClass();
+                    switch (type) {
+                        case 1 -> {
+                            byte[] content = (byte[]) args[0];
+                            logger.info("--parse field{}--[{}].[{}] skip len[{}] hex[{}]"
+                                    , LogUtil.getFieldStackTrace(fieldDeclaringClass, fieldName)
+                                    , clazz.getSimpleName()
+                                    , fieldName
+                                    , content.length
+                                    , ByteBufUtil.hexDump(content).toUpperCase()
+                            );
+                        }
+                        case 2 -> {
+                            BitBuf_reader_log.Log[] logs = (BitBuf_reader_log.Log[]) args[0];
+                            Object val = args[1];
+                            for (BitBuf_reader_log.Log log : logs) {
+                                logger.info("--parse field{}--[{}].[{}] val[{}] {}"
+                                        , LogUtil.getFieldStackTrace(fieldDeclaringClass, fieldName)
+                                        , clazz.getSimpleName()
+                                        , fieldName
+                                        , val
+                                        , log.msg());
+                            }
+                        }
+                        default -> {
+                            byte[] content = (byte[]) args[0];
+                            Object val = args[1];
+                            logger.info("--parse field{}--[{}].[{}] [{}]->[{}]"
+                                    , LogUtil.getFieldStackTrace(fieldDeclaringClass, fieldName)
+                                    , clazz.getSimpleName()
+                                    , fieldName
+                                    , ByteBufUtil.hexDump(content).toUpperCase()
+                                    , val
+                            );
+                        }
+                    }
+                } catch (NoSuchFieldException e) {
+                    throw MyException.get(e);
+                }
             }
         };
 
@@ -139,41 +166,59 @@ public class Parser {
 
     public static void withDefaultLogCollector_deParse() {
         logCollector_deParse = new LogCollector_deParse() {
-            @Override
-            public void collect_field(Class<?> clazz, Class<?> fieldDeclaringClass, String fieldName, Object val, byte[] content, String processorClassName) {
-                logger.info("--deParse field{}--[{}].[{}] [{}]->[{}]"
-                        , LogUtil.getFieldStackTrace(fieldDeclaringClass, fieldName)
-                        , clazz.getSimpleName()
-                        , fieldName
-                        , val
-                        , ByteBufUtil.hexDump(content).toUpperCase());
-            }
 
             @Override
-            public void collect_field_skip(Class<?> clazz, Class<?> fieldDeclaringClass, String fieldName, byte[] content) {
-                logger.info("--deParse field{}--[{}].[{}] append len[{}] [{}]"
-                        , LogUtil.getFieldStackTrace(fieldDeclaringClass, fieldName)
-                        , clazz.getSimpleName()
-                        , fieldName
-                        , content.length
-                        , ByteBufUtil.hexDump(content).toUpperCase());
-            }
-
-            @Override
-            public void collect_field_bit(Class<?> clazz, Class<?> fieldDeclaringClass, String fieldName, Object val, BitBuf_writer_log.Log[] logs, String processorClassName) {
-                for (BitBuf_writer_log.Log log : logs) {
-                    logger.info("--deParse field{}--[{}].[{}] val[{}] {}"
-                            , LogUtil.getFieldStackTrace(fieldDeclaringClass, fieldName)
-                            , clazz.getSimpleName()
-                            , fieldName
-                            , val
-                            , log.msg());
+            public void collect_field(Class<?> clazz, String fieldName, int type, Object... args) {
+                try {
+                    Field field = clazz.getField(fieldName);
+                    Class<?> fieldDeclaringClass = field.getDeclaringClass();
+                    switch (type) {
+                        case 1 -> {
+                            byte[] content = (byte[]) args[0];
+                            logger.info("--deParse field{}--[{}].[{}] append len[{}] [{}]"
+                                    , LogUtil.getFieldStackTrace(fieldDeclaringClass, fieldName)
+                                    , clazz.getSimpleName()
+                                    , fieldName
+                                    , content.length
+                                    , ByteBufUtil.hexDump(content).toUpperCase());
+                        }
+                        case 2 -> {
+                            Object val = args[0];
+                            BitBuf_writer_log.Log[] logs = (BitBuf_writer_log.Log[]) args[1];
+                            for (BitBuf_writer_log.Log log : logs) {
+                                logger.info("--deParse field{}--[{}].[{}] val[{}] {}"
+                                        , LogUtil.getFieldStackTrace(fieldDeclaringClass, fieldName)
+                                        , clazz.getSimpleName()
+                                        , fieldName
+                                        , val
+                                        , log.msg());
+                            }
+                        }
+                        default -> {
+                            Object val = args[0];
+                            byte[] content = (byte[]) args[1];
+                            logger.info("--deParse field{}--[{}].[{}] [{}]->[{}]"
+                                    , LogUtil.getFieldStackTrace(fieldDeclaringClass, fieldName)
+                                    , clazz.getSimpleName()
+                                    , fieldName
+                                    , val
+                                    , ByteBufUtil.hexDump(content).toUpperCase());
+                        }
+                    }
+                } catch (NoSuchFieldException e) {
+                    throw MyException.get(e);
                 }
             }
 
             @Override
-            public void collect_class(Class<?> clazz, String msg) {
-                logger.info("--deParse class[{}] {}", clazz.getName(), msg);
+            public void collect_class(Class<?> clazz, int type, Object... args) {
+                switch (type) {
+                    case 1 -> {
+                        logger.info("--deParse class[{}] {}", clazz.getName(), args[0]);
+                    }
+                    default -> {
+                    }
+                }
             }
         };
     }
@@ -339,7 +384,7 @@ public class Parser {
                 ParseUtil.append(processBody, "if({}>0){\n", FieldBuilder.varNameShouldSkip);
                 ParseUtil.append(processBody, "{}.skipBytes({});\n", FieldBuilder.varNameByteBuf, FieldBuilder.varNameShouldSkip);
                 if (logCollector_parse != null) {
-                    ParseUtil.append(processBody, "{}.logCollector_parse.collect_class({}.class,\"@C_skip skip[\"+{}+\"]\");\n", Parser.class.getName(), clazzName, FieldBuilder.varNameShouldSkip);
+                    ParseUtil.append(processBody, "{}.logCollector_parse.collect_class({}.class,1,new Object[]{\"@C_skip skip[\"+{}+\"]\"});\n", Parser.class.getName(), clazzName, FieldBuilder.varNameShouldSkip);
                 }
                 ParseUtil.append(processBody, "}\n");
             } else {
@@ -349,14 +394,14 @@ public class Parser {
                     String skipCode = "(" + lenValCode + "-" + classByteLen + ")";
                     ParseUtil.append(processBody, "{}.skipBytes({});\n", FieldBuilder.varNameByteBuf, skipCode);
                     if (logCollector_parse != null) {
-                        ParseUtil.append(processBody, "{}.logCollector_parse.collect_class({}.class,\"@C_skip skip[\"+{}+\"]\");\n", Parser.class.getName(), clazzName, skipCode);
+                        ParseUtil.append(processBody, "{}.logCollector_parse.collect_class({}.class,1,new Object[]{\"@C_skip skip[\"+{}+\"]\"});\n", Parser.class.getName(), clazzName, skipCode);
                     }
                 } else {
                     int skip = c_skip.len() - classByteLen;
                     if (skip > 0) {
                         ParseUtil.append(processBody, "{}.skipBytes({});\n", FieldBuilder.varNameByteBuf, skip);
                         if (logCollector_parse != null) {
-                            ParseUtil.append(processBody, "{}.logCollector_parse.collect_class({}.class,\"@C_skip skip[{}]\");\n", Parser.class.getName(), clazzName, skip);
+                            ParseUtil.append(processBody, "{}.logCollector_parse.collect_class({}.class,1,new Object[]{\"@C_skip skip[{}]\"});\n", Parser.class.getName(), clazzName, skip);
                         }
                     }
                 }
@@ -380,7 +425,7 @@ public class Parser {
         StringBuilder deProcessBody = new StringBuilder();
         deProcessBody.append("\n{\n");
         ParseUtil.append(deProcessBody, "final {} {}=({})$3;\n", clazzName, FieldBuilder.varNameInstance, clazzName);
-        BuilderContext deParseBuilderContext = new BuilderContext(classFieldDefineBody,constructBody, deProcessBody, clazz, cc, classVarDefineToVarName, byteOrder, bitOrder, fieldList);
+        BuilderContext deParseBuilderContext = new BuilderContext(classFieldDefineBody, constructBody, deProcessBody, clazz, cc, classVarDefineToVarName, byteOrder, bitOrder, fieldList);
         if (c_skip == null) {
             buildMethodBody_deProcess(deParseBuilderContext);
         } else {
@@ -398,7 +443,7 @@ public class Parser {
                 ParseUtil.append(deProcessBody, "if({}>0){\n", FieldBuilder.varNameShouldSkip);
                 ParseUtil.append(deProcessBody, "{}.writeZero({});\n", FieldBuilder.varNameByteBuf, FieldBuilder.varNameShouldSkip);
                 if (logCollector_parse != null) {
-                    ParseUtil.append(deProcessBody, "{}.logCollector_deParse.collect_class({}.class,\"@C_skip append[\"+{}+\"]\");\n", Parser.class.getName(), clazzName, FieldBuilder.varNameShouldSkip);
+                    ParseUtil.append(deProcessBody, "{}.logCollector_deParse.collect_class({}.class,1,new Object[]{\"@C_skip append[\"+{}+\"]\"});\n", Parser.class.getName(), clazzName, FieldBuilder.varNameShouldSkip);
                 }
                 ParseUtil.append(deProcessBody, "}\n");
             } else {
@@ -408,14 +453,14 @@ public class Parser {
                     String skipCode = "(" + lenValCode + "-" + classByteLen + ")";
                     ParseUtil.append(deProcessBody, "{}.writeZero({});\n", FieldBuilder.varNameByteBuf, skipCode);
                     if (logCollector_deParse != null) {
-                        ParseUtil.append(deProcessBody, "{}.logCollector_deParse.collect_class({}.class,\"@C_skip append[\"+{}+\"]\");\n", Parser.class.getName(), clazzName, skipCode);
+                        ParseUtil.append(deProcessBody, "{}.logCollector_deParse.collect_class({}.class,1,new Object[]{\"@C_skip append[\"+{}+\"]\"});\n", Parser.class.getName(), clazzName, skipCode);
                     }
                 } else {
                     int skip = c_skip.len() - classByteLen;
                     if (skip > 0) {
                         ParseUtil.append(deProcessBody, "{}.writeZero({});\n", FieldBuilder.varNameByteBuf, skip);
                         if (logCollector_deParse != null) {
-                            ParseUtil.append(deProcessBody, "{}.logCollector_deParse.collect_class({}.class,\"@C_skip append[{}]\");\n", Parser.class.getName(), clazzName, skip);
+                            ParseUtil.append(deProcessBody, "{}.logCollector_deParse.collect_class({}.class,1,new Object[]{\"@C_skip append[{}]\"});\n", Parser.class.getName(), clazzName, skip);
                         }
                     }
                 }
@@ -497,78 +542,17 @@ public class Parser {
     }
 
     public interface LogCollector_parse {
-        /**
-         * 收集每个字段解析的详情
-         *
-         * @param clazz               实体类
-         * @param fieldDeclaringClass 字段所属类
-         * @param fieldName           字段名称
-         * @param content             解析之前字节数组
-         * @param val                 解析后的值
-         * @param processorClassName  解析器类名
-         */
-        void collect_field(Class<?> clazz, Class<?> fieldDeclaringClass, String fieldName, byte[] content, Object val, String processorClassName);
 
-        void collect_field_skip(Class<?> clazz, Class<?> fieldDeclaringClass, String fieldName, byte[] content);
+        void collect_class(Class<?> clazz, int type, Object... args);
 
-        /**
-         * 收集每个字段解析的详情
-         *
-         * @param clazz               实体类
-         * @param fieldDeclaringClass 字段所属类
-         * @param fieldName           字段名称
-         * @param logs                bit解析日志
-         * @param val                 解析后的值
-         * @param processorClassName  解析器类名
-         */
-        void collect_field_bit(Class<?> clazz, Class<?> fieldDeclaringClass, String fieldName, BitBuf_reader_log.Log[] logs, Object val, String processorClassName);
-
-
-        /**
-         * 收集类解析的详情
-         * 用于{@link C_skip}
-         *
-         * @param clazz
-         * @param msg
-         */
-        void collect_class(Class<?> clazz, String msg);
+        void collect_field(Class<?> clazz, String fieldName, int type, Object... args);
     }
 
 
     public interface LogCollector_deParse {
-        /**
-         * 收集每个字段解析的详情
-         *
-         * @param clazz               实体类
-         * @param fieldDeclaringClass 字段所属类
-         * @param fieldName           字段名称
-         * @param val                 值
-         * @param content             值转换成的字节数组
-         * @param processorClassName  解析器类名
-         */
-        void collect_field(Class<?> clazz, Class<?> fieldDeclaringClass, String fieldName, Object val, byte[] content, String processorClassName);
+        void collect_field(Class<?> clazz, String fieldName, int type, Object... args);
 
-        void collect_field_skip(Class<?> clazz, Class<?> fieldDeclaringClass, String fieldName, byte[] content);
+        void collect_class(Class<?> clazz, int type, Object... args);
 
-        /**
-         * 收集每个字段解析的详情
-         *
-         * @param clazz               实体类
-         * @param fieldDeclaringClass 字段所属类
-         * @param fieldName           字段名称
-         * @param val                 值
-         * @param logs                bit解析日志
-         * @param processorClassName  解析器类名
-         */
-        void collect_field_bit(Class<?> clazz, Class<?> fieldDeclaringClass, String fieldName, Object val, BitBuf_writer_log.Log[] logs, String processorClassName);
-
-        /**
-         * 收集类解析的详情
-         * 用于{@link C_skip}
-         *
-         * @param clazz
-         * @param msg
-         */
-        void collect_class(Class<?> clazz, String msg);
     }
 }
