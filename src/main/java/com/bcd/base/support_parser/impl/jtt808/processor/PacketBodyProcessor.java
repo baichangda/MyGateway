@@ -1,6 +1,6 @@
 package com.bcd.base.support_parser.impl.jtt808.processor;
 
-import com.bcd.base.exception.MyException;
+import com.bcd.base.exception.BusinessException;
 import com.bcd.base.support_parser.Parser;
 import com.bcd.base.support_parser.impl.jtt808.data.*;
 import com.bcd.base.support_parser.processor.ProcessContext;
@@ -221,7 +221,7 @@ public class PacketBodyProcessor implements Processor<PacketBody> {
             case 0x0A00 -> {
                 packetBody = processor_TerminalRsa.process(data, processContext);
             }
-            default -> throw MyException.get("msgId[{}] not support", packet.header.msgId);
+            default -> throw BusinessException.get("msgId[{}] not support", packet.header.msgId);
         }
         return packetBody;
     }
@@ -395,7 +395,7 @@ public class PacketBodyProcessor implements Processor<PacketBody> {
             case 0x0A00 -> {
                 processor_TerminalRsa.process(data, processContext);
             }
-            default -> throw MyException.get("msgId[{}] not support", packet.header.msgId);
+            default -> throw BusinessException.get("msgId[{}] not support", packet.header.msgId);
         }
     }
 

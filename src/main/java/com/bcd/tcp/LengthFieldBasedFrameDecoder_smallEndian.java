@@ -1,6 +1,6 @@
 package com.bcd.tcp;
 
-import com.bcd.base.exception.MyException;
+import com.bcd.base.exception.BusinessException;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 
@@ -32,7 +32,7 @@ public class LengthFieldBasedFrameDecoder_smallEndian extends LengthFieldBasedFr
                 frameLength = buf.getLongLE(offset);
                 break;
             default:
-                throw MyException.get("not support");
+                throw BusinessException.get("not support");
         }
         return frameLength;
     }

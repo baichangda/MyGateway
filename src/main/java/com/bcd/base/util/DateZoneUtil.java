@@ -1,7 +1,7 @@
 package com.bcd.base.util;
 
 
-import com.bcd.base.exception.MyException;
+import com.bcd.base.exception.BusinessException;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
@@ -48,7 +48,7 @@ public class DateZoneUtil {
                 return DateZoneUtil.stringToDate_millisecond(dateStr);
             }
             default: {
-                throw MyException.get("dateStr[{}] not support", dateStr);
+                throw BusinessException.get("dateStr[{}] not support", dateStr);
             }
         }
     }

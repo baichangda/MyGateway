@@ -1,6 +1,6 @@
 package com.bcd.base.support_parser.builder;
 
-import com.bcd.base.exception.MyException;
+import com.bcd.base.exception.BusinessException;
 import com.bcd.base.support_parser.anno.BitRemainingMode;
 import com.bcd.base.support_parser.anno.F_bit_num;
 import com.bcd.base.support_parser.anno.F_bit_num_array;
@@ -70,7 +70,7 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
 
         final int len = anno.len();
         if (len < 1 || len > 64) {
-            throw MyException.get("class[{}] field[{}] anno[{}] len[{}] must in range [1,64]", field.getDeclaringClass().getName(), field.getName(), annoClass.getName(), len);
+            throw BusinessException.get("class[{}] field[{}] anno[{}] len[{}] must in range [1,64]", field.getDeclaringClass().getName(), field.getName(), annoClass.getName(), len);
         }
 
 
@@ -161,7 +161,7 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
 
         final int len = anno.len();
         if (len < 1 || len > 64) {
-            throw MyException.get("class[{}] field[{}] anno[{}] len[{}] must in range [1,64]", field.getDeclaringClass().getName(), field.getName(), annoClass.getName(), len);
+            throw BusinessException.get("class[{}] field[{}] anno[{}] len[{}] must in range [1,64]", field.getDeclaringClass().getName(), field.getName(), annoClass.getName(), len);
         }
         ParseUtil.append(body, "{}.write((long)({}),{},{},{});\n", varNameBitBuf, valCode, len, bigEndian, unsigned);
 

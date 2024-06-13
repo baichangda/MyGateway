@@ -2,7 +2,7 @@ package com.bcd.base.support_redis;
 
 import com.bcd.base.support_redis.serializer.RedisSerializer_key_string;
 import com.bcd.base.support_redis.serializer.RedisSerializer_value_integer;
-import com.bcd.base.exception.MyException;
+import com.bcd.base.exception.BusinessException;
 import com.bcd.base.util.JsonUtil;
 import com.fasterxml.jackson.databind.JavaType;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -85,7 +85,7 @@ public class RedisUtil {
         } else if (type instanceof JavaType) {
             redisSerializer = new Jackson2JsonRedisSerializer<>(JsonUtil.OBJECT_MAPPER, (JavaType) type);
         } else {
-            throw MyException.get("Param Type[{}] Not Support", type.getTypeName());
+            throw BusinessException.get("Param Type[{}] Not Support", type.getTypeName());
         }
         return redisSerializer;
     }

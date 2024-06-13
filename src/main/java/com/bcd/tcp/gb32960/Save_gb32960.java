@@ -1,6 +1,6 @@
 package com.bcd.tcp.gb32960;
 
-import com.bcd.base.exception.MyException;
+import com.bcd.base.exception.BusinessException;
 import com.bcd.base.support_mongo.MongoHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,7 +74,7 @@ public class Save_gb32960 implements ApplicationListener<ContextRefreshedEvent> 
                         }
                     }
                 } catch (InterruptedException ex) {
-                    throw MyException.get(ex);
+                    throw BusinessException.get(ex);
                 }
             });
         }

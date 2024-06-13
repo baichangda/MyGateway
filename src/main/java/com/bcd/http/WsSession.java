@@ -1,6 +1,6 @@
 package com.bcd.http;
 
-import com.bcd.base.exception.MyException;
+import com.bcd.base.exception.BusinessException;
 import com.bcd.base.util.JsonUtil;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
@@ -92,7 +92,7 @@ public abstract class WsSession<T> {
         try {
             channel = bootstrap.connect(host, port).sync().channel();
         } catch (InterruptedException e) {
-            throw MyException.get(e);
+            throw BusinessException.get(e);
         }
     }
 
@@ -121,7 +121,7 @@ public abstract class WsSession<T> {
         try {
             channel.writeAndFlush(buffer).sync();
         } catch (InterruptedException e) {
-            throw MyException.get(e);
+            throw BusinessException.get(e);
         }
         ws_send(new WsOutMsg(102, hex, true));
     }

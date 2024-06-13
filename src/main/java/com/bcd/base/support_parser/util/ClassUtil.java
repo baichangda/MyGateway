@@ -1,7 +1,7 @@
 package com.bcd.base.support_parser.util;
 
 
-import com.bcd.base.exception.MyException;
+import com.bcd.base.exception.BusinessException;
 
 import java.io.File;
 import java.io.IOException;
@@ -76,7 +76,7 @@ public class ClassUtil {
             annoNameToClassListMap.put(annoClass.getName(), classList);
             return annoNameToClassListMap;
         } catch (IOException | ClassNotFoundException e) {
-            throw MyException.get(e);
+            throw BusinessException.get(e);
         }
     }
 
