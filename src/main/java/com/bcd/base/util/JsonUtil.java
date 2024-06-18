@@ -17,9 +17,7 @@ import java.lang.reflect.Type;
  * Created by Administrator on 2017/5/12.
  */
 public class JsonUtil {
-    //此空过滤器必须定义在全局 GLOBAL_OBJECT_MAPPER 之前
     public final static ObjectMapper OBJECT_MAPPER = withConfig(new ObjectMapper());
-
 
     public static JavaType getJavaType(Type type) {
         //1、判断是否带有泛型
@@ -69,6 +67,8 @@ public class JsonUtil {
         t.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         //设置在序列化时候遇到空属性对象时候,不抛出异常
         t.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        //序列化日期时候转换为时间戳
+        t.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, true);
         //序列化和反序列化的数据内容中添加类属性
         //旧版本
         //t.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.PROPERTY);
