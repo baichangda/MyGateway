@@ -7,6 +7,8 @@ import java.lang.annotation.*;
 /**
  * 用于和{@link F_bean}标注接口字段时候
  * 标注到其接口类型的实现类上
+ * 注意:
+ * 被标注的类必须要和其接口在一个包下、否则会出现扫描不到子类的情况
  */
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
