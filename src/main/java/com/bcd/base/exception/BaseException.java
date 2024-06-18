@@ -27,12 +27,21 @@ public class BaseException extends RuntimeException {
      * 使用方式和sl4j log一样、例如
      * {@link org.slf4j.Logger#info(String, Object...)}
      * 如果需要转义、则\\{}
+     *
      * @param message
      * @param params
      * @return
      */
     public static BaseException get(String message, Object... params) {
         return new BaseException(StringUtil.format(message, params));
+    }
+
+    public static BaseException get(String message, Object arg) {
+        return new BaseException(StringUtil.format(message, arg));
+    }
+
+    public static BaseException get(String message, Object arg1, Object arg2) {
+        return new BaseException(StringUtil.format(message, arg1, arg2));
     }
 
     public static BaseException get(Throwable e) {
@@ -47,4 +56,5 @@ public class BaseException extends RuntimeException {
         this.code = code;
         return this;
     }
+
 }

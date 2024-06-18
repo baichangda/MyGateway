@@ -7,7 +7,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-@SuppressWarnings("unchecked")
 public class StringUtil {
 
     /**
@@ -16,11 +15,11 @@ public class StringUtil {
      * a_b_c会成为aBC
      *
      * @param str
-     * @param splitStr
+     * @param splitChar
      * @return
      */
-    public static String toFirstUpperCaseWithSplit(String str, char splitStr) {
-        if (str == null || str.length() == 0) {
+    public static String splitCharToCamelCase(String str, char splitChar) {
+        if (str == null || str.isEmpty()) {
             return str;
         }
         StringBuilder result = new StringBuilder();
@@ -29,7 +28,7 @@ public class StringUtil {
         result.append(Character.toLowerCase(arr[0]));
         for (int i = 1; i <= arr.length - 1; i++) {
             char c = arr[i];
-            if (c == splitStr) {
+            if (c == splitChar) {
                 nextIsUpper = true;
             } else {
                 if (nextIsUpper) {
@@ -43,8 +42,15 @@ public class StringUtil {
         return result.toString();
     }
 
-    public static String toFirstSplitWithUpperCase(String str, char splitStr) {
-        if (str == null || str.length() == 0) {
+    /**
+     * 将驼峰格式字符串转换为分隔符格式
+     *
+     * @param str
+     * @param splitChar
+     * @return
+     */
+    public static String camelCaseToSplitChar(String str, char splitChar) {
+        if (str == null || str.isEmpty()) {
             return str;
         }
         StringBuilder result = new StringBuilder();
@@ -53,7 +59,7 @@ public class StringUtil {
         for (int i = 1; i <= arr.length - 1; i++) {
             char c = arr[i];
             if (Character.isUpperCase(c)) {
-                result.append(splitStr);
+                result.append(splitChar);
             }
             result.append(Character.toLowerCase(c));
         }
@@ -67,7 +73,7 @@ public class StringUtil {
      * @return
      */
     public static String escapeExprSpecialWord(String str) {
-        if (str != null && !"".equals(str)) {
+        if (str != null && !str.isEmpty()) {
             String[] fbsArr = {"\\", "$", "(", ")", "*", "+", ".", "[", "]", "?", "^", "{", "}", "|"};
             for (String key : fbsArr) {
                 if (str.contains(key)) {
@@ -118,12 +124,26 @@ public class StringUtil {
      * 使用方式和sl4j log一样、例如
      * {@link org.slf4j.Logger#info(String, Object...)}
      * 如果需要转义、则\\{}
+     *
      * @param message
      * @param params
      * @return
      */
     public static String format(String message, Object... params) {
         return MessageFormatter.arrayFormat(message, params, null).getMessage();
+    }
+
+    public static String format(String message, Object arg) {
+        return MessageFormatter.format(message, arg).getMessage();
+    }
+
+    public static String format(String message, Object arg1, Object arg2) {
+        return MessageFormatter.format(message, arg1, arg2).getMessage();
+    }
+
+    public static void main(String[] args) {
+        System.out.println(format("{}-{}", 123, null));
+        System.out.println(format("{}-\\{}-{}", 123, null, "abc"));
     }
 
 }
