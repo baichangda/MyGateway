@@ -93,7 +93,10 @@ dependencies {
     // https://mvnrepository.com/artifact/io.helidon.webserver/helidon-webserver
     implementation group: 'io.helidon.webserver', name: 'helidon-webserver', version: "4.+"
     implementation group: 'io.helidon.webserver', name: 'helidon-webserver-static-content', version: "4.+"
-    implementation group: 'io.helidon.webserver', name: 'helidon-webserver-websocket', version: "4.+"
+    implementation group: 'io.helidon.webserver', name: 'helidon-webserver-websocket', version: "4.+"// https://mvnrepository.com/artifact/io.helidon.http.encoding/helidon-http-encoding-gzip
+    implementation group: 'io.helidon.http.encoding', name: 'helidon-http-encoding-gzip', version: "4.+"
+    implementation group: 'io.helidon.http.encoding', name: 'helidon-http-encoding-deflate', version: "4.+"
+
 }
 
 //生成jar时打包源码

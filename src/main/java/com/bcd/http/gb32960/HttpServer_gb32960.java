@@ -11,6 +11,9 @@ import io.helidon.http.HeaderNames;
 import io.helidon.http.Headers;
 import io.helidon.http.HttpMediaType;
 import io.helidon.http.HttpPrologue;
+import io.helidon.http.encoding.ContentEncodingContext;
+import io.helidon.http.encoding.deflate.DeflateEncoding;
+import io.helidon.http.encoding.gzip.GzipEncoding;
 import io.helidon.webserver.WebServer;
 import io.helidon.webserver.http.HttpRouting;
 import io.helidon.webserver.staticcontent.StaticContentService;
@@ -126,6 +129,11 @@ public class HttpServer_gb32960 implements CommandLineRunner {
                 }
             });
             WebServer.builder()
+                    .contentEncoding(e->
+                            e.contentEncodingsDiscoverServices(false)
+                            .addContentEncoding(GzipEncoding.create())
+                            .addContentEncoding(DeflateEncoding.create())
+                    )
                     .addRouting(httpRoutingBuilder)
                     .addRouting(wsRoutingBuilder)
                     .port(httpProp.port).build().start();
