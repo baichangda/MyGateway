@@ -7,8 +7,6 @@ spring:
   freemarker:
     checkTemplateLocation: false
   data:
-    #mongodb配置
-    mongodb.uri: ${mongo_uri:mongodb://127.0.0.1:27017/bcd_gateway}
     #redis配置
     #如果都进行了配置,加载的先后顺序为:
     #sentinel>cluster>single
@@ -51,12 +49,12 @@ spring:
   #  kafka配置
   kafka:
     consumer:
-      bootstrap-servers: ${kafka_bootstrap:192.168.23.128:9092}
+      bootstrap-servers: ${kafka_bootstrap:192.168.23.129:9092}
       group-id: ${gateway.id}
       key-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
       value-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
     producer:
-      bootstrap-servers: ${kafka_bootstrap:192.168.23.128:9092}
+      bootstrap-servers: ${kafka_bootstrap:192.168.23.129:9092}
       key-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
       value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
 
@@ -78,6 +76,6 @@ http:
 #  startIndex: 0
 #  num: 100
 #  server: 127.0.0.1:6666
-mongodbs: mongodb://10.0.11.50:27017/rvm2_1,mongodb://10.0.11.50:27017/rvm2_2,mongodb://10.0.11.50:27017/rvm2_3
+mongodbs: mongodb://bcd:bcd@192.168.23.129:27017/gw1,mongodb://bcd:bcd@192.168.23.129:27017/gw2,mongodb://bcd:bcd@192.168.23.129:27017/gw3
 
 

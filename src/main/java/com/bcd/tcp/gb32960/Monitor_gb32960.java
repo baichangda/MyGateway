@@ -17,8 +17,8 @@ public class Monitor_gb32960 implements Monitor {
     public String log(Duration period) {
         return StringUtil.format("gb32960 clientNum[{}] receiveSpeed[{}/s] queueNum[{}] saveSpeed[{}/s]",
                 Session_gb32960.getSessionMap().size(),
-                receiveNum.sumThenReset() / period.toSeconds(),
+                Monitor.formatSpeed(receiveNum.sumThenReset(), period),
                 queueNum.sum(),
-                saveNum.sumThenReset() / period.toSeconds());
+                Monitor.formatSpeed(saveNum.sumThenReset(), period));
     }
 }

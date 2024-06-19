@@ -34,16 +34,18 @@ public class FieldBuilder__F_bean extends FieldBuilder {
             ParseUtil.append(body, "int {}={};\n", varNameField_implClassVal, implClassValCode);
             //找到其实现类子类
             String pkg = fieldTypeName.substring(0, fieldTypeName.lastIndexOf("."));
-            List<Class<?>> implClassList = interfaceClassToImplClass.computeIfAbsent(fieldType, e1 -> {
+            List<Class<?>> implClassList = interfaceClassToImplClass.get(fieldType);
+            if (implClassList == null) {
                 try {
-                    return ClassUtil.getClassesByParentClass(e1, pkg).stream()
+                    implClassList = ClassUtil.getClassesByParentClass(fieldType, pkg).stream()
                             .filter(e2 -> e2.isAnnotationPresent(C_impl.class))
                             .sorted(Comparator.comparing(Class::getName))
                             .toList();
-                } catch (IOException | ClassNotFoundException ex) {
-                    throw BaseException.get(ex);
+                    interfaceClassToImplClass.put(fieldType, implClassList);
+                }catch (IOException | ClassNotFoundException e){
+                    throw BaseException.get(e);
                 }
-            });
+            }
             ParseUtil.append(body, "switch({}){\n", varNameField_implClassVal);
             Class<?> defaultClass = null;
             for (Class<?> implClass : implClassList) {
@@ -129,16 +131,18 @@ public class FieldBuilder__F_bean extends FieldBuilder {
             String varNameField_implClassVal = varNameField + "_implClassVal";
             ParseUtil.append(body, "int {}={};\n", varNameField_implClassVal, implClassValCode);
             String pkg = fieldTypeName.substring(0, fieldTypeName.lastIndexOf("."));
-            List<Class<?>> implClassList = interfaceClassToImplClass.computeIfAbsent(fieldType, e1 -> {
+            List<Class<?>> implClassList = interfaceClassToImplClass.get(fieldType);
+            if (implClassList == null) {
                 try {
-                    return ClassUtil.getClassesByParentClass(e1, pkg).stream()
+                    implClassList = ClassUtil.getClassesByParentClass(fieldType, pkg).stream()
                             .filter(e2 -> e2.isAnnotationPresent(C_impl.class))
                             .sorted(Comparator.comparing(Class::getName))
                             .toList();
-                } catch (IOException | ClassNotFoundException ex) {
-                    throw BaseException.get(ex);
+                    interfaceClassToImplClass.put(fieldType, implClassList);
+                }catch (IOException | ClassNotFoundException e){
+                    throw BaseException.get(e);
                 }
-            });
+            }
             ParseUtil.append(body, "switch({}){\n", varNameField_implClassVal);
             Class<?> defaultClass = null;
             for (Class<?> implClass : implClassList) {
