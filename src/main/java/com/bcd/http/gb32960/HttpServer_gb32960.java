@@ -15,6 +15,7 @@ import io.helidon.http.encoding.ContentEncodingContext;
 import io.helidon.http.encoding.deflate.DeflateEncoding;
 import io.helidon.http.encoding.gzip.GzipEncoding;
 import io.helidon.webserver.WebServer;
+import io.helidon.webserver.accesslog.AccessLogFeature;
 import io.helidon.webserver.http.HttpRouting;
 import io.helidon.webserver.staticcontent.StaticContentService;
 import io.helidon.webserver.websocket.WsRouting;
@@ -129,6 +130,7 @@ public class HttpServer_gb32960 implements CommandLineRunner {
                 }
             });
             WebServer.builder()
+                    .addFeature(AccessLogFeature.builder().defaultLogFormat().build())
                     .contentEncoding(e->
                             e.contentEncodingsDiscoverServices(false)
                             .addContentEncoding(GzipEncoding.create())
