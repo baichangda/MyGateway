@@ -29,13 +29,12 @@ public @interface F_skip {
      * 解析前跳过字节表达式
      * 和{@link #lenBefore()}互斥
      * 变量取值来源于var、globalVar
-     * 使用globalVar时候必须在变量前面带上@
      * 例如:
      * m
      * m*n
      * a*b-1
      * a*(b-2)
-     * a*(b-2)+@a
+     * a*(b-2)+A
      */
     String lenExprBefore() default "";
 
@@ -50,13 +49,12 @@ public @interface F_skip {
      * 解析前跳过字节表达式
      * 和{@link #lenAfter()}互斥
      * 变量取值来源于var、globalVar
-     * 使用globalVar时候必须在变量前面带上@
      * 例如:
      * m
      * m*n
      * a*b-1
      * a*(b-2)
-     * a*(b-2)+@a
+     * a*(b-2)+A
      */
     String lenExprAfter() default "";
 }

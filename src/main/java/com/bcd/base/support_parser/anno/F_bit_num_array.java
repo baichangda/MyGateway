@@ -35,13 +35,12 @@ public @interface F_bit_num_array {
      * 数组元素个数表达式,配合var参数使用
      * 与{@link #len()}互斥
      * 变量取值来源于var、globalVar
-     * 使用globalVar时候必须在变量前面带上@
      * 例如:
      * m
      * m*n
      * a*b-1
      * a*(b-2)
-     * a*(b-2)+@a
+     * a*(b-2)+A
      */
     String lenExpr() default "";
 
