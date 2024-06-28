@@ -24,7 +24,7 @@ public class FieldBuilder__F_bean_list extends FieldBuilder {
             fieldTypeFlag = 2;
             typeClass = (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
         } else {
-            ParseUtil.notSupport_type(context.clazz, field, anno.getClass());
+            ParseUtil.notSupport_type(context, F_bean_list.class);
             fieldTypeFlag = 0;
             typeClass = null;
         }
@@ -75,7 +75,7 @@ public class FieldBuilder__F_bean_list extends FieldBuilder {
             fieldTypeFlag = 2;
             typeClass = (Class<?>) ((ParameterizedType) field.getGenericType()).getActualTypeArguments()[0];
         } else {
-            ParseUtil.notSupport_type(context.clazz, field, anno.getClass());
+            ParseUtil.notSupport_type(context, F_bean_list.class);
             fieldTypeFlag = 0;
             typeClass = null;
         }

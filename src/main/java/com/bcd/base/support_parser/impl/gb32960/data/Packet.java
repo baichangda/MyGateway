@@ -23,7 +23,7 @@ public class Packet {
     @F_num(type = NumType.uint8)
     public short encodeWay;
     //数据单元长度 22-24
-    @F_num(type = NumType.uint16, globalVar = 'a')
+    @F_num(type = NumType.uint16, globalVar = 'A')
     public int contentLength;
     @F_bean(implClassExpr = "f")
     public PacketData data;

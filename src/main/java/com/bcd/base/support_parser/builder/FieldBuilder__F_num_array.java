@@ -27,7 +27,7 @@ public class FieldBuilder__F_num_array extends FieldBuilder {
                 if (arrayElementType.isEnum()) {
                     sourceValTypeName = "int";
                 } else {
-                    ParseUtil.notSupport_fieldType(context.clazz, field, annoClass);
+                    ParseUtil.notSupport_fieldType(context, annoClass);
                     sourceValTypeName = null;
                 }
             }
@@ -123,7 +123,6 @@ public class FieldBuilder__F_num_array extends FieldBuilder {
                     funcName = varNameByteBuf + ".readDouble" + (bigEndian ? "" : "LE") + "()";
                 }
                 default -> {
-                    ParseUtil.notSupport_numType(context.clazz, field, annoClass);
                     funcName = null;
                 }
             }
@@ -233,7 +232,6 @@ public class FieldBuilder__F_num_array extends FieldBuilder {
                     ParseUtil.append(body, "{}.{}((double)({}));\n", varNameByteBuf, funcName, arrEleValCode);
                 }
                 default -> {
-                    ParseUtil.notSupport_numType(context.clazz, field, annoClass);
                 }
             }
             if (singleSkip > 0) {

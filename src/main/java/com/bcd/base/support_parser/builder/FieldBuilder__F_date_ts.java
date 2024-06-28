@@ -74,7 +74,7 @@ public class FieldBuilder__F_date_ts extends FieldBuilder {
                     varNameValueZoneId,
                     dateTimeFormatterVarName);
         } else {
-            ParseUtil.notSupport_fieldType(context.clazz, field, F_date_ts.class);
+            ParseUtil.notSupport_fieldType(context, F_date_ts.class);
         }
     }
 
@@ -110,7 +110,7 @@ public class FieldBuilder__F_date_ts extends FieldBuilder {
             final String dateTimeFormatterVarName = ParseUtil.defineClassVar(context, DateTimeFormatter.class, "{}.ofPattern(\"{}\").withZone({})", DateTimeFormatter.class.getName(), anno.stringFormat(), varNameValueZoneId);
             ParseUtil.append(body, "final long {}={}.parse({},{}).toInstant().toEpochMilli();\n", varNameLongField, zoneDateTimeClassName, valCode, dateTimeFormatterVarName);
         } else {
-            ParseUtil.notSupport_fieldType(context.clazz, field, F_date_ts.class);
+            ParseUtil.notSupport_fieldType(context, F_date_ts.class);
         }
 
         //先转换为毫秒

@@ -40,6 +40,7 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
         final Class<?> fieldTypeClass = field.getType();
         final String fieldTypeName = fieldTypeClass.getName();
         final F_bit_num anno = field.getAnnotation(annoClass);
+        ParseUtil.check_var(context, annoClass, anno.var(), anno.globalVar());
         final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.bitOrder);
         final boolean unsigned = anno.unsigned();
         int skipBefore = anno.skipBefore();
@@ -61,7 +62,7 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
                 if (fieldTypeClass.isEnum()) {
                     sourceValTypeName = "int";
                 } else {
-                    ParseUtil.notSupport_fieldType(context.clazz, field, annoClass);
+                    ParseUtil.notSupport_fieldType(context, annoClass);
                     sourceValTypeName = null;
                 }
             }
@@ -111,6 +112,7 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
         final Class<F_bit_num> annoClass = F_bit_num.class;
         final Field field = context.field;
         final F_bit_num anno = field.getAnnotation(annoClass);
+        ParseUtil.check_var(context, annoClass, anno.var(), anno.globalVar());
         final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.bitOrder);
         final boolean unsigned = anno.unsigned();
         final String varNameInstance = FieldBuilder.varNameInstance;
@@ -123,6 +125,7 @@ public class FieldBuilder__F_bit_num extends FieldBuilder {
         int skipBefore = anno.skipBefore();
         int skipAfter = anno.skipAfter();
         final String varNameBitBuf = context.getBitBuf_deParse();
+
         if (skipBefore > 0) {
             ParseUtil.append(body, "{}.skip({});\n", varNameBitBuf, skipBefore);
         }

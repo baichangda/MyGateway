@@ -37,16 +37,21 @@ public class ParseUtil {
         }
     }
 
-    public static void notSupport_numType(Class<?> clazz, Field field, Class<?> annoClass) {
-        throw BaseException.get("class[{}] field[{}] anno[{}] numType not support", clazz.getName(), field.getName(), annoClass.getName());
+    public static void check_var(BuilderContext context, Class<?> annoClass, char var, char globalVar) {
+        if (var != '0' && (var < 'a' || var > 'z')) {
+            throw BaseException.get("class[{}] field[{}] anno[{}] var[{}] not in [a-z]", context.clazz.getName(), context.field.getName(), annoClass.getName(), var);
+        }
+        if (globalVar != '0' && (globalVar < 'A' || globalVar > 'Z')) {
+            throw BaseException.get("class[{}] field[{}] anno[{}] globalVar[{}] not in [A-Z]", context.clazz.getName(), context.field.getName(), annoClass.getName(), globalVar);
+        }
     }
 
-    public static void notSupport_type(Class<?> clazz, Field field, Class<?> annoClass) {
-        throw BaseException.get("class[{}] field[{}] anno[{}] type not support", clazz.getName(), field.getName(), annoClass.getName());
+    public static void notSupport_type(BuilderContext context, Class<?> annoClass) {
+        throw BaseException.get("class[{}] field[{}] anno[{}] type not support", context.clazz.getName(), context.field.getName(), annoClass.getName());
     }
 
-    public static void notSupport_fieldType(Class<?> clazz, Field field, Class<?> annoClass) {
-        throw BaseException.get("class[{}] field[{}] anno[{}] not support", clazz.getName(), field.getName(), annoClass.getName());
+    public static void notSupport_fieldType(BuilderContext context, Class<?> annoClass) {
+        throw BaseException.get("class[{}] field[{}] anno[{}] not support", context.clazz.getName(), context.field.getName(), annoClass.getName());
     }
 
     public static boolean bigEndian(BitOrder order, BitOrder parentOrder) {
@@ -320,28 +325,22 @@ public class ParseUtil {
         final Field field = context.field;
         final StringBuilder sb = new StringBuilder();
         final char[] chars = lenExpr.toCharArray();
-        boolean nextGlobalVar = false;
         for (char c : chars) {
             if (c == ' ') {
                 continue;
             }
-            if (nextGlobalVar) {
-                String globalVarName = context.getGlobalVarName(c);
-                sb.append(globalVarName);
-                nextGlobalVar = false;
-                continue;
-            }
-            if (c == '@') {
-                nextGlobalVar = true;
-                continue;
-            }
             if (c != '+' && c != '-' && c != '*' && c != '/' && c != '(' && c != ')' && !Character.isDigit(c)) {
-                final String s = map.get(c);
-                if (s == null) {
-                    throw BaseException.get("class[{}] field[{}] expr[{}] can't find char[{}] value", field.getDeclaringClass().getName(), field.getName(), lenExpr, c);
+                if (Character.isUpperCase(c)) {
+                    String globalVarName = context.getGlobalVarName(c);
+                    sb.append(globalVarName);
+                } else {
+                    final String s = map.get(c);
+                    if (s == null) {
+                        throw BaseException.get("class[{}] field[{}] expr[{}] can't find char[{}] value", field.getDeclaringClass().getName(), field.getName(), lenExpr, c);
+                    }
+                    //所有的len字段必须转化为int运算
+                    sb.append("(int)(").append(s).append(")");
                 }
-                //所有的len字段必须转化为int运算
-                sb.append("(int)(").append(s).append(")");
             } else {
                 sb.append(c);
             }
@@ -349,7 +348,7 @@ public class ParseUtil {
         return sb.toString();
     }
 
-    public static String replaceExprToCode(final String lenExpr, final Map<Character, String> map, Class<?> clazz) {
+    public static String replaceExprToCode_class(final String lenExpr, BuilderContext context) {
         final StringBuilder sb = new StringBuilder();
         final char[] chars = lenExpr.toCharArray();
         for (char c : chars) {
@@ -357,12 +356,17 @@ public class ParseUtil {
                 continue;
             }
             if (c != '+' && c != '-' && c != '*' && c != '/' && c != '(' && c != ')' && !Character.isDigit(c)) {
-                final String s = map.get(c);
-                if (s == null) {
-                    throw BaseException.get("class[{}] c_skip lenExpr[{}] can't find char[{}] value", clazz.getName(), lenExpr, c);
+                if (Character.isUpperCase(c)) {
+                    String globalVarName = context.getGlobalVarName(c);
+                    sb.append(globalVarName);
+                } else {
+                    final String s = context.method_varToFieldName.get(c);
+                    if (s == null) {
+                        throw BaseException.get("class[{}] c_skip lenExpr[{}] can't find char[{}] value", context.clazz.getName(), lenExpr, c);
+                    }
+                    //所有的len字段必须转化为int运算
+                    sb.append("(int)(").append(s).append(")");
                 }
-                //所有的len字段必须转化为int运算
-                sb.append("(int)(").append(s).append(")");
             } else {
                 sb.append(c);
             }
@@ -804,11 +808,7 @@ public class ParseUtil {
     }
 
     private static int getGlobalVarIndex(char var) {
-        int i = var - 'A';
-        if (i > 26) {
-            i = var - 'a' + 26;
-        }
-        return i;
+        return var - 'A';
     }
 
     public static String getGlobalVarName(char var) {

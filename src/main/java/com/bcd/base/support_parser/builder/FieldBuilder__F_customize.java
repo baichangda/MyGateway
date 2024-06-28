@@ -11,6 +11,7 @@ public class FieldBuilder__F_customize extends FieldBuilder {
     public void buildParse(BuilderContext context) {
         final Field field = context.field;
         final F_customize anno = field.getAnnotation(F_customize.class);
+        ParseUtil.check_var(context, F_customize.class, anno.var(), anno.globalVar());
         final Class<?> processorClass = anno.processorClass();
         final StringBuilder body = context.method_body;
         final String varNameField = ParseUtil.getFieldVarName(context);
@@ -39,6 +40,7 @@ public class FieldBuilder__F_customize extends FieldBuilder {
     public void buildDeParse(BuilderContext context) {
         final Field field = context.field;
         final F_customize anno = field.getAnnotation(F_customize.class);
+        ParseUtil.check_var(context, F_customize.class, anno.var(), anno.globalVar());
         final Class<?> processorClass = anno.processorClass();
         final StringBuilder body = context.method_body;
         final String varNameField = ParseUtil.getFieldVarName(context);

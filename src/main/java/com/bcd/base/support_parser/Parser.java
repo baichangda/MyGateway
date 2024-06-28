@@ -378,7 +378,7 @@ public class Parser {
                 buildMethodBody_process(parseBuilderContext);
                 String lenValCode;
                 if (c_skip.len() == 0) {
-                    lenValCode = ParseUtil.replaceExprToCode(c_skip.lenExpr(), parseBuilderContext.method_varToFieldName, clazz);
+                    lenValCode = ParseUtil.replaceExprToCode_class(c_skip.lenExpr(), parseBuilderContext);
                 } else {
                     lenValCode = c_skip.len() + "";
                 }
@@ -392,7 +392,7 @@ public class Parser {
             } else {
                 buildMethodBody_process(parseBuilderContext);
                 if (c_skip.len() == 0) {
-                    String lenValCode = ParseUtil.replaceExprToCode(c_skip.lenExpr(), parseBuilderContext.method_varToFieldName, clazz);
+                    String lenValCode = ParseUtil.replaceExprToCode(c_skip.lenExpr(), parseBuilderContext);
                     String skipCode = "(" + lenValCode + "-" + classByteLen + ")";
                     ParseUtil.append(processBody, "{}.skipBytes({});\n", FieldBuilder.varNameByteBuf, skipCode);
                     if (logCollector_parse != null) {
@@ -437,7 +437,7 @@ public class Parser {
                 buildMethodBody_deProcess(deParseBuilderContext);
                 String lenValCode;
                 if (c_skip.len() == 0) {
-                    lenValCode = ParseUtil.replaceExprToCode(c_skip.lenExpr(), parseBuilderContext.method_varToFieldName, clazz);
+                    lenValCode = ParseUtil.replaceExprToCode(c_skip.lenExpr(), parseBuilderContext);
                 } else {
                     lenValCode = c_skip.len() + "";
                 }
@@ -451,7 +451,7 @@ public class Parser {
             } else {
                 buildMethodBody_deProcess(deParseBuilderContext);
                 if (c_skip.len() == 0) {
-                    String lenValCode = ParseUtil.replaceExprToCode(c_skip.lenExpr(), parseBuilderContext.method_varToFieldName, clazz);
+                    String lenValCode = ParseUtil.replaceExprToCode(c_skip.lenExpr(), parseBuilderContext);
                     String skipCode = "(" + lenValCode + "-" + classByteLen + ")";
                     ParseUtil.append(deProcessBody, "{}.writeZero({});\n", FieldBuilder.varNameByteBuf, skipCode);
                     if (logCollector_deParse != null) {

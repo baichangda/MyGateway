@@ -7,7 +7,7 @@ import com.bcd.base.support_parser.util.BitBuf_writer_log;
 import io.netty.buffer.ByteBuf;
 
 public class ProcessContext<T> {
-    public T instance;
+    public final T instance;
     public final ProcessContext<?> parentContext;
     public final ByteBuf byteBuf;
     public BitBuf_reader bitBuf_reader;
@@ -59,7 +59,7 @@ public class ProcessContext<T> {
 
     public final void putGlobalVar(int varIndex, int v) {
         if (globalVars == null) {
-            globalVars = new int[52];
+            globalVars = new int[26];
         }
         globalVars[varIndex] = v;
     }

@@ -58,7 +58,7 @@ public class FieldBuilder__F_bit_num_array extends FieldBuilder {
             }
             default -> {
                 if (!arrayElementType.isEnum()) {
-                    ParseUtil.notSupport_fieldType(context.clazz, field, annoClass);
+                    ParseUtil.notSupport_fieldType(context, annoClass);
                 }
             }
         }

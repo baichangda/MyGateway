@@ -13,6 +13,8 @@ public class FieldBuilder__F_num extends FieldBuilder {
     public void buildParse(BuilderContext context) {
         final Class<F_num> annoClass = F_num.class;
         final Field field = context.field;
+        final F_num anno = field.getAnnotation(annoClass);
+        ParseUtil.check_var(context, annoClass, anno.var(), anno.globalVar());
         final Class<?> fieldTypeClass = field.getType();
         final String sourceValTypeName;
         final String fieldTypeName = fieldTypeClass.getName();
@@ -25,13 +27,13 @@ public class FieldBuilder__F_num extends FieldBuilder {
                 if (fieldTypeClass.isEnum()) {
                     sourceValTypeName = "int";
                 } else {
-                    ParseUtil.notSupport_fieldType(context.clazz, field, annoClass);
+                    ParseUtil.notSupport_fieldType(context, annoClass);
                     sourceValTypeName = null;
                 }
             }
         }
 
-        final F_num anno = field.getAnnotation(annoClass);
+
         final StringBuilder body = context.method_body;
         final String varNameInstance = FieldBuilder.varNameInstance;
         final String varNameField = ParseUtil.getFieldVarName(context);
@@ -106,7 +108,6 @@ public class FieldBuilder__F_num extends FieldBuilder {
                 funcName = varNameByteBuf + ".readDouble" + (bigEndian ? "" : "LE") + "()";
             }
             default -> {
-                ParseUtil.notSupport_numType(context.clazz, field, annoClass);
                 funcName = null;
             }
         }
@@ -138,7 +139,7 @@ public class FieldBuilder__F_num extends FieldBuilder {
         final Class<F_num> annoClass = F_num.class;
         final Field field = context.field;
         final F_num anno = context.field.getAnnotation(annoClass);
-
+        ParseUtil.check_var(context, annoClass, anno.var(), anno.globalVar());
         final boolean bigEndian = ParseUtil.bigEndian(anno.order(), context.byteOrder);
         final String varNameInstance = FieldBuilder.varNameInstance;
         final StringBuilder body = context.method_body;
@@ -222,7 +223,6 @@ public class FieldBuilder__F_num extends FieldBuilder {
                 ParseUtil.append(body, "{}.{}((double)({}));\n", varNameByteBuf, funcName, valCode);
             }
             default -> {
-                ParseUtil.notSupport_numType(context.clazz, field, annoClass);
             }
         }
     }
