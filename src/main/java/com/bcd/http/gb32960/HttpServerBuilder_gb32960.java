@@ -5,20 +5,15 @@ import com.bcd.base.support_parser.impl.gb32960.data.Packet;
 import com.bcd.base.support_parser.processor.Processor;
 import com.bcd.base.util.JsonUtil;
 import com.bcd.http.HttpProp;
+import com.bcd.http.HttpServerBuilder;
 import com.bcd.http.WsInMsg;
 import com.bcd.http.WsSession;
-import io.helidon.cors.CorsRequestAdapter;
-import io.helidon.cors.CorsSupportHelper;
 import io.helidon.cors.CrossOriginConfig;
 import io.helidon.http.HeaderNames;
 import io.helidon.http.Headers;
 import io.helidon.http.HttpMediaType;
 import io.helidon.http.HttpPrologue;
-import io.helidon.http.encoding.ContentEncodingContext;
-import io.helidon.http.encoding.deflate.DeflateEncoding;
-import io.helidon.http.encoding.gzip.GzipEncoding;
-import io.helidon.webserver.WebServer;
-import io.helidon.webserver.accesslog.AccessLogFeature;
+import io.helidon.webserver.WebServerConfig;
 import io.helidon.webserver.cors.CorsSupport;
 import io.helidon.webserver.http.HttpRouting;
 import io.helidon.webserver.staticcontent.StaticContentService;
@@ -27,11 +22,8 @@ import io.helidon.websocket.WsListener;
 import io.helidon.websocket.WsUpgradeException;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
-import io.netty.handler.codec.http.cors.CorsConfigBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
@@ -42,18 +34,14 @@ import java.util.Optional;
 
 @ConditionalOnProperty("http.port")
 @Component
-public class HttpServer_gb32960 implements CommandLineRunner {
-    static Logger logger = LoggerFactory.getLogger(HttpServer_gb32960.class);
+public class HttpServerBuilder_gb32960 implements HttpServerBuilder {
+    static Logger logger = LoggerFactory.getLogger(HttpServerBuilder_gb32960.class);
 
     public static Processor<Packet> processor = Parser.getProcessor(Packet.class);
 
-    @Autowired
-    public HttpProp httpProp;
-
-    @Override
-    public void run(String... args) {
+    public void build(HttpRouting.Builder httpRoutingBuilder, WsRouting.Builder wsRoutingBuilder) {
         Thread.startVirtualThread(() -> {
-            HttpRouting.Builder httpRoutingBuilder = HttpRouting.builder()
+            httpRoutingBuilder
                     .register("/gb32960", StaticContentService.builder(Paths.get("src/main/resources/http/gb32960")).welcomeFileName("index.html").contentType(".html", HttpMediaType.create("text/html;charset=utf-8")))
 //                    .register("/gb32960/*", StaticContentService.builder("http/gb32960"))
                     .get("/parse/gb32960", (req, rep) -> {
@@ -74,7 +62,7 @@ public class HttpServer_gb32960 implements CommandLineRunner {
                             rep.send(JsonUtil.toJson(Map.of("msg", "解析失败、报文不是16进制格式", "succeed", false)));
                         }
                     });
-            WsRouting.Builder wsRoutingBuilder = WsRouting.builder().endpoint("/ws/gb32960", () -> new WsListener() {
+            wsRoutingBuilder.endpoint("/ws/gb32960", () -> new WsListener() {
                 private String vin;
                 private WsSession<Packet> wsSession;
                 private StringBuilder sb = new StringBuilder();
@@ -134,27 +122,6 @@ public class HttpServer_gb32960 implements CommandLineRunner {
                     WsListener.super.onError(session, t);
                 }
             });
-            CorsSupport corsSupport = CorsSupport.builder().addCrossOrigin(
-                    CrossOriginConfig
-                            .builder()
-                            .allowOrigins("*")
-                            .allowMethods("GET","POST","PUT","OPTIONS","DELETE")
-                            .maxAgeSeconds(0)
-                            //表明哪些headers可以暴露给客户端使用
-                            .exposeHeaders()
-                            .enabled(true)
-                            .build()
-            ).build();
-            WebServer.builder()
-                    .addFeature(AccessLogFeature.builder().defaultLogFormat().build())
-                    .contentEncoding(e->
-                            e.contentEncodingsDiscoverServices(false)
-                            .addContentEncoding(GzipEncoding.create())
-                            .addContentEncoding(DeflateEncoding.create())
-                    )
-                    .addRouting(httpRoutingBuilder.register(corsSupport))
-                    .addRouting(wsRoutingBuilder)
-                    .port(httpProp.port).build().start();
         });
 
     }

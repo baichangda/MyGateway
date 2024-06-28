@@ -26,7 +26,7 @@ public class WsSession_gb32960 extends WsSession<Packet> {
 
     public Packet initSample(Object ... args){
         byte[] bytes = ByteBufUtil.decodeHexDump(sample);
-        Packet packet = HttpServer_gb32960.processor.process(Unpooled.wrappedBuffer(bytes));
+        Packet packet = HttpServerBuilder_gb32960.processor.process(Unpooled.wrappedBuffer(bytes));
         packet.vin = args[0].toString();
         return packet;
     }
@@ -34,7 +34,7 @@ public class WsSession_gb32960 extends WsSession<Packet> {
     public ByteBuf toByteBuf(Packet sample, long ts){
         ByteBuf buffer = Unpooled.buffer();
         ((VehicleRunData) sample.data).collectTime = new Date(ts);
-        HttpServer_gb32960.processor.deProcess(buffer, sample);
+        HttpServerBuilder_gb32960.processor.deProcess(buffer, sample);
         return buffer;
     }
 }
