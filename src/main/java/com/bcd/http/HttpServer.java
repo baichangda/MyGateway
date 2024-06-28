@@ -24,10 +24,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Optional;
 
 @ConditionalOnProperty("http.port")
 @Component
