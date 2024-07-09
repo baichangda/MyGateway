@@ -1,8 +1,8 @@
 package com.bcd.base.support_parser.builder;
 
-import com.bcd.base.exception.BaseException;
 import com.bcd.base.support_parser.anno.C_impl;
 import com.bcd.base.support_parser.anno.F_bean;
+import com.bcd.base.support_parser.exception.ParseException;
 import com.bcd.base.support_parser.util.ClassUtil;
 import com.bcd.base.support_parser.util.ParseUtil;
 import javassist.*;
@@ -27,7 +27,7 @@ public class FieldBuilder__F_bean extends FieldBuilder {
         if (fieldType.isInterface()) {
             String implClassExpr = anno.implClassExpr();
             if (implClassExpr.isEmpty()) {
-                throw BaseException.get("class[{}] interface field[{}] anno[{}] implClassExpr must not be empty", field.getDeclaringClass().getName(), field.getName(), F_bean.class.getName());
+                throw ParseException.get("class[{}] interface field[{}] anno[{}] implClassExpr must not be empty", field.getDeclaringClass().getName(), field.getName(), F_bean.class.getName());
             }
             String implClassValCode = ParseUtil.replaceExprToCode(implClassExpr, context);
             String varNameField_implClassVal = varNameField + "_implClassVal";
@@ -43,7 +43,7 @@ public class FieldBuilder__F_bean extends FieldBuilder {
                             .toList();
                     interfaceClassToImplClass.put(fieldType, implClassList);
                 }catch (IOException | ClassNotFoundException e){
-                    throw BaseException.get(e);
+                    throw ParseException.get(e);
                 }
             }
             ParseUtil.append(body, "switch({}){\n", varNameField_implClassVal);
@@ -81,7 +81,7 @@ public class FieldBuilder__F_bean extends FieldBuilder {
             }
             if (defaultClass == null) {
                 ParseUtil.append(body, "default:{\nthrow {}.get(\"class[{}] field[{}] implClass value[\"+" + varNameField_implClassVal + "+\"] not support\");\n}",
-                        BaseException.class.getName(),
+                        ParseException.class.getName(),
                         field.getDeclaringClass().getName(),
                         field.getName());
             } else {
@@ -125,7 +125,7 @@ public class FieldBuilder__F_bean extends FieldBuilder {
         if (fieldType.isInterface()) {
             String implClassExpr = anno.implClassExpr();
             if (implClassExpr.isEmpty()) {
-                throw BaseException.get("class[{}] interface field[{}] anno[{}] implClassExpr must not be empty", field.getDeclaringClass().getName(), field.getName(), F_bean.class.getName());
+                throw ParseException.get("class[{}] interface field[{}] anno[{}] implClassExpr must not be empty", field.getDeclaringClass().getName(), field.getName(), F_bean.class.getName());
             }
             String implClassValCode = ParseUtil.replaceExprToCode(implClassExpr, context);
             String varNameField_implClassVal = varNameField + "_implClassVal";
@@ -140,7 +140,7 @@ public class FieldBuilder__F_bean extends FieldBuilder {
                             .toList();
                     interfaceClassToImplClass.put(fieldType, implClassList);
                 }catch (IOException | ClassNotFoundException e){
-                    throw BaseException.get(e);
+                    throw ParseException.get(e);
                 }
             }
             ParseUtil.append(body, "switch({}){\n", varNameField_implClassVal);
@@ -178,7 +178,7 @@ public class FieldBuilder__F_bean extends FieldBuilder {
             }
             if (defaultClass == null) {
                 ParseUtil.append(body, "default:{\nthrow {}.get(\"class[{}] field[{}] implClass value[\"+" + varNameField_implClassVal + "+\"] not support\");\n}",
-                        BaseException.class.getName(),
+                        ParseException.class.getName(),
                         field.getDeclaringClass().getName(),
                         field.getName(),
                         fieldTypeName);

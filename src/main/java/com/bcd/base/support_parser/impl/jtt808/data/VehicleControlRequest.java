@@ -1,6 +1,6 @@
 package com.bcd.base.support_parser.impl.jtt808.data;
 
-import com.bcd.base.exception.BaseException;
+import com.bcd.base.support_parser.exception.ParseException;
 import io.netty.buffer.ByteBuf;
 
 public class VehicleControlRequest implements PacketBody {
@@ -25,7 +25,7 @@ public class VehicleControlRequest implements PacketBody {
                     types[i] = vehicleControlType;
                 }
                 default -> {
-                    throw BaseException.get("VehicleControlType id[{}] not support", id);
+                    throw ParseException.get("VehicleControlType id[{}] not support", id);
                 }
             }
         }

@@ -1,6 +1,6 @@
 package com.bcd.base.support_parser.impl.jtt808.data;
 
-import com.bcd.base.exception.BaseException;
+import com.bcd.base.support_parser.exception.ParseException;
 import io.netty.buffer.ByteBuf;
 
 public class QueryAreaOrPathResponse implements PacketBody {
@@ -40,7 +40,7 @@ public class QueryAreaOrPathResponse implements PacketBody {
                     items[i] = CornerItem.read(data);
                 }
             }
-            default -> throw BaseException.get("QueryAreaOrPathResponse type[{}] not support", type);
+            default -> throw ParseException.get("QueryAreaOrPathResponse type[{}] not support", type);
         }
         return queryAreaOrPathResponse;
     }

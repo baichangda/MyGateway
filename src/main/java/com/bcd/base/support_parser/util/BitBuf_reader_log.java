@@ -1,6 +1,5 @@
 package com.bcd.base.support_parser.util;
 
-import com.bcd.base.util.StringUtil;
 import com.google.common.base.Strings;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;

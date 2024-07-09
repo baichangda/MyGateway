@@ -1,11 +1,11 @@
 package com.bcd.base.support_parser.util;
 
 
-import com.bcd.base.exception.BaseException;
 import com.bcd.base.support_parser.Parser;
 import com.bcd.base.support_parser.anno.*;
 import com.bcd.base.support_parser.builder.BuilderContext;
 import com.bcd.base.support_parser.builder.FieldBuilder;
+import com.bcd.base.support_parser.exception.ParseException;
 import com.bcd.base.support_parser.processor.Processor;
 import javassist.CannotCompileException;
 import javassist.CtClass;
@@ -39,19 +39,19 @@ public class ParseUtil {
 
     public static void check_var(BuilderContext context, Class<?> annoClass, char var, char globalVar) {
         if (var != '0' && (var < 'a' || var > 'z')) {
-            throw BaseException.get("class[{}] field[{}] anno[{}] var[{}] not in [a-z]", context.clazz.getName(), context.field.getName(), annoClass.getName(), var);
+            throw ParseException.get("class[{}] field[{}] anno[{}] var[{}] not in [a-z]", context.clazz.getName(), context.field.getName(), annoClass.getName(), var);
         }
         if (globalVar != '0' && (globalVar < 'A' || globalVar > 'Z')) {
-            throw BaseException.get("class[{}] field[{}] anno[{}] globalVar[{}] not in [A-Z]", context.clazz.getName(), context.field.getName(), annoClass.getName(), globalVar);
+            throw ParseException.get("class[{}] field[{}] anno[{}] globalVar[{}] not in [A-Z]", context.clazz.getName(), context.field.getName(), annoClass.getName(), globalVar);
         }
     }
 
     public static void notSupport_type(BuilderContext context, Class<?> annoClass) {
-        throw BaseException.get("class[{}] field[{}] anno[{}] type not support", context.clazz.getName(), context.field.getName(), annoClass.getName());
+        throw ParseException.get("class[{}] field[{}] anno[{}] type not support", context.clazz.getName(), context.field.getName(), annoClass.getName());
     }
 
     public static void notSupport_fieldType(BuilderContext context, Class<?> annoClass) {
-        throw BaseException.get("class[{}] field[{}] anno[{}] not support", context.clazz.getName(), context.field.getName(), annoClass.getName());
+        throw ParseException.get("class[{}] field[{}] anno[{}] not support", context.clazz.getName(), context.field.getName(), annoClass.getName());
     }
 
     public static boolean bigEndian(BitOrder order, BitOrder parentOrder) {
@@ -117,7 +117,7 @@ public class ParseUtil {
                 final CtField ctField = CtField.make(define, ctClass);
                 ctClass.addField(ctField);
             } catch (CannotCompileException e) {
-                throw BaseException.get(e);
+                throw ParseException.get(e);
             }
             if (doAfterDefine != null) {
                 doAfterDefine.accept(varName);
@@ -336,7 +336,7 @@ public class ParseUtil {
                 } else {
                     final String s = map.get(c);
                     if (s == null) {
-                        throw BaseException.get("class[{}] field[{}] expr[{}] can't find char[{}] value", field.getDeclaringClass().getName(), field.getName(), lenExpr, c);
+                        throw ParseException.get("class[{}] field[{}] expr[{}] can't find char[{}] value", field.getDeclaringClass().getName(), field.getName(), lenExpr, c);
                     }
                     //所有的len字段必须转化为int运算
                     sb.append("(int)(").append(s).append(")");
@@ -362,7 +362,7 @@ public class ParseUtil {
                 } else {
                     final String s = context.method_varToFieldName.get(c);
                     if (s == null) {
-                        throw BaseException.get("class[{}] c_skip lenExpr[{}] can't find char[{}] value", context.clazz.getName(), lenExpr, c);
+                        throw ParseException.get("class[{}] c_skip lenExpr[{}] can't find char[{}] value", context.clazz.getName(), lenExpr, c);
                     }
                     //所有的len字段必须转化为int运算
                     sb.append("(int)(").append(s).append(")");
@@ -486,7 +486,7 @@ public class ParseUtil {
                 }
             }
         } catch (Exception e) {
-            throw BaseException.get(e);
+            throw ParseException.get(e);
         }
 
         StringJoiner sj = new StringJoiner("\n");

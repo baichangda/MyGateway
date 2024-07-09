@@ -1,7 +1,7 @@
 package com.bcd.base.support_parser.util;
 
 
-import com.bcd.base.exception.BaseException;
+import com.bcd.base.support_parser.exception.ParseException;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,82 +20,6 @@ import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 
 public class ClassUtil {
-    public static Type getParentUntil(Class<?> startClass, Class<?>... endClasses) {
-        Type parentType = startClass.getGenericSuperclass();
-        while (true) {
-            if (parentType instanceof ParameterizedType) {
-                Class<?> rawType = (Class<?>) ((ParameterizedType) parentType).getRawType();
-                boolean isMatch = false;
-                for (Class<?> endClass : endClasses) {
-                    if (rawType.equals(endClass)) {
-                        isMatch = true;
-                        break;
-                    }
-                }
-                if (isMatch) {
-                    break;
-                } else {
-                    parentType = rawType.getGenericSuperclass();
-                }
-            } else {
-                parentType = ((Class<?>) parentType).getGenericSuperclass();
-            }
-        }
-        return parentType;
-    }
-
-    /**
-     * 递归扫描, 找出所有此注解及其标注的子注解所标注的所有类, 结果根据注解类型分类
-     *
-     * @param annoClass
-     * @param packages
-     * @return
-     */
-    public static Map<String, List<Class<?>>> findWithSub(Class<? extends Annotation> annoClass, String... packages) {
-        try {
-            Map<String, List<Class<?>>> annoNameToClassListMap = new HashMap<>();
-            //1、找出所有带注解的类
-            List<Class<?>> classList = ClassUtil.getClassesWithAnno(annoClass, packages);
-            //2、找出其中的 注解,并从集合中移除
-            List<Class<? extends Annotation>> subAnnoList = new ArrayList<>();
-            for (int i = 0; i <= classList.size() - 1; i++) {
-                Class<?> clazz = classList.get(i);
-                if (clazz.isAnnotation()) {
-                    subAnnoList.add((Class<? extends Annotation>) clazz);
-                    classList.remove(i);
-                    i--;
-                }
-            }
-            //3、找出所有子注解的类
-            for (Class<? extends Annotation> subAnno : subAnnoList) {
-                //3.1、将子注解扫描出来的类添加进去
-                Map<String, List<Class<?>>> tempMap = findWithSub(subAnno, packages);
-                annoNameToClassListMap.putAll(tempMap);
-            }
-            //4、返回此注解和其子注解 标注的类
-            annoNameToClassListMap.put(annoClass.getName(), classList);
-            return annoNameToClassListMap;
-        } catch (IOException | ClassNotFoundException e) {
-            throw BaseException.get(e);
-        }
-    }
-
-    /**
-     * 找出所有带注解的类
-     *
-     * @param annoClass
-     * @param packageNames
-     * @return
-     * @throws IOException
-     * @throws ClassNotFoundException
-     */
-    public static List<Class<?>> getClassesWithAnno(Class<? extends Annotation> annoClass, String... packageNames) throws IOException, ClassNotFoundException {
-        Set<Class<?>> classSet = new HashSet<>();
-        for (String packageName : packageNames) {
-            classSet.addAll(getClasses(packageName));
-        }
-        return classSet.stream().filter(e -> e.getAnnotation(annoClass) != null).collect(Collectors.toList());
-    }
 
     /**
      * 根据父类找出所有子类,去除接口和抽象类
@@ -223,29 +147,6 @@ public class ClassUtil {
         } catch (NoSuchFieldException | SecurityException | IllegalAccessException ex) {
             return false;
         }
-    }
-
-    /**
-     * 判断是否是实体类
-     * - 非java基础类型及包装类型
-     * - 非接口、抽象类
-     * - 非枚举类
-     * - 非数组类
-     * - 非List、Map及其子类
-     *
-     * @param clazz
-     * @return
-     */
-    public static boolean isBeanType(Class<?> clazz) {
-        if (clazz.isPrimitive() || isPrimitiveWrapper(clazz)) {
-            return false;
-        } else if (clazz.isInterface() || javassist.Modifier.isAbstract(clazz.getModifiers())) {
-            return false;
-        } else if (clazz.isEnum()) {
-            return false;
-        } else if (clazz.isArray()) {
-            return false;
-        } else return !List.class.isAssignableFrom(clazz) && !Map.class.isAssignableFrom(clazz);
     }
 
 

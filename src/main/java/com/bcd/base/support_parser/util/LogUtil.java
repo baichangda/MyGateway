@@ -1,6 +1,6 @@
 package com.bcd.base.support_parser.util;
 
-import com.bcd.base.exception.BaseException;
+import com.bcd.base.support_parser.exception.ParseException;
 import com.bcd.base.support_parser.impl.immotors.Evt_0001;
 
 import java.io.BufferedReader;
@@ -50,7 +50,7 @@ public class LogUtil {
                             no++;
                         }
                     } catch (IOException ex) {
-                        throw BaseException.get(ex);
+                        throw ParseException.get(ex);
                     }
                 }
                 return resMap;

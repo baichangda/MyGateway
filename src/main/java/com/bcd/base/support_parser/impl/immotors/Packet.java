@@ -1,7 +1,7 @@
 package com.bcd.base.support_parser.impl.immotors;
 
-import com.bcd.base.exception.BaseException;
 import com.bcd.base.support_parser.Parser;
+import com.bcd.base.support_parser.exception.ParseException;
 import com.bcd.base.support_parser.processor.Processor;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
@@ -162,7 +162,7 @@ public class Packet {
                         evt_4_x_unknown.add(processor_Evt_4_x_unknown.process(data));
                     } else {
                         final String evtIdHex = ByteBufUtil.hexDump(new byte[]{(byte) (evtId >> 8), (byte) evtId});
-                        throw BaseException.get("evtId[{}] not support", evtIdHex);
+                        throw ParseException.get("evtId[{}] not support", evtIdHex);
                     }
                 }
             }

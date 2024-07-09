@@ -1,9 +1,9 @@
 package com.bcd.base.support_parser;
 
-import com.bcd.base.exception.BaseException;
 import com.bcd.base.support_parser.anno.*;
 import com.bcd.base.support_parser.builder.BuilderContext;
 import com.bcd.base.support_parser.builder.FieldBuilder;
+import com.bcd.base.support_parser.exception.ParseException;
 import com.bcd.base.support_parser.processor.ProcessContext;
 import com.bcd.base.support_parser.processor.Processor;
 import com.bcd.base.support_parser.util.BitBuf_reader_log;
@@ -159,7 +159,7 @@ public class Parser {
                         }
                     }
                 } catch (NoSuchFieldException e) {
-                    throw BaseException.get(e);
+                    throw ParseException.get(e);
                 }
             }
         };
@@ -218,7 +218,7 @@ public class Parser {
                         }
                     }
                 } catch (NoSuchFieldException e) {
-                    throw BaseException.get(e);
+                    throw ParseException.get(e);
                 }
             }
 
@@ -535,7 +535,7 @@ public class Parser {
                         beanProcessorKey_processor.put(key, processor);
                     } catch (CannotCompileException | NotFoundException | IOException | NoSuchMethodException |
                              InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                        throw BaseException.get(e);
+                        throw ParseException.get(e);
                     }
                 }
             }
