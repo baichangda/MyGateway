@@ -1,7 +1,7 @@
 package com.bcd.base.support_parser.impl.jtt808.data;
 
 import com.bcd.base.support_parser.builder.FieldBuilder__F_date_bytes_6;
-import com.bcd.base.support_parser.util.DateZoneUtil;
+import com.bcd.base.support_parser.util.DateUtil;
 import io.netty.buffer.ByteBuf;
 
 import java.nio.charset.StandardCharsets;
@@ -31,8 +31,8 @@ public class SetPath implements PacketBody {
         short attr = data.readShort();
         setPath.attr = attr;
         if ((attr & 0x01) != 0) {
-            setPath.startTime = new Date(FieldBuilder__F_date_bytes_6.read(data, DateZoneUtil.ZONE_OFFSET, 2000));
-            setPath.endTime = new Date(FieldBuilder__F_date_bytes_6.read(data, DateZoneUtil.ZONE_OFFSET, 2000));
+            setPath.startTime = new Date(FieldBuilder__F_date_bytes_6.read(data, DateUtil.ZONE_OFFSET, 2000));
+            setPath.endTime = new Date(FieldBuilder__F_date_bytes_6.read(data, DateUtil.ZONE_OFFSET, 2000));
         }
         int num = data.readUnsignedShort();
         setPath.num = num;
@@ -50,8 +50,8 @@ public class SetPath implements PacketBody {
         data.writeInt((int) id);
         data.writeShort(attr);
         if ((attr & 0x01) != 0) {
-            FieldBuilder__F_date_bytes_6.write(data, startTime.getTime(), DateZoneUtil.ZONE_OFFSET, 2000);
-            FieldBuilder__F_date_bytes_6.write(data, endTime.getTime(), DateZoneUtil.ZONE_OFFSET, 2000);
+            FieldBuilder__F_date_bytes_6.write(data, startTime.getTime(), DateUtil.ZONE_OFFSET, 2000);
+            FieldBuilder__F_date_bytes_6.write(data, endTime.getTime(), DateUtil.ZONE_OFFSET, 2000);
         }
         data.writeShort(num);
         for (CornerItem item : items) {

@@ -5,7 +5,7 @@ import com.bcd.base.support_parser.builder.FieldBuilder__F_date_bytes_6;
 import com.bcd.base.support_parser.impl.gb32960.data.*;
 import com.bcd.base.support_parser.processor.ProcessContext;
 import com.bcd.base.support_parser.processor.Processor;
-import com.bcd.base.support_parser.util.DateZoneUtil;
+import com.bcd.base.support_parser.util.DateUtil;
 import io.netty.buffer.ByteBuf;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +30,7 @@ public class VehicleRunDataProcessor implements Processor<VehicleRunData> {
     public VehicleRunData process(ByteBuf data, ProcessContext<?> processContext) {
         ProcessContext<?> parentContext=new ProcessContext<>(data,processContext);
         VehicleRunData instance = new VehicleRunData();
-        instance.collectTime = new Date(FieldBuilder__F_date_bytes_6.read(data, DateZoneUtil.ZONE_OFFSET, 2000));
+        instance.collectTime = new Date(FieldBuilder__F_date_bytes_6.read(data, DateUtil.ZONE_OFFSET, 2000));
         final Packet packet = (Packet) processContext.instance;
         int allLen = packet.contentLength - 6;
         int beginLeave = data.readableBytes();
@@ -96,7 +96,7 @@ public class VehicleRunDataProcessor implements Processor<VehicleRunData> {
     @Override
     public void deProcess(ByteBuf data, ProcessContext<?> processContext, VehicleRunData instance) {
         ProcessContext<?> parentContext=new ProcessContext<>(data,processContext);
-        FieldBuilder__F_date_bytes_6.write(data, instance.collectTime.getTime(), DateZoneUtil.ZONE_OFFSET, 2000);
+        FieldBuilder__F_date_bytes_6.write(data, instance.collectTime.getTime(), DateUtil.ZONE_OFFSET, 2000);
         if (instance.vehicleBaseData != null) {
             data.writeByte(1);
             processor_vehicleBaseData.deProcess(data, parentContext, instance.vehicleBaseData);

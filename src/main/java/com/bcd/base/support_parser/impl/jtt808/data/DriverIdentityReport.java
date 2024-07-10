@@ -5,7 +5,7 @@ import com.bcd.base.support_parser.anno.NumType;
 import com.bcd.base.support_parser.builder.FieldBuilder__F_date_bytes_6;
 import com.bcd.base.support_parser.builder.FieldBuilder__F_string;
 import com.bcd.base.support_parser.builder.FieldBuilder__F_string_bcd;
-import com.bcd.base.support_parser.util.DateZoneUtil;
+import com.bcd.base.support_parser.util.DateUtil;
 import io.netty.buffer.ByteBuf;
 
 import java.nio.charset.StandardCharsets;
@@ -37,7 +37,7 @@ public class DriverIdentityReport implements PacketBody {
     public static DriverIdentityReport read(ByteBuf data) {
         DriverIdentityReport driverIdentityReport = new DriverIdentityReport();
         driverIdentityReport.status = data.readByte();
-        driverIdentityReport.time = new Date(FieldBuilder__F_date_bytes_6.read(data, DateZoneUtil.ZONE_OFFSET, 2000));
+        driverIdentityReport.time = new Date(FieldBuilder__F_date_bytes_6.read(data, DateUtil.ZONE_OFFSET, 2000));
         driverIdentityReport.res = data.readByte();
         if (driverIdentityReport.res == 0) {
             driverIdentityReport.nameLen = data.readUnsignedByte();
@@ -53,7 +53,7 @@ public class DriverIdentityReport implements PacketBody {
 
     public void write(ByteBuf data) {
         data.writeByte(status);
-        FieldBuilder__F_date_bytes_6.write(data, time.getTime(), DateZoneUtil.ZONE_OFFSET, 2000);
+        FieldBuilder__F_date_bytes_6.write(data, time.getTime(), DateUtil.ZONE_OFFSET, 2000);
         data.writeByte(res);
         if (res == 0) {
             data.writeByte(nameLen);
