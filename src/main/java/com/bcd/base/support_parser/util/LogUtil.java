@@ -1,7 +1,7 @@
 package com.bcd.base.support_parser.util;
 
 import com.bcd.base.support_parser.exception.ParseException;
-import com.bcd.base.support_parser.impl.immotors.Evt_0001;
+//import com.bcd.base.support_parser.impl.immotors.Evt_0001;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -71,6 +71,6 @@ public class LogUtil {
     }
 
     public static void main(String[] args) {
-        System.out.println("." + getFieldStackTrace(Evt_0001.class, null));
+//        System.out.println("." + getFieldStackTrace(Evt_0001.class, null));
     }
 }
