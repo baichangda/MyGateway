@@ -5,7 +5,7 @@ import com.bcd.base.support_parser.anno.NumType;
 import com.bcd.base.support_parser.builder.FieldBuilder__F_date_bytes_6;
 import com.bcd.base.support_parser.builder.FieldBuilder__F_string;
 import com.bcd.base.support_parser.builder.FieldBuilder__F_string_bcd;
-import com.bcd.base.util.DateZoneUtil;
+import com.bcd.base.support_parser.util.DateZoneUtil;
 import io.netty.buffer.ByteBuf;
 
 import java.nio.charset.StandardCharsets;

@@ -1,7 +1,7 @@
 package com.bcd.base.support_parser.impl.jtt808.data;
 
 import com.bcd.base.support_parser.builder.FieldBuilder__F_date_bcd;
-import com.bcd.base.util.DateZoneUtil;
+import com.bcd.base.support_parser.util.DateZoneUtil;
 import io.netty.buffer.ByteBuf;
 
 import java.util.Date;
