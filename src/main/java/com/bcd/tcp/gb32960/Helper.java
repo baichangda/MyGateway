@@ -1,5 +1,6 @@
 package com.bcd.tcp.gb32960;
 
+import com.bcd.base.exception.BaseException;
 import com.bcd.base.support_mongo.MongoHandler;
 import com.bcd.base.support_parser.Parser;
 import com.bcd.base.support_parser.impl.gb32960.data.Packet;
@@ -109,13 +110,21 @@ public class Helper {
                 saveData.jsonData = JsonUtil.OBJECT_MAPPER.readValue(saveData.json, JsonData.class);
             }
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
+            throw BaseException.get(e);
         }
         return list;
     }
 
     public static SaveData get(MongoTemplate mongoTemplate, String vin, byte type, Date collectTime) {
-        return mongoTemplate.findById(toId(vin, type, collectTime), SaveData.class);
+        SaveData saveData = mongoTemplate.findById(toId(vin, type, collectTime), SaveData.class);
+        if (saveData != null) {
+            try {
+                saveData.jsonData = JsonUtil.OBJECT_MAPPER.readValue(saveData.json, JsonData.class);
+            } catch (JsonProcessingException e) {
+                throw BaseException.get(e);
+            }
+        }
+        return saveData;
     }
 
     /**
