@@ -35,12 +35,6 @@ public class Helper {
         Helper.mongoHandler = mongoHandler;
     }
 
-    static final Processor<Packet> processor_packet;
-
-    static {
-        processor_packet = Parser.getProcessor(Packet.class);
-    }
-
     public static MongoTemplate getMongoTemplate(String vin) {
         return mongoHandler.getMongoTemplate(vin);
     }
@@ -179,7 +173,7 @@ public class Helper {
     public static Packet toPacket(SaveData saveData) {
         byte[] bytes = ByteBufUtil.decodeHexDump(saveData.jsonData.hex);
         ByteBuf byteBuf = Unpooled.wrappedBuffer(bytes);
-        return processor_packet.process(byteBuf, null);
+        return Packet.read(byteBuf);
     }
 
     /**
@@ -191,6 +185,6 @@ public class Helper {
     public static Packet toPacket(String hex) {
         byte[] bytes = ByteBufUtil.decodeHexDump(hex);
         ByteBuf byteBuf = Unpooled.wrappedBuffer(bytes);
-        return processor_packet.process(byteBuf, null);
+        return Packet.read(byteBuf);
     }
 }
