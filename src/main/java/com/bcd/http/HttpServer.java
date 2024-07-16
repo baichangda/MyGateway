@@ -41,8 +41,10 @@ public class HttpServer implements CommandLineRunner {
     public void run(String... args) throws Exception {
         Thread.startVirtualThread(() -> {
             if (!handlers.isEmpty()) {
+//                StaticContentService.FileSystemBuilder staticBuilder = StaticContentService.builder(Paths.get("src/main/resources/http/common"));
+                StaticContentService.ClassPathBuilder staticBuilder = StaticContentService.builder("http/common");
                 HttpRouting.Builder httpRoutingBuilder = HttpRouting.builder()
-                        .register("/common", StaticContentService.builder(Paths.get("src/main/resources/http/common")));
+                        .register("/common", staticBuilder);
                 WebServerConfig.Builder builder = WebServer.builder()
                         .addFeature(AccessLogFeature.builder().defaultLogFormat().build())
                         .contentEncoding(e ->

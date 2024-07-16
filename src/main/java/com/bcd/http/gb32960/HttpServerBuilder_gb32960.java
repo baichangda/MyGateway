@@ -41,9 +41,10 @@ public class HttpServerBuilder_gb32960 implements HttpServerBuilder {
 
     public void build(HttpRouting.Builder httpRoutingBuilder, WsRouting.Builder wsRoutingBuilder) {
         Thread.startVirtualThread(() -> {
+//            StaticContentService.FileSystemBuilder builder = StaticContentService.builder(Paths.get("src/main/resources/http/gb32960");
+            StaticContentService.ClassPathBuilder builder = StaticContentService.builder("http/gb32960");
             httpRoutingBuilder
-                    .register("/gb32960", StaticContentService.builder(Paths.get("src/main/resources/http/gb32960")).welcomeFileName("index.html").contentType(".html", HttpMediaType.create("text/html;charset=utf-8")))
-//                    .register("/gb32960/*", StaticContentService.builder("http/gb32960"))
+                    .register("/gb32960", builder.welcomeFileName("index.html").contentType(".html", HttpMediaType.create("text/html;charset=utf-8")))
                     .get("/parse/gb32960", (req, rep) -> {
                         String hex = req.query().get("hex");
                         rep.header(HeaderNames.CONTENT_TYPE, "application/json;charset=utf-8");
