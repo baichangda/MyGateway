@@ -72,7 +72,7 @@ public class FieldBuilder__F_bean extends FieldBuilder {
                     ParseUtil.append(body, "case {}:{}\n", value[i]);
                 }
                 ParseUtil.append(body, "case {}:{\n{}.{}={}.process({},{});\nbreak;\n}\n",
-                        filterValue.getLast(),
+                        filterValue.get(filterValue.size()-1),
                         varNameInstance,
                         field.getName(),
                         implProcessorVarName,
@@ -169,7 +169,7 @@ public class FieldBuilder__F_bean extends FieldBuilder {
                     ParseUtil.append(body, "case {}:{}\n", value[i]);
                 }
                 ParseUtil.append(body, "case {}:{\n{}.deProcess({},{},({})({}));\nbreak;\n}\n",
-                        filterValue.getLast(),
+                        filterValue.get(filterValue.size()-1),
                         implProcessorVarName,
                         varNameByteBuf,
                         processContextVarName,
