@@ -7,7 +7,7 @@ public enum MessageType {
     REQUEST(0x00),
 
     /**
-     * A fire&forget request
+     * A fire forget request
      */
     REQUEST_NO_RETURN(0x01),
 
@@ -34,7 +34,7 @@ public enum MessageType {
     TP_REQUEST(0x20),
 
     /**
-     * A TP fire&forget request
+     * A TP fire forget request
      */
     TP_REQUEST_NO_RETURN(0x21),
 
