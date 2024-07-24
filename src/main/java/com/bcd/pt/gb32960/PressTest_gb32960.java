@@ -1,10 +1,10 @@
 package com.bcd.pt.gb32960;
 
+import cn.bcd.parser.base.Parser;
+import cn.bcd.parser.base.processor.Processor;
+import cn.bcd.parser.protocol.gb32960.data.Packet;
+import cn.bcd.parser.protocol.gb32960.data.VehicleRunData;
 import com.bcd.pt.PressTest;
-import com.bcd.base.support_parser.Parser;
-import com.bcd.base.support_parser.impl.gb32960.data.Packet;
-import com.bcd.base.support_parser.impl.gb32960.data.VehicleRunData;
-import com.bcd.base.support_parser.processor.Processor;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;

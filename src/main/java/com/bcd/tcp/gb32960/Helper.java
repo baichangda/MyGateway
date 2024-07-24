@@ -1,10 +1,8 @@
 package com.bcd.tcp.gb32960;
 
+import cn.bcd.parser.protocol.gb32960.data.Packet;
 import com.bcd.base.exception.BaseException;
 import com.bcd.base.support_mongo.MongoHandler;
-import com.bcd.base.support_parser.Parser;
-import com.bcd.base.support_parser.impl.gb32960.data.Packet;
-import com.bcd.base.support_parser.processor.Processor;
 import com.bcd.base.util.DateZoneUtil;
 import com.bcd.base.util.JsonUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -48,7 +46,7 @@ public class Helper {
      * 范围查询
      *
      * @param vin       vin
-     * @param type      gb32960协议文档中的命令标识定义、可以为null {@link com.bcd.base.support_parser.impl.gb32960.data.PacketFlag}
+     * @param type      gb32960协议文档中的命令标识定义、可以为null {@link cn.bcd.parser.protocol.gb32960.data.PacketFlag}
      *                  1、车辆登入
      *                  2、实时信息上报
      *                  3、补发信息上报

@@ -1,12 +1,6 @@
 package com.bcd.http;
 
-import com.bcd.base.support_parser.impl.gb32960.data.Packet;
-import com.bcd.base.util.JsonUtil;
-import com.bcd.http.gb32960.WsSession_gb32960;
 import io.helidon.cors.CrossOriginConfig;
-import io.helidon.http.Headers;
-import io.helidon.http.HttpMediaType;
-import io.helidon.http.HttpPrologue;
 import io.helidon.http.encoding.deflate.DeflateEncoding;
 import io.helidon.http.encoding.gzip.GzipEncoding;
 import io.helidon.webserver.WebServer;
@@ -16,9 +10,6 @@ import io.helidon.webserver.cors.CorsSupport;
 import io.helidon.webserver.http.HttpRouting;
 import io.helidon.webserver.staticcontent.StaticContentService;
 import io.helidon.webserver.websocket.WsRouting;
-import io.helidon.websocket.WsListener;
-import io.helidon.websocket.WsSession;
-import io.helidon.websocket.WsUpgradeException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

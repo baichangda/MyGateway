@@ -1,8 +1,8 @@
 package com.bcd.http.gb32960;
 
-import com.bcd.base.support_parser.Parser;
-import com.bcd.base.support_parser.impl.gb32960.data.Packet;
-import com.bcd.base.support_parser.processor.Processor;
+import cn.bcd.parser.base.Parser;
+import cn.bcd.parser.base.processor.Processor;
+import cn.bcd.parser.protocol.gb32960.data.Packet;
 import com.bcd.base.util.JsonUtil;
 import com.bcd.http.HttpProp;
 import com.bcd.http.HttpServerBuilder;

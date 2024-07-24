@@ -1,6 +1,7 @@
 buildscript {
     ext {
         aliyunPublic = 'https://maven.aliyun.com/repository/public'
+
     }
 
     repositories {
@@ -16,7 +17,6 @@ plugins {
     id 'idea'
     id "io.spring.dependency-management" version "1.1.5"
     id 'org.springframework.boot' version "3.3.1"
-    id "com.vanniktech.maven.publish" version "0.29.0"
 }
 
 group 'com.bcd'
@@ -57,11 +57,11 @@ configurations.configureEach {
 
 dependencies {
     // https://mvnrepository.com/artifact/org.projectlombok/lombok
-    compileOnly group: 'org.projectlombok', name: 'lombok', version: "1.18.34"
-    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: "1.18.34"
+    compileOnly group: 'org.projectlombok', name: 'lombok', version: "+"
+    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: "+"
 
     // https://mvnrepository.com/artifact/com.google.guava/guava
-    implementation group: 'com.google.guava', name: 'guava', version: "33.2.1-jre"
+    implementation group: 'com.google.guava', name: 'guava', version: "+"
 
     //springboot支持
     implementation("org.springframework.boot:spring-boot-starter")
@@ -77,15 +77,16 @@ dependencies {
     //springboot mongodb支持
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
     //spring kafka支持
-    implementation group: 'org.springframework.kafka', name: 'spring-kafka', version: "3.2.2"
+    implementation group: 'org.springframework.kafka', name: 'spring-kafka', version: "3.+"
 
     // https://mvnrepository.com/artifact/io.netty/netty-all
-    implementation group: 'io.netty', name: 'netty-all', version: "4.1.111.Final"
+    implementation group: 'io.netty', name: 'netty-all', version: "4.+"
 
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: "2.17.2"
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: "2.17.2"
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: "2.17.2"
+    var jacksonVersion = "+"
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: "${jacksonVersion}"
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: "${jacksonVersion}"
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: "${jacksonVersion}"
 
     // https://mvnrepository.com/artifact/org.javassist/javassist
     implementation group: 'org.javassist', name: 'javassist', version: "3.30.2-GA"
@@ -93,14 +94,17 @@ dependencies {
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-test
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
 
-    implementation group: 'io.helidon.webserver', name: 'helidon-webserver', version: "4.0.10"
-    implementation group: 'io.helidon.webserver', name: 'helidon-webserver-static-content', version: "4.0.10"
-    implementation group: 'io.helidon.webserver', name: 'helidon-webserver-websocket', version: "4.0.10"
-    implementation group: 'io.helidon.webserver', name: 'helidon-webserver-access-log', version: "4.0.10"
-    implementation group: 'io.helidon.webserver', name: 'helidon-webserver-cors', version: "4.0.10"
-    implementation group: 'io.helidon.cors', name: 'helidon-cors', version: "4.0.10"
-    implementation group: 'io.helidon.http.encoding', name: 'helidon-http-encoding-gzip', version: "4.0.10"
-    implementation group: 'io.helidon.http.encoding', name: 'helidon-http-encoding-deflate', version: "4.0.10"
+    var helidonVersion = "4.+"
+    implementation group: 'io.helidon.webserver', name: 'helidon-webserver', version: "${helidonVersion}"
+    implementation group: 'io.helidon.webserver', name: 'helidon-webserver-static-content', version: "${helidonVersion}"
+    implementation group: 'io.helidon.webserver', name: 'helidon-webserver-websocket', version: "${helidonVersion}"
+    implementation group: 'io.helidon.webserver', name: 'helidon-webserver-access-log', version: "${helidonVersion}"
+    implementation group: 'io.helidon.webserver', name: 'helidon-webserver-cors', version: "${helidonVersion}"
+    implementation group: 'io.helidon.cors', name: 'helidon-cors', version: "${helidonVersion}"
+    implementation group: 'io.helidon.http.encoding', name: 'helidon-http-encoding-gzip', version: "${helidonVersion}"
+    implementation group: 'io.helidon.http.encoding', name: 'helidon-http-encoding-deflate', version: "${helidonVersion}"
+
+    implementation group: 'io.github.baichangda', name: 'parser-protocol-gb32960', version: "+"
 
 }
 
@@ -114,9 +118,9 @@ test {
     useJUnitPlatform()
 }
 
-bootJar{
+bootJar {
     manifest {
 //        attributes 'Start-Class':'com.bcd.http.HttpServer'
-        attributes 'Start-Class':'com.bcd.Application'
+        attributes 'Start-Class': 'com.bcd.Application'
     }
 }
