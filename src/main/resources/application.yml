@@ -70,7 +70,7 @@ tcp:
   #kafka topic、多网关之间同一设备session上下线通知
   sessionTopic: bcd-gw-session
 http:
-  port: 8888
+  port: 11111
 #pt:
 #  period: 10
 #  startIndex: 0

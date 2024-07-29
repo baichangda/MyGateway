@@ -34,7 +34,7 @@ public abstract class WsSession<T> {
         this.sample = initSample(args);
         this.sampleClazz = (Class<T>) this.sample.getClass();
         this.closed = false;
-        ws_send(new WsOutMsg(101, JsonUtil.toJson(sample), true));
+        ws_sendSample();
     }
 
     public synchronized void ws_onClose() {
@@ -47,6 +47,10 @@ public abstract class WsSession<T> {
         }
     }
 
+    public synchronized void ws_sendSample() {
+        ws_send(new WsOutMsg(101, JsonUtil.toJson(sample), true));
+    }
+
     public synchronized void ws_onMsg(WsInMsg inMsg) {
         switch (inMsg.flag()) {
             case 1 -> {
@@ -55,7 +59,6 @@ public abstract class WsSession<T> {
                     tcp_connect(split[0], Integer.parseInt(split[1]));
                     tcp_startSendRunData();
                     ws_send(new WsOutMsg(1, null, true));
-
                 } catch (Exception ex) {
                     logger.error("connect tcp address[{}] error", inMsg.data(), ex);
                     ws_send(new WsOutMsg(1, null, false));

@@ -104,7 +104,7 @@ dependencies {
     implementation group: 'io.helidon.http.encoding', name: 'helidon-http-encoding-gzip', version: "${helidonVersion}"
     implementation group: 'io.helidon.http.encoding', name: 'helidon-http-encoding-deflate', version: "${helidonVersion}"
 
-    implementation group: 'io.github.baichangda', name: 'parser-protocol-gb32960', version: "+"
+    implementation group: 'io.github.baichangda', name: 'parser-protocol-gb32960', version: "1.+"
 
 }
 
