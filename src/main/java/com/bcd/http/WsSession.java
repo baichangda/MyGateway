@@ -51,6 +51,13 @@ public abstract class WsSession<T> {
         ws_send(new WsOutMsg(101, JsonUtil.toJson(sample), true));
     }
 
+    /**
+     * 当数据更新时候
+     *
+     * @return true代表需要更新客户端、false代表不需要更新客户端
+     */
+    public abstract boolean ws_onSampleUpdate();
+
     public synchronized void ws_onMsg(WsInMsg inMsg) {
         switch (inMsg.flag()) {
             case 1 -> {
@@ -67,7 +74,11 @@ public abstract class WsSession<T> {
             case 2 -> {
                 try {
                     sample = JsonUtil.OBJECT_MAPPER.readValue(inMsg.data(), sampleClazz);
-                    ws_send(new WsOutMsg(2, null, true));
+                    if (ws_onSampleUpdate()) {
+                        ws_send(new WsOutMsg(2, JsonUtil.toJson(sample), true));
+                    } else {
+                        ws_send(new WsOutMsg(2, null, true));
+                    }
                 } catch (IOException ex) {
                     logger.error("error", ex);
                     ws_send(new WsOutMsg(2, null, false));

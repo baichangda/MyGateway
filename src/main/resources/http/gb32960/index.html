@@ -156,7 +156,12 @@
             }
             case 2: {
                 if (parse.succeed) {
-                    appendToOutput("更新运行信息到ws成功", 2)
+                    if (parse.data === undefined) {
+                        appendToOutput("更新运行信息到ws成功", 2)
+                    } else {
+                        editor.set(JSON.parse(parse.data))
+                        appendToOutput("更新运行信息到ws成功、检测数据不符合格式、刷新客户端运行数据", 2)
+                    }
                 } else {
                     appendToOutput("更新运行信息到ws失败", 2)
                 }

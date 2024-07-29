@@ -1,20 +1,14 @@
 package com.bcd.http.gb32960;
 
-import cn.bcd.parser.base.Parser;
-import cn.bcd.parser.base.processor.Processor;
 import cn.bcd.parser.protocol.gb32960.data.Packet;
 import com.bcd.base.util.JsonUtil;
-import com.bcd.http.HttpProp;
 import com.bcd.http.HttpServerBuilder;
 import com.bcd.http.WsInMsg;
 import com.bcd.http.WsSession;
-import io.helidon.cors.CrossOriginConfig;
 import io.helidon.http.HeaderNames;
 import io.helidon.http.Headers;
 import io.helidon.http.HttpMediaType;
 import io.helidon.http.HttpPrologue;
-import io.helidon.webserver.WebServerConfig;
-import io.helidon.webserver.cors.CorsSupport;
 import io.helidon.webserver.http.HttpRouting;
 import io.helidon.webserver.staticcontent.StaticContentService;
 import io.helidon.webserver.websocket.WsRouting;
@@ -28,7 +22,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Optional;
 
@@ -36,8 +29,6 @@ import java.util.Optional;
 @Component
 public class HttpServerBuilder_gb32960 implements HttpServerBuilder {
     static Logger logger = LoggerFactory.getLogger(HttpServerBuilder_gb32960.class);
-
-    public static Processor<Packet> processor = Parser.getProcessor(Packet.class);
 
     public void build(HttpRouting.Builder httpRoutingBuilder, WsRouting.Builder wsRoutingBuilder) {
         Thread.startVirtualThread(() -> {
@@ -51,7 +42,7 @@ public class HttpServerBuilder_gb32960 implements HttpServerBuilder {
                         try {
                             byte[] bytes = ByteBufUtil.decodeHexDump(hex);
                             try {
-                                Packet packet = processor.process(Unpooled.wrappedBuffer(bytes));
+                                Packet packet = Packet.read(Unpooled.wrappedBuffer(bytes));
                                 String json = JsonUtil.toJson(packet);
                                 rep.send(JsonUtil.toJson(Map.of("data", json, "succeed", true)));
                             } catch (Exception ex) {
