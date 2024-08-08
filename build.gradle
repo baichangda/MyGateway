@@ -69,6 +69,8 @@ dependencies {
 
     //springboot log4j2支持
     implementation('org.springframework.boot:spring-boot-starter-log4j2')
+    // 此为log4j2的桥接器、用于System.getLogger
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-jpl', version: '2.23.1'
 
     //springboot redis支持
     //lettuce异步客户端(默认使用lettuce)
