@@ -11,6 +11,8 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.undertow.websockets.core.WebSocketChannel;
+import io.undertow.websockets.core.WebSockets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,14 +25,14 @@ public abstract class WsSession<T> {
     static Logger logger = LoggerFactory.getLogger(WsSession.class);
     static NioEventLoopGroup tcp_workerGroup = new NioEventLoopGroup();
     private ScheduledExecutorService pool;
-    public final io.helidon.websocket.WsSession ws;
+    public final WebSocketChannel wsChannel;
     public Channel channel;
     public volatile T sample;
     public final Class<T> sampleClazz;
     public volatile boolean closed;
 
-    public WsSession(io.helidon.websocket.WsSession ws, Object... args) {
-        this.ws = ws;
+    public WsSession(WebSocketChannel wsChannel, Object... args) {
+        this.wsChannel = wsChannel;
         this.sample = initSample(args);
         this.sampleClazz = (Class<T>) this.sample.getClass();
         this.closed = false;
@@ -125,7 +127,11 @@ public abstract class WsSession<T> {
 
     public synchronized void ws_send(WsOutMsg outMsg) {
         if (!closed) {
-            ws.send(JsonUtil.toJson(outMsg), true);
+            try {
+                WebSockets.sendTextBlocking(JsonUtil.toJson(outMsg), wsChannel);
+            } catch (IOException e) {
+                throw BaseException.get(e);
+            }
         }
     }
 

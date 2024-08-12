@@ -1,8 +1,7 @@
 package com.bcd.http;
 
-import io.helidon.webserver.http.HttpRouting;
-import io.helidon.webserver.websocket.WsRouting;
+import io.undertow.server.handlers.PathHandler;
 
 public interface HttpServerBuilder {
-    void build(HttpRouting.Builder httpRoutingBuilder, WsRouting.Builder wsRoutingBuilder);
+    void build(PathHandler pathHandler);
 }
