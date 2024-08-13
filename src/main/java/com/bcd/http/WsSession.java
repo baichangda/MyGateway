@@ -91,7 +91,6 @@ public abstract class WsSession<T> {
 
 
     public synchronized void tcp_connect(String host, int port) {
-        final WsSession<T> wsSession = this;
         Bootstrap bootstrap = new Bootstrap();
         bootstrap.group(tcp_workerGroup);
         bootstrap.channel(NioSocketChannel.class).option(ChannelOption.TCP_NODELAY, true);

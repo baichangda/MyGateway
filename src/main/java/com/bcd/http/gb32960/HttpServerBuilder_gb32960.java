@@ -19,6 +19,7 @@ import io.undertow.websockets.WebSocketConnectionCallback;
 import io.undertow.websockets.WebSocketProtocolHandshakeHandler;
 import io.undertow.websockets.core.AbstractReceiveListener;
 import io.undertow.websockets.core.BufferedTextMessage;
+import io.undertow.websockets.core.StreamSourceFrameChannel;
 import io.undertow.websockets.core.WebSocketChannel;
 import io.undertow.websockets.spi.WebSocketHttpExchange;
 import org.slf4j.Logger;
@@ -58,27 +59,27 @@ public class HttpServerBuilder_gb32960 implements HttpServerBuilder {
                 }
             });
 
-            WebSocketProtocolHandshakeHandler webSocketProtocolHandshakeHandler = new WebSocketProtocolHandshakeHandler(new WebSocketConnectionCallback() {
-                private WsSession<Packet> wsSession;
-
-                @Override
-                public void onConnect(WebSocketHttpExchange exchange, WebSocketChannel channel) {
-                    channel.getReceiveSetter().set(new AbstractReceiveListener() {
-                        @Override
-                        protected void onFullTextMessage(WebSocketChannel channel, BufferedTextMessage message) {
-                            String data = message.getData();
-                            try {
-                                WsInMsg wsInMsg = JsonUtil.OBJECT_MAPPER.readValue(data, WsInMsg.class);
-                                wsSession.ws_onMsg(wsInMsg);
-                            } catch (IOException ex) {
-                                logger.error("receive ws msg parse json error:\n{}", data);
-                            }
+            WebSocketProtocolHandshakeHandler webSocketProtocolHandshakeHandler = new WebSocketProtocolHandshakeHandler((WebSocketConnectionCallback) (exchange, channel) -> {
+                String vin = exchange.getRequestParameters().get("vin").getFirst();
+                WsSession<Packet> wsSession= new WsSession_gb32960(channel, vin);
+                channel.getReceiveSetter().set(new AbstractReceiveListener() {
+                    @Override
+                    protected void onFullTextMessage(WebSocketChannel channel, BufferedTextMessage message) {
+                        String data = message.getData();
+                        try {
+                            WsInMsg wsInMsg = JsonUtil.OBJECT_MAPPER.readValue(data, WsInMsg.class);
+                            wsSession.ws_onMsg(wsInMsg);
+                        } catch (IOException ex) {
+                            logger.error("receive ws msg parse json error:\n{}", data);
                         }
-                    });
-                    String vin = exchange.getRequestParameters().get("vin").getFirst();
-                    wsSession = new WsSession_gb32960(channel, vin);
-                    channel.resumeReceives();
-                }
+                    }
+
+                    @Override
+                    protected void onClose(WebSocketChannel webSocketChannel, StreamSourceFrameChannel channel) {
+                        wsSession.ws_onClose();
+                    }
+                });
+                channel.resumeReceives();
             });
             pathHandler.addExactPath("/ws/gb32960", webSocketProtocolHandshakeHandler);
         } catch (IOException ex) {
