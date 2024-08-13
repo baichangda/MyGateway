@@ -50,7 +50,7 @@ public class Handler_gb32960 extends ChannelInboundHandlerAdapter {
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         //关闭
         if (session != null) {
-            session.close();
+            session.close(true);
         }
         super.channelInactive(ctx);
     }

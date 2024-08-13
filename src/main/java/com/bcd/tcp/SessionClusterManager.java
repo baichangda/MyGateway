@@ -41,7 +41,7 @@ public class SessionClusterManager {
             if (local != null) {
                 final long remoteTs = Long.parseLong(split[3]);
                 if (local.createTs < remoteTs) {
-                    local.close();
+                    local.close(true);
                     logger.debug("close local session[{},{}] with listen[{}]", local.id, local.createTs, value);
                 }
             }

@@ -3,6 +3,7 @@ package com.bcd.tcp;
 import io.netty.channel.Channel;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Future;
 
 @SuppressWarnings("unchecked")
 public class Session {
@@ -18,18 +19,23 @@ public class Session {
         this.id = id;
         this.channel = channel;
         this.createTs = System.currentTimeMillis();
-        sessionMaps[type].put(id, this);
+        Session old = sessionMaps[type].put(id, this);
+        if (old != null) {
+            old.close(false);
+        }
     }
 
     public static Session getSession(int type, String id) {
         return sessionMaps[type].get(id);
     }
 
-    public void close() {
-        channel.eventLoop().execute(() -> {
+    public Future<?> close(boolean removeSessionMap) {
+        return channel.eventLoop().submit(() -> {
             if (!closed) {
-                //移除会话
-                sessionMaps[type].remove(id);
+                if (removeSessionMap) {
+                    //移除会话
+                    sessionMaps[type].remove(id);
+                }
                 //关闭会话
                 channel.close();
                 closed = true;
