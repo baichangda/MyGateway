@@ -21,7 +21,7 @@ public class Session {
         this.createTs = System.currentTimeMillis();
         Session old = sessionMaps[type].put(id, this);
         if (old != null) {
-            old.close(false);
+            old.close();
         }
     }
 
@@ -29,13 +29,11 @@ public class Session {
         return sessionMaps[type].get(id);
     }
 
-    public Future<?> close(boolean removeSessionMap) {
+    public Future<?> close() {
+        Session cur = this;
         return channel.eventLoop().submit(() -> {
             if (!closed) {
-                if (removeSessionMap) {
-                    //移除会话
-                    sessionMaps[type].remove(id);
-                }
+                sessionMaps[type].remove(id, cur);
                 //关闭会话
                 channel.close();
                 closed = true;
