@@ -5,6 +5,7 @@ import io.helidon.cors.CrossOriginConfig;
 import io.helidon.http.media.jackson.JacksonSupport;
 import io.helidon.webserver.WebServer;
 import io.helidon.webserver.WebServerConfig;
+import io.helidon.webserver.cors.CorsFeature;
 import io.helidon.webserver.cors.CorsSupport;
 import io.helidon.webserver.http.HttpRouting;
 import io.helidon.webserver.staticcontent.StaticContentService;
@@ -35,27 +36,17 @@ public class HttpServer implements CommandLineRunner {
                 HttpRouting.Builder httpRoutingBuilder = HttpRouting.builder()
                         .register("/common", staticBuilder);
                 WebServerConfig.Builder builder = WebServer.builder()
-                        //自动发现引入的插件、即引入的插件jar不用手动代码调用
+                        //自动发现引入的组件、即引入的组件jar不用手动代码调用
                         .featuresDiscoverServices(true)
                         .protocolsDiscoverServices(true)
-                        //手动引入
-                        .mediaContext(e -> e.addMediaSupport(JacksonSupport.create(JsonUtil.OBJECT_MAPPER)));
-                //cors支持
-                CorsSupport corsSupport = CorsSupport.builder().addCrossOrigin(
-                        CrossOriginConfig
-                                .builder()
-                                .allowOrigins("*")
-                                .allowMethods("GET", "POST", "PUT", "OPTIONS", "DELETE")
-                                .maxAgeSeconds(0)
-                                //表明哪些headers可以暴露给客户端使用
-                                .exposeHeaders()
-                                .enabled(true)
-                                .build()).build();
+                        //手动引入、优先级更高、会覆盖自动发现的组件
+                        .mediaContext(e -> e.addMediaSupport(JacksonSupport.create(JsonUtil.OBJECT_MAPPER)))
+                        .addFeature(CorsFeature.create(e->e.enabled(true)));
                 WsRouting.Builder wsRoutingBuilder = WsRouting.builder();
                 for (HttpServerBuilder handler : handlers) {
                     handler.build(httpRoutingBuilder, wsRoutingBuilder);
                 }
-                builder.addRouting(httpRoutingBuilder.register(corsSupport));
+                builder.addRouting(httpRoutingBuilder);
                 builder.addRouting(wsRoutingBuilder);
                 builder.port(httpProp.port).build().start();
             }
