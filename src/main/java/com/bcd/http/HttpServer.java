@@ -2,18 +2,13 @@ package com.bcd.http;
 
 import com.bcd.base.util.JsonUtil;
 import io.helidon.cors.CrossOriginConfig;
-import io.helidon.http.encoding.deflate.DeflateEncoding;
-import io.helidon.http.encoding.gzip.GzipEncoding;
 import io.helidon.http.media.jackson.JacksonSupport;
-import io.helidon.http.media.multipart.MultiPartSupport;
 import io.helidon.webserver.WebServer;
 import io.helidon.webserver.WebServerConfig;
-import io.helidon.webserver.accesslog.AccessLogFeature;
 import io.helidon.webserver.cors.CorsSupport;
 import io.helidon.webserver.http.HttpRouting;
 import io.helidon.webserver.staticcontent.StaticContentService;
 import io.helidon.webserver.websocket.WsRouting;
-import org.apache.logging.log4j.util.ProviderUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -42,7 +37,9 @@ public class HttpServer implements CommandLineRunner {
                 WebServerConfig.Builder builder = WebServer.builder()
                         //自动发现引入的插件、即引入的插件jar不用手动代码调用
                         .featuresDiscoverServices(true)
-                        .protocolsDiscoverServices(true);
+                        .protocolsDiscoverServices(true)
+                        //手动引入
+                        .mediaContext(e -> e.addMediaSupport(JacksonSupport.create(JsonUtil.OBJECT_MAPPER)));
                 //cors支持
                 CorsSupport corsSupport = CorsSupport.builder().addCrossOrigin(
                         CrossOriginConfig
