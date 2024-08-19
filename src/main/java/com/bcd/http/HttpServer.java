@@ -1,29 +1,25 @@
 package com.bcd.http;
 
-import com.bcd.base.exception.BaseException;
-import io.undertow.Handlers;
-import io.undertow.Undertow;
-import io.undertow.server.HandlerWrapper;
-import io.undertow.server.handlers.PathHandler;
-import io.undertow.server.handlers.accesslog.AccessLogHandler;
-import io.undertow.server.handlers.encoding.EncodingHandler;
-import io.undertow.server.handlers.resource.ClassPathResourceManager;
-import io.undertow.server.handlers.resource.ResourceHandler;
-import io.undertow.server.handlers.resource.ResourceManager;
+import io.helidon.cors.CrossOriginConfig;
+import io.helidon.http.encoding.deflate.DeflateEncoding;
+import io.helidon.http.encoding.gzip.GzipEncoding;
+import io.helidon.webserver.WebServer;
+import io.helidon.webserver.WebServerConfig;
+import io.helidon.webserver.accesslog.AccessLogFeature;
+import io.helidon.webserver.cors.CorsSupport;
+import io.helidon.webserver.http.HttpRouting;
+import io.helidon.webserver.staticcontent.StaticContentService;
+import io.helidon.webserver.websocket.WsRouting;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 
 @ConditionalOnProperty("http.port")
 @Component
 public class HttpServer implements CommandLineRunner {
-    public final static HandlerWrapper encodinghandlerWrapper = new EncodingHandler.Builder().build(null);
-    public final static HandlerWrapper accessLogHandler = new AccessLogHandler.Builder().build(Map.of("format", "common", "category", "bcd"));
 
     @Autowired
     public HttpProp httpProp;
@@ -34,16 +30,38 @@ public class HttpServer implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         Thread.startVirtualThread(() -> {
-            try (ResourceManager resourceManager = new ClassPathResourceManager(HttpServer.class.getClassLoader(), "http/common")) {
-                ResourceHandler resourceHandler = new ResourceHandler(resourceManager);
-                PathHandler pathHandler = Handlers.path()
-                        .addPrefixPath("/common", resourceHandler);
+            if (!handlers.isEmpty()) {
+//                StaticContentService.FileSystemBuilder staticBuilder = StaticContentService.builder(Paths.get("src/main/resources/http/common"));
+                StaticContentService.ClassPathBuilder staticBuilder = StaticContentService.builder("http/common");
+                HttpRouting.Builder httpRoutingBuilder = HttpRouting.builder()
+                        .register("/common", staticBuilder);
+                WebServerConfig.Builder builder = WebServer.builder()
+                        //访问日志
+                        .addFeature(AccessLogFeature.builder().defaultLogFormat().build())
+                        //响应压缩支持
+                        .contentEncoding(e ->
+                                e.contentEncodingsDiscoverServices(false)
+                                        .addContentEncoding(GzipEncoding.create())
+                                        .addContentEncoding(DeflateEncoding.create())
+                        );
+                //cors支持
+                CorsSupport corsSupport = CorsSupport.builder().addCrossOrigin(
+                        CrossOriginConfig
+                                .builder()
+                                .allowOrigins("*")
+                                .allowMethods("GET","POST","PUT","OPTIONS","DELETE")
+                                .maxAgeSeconds(0)
+                                //表明哪些headers可以暴露给客户端使用
+                                .exposeHeaders()
+                                .enabled(true)
+                                .build()).build();
+                WsRouting.Builder wsRoutingBuilder = WsRouting.builder();
                 for (HttpServerBuilder handler : handlers) {
-                    handler.build(pathHandler);
+                    handler.build(httpRoutingBuilder,wsRoutingBuilder);
                 }
-                Undertow.builder().addHttpListener(httpProp.port, "0.0.0.0").setHandler(accessLogHandler.wrap(encodinghandlerWrapper.wrap(pathHandler))).build().start();
-            } catch (IOException ex) {
-                throw BaseException.get(ex);
+                builder.addRouting(httpRoutingBuilder.register(corsSupport));
+                builder.addRouting(wsRoutingBuilder);
+                builder.port(httpProp.port).build().start();
             }
         });
     }

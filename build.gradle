@@ -15,8 +15,8 @@ plugins {
     id 'java-library'
     id 'java'
     id 'idea'
-    id "io.spring.dependency-management" version "1.1.6"
-    id 'org.springframework.boot' version "3.3.2"
+    id "io.spring.dependency-management" version "1.1.5"
+    id 'org.springframework.boot' version "3.3.1"
 }
 
 group 'com.bcd'
@@ -70,7 +70,7 @@ dependencies {
     //springboot log4j2支持
     implementation('org.springframework.boot:spring-boot-starter-log4j2')
     // 此为log4j2的桥接器、用于System.getLogger
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-jpl', version: '2.+'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-jpl', version: '2.23.1'
 
     //springboot redis支持
     //lettuce异步客户端(默认使用lettuce)
@@ -96,13 +96,18 @@ dependencies {
     // https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-test
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
 
+    var helidonVersion = "4.+"
+    implementation group: 'io.helidon.webserver', name: 'helidon-webserver', version: "${helidonVersion}"
+    implementation group: 'io.helidon.webserver', name: 'helidon-webserver-static-content', version: "${helidonVersion}"
+    implementation group: 'io.helidon.webserver', name: 'helidon-webserver-websocket', version: "${helidonVersion}"
+    implementation group: 'io.helidon.webserver', name: 'helidon-webserver-access-log', version: "${helidonVersion}"
+    implementation group: 'io.helidon.webserver', name: 'helidon-webserver-cors', version: "${helidonVersion}"
+    implementation group: 'io.helidon.cors', name: 'helidon-cors', version: "${helidonVersion}"
+    implementation group: 'io.helidon.http.encoding', name: 'helidon-http-encoding-gzip', version: "${helidonVersion}"
+    implementation group: 'io.helidon.http.encoding', name: 'helidon-http-encoding-deflate', version: "${helidonVersion}"
+
     implementation group: 'io.github.baichangda', name: 'parser-protocol-gb32960', version: "1.+"
 
-    var undertowVersion = "2.+"
-    // https://mvnrepository.com/artifact/io.undertow/undertow-core
-    implementation group: 'io.undertow', name: 'undertow-core', version: "${undertowVersion}"
-    // https://mvnrepository.com/artifact/io.undertow/undertow-websockets-jsr
-    implementation group: 'io.undertow', name: 'undertow-websockets-jsr', version: "${undertowVersion}"
 }
 
 //生成jar时打包源码
