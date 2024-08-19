@@ -105,6 +105,9 @@ dependencies {
     implementation group: 'io.helidon.cors', name: 'helidon-cors', version: "${helidonVersion}"
     implementation group: 'io.helidon.http.encoding', name: 'helidon-http-encoding-gzip', version: "${helidonVersion}"
     implementation group: 'io.helidon.http.encoding', name: 'helidon-http-encoding-deflate', version: "${helidonVersion}"
+    implementation group: 'io.helidon.http.media', name: 'helidon-http-media-multipart', version: "${helidonVersion}"
+    implementation group: 'io.helidon.http.media', name: 'helidon-http-media-jackson', version: "${helidonVersion}"
+
 
     implementation group: 'io.github.baichangda', name: 'parser-protocol-gb32960', version: "1.+"
 
