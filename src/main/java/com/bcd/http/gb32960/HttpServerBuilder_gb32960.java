@@ -35,7 +35,7 @@ public class HttpServerBuilder_gb32960 implements HttpServerBuilder {
 //            StaticContentService.FileSystemBuilder builder = StaticContentService.builder(Paths.get("src/main/resources/http/gb32960");
             StaticContentService.ClassPathBuilder builder = StaticContentService.builder("http/gb32960");
             httpRoutingBuilder
-                    .register("/gb32960", builder.welcomeFileName("index.html").contentType(".html", HttpMediaType.create("text/html;charset=utf-8")))
+                    .register("/gb32960", builder.welcomeFileName("index.html"))
                     .post("/parse/gb32960", (req, rep) -> {
                         String hex = req.content().as(String.class);
                         rep.header(HeaderNames.CONTENT_TYPE, "application/json;charset=utf-8");
