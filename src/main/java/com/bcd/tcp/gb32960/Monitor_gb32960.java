@@ -15,10 +15,10 @@ public class Monitor_gb32960 implements Monitor {
 
     @Override
     public String log(Duration period) {
-        return StringUtil.format("gb32960 clientNum[{}] receiveSpeed[{}/s] queueNum[{}] saveSpeed[{}/s]",
+        return StringUtil.format("gb32960 clientNum[{}] receiveSpeed[{}/{}s] queueNum[{}] saveSpeed[{}/{}s]",
                 Session_gb32960.getSessionMap().size(),
-                Monitor.formatSpeed(receiveNum.sumThenReset(), period),
+                receiveNum.sumThenReset(), period.toSeconds(),
                 queueNum.sum(),
-                Monitor.formatSpeed(saveNum.sumThenReset(), period));
+                saveNum.sumThenReset(), period.toSeconds());
     }
 }
